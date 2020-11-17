@@ -14,16 +14,13 @@ steps:
   inputs:
     versionSpec: '12.x'
   displayName: 'Install Node.js'
-
-- script: |
-    cd HarvestMobile
-  displayName: 'change to HarvestMobile directory'
-
 - task: Npm@1
   displayName: 'npm install'
   inputs:
     command: 'ci'
+    workingDir: 'HarvestMobile'
 
 - script: |
     npx jest --ci
+  workingDirectory: 'HarvestMobile'
   displayName: 'npm run ci tests'
