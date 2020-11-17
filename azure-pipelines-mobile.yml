@@ -21,6 +21,6 @@ steps:
     workingDir: 'HarvestMobile'
 
 - script: |
-    npx jest --ci
+    npx jest --ci --passWithNoTests
   workingDirectory: 'HarvestMobile'
   displayName: 'npm run ci tests'
