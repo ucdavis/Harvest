@@ -15,6 +15,10 @@ steps:
     versionSpec: '12.x'
   displayName: 'Install Node.js'
 
+- script: |
+    cd HarvestMobile
+  displayName: 'change to HarvestMobile directory'
+
 - task: Npm@1
   displayName: 'npm install'
   inputs:
