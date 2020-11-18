@@ -13,5 +13,26 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: echo buildplaceholder
-  displayName: 'build will go here'
+- task: UseDotNet@2
+  displayName: 'Use .NET 5 sdk'
+  inputs:
+    packageType: 'sdk'
+    version: '5.x'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Harvest.Web'
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    zipAfterPublish: false
+    modifyOutputPath: false
+    projects: './Harest.Web/Harvest.Web.csproj'
+    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/'
+
+- task: PublishBuildArtifacts@1
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  displayName: 'Publish Build Artifacts for master branch builds'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
