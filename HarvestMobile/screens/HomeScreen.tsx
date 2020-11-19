@@ -19,7 +19,6 @@ export default function HomeScreen() {
     function handleSelectItem(item: Project) {
       setValue(item.name);
       setHideList(true);
-      console.log(item);
     }
 
     function handleChangeText(text: string) {

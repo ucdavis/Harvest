@@ -2,7 +2,7 @@ import { useState } from '@hookstate/core';
 import * as React from 'react';
 import { Button, StyleSheet, TextInput } from 'react-native';
 
-import { globalAuthState, signIn } from '../components/Auth';
+import { globalAuthState } from '../hooks/useAuth';
 import { Text, View } from '../components/Themed';
 
 export default function SignInScreen() {
@@ -12,7 +12,8 @@ export default function SignInScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Sign In</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <Button title="Sign in" onPress={() => signIn('dummy-auth-token')} />
+      {/* <Button disabled={authState.isLoading.get() || Boolean(authState.userToken.get())} title="Sign in" onPress={() => authState.promptSignIn.get()() } /> */}
+      <Button title="Sign in" onPress={() => authState.promptSignIn.get()() } />
     </View>
   );
 }

@@ -13,35 +13,17 @@ import { DrawerParamList, HomeParamList } from '../types';
 import Sidebar from './Sidebar';
 import { ScreenHeader } from '../components/ScreenHeader';
 import SignInScreen from '../screens/SignInScreen';
-import { globalAuthState } from '../components/Auth';
+import { useAuth } from '../hooks/useAuth';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 
 export function DrawerNavigator() {
   const colorScheme = useColorScheme();
-  const authState = useState(globalAuthState);
+  const authState = useAuth();
 
   React.useEffect(() => {
-    // Fetch the token from storage then navigate to our appropriate place
-    const bootstrapAsync = async () => {
-      let userToken: string | null = null;
-
-      try {
-        userToken = await SecureStore.getItemAsync('userToken');
-      } catch (e) {
-        // Restoring token failed
-      }
-
-      // After restoring token, we may need to validate it in production apps
-
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
-      authState.userToken.set(userToken);
-      authState.isLoading.set(false);
-    };
-
-    bootstrapAsync();
+    authState.tryRestoreToken.get()();
   }, []);
 
   return authState.userToken.get() == null ? (

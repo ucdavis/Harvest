@@ -3,7 +3,7 @@ import { FlatList, TouchableOpacity, StyleSheet, Image, Text, Button } from 'rea
 import { View } from '../components/Themed';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { globalAuthState, signOut } from '../components/Auth';
+import { globalAuthState } from '../hooks/useAuth';
 import { useState } from '@hookstate/core';
 
 type ItemProps = {
@@ -44,7 +44,7 @@ export default function Sidebar() {
       <FontAwesome5 name={"tractor"} size={64} style={styles.profileImg} />
       {authState.userToken.get() && (<>
         <Text style={{ fontWeight: "bold", fontSize: 16, marginTop: 10 }}>John Doe</Text>
-        <Button title="Sign out" onPress={signOut} />
+        <Button title="Sign out" onPress={authState.signOut.get()} />
       </>)}
       <View style={styles.sidebarDivider}></View>
       <FlatList<RouteData>
