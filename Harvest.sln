@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.64
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvest.Web", "Harvest.Web\Harvest.Web.csproj", "{9613D252-1CCE-4EB2-B802-471D89D2E0C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Web", "Harvest.Web\Harvest.Web.csproj", "{9613D252-1CCE-4EB2-B802-471D89D2E0C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,9 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9613D252-1CCE-4EB2-B802-471D89D2E0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -30,5 +27,11 @@ Global
 		{9613D252-1CCE-4EB2-B802-471D89D2E0C0}.Release|x64.Build.0 = Release|Any CPU
 		{9613D252-1CCE-4EB2-B802-471D89D2E0C0}.Release|x86.ActiveCfg = Release|Any CPU
 		{9613D252-1CCE-4EB2-B802-471D89D2E0C0}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C9EDA1D-ABD7-4EBC-A6CA-15B0B9BD925F}
 	EndGlobalSection
 EndGlobal

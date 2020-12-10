@@ -1,10 +1,14 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Harvest.Web
 {
@@ -28,6 +32,26 @@ namespace Harvest.Web
             {
                 configuration.RootPath = "ClientApp/build";
             });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+            .AddCookie()
+            .AddOpenIdConnect(oidc =>
+            {
+                oidc.ClientId = Configuration["Authentication:ClientId"];
+                oidc.ClientSecret = Configuration["Authentication:ClientSecret"];
+                oidc.Authority = Configuration["Authentication:Authority"];
+                oidc.ResponseType = OpenIdConnectResponseType.Code;
+                oidc.Scope.Add("openid");
+                oidc.Scope.Add("profile");
+                oidc.TokenValidationParameters = new TokenValidationParameters
+                {
+                    NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +74,22 @@ namespace Harvest.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            // authenticate all app visitors and create an auth cookie
+            app.Use(async (context, next) =>
+            {
+                if (!context.User.Identity.IsAuthenticated)
+                {
+                    await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme);
+                }
+                else
+                {
+                    await next();
+                }
+            });
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
