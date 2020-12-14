@@ -84,7 +84,11 @@ namespace Harvest.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            app.UseSerilogRequestLogging();
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.EnrichDiagnosticContext = SerilogHelpers.EnrichFromRequest;
+                options.GetLevel = SerilogHelpers.GetLogEventLevel;
+            });
 
             app.UseRouting();
 
