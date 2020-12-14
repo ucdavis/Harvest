@@ -60,7 +60,6 @@ namespace Harvest.Web
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             LogConfiguration.Setup(Configuration);
-            loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {
@@ -77,12 +76,12 @@ namespace Harvest.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            app.UseSerilogRequestLogging();
+
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseSerilogRequestLogging();
 
             // authenticate all app visitors and create an auth cookie
             app.Use(async (context, next) =>
