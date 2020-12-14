@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Serilog;
 
@@ -25,7 +26,30 @@ namespace Harvest.Web.Middleware
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            
+            var httpContext = context.HttpContext;
+            var request = httpContext.Request;
+
+            // Set all the common properties available for every request
+            _diagnosticContext.Set("Host", request.Host);
+            _diagnosticContext.Set("Protocol", request.Protocol);
+            _diagnosticContext.Set("Scheme", request.Scheme);
+
+            // Only set it if available. You're not sending sensitive data in a querystring right?!
+            if (request.QueryString.HasValue)
+            {
+                _diagnosticContext.Set("QueryString", request.QueryString.Value);
+            }
+
+            // Set the content-type of the Response at this point
+            _diagnosticContext.Set("ResponseContentType", httpContext.Response.ContentType);
+
+            // Retrieve the IEndpointFeature selected for the request
+            var endpoint = httpContext.GetEndpoint();
+            if (endpoint is object) // endpoint != null
+            {
+                _diagnosticContext.Set("EndpointName", endpoint.DisplayName);
+            }
+
         }
     }
 }
