@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -32,9 +33,6 @@ namespace Harvest.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
-            }).AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.WriteIndented = true;
             });
 
             // In production, the React files will be served from this directory
@@ -67,8 +65,6 @@ namespace Harvest.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
-            LogConfiguration.Setup(Configuration);
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -88,6 +84,9 @@ namespace Harvest.Web
             {
                 options.EnrichDiagnosticContext = SerilogHelpers.EnrichFromRequest;
                 options.GetLevel = SerilogHelpers.GetLogEventLevel;
+                options.Logger = new LoggerConfiguration()
+                    .ReadFrom.Configuration(Configuration, "Serilog")
+                    .CreateLogger();
             });
 
             app.UseRouting();

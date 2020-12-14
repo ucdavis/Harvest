@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +16,10 @@ namespace Harvest.Web
     {
         public static int Main(string[] args)
         {
-            // provide some basic console logging for app startup...
+#if DEBUG
+            Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+#endif
+            // provide some basic console logging (can be captured by Azure logging)
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
