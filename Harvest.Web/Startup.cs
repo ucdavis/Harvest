@@ -1,4 +1,3 @@
-using Harvest.Web.Helpers;
 using Harvest.Web.Middleware;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
