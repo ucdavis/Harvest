@@ -1,3 +1,4 @@
+using Harvest.Web.Middleware;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -6,9 +7,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
+
 
 namespace Harvest.Web
 {
@@ -24,8 +29,10 @@ namespace Harvest.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<SerilogControllerActionFilter>();
+            });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -55,7 +62,7 @@ namespace Harvest.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -71,6 +78,14 @@ namespace Harvest.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
+
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.GetLevel = SerilogHelpers.GetLogEventLevel;
+                options.Logger = SerilogHelpers
+                    .GetConfiguration(Configuration)
+                    .CreateLogger();
+            });
 
             app.UseRouting();
 
@@ -89,7 +104,8 @@ namespace Harvest.Web
                     await next();
                 }
             });
-            
+
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
