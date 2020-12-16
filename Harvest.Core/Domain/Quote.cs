@@ -47,14 +47,5 @@ namespace Harvest.Core.Domain
         public List<Document> Documents { get; set; }
 
         public Document CurrentDocument { get; set; }
-
-        internal static void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Document>()
-                .HasOne(d => d.Quote)
-                .WithMany(q => q.Documents)
-                .HasForeignKey(d => d.QuoteId);
-
-        }
     }
 }

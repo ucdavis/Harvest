@@ -20,7 +20,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Permission>()
                 .HasOne(p => p.Role)
                 .WithMany()
-                .HasForeignKey(p => p.RoleId);
+                .HasForeignKey(p => p.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -25,10 +25,17 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Document>()
+                .HasOne(d => d.Quote)
+                .WithOne(q => q.CurrentDocument)
+                .HasForeignKey<Quote>(q => q.CurrentDocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
             modelBuilder.Entity<Quote>()
-                .HasOne(q => q.CurrentDocument)
-                .WithOne(d => d.Quote)
-                .HasForeignKey<Quote>(q => q.CurrentDocumentId);
+                .HasMany(q => q.Documents)
+                .WithOne()
+                .HasForeignKey(d => d.QuoteId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

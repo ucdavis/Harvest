@@ -1,3 +1,4 @@
+using Harvest.Core.Data;
 using Harvest.Web.Middleware;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -5,6 +6,9 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
@@ -59,11 +63,38 @@ namespace Harvest.Web
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
                 };
             });
+
+            // setup entity framework
+            if (Configuration.GetValue<bool>("Dev:UseSql"))
+            {
+                services.AddDbContextPool<AppDbContext>(o =>
+                {
+                    o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                        sqlOptions => sqlOptions.UseNetTopologySuite());
+#if DEBUG
+                    o.EnableSensitiveDataLogging();
+#endif
+                });
+            }
+            else
+            {
+                services.AddDbContextPool<AppDbContext>(o =>
+                {
+                    var connection = new SqliteConnection("Data Source=harvest.db");
+                    o.UseSqlite(connection, sqliteOptions =>
+                    {
+                        sqliteOptions.MigrationsAssembly("Harvest.Core");
+                        sqliteOptions.UseNetTopologySuite();
+                    });
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext)
         {
+            ConfigureDb(dbContext);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -122,6 +153,22 @@ namespace Harvest.Web
                     spa.UseReactDevelopmentServer(npmScript: "start");
                 }
             });
+        }
+
+        private void ConfigureDb(AppDbContext dbContext)
+        {
+            var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
+
+            if (recreateDb)
+                dbContext.Database.EnsureDeleted();
+
+            dbContext.Database.Migrate();
+
+            if (recreateDb)
+            {
+                var initializer = new DbInitializer(dbContext);
+                initializer.Initialize().GetAwaiter().GetResult();
+            }
         }
     }
 }

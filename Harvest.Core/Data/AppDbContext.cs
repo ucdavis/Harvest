@@ -8,10 +8,6 @@ namespace Harvest.Core.Data
 {
     public class AppDbContext: DbContext
     {
-        public AppDbContext()
-        {
-        }
-
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -32,7 +28,6 @@ namespace Harvest.Core.Data
         {
             Document.OnModelCreating(modelBuilder);
             Project.OnModelCreating(modelBuilder);
-            Quote.OnModelCreating(modelBuilder);
             Role.OnModelCreating(modelBuilder);
             Team.OnModelCreating(modelBuilder);
             User.OnModelCreating(modelBuilder);

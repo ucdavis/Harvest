@@ -31,12 +31,14 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Permission>()
                 .HasOne(q => q.Team)
                 .WithMany(t => t.Permissions)
-                .HasForeignKey(p => p.TeamId);
+                .HasForeignKey(p => p.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Project>()
                 .HasOne(q => q.Team)
                 .WithMany()
-                .HasForeignKey(p => p.TeamId);
+                .HasForeignKey(p => p.TeamId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

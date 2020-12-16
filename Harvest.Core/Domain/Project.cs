@@ -76,22 +76,26 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Account>()
                 .HasOne(a => a.Project)
                 .WithMany(p => p.Accounts)
-                .HasForeignKey(a => a.ProjectId);
+                .HasForeignKey(a => a.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.Project)
                 .WithMany()
-                .HasForeignKey(n => n.ProjectId);
+                .HasForeignKey(n => n.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ProjectHistory>()
                 .HasOne(p => p.Project)
                 .WithMany()
-                .HasForeignKey(p => p.ProjectId);
+                .HasForeignKey(p => p.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Quote>()
                 .HasOne(q => q.Project)
                 .WithMany(p => p.Quotes)
-                .HasForeignKey(q => q.ProjectId);
+                .HasForeignKey(q => q.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
 
         }
     }
