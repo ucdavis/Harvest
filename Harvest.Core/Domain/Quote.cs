@@ -54,6 +54,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Quote>().HasIndex(a => a.ApprovedById);
             modelBuilder.Entity<Quote>().HasIndex(a => a.CurrentDocumentId);
             modelBuilder.Entity<Quote>().HasIndex(a => a.InitatedById);
+
+            modelBuilder.Entity<Quote>().Property(a => a.Total).HasPrecision(18, 2);
         }
     }
 }

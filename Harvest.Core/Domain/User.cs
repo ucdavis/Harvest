@@ -22,7 +22,7 @@ namespace Harvest.Core.Domain
         public string LastName { get; set; }
 
         [Required]
-        [StringLength(256)]
+        [StringLength(300)]
         [EmailAddress]
         public string Email { get; set; }
 

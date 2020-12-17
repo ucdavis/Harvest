@@ -11,7 +11,7 @@ namespace Harvest.Core.Domain
         [Key]
         public int Id { get; set; }
 
-        [StringLength(50)]
+        [StringLength(200)]
         [Required]
         public string Name { get; set; }
 

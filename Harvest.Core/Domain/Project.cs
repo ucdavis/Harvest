@@ -78,6 +78,9 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Project>().HasIndex(a => a.QuoteId);
 
+            modelBuilder.Entity<Project>().Property(a => a.ChargedTotal).HasPrecision(18, 2);
+            modelBuilder.Entity<Project>().Property(a => a.QuoteTotal).HasPrecision(18, 2);
+
             modelBuilder.Entity<Account>()
                 .HasOne(a => a.Project)
                 .WithMany(p => p.Accounts)

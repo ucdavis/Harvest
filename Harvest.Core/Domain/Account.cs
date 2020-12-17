@@ -37,6 +37,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Account>().HasIndex(a => a.Name);
             modelBuilder.Entity<Account>().HasIndex(a => a.Number);
             modelBuilder.Entity<Account>().HasIndex(a => a.ProjectId);
+
+            modelBuilder.Entity<Account>().Property(a => a.Percentage).HasPrecision(18, 2);
         }
     }
 }

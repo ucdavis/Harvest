@@ -70,23 +70,22 @@ namespace Harvest.Web
 
             if (efProvider == "SqlServer" || (efProvider == "none" && Configuration.GetValue<bool>("Dev:UseSql")))
             {
-                services.AddDbContext<AppDbContext, AppDbContextSqlServer>((serviceProvider, o) =>
+                services.AddDbContextPool<AppDbContext, AppDbContextSqlServer>((serviceProvider, o) =>
                 {
                     o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
-                        sqlOptions => sqlOptions.UseNetTopologySuite());
-
-                    //o.UseInternalServiceProvider(serviceProvider);
+                        sqlOptions =>
+                        {
+                            sqlOptions.MigrationsAssembly("Harvest.Core");
+                            sqlOptions.UseNetTopologySuite();
+                        });
 #if DEBUG
                     o.EnableSensitiveDataLogging();
 #endif
                 });
-
-                services.AddEntityFrameworkSqlServer();
-                services.AddEntityFrameworkSqlServerNetTopologySuite();
             }
             else
             {
-                services.AddDbContext<AppDbContext, AppDbContextSqlite>((serviceProvider, o) =>
+                services.AddDbContextPool<AppDbContext, AppDbContextSqlite>((serviceProvider, o) =>
                 {
                     var connection = new SqliteConnection("Data Source=harvest.db");
                     o.UseSqlite(connection, sqliteOptions =>
@@ -94,11 +93,7 @@ namespace Harvest.Web
                         sqliteOptions.MigrationsAssembly("Harvest.Core");
                         sqliteOptions.UseNetTopologySuite();
                     });
-                    //o.UseInternalServiceProvider(serviceProvider);
                 });
-
-                services.AddEntityFrameworkSqlite();
-                services.AddEntityFrameworkSqliteNetTopologySuite();
             }
 
         }

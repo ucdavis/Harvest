@@ -15,12 +15,12 @@ namespace Harvest.Core.Domain
         public int ProjectId { get; set; }
 
         [Required]
-        [StringLength(256)]
+        [StringLength(300)]
         [EmailAddress]
         public string Email { get; set; }
 
         [Required]
-        [StringLength(256)]
+        [StringLength(300)]
         public string Subject { get; set; }
 
         [Required]
