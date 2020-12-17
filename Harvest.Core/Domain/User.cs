@@ -36,6 +36,10 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>().HasIndex(a => a.Kerberos);
+            modelBuilder.Entity<User>().HasIndex(a => a.Iam);
+            modelBuilder.Entity<User>().HasIndex(a => a.Email);
+
             modelBuilder.Entity<Permission>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.Permissions)

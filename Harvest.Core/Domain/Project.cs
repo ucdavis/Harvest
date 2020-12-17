@@ -73,6 +73,11 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Project>().HasIndex(a => a.Name);
+            modelBuilder.Entity<Project>().HasIndex(a => a.TeamId);
+            modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
+            modelBuilder.Entity<Project>().HasIndex(a => a.QuoteId);
+
             modelBuilder.Entity<Account>()
                 .HasOne(a => a.Project)
                 .WithMany(p => p.Accounts)

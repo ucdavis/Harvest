@@ -31,5 +31,12 @@ namespace Harvest.Core.Domain
         public User ApprovedBy { get; set; }
 
         public Project Project { get; set; }
+
+        internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Account>().HasIndex(a => a.Name);
+            modelBuilder.Entity<Account>().HasIndex(a => a.Number);
+            modelBuilder.Entity<Account>().HasIndex(a => a.ProjectId);
+        }
     }
 }

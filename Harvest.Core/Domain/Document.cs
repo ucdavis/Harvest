@@ -25,6 +25,9 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Document>().HasIndex(a => a.Name);
+            modelBuilder.Entity<Document>().HasIndex(a => a.QuoteId);
+
             modelBuilder.Entity<Document>()
                 .HasOne(d => d.Quote)
                 .WithOne(q => q.CurrentDocument)

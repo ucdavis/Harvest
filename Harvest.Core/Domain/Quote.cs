@@ -47,5 +47,13 @@ namespace Harvest.Core.Domain
         public List<Document> Documents { get; set; }
 
         public Document CurrentDocument { get; set; }
+
+        internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Quote>().HasIndex(a => a.ProjectId);
+            modelBuilder.Entity<Quote>().HasIndex(a => a.ApprovedById);
+            modelBuilder.Entity<Quote>().HasIndex(a => a.CurrentDocumentId);
+            modelBuilder.Entity<Quote>().HasIndex(a => a.InitatedById);
+        }
     }
 }

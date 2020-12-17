@@ -35,5 +35,10 @@ namespace Harvest.Core.Domain
         public DateTime ActionDate { get; set; }
 
         public Project Project { get; set; }
+
+        internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProjectHistory>().HasIndex(a => a.ProjectId);
+        }
     }
 }

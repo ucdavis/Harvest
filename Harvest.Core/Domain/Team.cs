@@ -28,6 +28,9 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Team>().HasIndex(a => a.Name).IsUnique();
+            modelBuilder.Entity<Team>().HasIndex(a => a.Slug).IsUnique();
+
             modelBuilder.Entity<Permission>()
                 .HasOne(q => q.Team)
                 .WithMany(t => t.Permissions)

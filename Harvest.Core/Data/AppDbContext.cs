@@ -52,8 +52,13 @@ namespace Harvest.Core.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            Account.OnModelCreating(modelBuilder);
             Document.OnModelCreating(modelBuilder);
+            Notification.OnModelCreating(modelBuilder);
+            Permission.OnModelCreating(modelBuilder);
             Project.OnModelCreating(modelBuilder);
+            Domain.ProjectHistory.OnModelCreating(modelBuilder);
+            Quote.OnModelCreating(modelBuilder);
             Role.OnModelCreating(modelBuilder);
             Team.OnModelCreating(modelBuilder);
             User.OnModelCreating(modelBuilder);

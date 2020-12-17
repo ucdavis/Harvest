@@ -25,5 +25,12 @@ namespace Harvest.Core.Domain
         public Role Role { get; set; }
 
         public User User { get; set; }
+
+        internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Permission>().HasIndex(a => a.TeamId);
+            modelBuilder.Entity<Permission>().HasIndex(a => a.RoleId);
+            modelBuilder.Entity<Permission>().HasIndex(a => a.UserId);
+        }
     }
 }

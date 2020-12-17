@@ -31,5 +31,10 @@ namespace Harvest.Core.Domain
         public bool Sent { get; set; }
 
         public Project Project { get; set; }
+
+        internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Notification>().HasIndex(a => a.ProjectId);
+        }
     }
 }
