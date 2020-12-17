@@ -10,24 +10,16 @@ namespace Harvest.Core.Data
     // Commands to add migrations are (from within Harvest.Core directory)...
     // dotnet ef migrations add Initial --context AppDbContextSqlite --output-dir Migrations/Sqlite --startup-project ../Harvest.Web/Harvest.Web.csproj -- --provider Sqlite
     // dotnet ef migrations add Initial --context AppDbContextSqlServer --output-dir Migrations/SqlServer --startup-project ../Harvest.Web/Harvest.Web.csproj -- --provider SqlServer
-    public sealed class AppDbContextSqlite : AppDbContext<AppDbContextSqlite>
+    public sealed class AppDbContextSqlite : AppDbContext
     {
         public AppDbContextSqlite(DbContextOptions<AppDbContextSqlite> options) : base(options)
         {
         }
     }
 
-    public sealed class AppDbContextSqlServer : AppDbContext<AppDbContextSqlServer>
+    public sealed class AppDbContextSqlServer : AppDbContext
     {
         public AppDbContextSqlServer(DbContextOptions<AppDbContextSqlServer> options) : base(options)
-        {
-        }
-    }
-
-    public abstract class AppDbContext<T> : AppDbContext
-        where T : AppDbContext<T>
-    {
-        protected AppDbContext(DbContextOptions<T> options) : base(options)
         {
         }
     }
