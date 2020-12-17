@@ -65,20 +65,28 @@ namespace Harvest.Web
             });
 
             // setup entity framework
-            if (Configuration.GetValue<bool>("Dev:UseSql"))
+            // "Provider" config only present when using ef migrations cli
+            var efProvider = Configuration.GetValue("Provider", "none");
+
+            if (efProvider == "SqlServer" || (efProvider == "none" && Configuration.GetValue<bool>("Dev:UseSql")))
             {
-                services.AddDbContextPool<AppDbContext>(o =>
+                services.AddDbContext<AppDbContext, AppDbContextSqlServer>((serviceProvider, o) =>
                 {
                     o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                         sqlOptions => sqlOptions.UseNetTopologySuite());
+
+                    //o.UseInternalServiceProvider(serviceProvider);
 #if DEBUG
                     o.EnableSensitiveDataLogging();
 #endif
                 });
+
+                services.AddEntityFrameworkSqlServer();
+                services.AddEntityFrameworkSqlServerNetTopologySuite();
             }
             else
             {
-                services.AddDbContextPool<AppDbContext>(o =>
+                services.AddDbContext<AppDbContext, AppDbContextSqlite>((serviceProvider, o) =>
                 {
                     var connection = new SqliteConnection("Data Source=harvest.db");
                     o.UseSqlite(connection, sqliteOptions =>
@@ -86,8 +94,13 @@ namespace Harvest.Web
                         sqliteOptions.MigrationsAssembly("Harvest.Core");
                         sqliteOptions.UseNetTopologySuite();
                     });
+                    //o.UseInternalServiceProvider(serviceProvider);
                 });
+
+                services.AddEntityFrameworkSqlite();
+                services.AddEntityFrameworkSqliteNetTopologySuite();
             }
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

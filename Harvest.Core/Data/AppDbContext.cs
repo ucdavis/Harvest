@@ -6,9 +6,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Data
 {
-    public class AppDbContext: DbContext
+    // Subclasses are a MS-condoned hack to allow defining provider-specific migrations
+    // Commands to add migrations are (from within Harvest.Core directory)...
+    // dotnet ef migrations add Initial --context AppDbContextSqlite --output-dir Migrations/Sqlite --startup-project ../Harvest.Web/Harvest.Web.csproj -- --provider Sqlite
+    // dotnet ef migrations add Initial --context AppDbContextSqlServer --output-dir Migrations/SqlServer --startup-project ../Harvest.Web/Harvest.Web.csproj -- --provider SqlServer
+    public sealed class AppDbContextSqlite : AppDbContext<AppDbContextSqlite>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public AppDbContextSqlite(DbContextOptions<AppDbContextSqlite> options) : base(options)
+        {
+        }
+    }
+
+    public sealed class AppDbContextSqlServer : AppDbContext<AppDbContextSqlServer>
+    {
+        public AppDbContextSqlServer(DbContextOptions<AppDbContextSqlServer> options) : base(options)
+        {
+        }
+    }
+
+    public abstract class AppDbContext<T> : AppDbContext
+        where T : AppDbContext<T>
+    {
+        protected AppDbContext(DbContextOptions<T> options) : base(options)
+        {
+        }
+    }
+
+    public abstract class AppDbContext: DbContext
+    {
+        protected AppDbContext(DbContextOptions options) : base(options)
         {
         }
 
