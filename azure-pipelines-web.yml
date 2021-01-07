@@ -43,7 +43,7 @@ stages:
         testRunTitle: 'Client Tests'
 
     - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage from Harvest.Web/ClientApp/output/cobertura-coverage.xml'
+      displayName: 'Publish code coverage from Harvest.Web/ClientApp/cobertura-coverage.xml'
       inputs:
         codeCoverageTool: cobertura
         summaryFileLocation: './Harvest.Web/ClientApp/cobertura-coverage.xml'
