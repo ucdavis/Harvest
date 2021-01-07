@@ -17,15 +17,15 @@
     "web-vitals": "^0.2.4"
   },
   "devDependencies": {
-    "@rescripts/cli": "0.0.15",
     "cross-env": "^7.0.3",
     "jest-trx-results-processor": "^2.2.0"
   },
   "scripts": {
-    "start": "rescripts  start",
-    "build": "rescripts  build",
-    "test": "rescripts  test",
-    "citest": "cross-env CI=true rescripts test --coverage --coverageDirectory=output"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "citest": "cross-env CI=true react-scripts test --coverage --coverageDirectory=./ --reporters default --reporters jest-trx-results-processor",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

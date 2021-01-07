@@ -6,7 +6,8 @@
 .pnp.js
 
 # testing
-/coverage
+/cobertura-coverage.xml
+/test-results.trx
 
 # production
 /build

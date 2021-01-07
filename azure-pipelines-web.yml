@@ -37,17 +37,17 @@ stages:
     - task: PublishTestResults@2
       displayName: 'Publish Client Test Results'
       inputs:
-        searchFolder: './Harvest.Web/ClientApp/output'
+        searchFolder: './Harvest.Web/ClientApp'
         testResultsFormat: 'VSTest'
-        testResultsFiles: '**/jest-results.trx'
+        testResultsFiles: '**/test-results.trx'
         testRunTitle: 'Client Tests'
 
     - task: PublishCodeCoverageResults@1
       displayName: 'Publish code coverage from Harvest.Web/ClientApp/output/cobertura-coverage.xml'
       inputs:
         codeCoverageTool: cobertura
-        summaryFileLocation: './Harvest.Web/ClientApp/output/cobertura-coverage.xml'
-        reportDirectory: './Harvest.Web/ClientApp/output'
+        summaryFileLocation: './Harvest.Web/ClientApp/cobertura-coverage.xml'
+        reportDirectory: './Harvest.Web/ClientApp'
 
 - stage: Publish
   jobs:

@@ -234,5 +234,3 @@ _Pvt_Extensions
 # Sqlite db
 **/harvest.db
 
-# jest output
-**/ClientApp/output/
