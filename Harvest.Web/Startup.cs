@@ -33,6 +33,8 @@ namespace Harvest.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
@@ -143,7 +145,6 @@ namespace Harvest.Web
                     await next();
                 }
             });
-
 
             app.UseEndpoints(endpoints =>
             {

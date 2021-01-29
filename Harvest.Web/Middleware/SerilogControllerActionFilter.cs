@@ -40,6 +40,8 @@ namespace Harvest.Web.Middleware
                 _diagnosticContext.Set("QueryString", request.QueryString.Value);
             }
 
+            _diagnosticContext.Set("User", request.HttpContext.User.Identity?.Name ?? "anonymous");
+
             // Set the content-type of the Response at this point
             _diagnosticContext.Set("ResponseContentType", httpContext.Response.ContentType);
 

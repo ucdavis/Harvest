@@ -41,6 +41,8 @@ namespace Harvest.Web
                 // .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning) // uncomment this to hide EF core general info logs
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
+                .Enrich.WithClientIp()
+                .Enrich.WithClientAgent()
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Application", loggingSection.GetValue<string>("AppName"))
                 .Enrich.WithProperty("AppEnvironment", loggingSection.GetValue<string>("Environment"))
