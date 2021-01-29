@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
+using Serilog.Sinks.Elasticsearch;
 
 namespace Harvest.Web.Middleware
 {
@@ -31,6 +32,16 @@ namespace Harvest.Web.Middleware
             // various sinks
             logConfig = logConfig
                 .WriteTo.Console(outputTemplate: "[{yyyy-MM-dd HH:mm:ss.fff}] [{Level}] {MachineName} <{SourceContext}> {Message}{NewLine}{Exception}");
+            
+            // add in elastic search sink if the uri is valid
+            Uri elasticUri;
+            if (Uri.TryCreate(configuration.GetValue<string>("ElasticUrl"), UriKind.Absolute, out elasticUri))
+            {
+                logConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
+                {
+                    IndexFormat = "aspnet-harvest-{0:yyyy.MM.dd}"
+                });
+            }
 
             return logConfig;
         }
