@@ -120,18 +120,13 @@ namespace Harvest.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.GetLevel = SerilogHelpers.GetLogEventLevel;
-                options.Logger = SerilogHelpers
-                    .GetConfiguration(Configuration)
-                    .CreateLogger();
-            });
-
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<LogUserNameMiddleware>();
+            app.UseSerilogRequestLogging();
 
             // authenticate all app visitors and create an auth cookie
             app.Use(async (context, next) =>

@@ -37,9 +37,11 @@ namespace Harvest.Web
             var loggingSection = configuration.GetSection("Serilog");
 
             var loggerConfig = new LoggerConfiguration()
+                .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 // .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning) // uncomment this to hide EF core general info logs
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .Enrich.WithClientIp()
                 .Enrich.WithClientAgent()
