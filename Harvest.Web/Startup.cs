@@ -145,24 +145,30 @@ namespace Harvest.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseSpa(spa =>
+            // SPA only kicks in for paths under /spa
+            app.Map("/spa", client =>
             {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
+                app.UseSpa(spa =>
                 {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
+                    spa.Options.SourcePath = "ClientApp";
+
+                    if (env.IsDevelopment())
+                    {
+                        spa.UseReactDevelopmentServer(npmScript: "start");
+                    }
+                });
             });
+
+            // TODO: Fallback for 404
         }
 
         private void ConfigureDb(AppDbContext dbContext)
         {
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
-            
+
             if (recreateDb)
                 dbContext.Database.EnsureDeleted();
 
