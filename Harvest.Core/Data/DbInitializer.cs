@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Harvest.Core.Domain;
 
 namespace Harvest.Core.Data
 {
