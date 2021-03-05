@@ -162,7 +162,7 @@ namespace Harvest.Web
         private void ConfigureDb(AppDbContext dbContext)
         {
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
-
+            
             if (recreateDb)
                 dbContext.Database.EnsureDeleted();
 
