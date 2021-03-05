@@ -148,21 +148,17 @@ namespace Harvest.Web
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            // SPA only kicks in for paths under /spa
-            app.Map("/spa", client =>
+            // SPA needs to kick in for all paths during development
+            // TODO: create SPA 404 page or have SPA redirect back to MVC app on invalid route
+            app.UseSpa(spa =>
             {
-                app.UseSpa(spa =>
+                spa.Options.SourcePath = "ClientApp";
+
+                if (env.IsDevelopment())
                 {
-                    spa.Options.SourcePath = "ClientApp";
-
-                    if (env.IsDevelopment())
-                    {
-                        spa.UseReactDevelopmentServer(npmScript: "start");
-                    }
-                });
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
             });
-
-            // TODO: Fallback for 404
         }
 
         private void ConfigureDb(AppDbContext dbContext)
