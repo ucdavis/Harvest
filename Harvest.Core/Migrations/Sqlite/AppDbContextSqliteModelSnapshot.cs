@@ -127,17 +127,12 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
-
-                    b.HasIndex("TeamId");
 
                     b.HasIndex("UserId");
 
@@ -201,9 +196,6 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
@@ -211,8 +203,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.HasIndex("Name");
 
                     b.HasIndex("QuoteId");
-
-                    b.HasIndex("TeamId");
 
                     b.ToTable("Projects");
                 });
@@ -328,33 +318,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("Harvest.Core.Domain.Team", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Name")
-                        .IsUnique();
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
-                    b.ToTable("Teams");
-                });
-
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>
                 {
                     b.Property<int>("Id")
@@ -442,21 +405,13 @@ namespace Harvest.Core.Migrations.Sqlite
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harvest.Core.Domain.Team", "Team")
-                        .WithMany("Permissions")
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Harvest.Core.Domain.User", "User")
                         .WithMany("Permissions")
-                        .HasForeignKey("TeamId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
-
-                    b.Navigation("Team");
 
                     b.Navigation("User");
                 });
@@ -469,15 +424,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Harvest.Core.Domain.Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.ProjectHistory", b =>
@@ -539,11 +486,6 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Quote", b =>
                 {
                     b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.Team", b =>
-                {
-                    b.Navigation("Permissions");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>
