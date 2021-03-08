@@ -145,9 +145,11 @@ namespace Harvest.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
+            // SPA needs to kick in for all paths during development
+            // TODO: create SPA 404 page or have SPA redirect back to MVC app on invalid route
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
@@ -162,7 +164,7 @@ namespace Harvest.Web
         private void ConfigureDb(AppDbContext dbContext)
         {
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
-            
+
             if (recreateDb)
                 dbContext.Database.EnsureDeleted();
 
