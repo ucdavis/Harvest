@@ -6,11 +6,12 @@ import { BrowserRouter } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.css";
 
+const rootElement = document.getElementById("root");
+
 const baseUrl =
   document.getElementsByTagName("base")[0]?.getAttribute("href") || undefined;
 
-// NOTE: We are using baseURL here to determine if we should load react.  Another good option would be to check to see if our "root" element exists
-if (baseUrl !== undefined) {
+if (rootElement && baseUrl) {
   // <React.StrictMode> should be used when possible.  ReactStrap will need to update context API usage first
   ReactDOM.render(
     <BrowserRouter basename={baseUrl}>
@@ -18,7 +19,7 @@ if (baseUrl !== undefined) {
         <App />
       </React.Fragment>
     </BrowserRouter>,
-    document.getElementById("root")
+    rootElement
   );
 
   // If you want to start measuring performance in your app, pass a function
