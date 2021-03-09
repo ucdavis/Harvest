@@ -1,5 +1,6 @@
 using Harvest.Core.Data;
 using Harvest.Web.Middleware;
+using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -60,6 +61,7 @@ namespace Harvest.Web
                 oidc.ResponseType = OpenIdConnectResponseType.Code;
                 oidc.Scope.Add("openid");
                 oidc.Scope.Add("profile");
+                oidc.Scope.Add("email");
                 oidc.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
@@ -98,6 +100,7 @@ namespace Harvest.Web
                 });
             }
 
+            services.AddScoped<IUserService, UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

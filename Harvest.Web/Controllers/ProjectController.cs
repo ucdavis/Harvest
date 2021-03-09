@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +13,12 @@ namespace Harvest.Web.Controllers
     public class ProjectController : Controller
     {
         private readonly AppDbContext _dbContext;
+        private readonly IUserService _userService;
 
-        public ProjectController(AppDbContext dbContext)
+        public ProjectController(AppDbContext dbContext, IUserService userService)
         {
             this._dbContext = dbContext;
+            this._userService = userService;
         }
         public async Task<ActionResult> Index()
         {
@@ -31,6 +34,11 @@ namespace Harvest.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(Project project) {
             // TODO: validation!
+            var user = await _userService.GetCurrentUser();
+
+            project.CreatedBy = user;
+            project.Status = "Requested";
+
             _dbContext.Projects.Add(project);
 
             await _dbContext.SaveChangesAsync();
