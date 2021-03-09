@@ -27,7 +27,7 @@ export const NavBar = () => {
         <Collapse isOpen={isOpen} navbar>
           <Nav className="me-auto" navbar>
             <NavItem>
-              <Link to="/Projects">Projects TODO</Link>
+              <a href="/project">Projects</a>
             </NavItem>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>
