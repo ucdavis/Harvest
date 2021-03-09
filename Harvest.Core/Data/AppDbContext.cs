@@ -38,7 +38,6 @@ namespace Harvest.Core.Data
         public DbSet<ProjectHistory> ProjectHistory { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<Team> Teams { get; set; }
         public DbSet<User> Users { get; set; }
 
 
@@ -52,7 +51,6 @@ namespace Harvest.Core.Data
             Domain.ProjectHistory.OnModelCreating(modelBuilder);
             Quote.OnModelCreating(modelBuilder);
             Role.OnModelCreating(modelBuilder);
-            Team.OnModelCreating(modelBuilder);
             User.OnModelCreating(modelBuilder);
         }
     }

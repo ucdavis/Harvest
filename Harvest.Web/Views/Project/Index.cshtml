@@ -1,0 +1,10 @@
+@model Project[]
+
+<ul>
+    @foreach (var project in Model)
+    {
+        <li>
+            @project.Name
+        </li>
+    }
+</ul>

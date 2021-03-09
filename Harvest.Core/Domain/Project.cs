@@ -12,9 +12,6 @@ namespace Harvest.Core.Domain
         [Key]
         public int Id { get; set; }
         
-        [Required]
-        public int TeamId { get; set; }
-        
         public DateTime Start { get; set; }
         
         public DateTime End { get; set; }
@@ -62,8 +59,6 @@ namespace Harvest.Core.Domain
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
 
-        public Team Team { get; set; }
-
         [Display(Name = "Created By")]
         public User CreatedBy { get; set; }
 
@@ -74,7 +69,6 @@ namespace Harvest.Core.Domain
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Project>().HasIndex(a => a.Name);
-            modelBuilder.Entity<Project>().HasIndex(a => a.TeamId);
             modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Project>().HasIndex(a => a.QuoteId);
 

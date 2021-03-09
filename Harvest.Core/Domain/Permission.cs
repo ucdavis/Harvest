@@ -12,15 +12,10 @@ namespace Harvest.Core.Domain
         public int Id { get; set; }
 
         [Required]
-        public int TeamId { get; set; }
-
-        [Required]
         public int RoleId { get; set; }
 
         [Required]
         public int UserId { get; set; }
-
-        public Team Team { get; set; }
 
         public Role Role { get; set; }
 
@@ -28,7 +23,6 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Permission>().HasIndex(a => a.TeamId);
             modelBuilder.Entity<Permission>().HasIndex(a => a.RoleId);
             modelBuilder.Entity<Permission>().HasIndex(a => a.UserId);
         }
