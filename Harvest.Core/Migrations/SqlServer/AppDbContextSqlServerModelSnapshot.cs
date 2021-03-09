@@ -160,6 +160,9 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Crop")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -187,7 +190,10 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int>("PrincipalInvestigator")
                         .HasColumnType("int");
 
-                    b.Property<int>("QuoteId")
+                    b.Property<int?>("QuoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuoteId1")
                         .HasColumnType("int");
 
                     b.Property<decimal>("QuoteTotal")
@@ -211,6 +217,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("Name");
 
                     b.HasIndex("QuoteId");
+
+                    b.HasIndex("QuoteId1");
 
                     b.ToTable("Projects");
                 });
@@ -261,16 +269,16 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("ApprovedById")
+                    b.Property<int?>("ApprovedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ApprovedOn")
+                    b.Property<DateTime?>("ApprovedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CurrentDocumentId")
+                    b.Property<int?>("CurrentDocumentId")
                         .HasColumnType("int");
 
                     b.Property<int>("InitatedById")
@@ -298,7 +306,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("ApprovedById");
 
                     b.HasIndex("CurrentDocumentId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[CurrentDocumentId] IS NOT NULL");
 
                     b.HasIndex("InitatedById");
 
@@ -436,7 +445,13 @@ namespace Harvest.Core.Migrations.SqlServer
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Harvest.Core.Domain.Quote", "Quote")
+                        .WithMany()
+                        .HasForeignKey("QuoteId1");
+
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Quote");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.ProjectHistory", b =>
@@ -454,15 +469,12 @@ namespace Harvest.Core.Migrations.SqlServer
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
                         .WithMany()
-                        .HasForeignKey("ApprovedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApprovedById");
 
                     b.HasOne("Harvest.Core.Domain.Document", "CurrentDocument")
                         .WithOne("Quote")
                         .HasForeignKey("Harvest.Core.Domain.Quote", "CurrentDocumentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Harvest.Core.Domain.User", "InitiatedBy")
                         .WithMany()
