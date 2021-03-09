@@ -33,6 +33,8 @@ namespace Harvest.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
+
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
@@ -118,18 +120,13 @@ namespace Harvest.Web
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.GetLevel = SerilogHelpers.GetLogEventLevel;
-                options.Logger = SerilogHelpers
-                    .GetConfiguration(Configuration)
-                    .CreateLogger();
-            });
-
             app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseMiddleware<LogUserNameMiddleware>();
+            app.UseSerilogRequestLogging();
 
             // authenticate all app visitors and create an auth cookie
             app.Use(async (context, next) =>
@@ -143,7 +140,6 @@ namespace Harvest.Web
                     await next();
                 }
             });
-
 
             app.UseEndpoints(endpoints =>
             {
@@ -166,7 +162,7 @@ namespace Harvest.Web
         private void ConfigureDb(AppDbContext dbContext)
         {
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
-
+            
             if (recreateDb)
                 dbContext.Database.EnsureDeleted();
 
