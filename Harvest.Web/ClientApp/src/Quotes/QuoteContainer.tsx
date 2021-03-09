@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 interface RouteParams {
@@ -6,6 +7,20 @@ interface RouteParams {
 
 export const QuoteContainer = () => {
   const { projectId } = useParams<RouteParams>();
+
+  useEffect(() => {
+    const cb = async () => {
+      const response = await fetch("/Quote/3");
+
+      if (response.ok) {
+        console.log(await response.json());
+      } else {
+        console.log(response);
+      }
+    };
+
+    cb();
+  });
 
   return (
     <div>

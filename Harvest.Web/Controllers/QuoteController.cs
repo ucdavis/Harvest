@@ -21,7 +21,7 @@ namespace Harvest.Web.Controllers
             this._dbContext = dbContext;
         }
 
-        // For now we just return project details but eventually we'll want info on any outstanding quotes too
+        // Get info on the project as well as outstanding quotes (in case we want to edit an in-progess quote)
         [HttpGet("{id?}")]
         public async Task<ActionResult> Get(int id)
         {
