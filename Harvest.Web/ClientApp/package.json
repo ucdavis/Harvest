@@ -22,10 +22,16 @@
     "typescript": "^4.2.2",
     "web-vitals": "^1.1.0"
   },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.1.7",
+    "cross-env": "^7.0.3",
+    "jest-trx-results-processor": "^2.2.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "citest": "cross-env CI=true react-scripts test --coverage --coverageDirectory=./ --reporters default --reporters jest-trx-results-processor",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -46,7 +52,18 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "@types/react-router-dom": "^5.1.7"
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 0,
+        "functions": 0,
+        "lines": 0,
+        "statements": 0
+      }
+    },
+    "coverageReporters": [
+      "text",
+      "cobertura"
+    ]
   }
 }

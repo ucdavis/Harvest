@@ -12,27 +12,67 @@ pool:
 variables:
   buildConfiguration: 'Release'
 
-steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET 5 sdk'
-  inputs:
-    packageType: 'sdk'
-    version: '5.x'
+stages:
+- stage: Test
+  jobs:
+  - job:
+    steps:
+    - task: NodeTool@0
+      inputs:
+        versionSpec: '12.x'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Publish Harvest.Web'
-  inputs:
-    command: 'publish'
-    publishWebProjects: true
-    zipAfterPublish: false
-    modifyOutputPath: false
-    projects: './Harest.Web/Harvest.Web.csproj'
-    arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/'
+    - task: Npm@1
+      displayName: 'Install Npm Packages'
+      inputs:
+        command: 'install'
+        workingDir: './Harvest.Web/ClientApp'
+    
+    - task: Npm@1
+      displayName: 'Run Client Tests'
+      inputs:
+        command: 'custom'
+        workingDir: './Harvest.Web/ClientApp'
+        customCommand: 'run citest'
 
-- task: PublishBuildArtifacts@1
-  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
-  displayName: 'Publish Build Artifacts for main branch builds'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    - task: PublishTestResults@2
+      displayName: 'Publish Client Test Results'
+      inputs:
+        searchFolder: './Harvest.Web/ClientApp'
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/test-results.trx'
+        testRunTitle: 'Client Tests'
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage from Harvest.Web/ClientApp/cobertura-coverage.xml'
+      inputs:
+        codeCoverageTool: cobertura
+        summaryFileLocation: './Harvest.Web/ClientApp/cobertura-coverage.xml'
+        reportDirectory: './Harvest.Web/ClientApp'
+
+- stage: Publish
+  jobs:
+  - job:
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET 5 sdk'
+      inputs:
+        packageType: 'sdk'
+        version: '5.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Harvest.Web'
+      inputs:
+        command: 'publish'
+        publishWebProjects: true
+        zipAfterPublish: false
+        modifyOutputPath: false
+        projects: './Harest.Web/Harvest.Web.csproj'
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/'
+
+    - task: PublishBuildArtifacts@1
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+      displayName: 'Publish Build Artifacts for main branch builds'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'

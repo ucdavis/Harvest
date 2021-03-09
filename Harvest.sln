@@ -5,7 +5,16 @@ VisualStudioVersion = 16.0.30709.64
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Web", "Harvest.Web\Harvest.Web.csproj", "{9613D252-1CCE-4EB2-B802-471D89D2E0C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvest.Core", "Harvest.Core\Harvest.Core.csproj", "{CF4A56E9-A24C-4881-A307-5D1A23DB481B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Core", "Harvest.Core\Harvest.Core.csproj", "{CF4A56E9-A24C-4881-A307-5D1A23DB481B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2F1EC784-359B-4A83-BECD-BABDECB29161}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		azure-pipelines-mobile.yml = azure-pipelines-mobile.yml
+		azure-pipelines-web.yml = azure-pipelines-web.yml
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
