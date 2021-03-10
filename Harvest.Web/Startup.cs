@@ -1,3 +1,4 @@
+using System.IO;
 using Harvest.Core.Data;
 using Harvest.Web.Middleware;
 using Harvest.Web.Services;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -101,6 +103,7 @@ namespace Harvest.Web
             }
 
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

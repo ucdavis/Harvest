@@ -8,13 +8,10 @@ import "bootstrap/dist/css/bootstrap.css";
 
 const rootElement = document.getElementById("root");
 
-const baseUrl =
-  document.getElementsByTagName("base")[0]?.getAttribute("href") || undefined;
-
-if (rootElement && baseUrl) {
+if (rootElement) {
   // <React.StrictMode> should be used when possible.  ReactStrap will need to update context API usage first
   ReactDOM.render(
-    <BrowserRouter basename={baseUrl}>
+    <BrowserRouter>
       <React.Fragment>
         <App />
       </React.Fragment>
