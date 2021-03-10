@@ -9,6 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Harvest</title>
 
+    <environment exclude="Development">
+        @* In a production deployment, we will use a dynamic view component to load the generated styles *@
+        <cache expires-after="@TimeSpan.FromMinutes(30)">
+            @await Component.InvokeAsync("DynamicStyles")
+        </cache>
+    </environment>
+
     @RenderSection("Styles", required: false)
 </head>
 
