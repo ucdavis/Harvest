@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Models;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,17 +28,24 @@ namespace Harvest.Web.Controllers
             return View(projects);
         }
 
-        public ActionResult Create() {
+        public async Task<ActionResult> Details(int id)
+        {
+            return View(await _dbContext.Projects.SingleAsync(p => p.Id == id));
+        }
+
+        public ActionResult Create()
+        {
             return View();
         }
 
         [HttpPost]
-        public async Task<ActionResult> Create(Project project) {
+        public async Task<ActionResult> Create(Project project)
+        {
             // TODO: validation!
             var user = await _userService.GetCurrentUser();
 
             project.CreatedBy = user;
-            project.Status = "Requested";
+            project.Status = StatusTypes.Requested;
 
             _dbContext.Projects.Add(project);
 

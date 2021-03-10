@@ -22,12 +22,12 @@ namespace Harvest.Core.Domain
 
         public int InitatedById { get; set; }
 
-        public int CurrentDocumentId { get; set; }
+        public int? CurrentDocumentId { get; set; }
 
-        public int ApprovedById { get; set; }
+        public int? ApprovedById { get; set; }
 
         [Display(Name = "Aproved On")]
-        public DateTime ApprovedOn { get; set; }
+        public DateTime? ApprovedOn { get; set; }
 
         [Required]
         [Display(Name = "Created Date")]

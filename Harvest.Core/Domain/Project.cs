@@ -32,8 +32,9 @@ namespace Harvest.Core.Domain
         [StringLength(50)]
         public string LocationCode { get; set; }
         
-        public int QuoteId { get; set; }
+        public int? QuoteId { get; set; }
         
+        public Quote Quote { get; set; }
         // public decimal AcreagePerMonth  { get; set; }
         
         [Required]
@@ -46,6 +47,8 @@ namespace Harvest.Core.Domain
         
         [Required]
         public int CreatedById { get; set; }
+
+        public DateTime CreatedOn { get; set; }
         
         [StringLength(50)]
         public string Status { get; set; }

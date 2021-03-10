@@ -1,10 +1,27 @@
 @model Project[]
 
-<ul>
-    @foreach (var project in Model)
-    {
-        <li>
-            @project.Name
-        </li>
-    }
-</ul>
+<a asp-action="Create">Create new</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Status
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var project in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@project.Id">@project.Name</a>
+                </td>
+                <td>@project.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

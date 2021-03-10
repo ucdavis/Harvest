@@ -12,5 +12,9 @@ namespace Harvest.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult Spa() {
+            return View();
+        }
     }
 }
