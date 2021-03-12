@@ -42,6 +42,7 @@ namespace Harvest.Web.Services
                     FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
                     LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
                     Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
+                    Iam = userClaims.Single(c => c.Type == "ucdPersonIAMID").Value,
                     Kerberos = username
                 };
 

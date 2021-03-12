@@ -64,6 +64,7 @@ namespace Harvest.Web
                 oidc.Scope.Add("openid");
                 oidc.Scope.Add("profile");
                 oidc.Scope.Add("email");
+                oidc.Scope.Add("eduPerson");
                 oidc.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
