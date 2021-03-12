@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers
 {
     [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-    public class QuoteController : Controller
+    public class QuoteController : SuperController
     {
         private readonly AppDbContext _dbContext;
 

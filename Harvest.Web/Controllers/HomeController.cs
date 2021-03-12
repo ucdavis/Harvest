@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Harvest.Web.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : SuperController
     {
         public ActionResult Index()
         {

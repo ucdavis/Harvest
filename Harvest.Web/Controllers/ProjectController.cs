@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers
 {
     [Authorize]
-    public class ProjectController : Controller
+    public class ProjectController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
@@ -52,6 +52,8 @@ namespace Harvest.Web.Controllers
             _dbContext.Projects.Add(project);
 
             await _dbContext.SaveChangesAsync();
+
+            Message = "Project Created";
 
             return RedirectToAction("Index");
         }
