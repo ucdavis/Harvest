@@ -33,12 +33,14 @@ namespace Harvest.Web.Controllers
             return View(await _dbContext.Projects.SingleAsync(p => p.Id == id));
         }
 
+        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         public ActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         public async Task<ActionResult> Create(Project project)
         {
             // TODO: validation!
