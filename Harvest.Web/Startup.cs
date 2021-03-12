@@ -173,15 +173,16 @@ namespace Harvest.Web
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
 
             if (recreateDb)
+            {
                 dbContext.Database.EnsureDeleted();
+            }
 
             dbContext.Database.Migrate();
 
-            if (recreateDb)
-            {
-                var initializer = new DbInitializer(dbContext);
-                initializer.Initialize().GetAwaiter().GetResult();
-            }
+
+            var initializer = new DbInitializer(dbContext);
+            initializer.Initialize(recreateDb).GetAwaiter().GetResult();
+            
         }
     }
 }
