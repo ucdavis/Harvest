@@ -16,10 +16,12 @@ namespace Harvest.Web.Services
     public class UserService : IUserService
     {
         private IHttpContextAccessor _httpContextAccessor;
+        private readonly IIdentityService _identityService;
         private readonly AppDbContext _dbContext;
-        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, IIdentityService identityService)
         {
             _httpContextAccessor = httpContextAccessor;
+            _identityService = identityService;
             _dbContext = dbContext;
         }
 
@@ -36,15 +38,8 @@ namespace Harvest.Web.Services
             }
             else
             {
-                var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
+                var newUser = await _identityService.GetByKerberos(username);
                 
-                var newUser = new User {
-                    FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
-                    LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
-                    Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
-                    Kerberos = username
-                };
-
                 _dbContext.Users.Add(newUser);
 
                 await _dbContext.SaveChangesAsync();

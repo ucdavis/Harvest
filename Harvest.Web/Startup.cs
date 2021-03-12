@@ -1,6 +1,7 @@
 using System.IO;
 using Harvest.Core.Data;
 using Harvest.Web.Middleware;
+using Harvest.Web.Models;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -102,6 +103,9 @@ namespace Harvest.Web
                 });
             }
 
+            services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
+
+            services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
         }
