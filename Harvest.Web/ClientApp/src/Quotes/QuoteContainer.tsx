@@ -10,7 +10,7 @@ export const QuoteContainer = () => {
 
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch("/Quote/3");
+      const response = await fetch("/Quote/Get/3");
 
       if (response.ok) {
         console.log(await response.json());

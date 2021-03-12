@@ -9,10 +9,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers
 {
     // Must be field manager (or possibly supervisors can make but not submit quotes)
-    [ApiController]
-    [Route("[controller]")]
     [Authorize]
-    public class QuoteController : ControllerBase
+    public class QuoteController : Controller
     {
         private readonly AppDbContext _dbContext;
 
@@ -22,7 +20,6 @@ namespace Harvest.Web.Controllers
         }
 
         // Get info on the project as well as outstanding quotes (in case we want to edit an in-progess quote)
-        [HttpGet("{id?}")]
         public async Task<ActionResult> Get(int id)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
@@ -31,6 +28,12 @@ namespace Harvest.Web.Controllers
             var model = new QuoteModel { Project = project, Quotes = quotes };
 
             return Ok(model);
+        }
+
+        // Create a quote for project ID
+        [HttpGet]
+        public ActionResult Create(int id) {
+            return View();
         }
     }
 
