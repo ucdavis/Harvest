@@ -1,6 +1,8 @@
 import React from "react";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, FeatureGroup } from "react-leaflet";
+import EditControl from './EditControl';
+
 
 export const Map = () => {
   return (
@@ -14,6 +16,18 @@ export const Map = () => {
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <FeatureGroup>
+          <EditControl
+            position="topright"
+            onCreated={console.log}
+            draw={{
+              polyline: false,
+              circle: false,
+              circlemarker: false,
+              marker: false
+            }}
+          />
+        </FeatureGroup>
         <Marker position={[38.5449, -121.7405]}>
           <Popup>
             A pretty CSS3 popup. <br /> Easily customizable.
