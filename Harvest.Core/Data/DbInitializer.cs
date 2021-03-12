@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Harvest.Core.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Data
 {
@@ -15,9 +16,32 @@ namespace Harvest.Core.Data
             _dbContext = dbContext;
         }
 
-        public Task Initialize()
+        public async Task Initialize(bool recreateDb)
         {
-            return Task.CompletedTask;
+            if (recreateDb)
+            {
+                //do what needs to be done?
+            }
+
+            //Make sure roles exist
+            await CheckCreateRole("System");
+            await CheckCreateRole("Admin");
+            await CheckCreateRole("Supervisor");
+            await CheckCreateRole("Worker");
+
+            return;
+        }
+
+        private async Task CheckCreateRole(string role)
+        {
+            if (!await _dbContext.Roles.AnyAsync(a => a.Name == role))
+            {
+                var roleToCreate = new Role {Name = role};
+                await _dbContext.Roles.AddAsync(roleToCreate);
+                await _dbContext.SaveChangesAsync();
+            }
+            
+            return;
         }
     }
 }
