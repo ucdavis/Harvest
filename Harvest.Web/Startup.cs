@@ -172,7 +172,9 @@ namespace Harvest.Web
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
 
             if (recreateDb)
+            {
                 dbContext.Database.EnsureDeleted();
+            }
 
             dbContext.Database.Migrate();
 

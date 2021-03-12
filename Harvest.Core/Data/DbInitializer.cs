@@ -29,6 +29,8 @@ namespace Harvest.Core.Data
             await CheckCreateRole("Supervisor");
             await CheckCreateRole("Worker");
 
+            await _dbContext.SaveChangesAsync();
+
             return;
         }
 
@@ -38,7 +40,6 @@ namespace Harvest.Core.Data
             {
                 var roleToCreate = new Role {Name = role};
                 await _dbContext.Roles.AddAsync(roleToCreate);
-                await _dbContext.SaveChangesAsync();
             }
             
             return;
