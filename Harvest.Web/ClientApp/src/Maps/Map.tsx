@@ -21,6 +21,10 @@ export const Map = () => {
             position="topright"
             onCreated={console.log}
             draw={{
+              polygon: {
+                allowIntersection: false,
+                showArea: true
+              },
               polyline: false,
               circle: false,
               circlemarker: false,
