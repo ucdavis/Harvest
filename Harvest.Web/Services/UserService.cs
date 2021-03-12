@@ -30,7 +30,7 @@ namespace Harvest.Web.Services
             var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
             string iamId = userClaims.Single(c => c.Type == "ucdPersonIAMID").Value;
 
-            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Kerberos == username && a.Iam == iamId);
+            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
 
             if (dbUser != null)
             {
