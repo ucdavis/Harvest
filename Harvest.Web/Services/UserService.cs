@@ -30,7 +30,7 @@ namespace Harvest.Web.Services
         {
             var username = _httpContextAccessor.HttpContext.User.Identity.Name;
 
-            var dbUser = await _dbContext.Users.SingleOrDefaultAsync();
+            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Kerberos == username);
 
             if (dbUser != null)
             {
