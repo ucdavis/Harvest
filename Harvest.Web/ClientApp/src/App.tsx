@@ -2,6 +2,7 @@ import React from "react";
 
 import { Route } from "react-router-dom";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
+import { Map } from "./Maps/Map";
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
+      <Route path="/home/map" component={Map} />
     </>
   );
 }
