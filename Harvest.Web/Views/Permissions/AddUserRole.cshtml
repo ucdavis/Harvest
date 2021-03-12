@@ -1,0 +1,31 @@
+﻿@model Harvest.Web.Models.AddUserRolesModel
+
+@{
+    ViewBag.Title = "Add User Roles";
+}
+
+<div class="card">
+    <div class="card-header-primary">
+        <div class="card-head">
+            <h2>Add Member to Role</h2>
+        </div>
+    </div>
+    <div class="card-content col-lg-4">
+        <form asp-action="AddUserRole">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="RoleId" class="control-label"></label>
+                <select asp-for="RoleId" class="form-control" asp-items="@(new SelectList(Model.Roles, "Id", "Name"))"></select>
+                <span asp-validation-for="RoleId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UserEmail" class="control-label"></label>
+                <input asp-for="UserEmail" class="form-control"/>
+                <span asp-validation-for="UserEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Assign Role to User" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
