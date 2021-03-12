@@ -27,8 +27,10 @@ namespace Harvest.Web.Services
         public async Task<User> GetCurrentUser()
         {
             var username = _httpContextAccessor.HttpContext.User.Identity.Name;
+            var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
+            string iamId = userClaims.Single(c => c.Type == "ucdPersonIAMID").Value;
 
-            var dbUser = await _dbContext.Users.SingleOrDefaultAsync();
+            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Kerberos == username && a.Iam == iamId);
 
             if (dbUser != null)
             {
@@ -36,13 +38,11 @@ namespace Harvest.Web.Services
             }
             else
             {
-                var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
-                
                 var newUser = new User {
                     FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
                     LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
                     Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
-                    Iam = userClaims.Single(c => c.Type == "ucdPersonIAMID").Value,
+                    Iam = iamId,
                     Kerberos = username
                 };
 
