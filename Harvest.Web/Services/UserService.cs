@@ -16,12 +16,10 @@ namespace Harvest.Web.Services
     public class UserService : IUserService
     {
         private IHttpContextAccessor _httpContextAccessor;
-        private readonly IIdentityService _identityService;
         private readonly AppDbContext _dbContext;
-        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, IIdentityService identityService)
+        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
-            _identityService = identityService;
             _dbContext = dbContext;
         }
 
@@ -29,8 +27,10 @@ namespace Harvest.Web.Services
         public async Task<User> GetCurrentUser()
         {
             var username = _httpContextAccessor.HttpContext.User.Identity.Name;
+            var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
+            string iamId = userClaims.Single(c => c.Type == "ucdPersonIAMID").Value;
 
-            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Kerberos == username);
+            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Kerberos == username && a.Iam == iamId);
 
             if (dbUser != null)
             {
@@ -38,8 +38,14 @@ namespace Harvest.Web.Services
             }
             else
             {
-                var newUser = await _identityService.GetByKerberos(username);
-                
+                var newUser = new User {
+                    FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
+                    LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
+                    Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
+                    Iam = iamId,
+                    Kerberos = username
+                };
+
                 _dbContext.Users.Add(newUser);
 
                 await _dbContext.SaveChangesAsync();

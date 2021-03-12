@@ -65,6 +65,7 @@ namespace Harvest.Web
                 oidc.Scope.Add("openid");
                 oidc.Scope.Add("profile");
                 oidc.Scope.Add("email");
+                oidc.Scope.Add("eduPerson");
                 oidc.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
@@ -176,15 +177,16 @@ namespace Harvest.Web
             var recreateDb = Configuration.GetValue<bool>("Dev:RecreateDb");
 
             if (recreateDb)
+            {
                 dbContext.Database.EnsureDeleted();
+            }
 
             dbContext.Database.Migrate();
 
-            if (recreateDb)
-            {
-                var initializer = new DbInitializer(dbContext);
-                initializer.Initialize().GetAwaiter().GetResult();
-            }
+
+            var initializer = new DbInitializer(dbContext);
+            initializer.Initialize(recreateDb).GetAwaiter().GetResult();
+            
         }
     }
 }
