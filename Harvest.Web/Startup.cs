@@ -1,11 +1,15 @@
 using System.IO;
 using Harvest.Core.Data;
+using Harvest.Core.Domain;
+using Harvest.Core.Models;
+using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
 using Harvest.Web.Models;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -71,6 +75,20 @@ namespace Harvest.Web
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
                 };
             });
+
+            services.AddAuthorization(options =>
+            {
+                // no need to specify additional roles for system admin, as an exception is made for it in VerifyRoleAccessHandler
+                options.AddPolicy(AccessCodes.SystemAdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.System)));
+
+                options.AddPolicy(AccessCodes.DepartmentAdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin, Role.Codes.Supervisor, Role.Codes.Worker)));
+                options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
+                options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
+                options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Worker)));
+            });
+
+            services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();
+
 
             // setup entity framework
             // "Provider" config only present when using ef migrations cli
@@ -138,19 +156,6 @@ namespace Harvest.Web
 
             app.UseMiddleware<LogUserNameMiddleware>();
             app.UseSerilogRequestLogging();
-
-            // authenticate all app visitors and create an auth cookie
-            app.Use(async (context, next) =>
-            {
-                if (!context.User.Identity.IsAuthenticated)
-                {
-                    await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme);
-                }
-                else
-                {
-                    await next();
-                }
-            });
 
             app.UseEndpoints(endpoints =>
             {

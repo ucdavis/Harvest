@@ -28,7 +28,7 @@ namespace Harvest.Web.Services
         {
             var username = _httpContextAccessor.HttpContext.User.Identity.Name;
             var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
-            string iamId = userClaims.Single(c => c.Type == "ucdPersonIAMID").Value;
+            string iamId = userClaims.Single(c => c.Type == IamIdClaimType).Value;
 
             var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Kerberos == username && a.Iam == iamId);
 
@@ -53,5 +53,7 @@ namespace Harvest.Web.Services
                 return newUser;
             }
         }
+
+        public const string IamIdClaimType = "ucdPersonIAMID";
     }
 }
