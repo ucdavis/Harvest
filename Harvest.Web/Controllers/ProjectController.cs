@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers
 {
     [Authorize]
-    public class ProjectController : Controller
+    public class ProjectController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
@@ -33,12 +33,14 @@ namespace Harvest.Web.Controllers
             return View(await _dbContext.Projects.SingleAsync(p => p.Id == id));
         }
 
+        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         public ActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         public async Task<ActionResult> Create(Project project)
         {
             // TODO: validation!
@@ -50,6 +52,8 @@ namespace Harvest.Web.Controllers
             _dbContext.Projects.Add(project);
 
             await _dbContext.SaveChangesAsync();
+
+            Message = "Project Created";
 
             return RedirectToAction("Index");
         }

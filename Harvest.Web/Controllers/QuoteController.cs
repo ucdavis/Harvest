@@ -2,15 +2,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    // Must be field manager (or possibly supervisors can make but not submit quotes)
-    [Authorize]
-    public class QuoteController : Controller
+    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    public class QuoteController : SuperController
     {
         private readonly AppDbContext _dbContext;
 
