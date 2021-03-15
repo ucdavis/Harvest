@@ -24,9 +24,29 @@ namespace Harvest.Web.Controllers
             _dbContext = dbContext;
             _identityService = identityService;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            //TODO: Filter out System roles?
+            var permissions = await _dbContext.Permissions
+                .Include(a => a.User)
+                .Include(a => a.Role)
+                .ToListAsync();
+
+            var viewModel = new UserPermissionsListModel();
+            foreach (var permission in permissions)
+            {
+                if (viewModel.UserRoles.Any(a => a.User.Id == permission.User.Id))
+                {
+                    viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).Roles.Add(permission.Role);
+                }
+                else
+                {
+                    viewModel.UserRoles.Add(new UserRole(permission));
+                }
+            }
+            viewModel.UserRoles = viewModel.UserRoles.OrderBy(u => u.User.LastName).ThenBy(u => u.User.FirstName).ToList();
+
+            return View(viewModel);
         }
 
         public async Task<IActionResult> Create()
@@ -111,10 +131,15 @@ namespace Harvest.Web.Controllers
                 await _dbContext.SaveChangesAsync();
 
                 Message = "User Permission added";
-                //TODO: Redirect to index
+                return RedirectToAction("Index");
             }
 
             return View(viewModel);
+        }
+
+        public IActionResult Delete(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
