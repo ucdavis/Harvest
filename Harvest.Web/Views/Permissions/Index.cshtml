@@ -1,0 +1,51 @@
+﻿@model Harvest.Web.Models.UserPermissionsListModel
+
+@{
+    ViewData["Title"] = "Role Assigned Users ";
+}
+
+<div class="card">
+    <div class="card-header-primary">
+        <div class="card-head row justify-content-between">
+            <h2>Users with roles</h2>
+            <a class="btn btn-link" asp-action="Create"><i class="fas fa-plus fa-xs"/></i> Add new User/Role.</a>
+        </div>
+    </div>
+    <div class="card-content">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Roles
+                </th>
+                <th>
+
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var item in Model.UserRoles) {
+                <tr>
+                    <td>
+                        @item.User.Name
+                    </td>
+                    <td>@Html.DisplayFor(a => item.User.Email)</td>
+                    <td>
+                        @item.RolesList
+                    </td>
+                    <td>
+                        @Html.ActionLink("Remove Role(s)", "Delete", new { userId = item.User.Id})
+                    </td>
+
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

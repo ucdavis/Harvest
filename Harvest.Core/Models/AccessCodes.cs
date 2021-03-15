@@ -2,7 +2,8 @@ namespace Harvest.Core.Models
 {
     public static class AccessCodes
     {
-        public const string SystemAdminAccess = "SystemAdminAccess";
+        public const string SystemAccess = "SystemAccess";
+        public const string AdminAccess = "AdminAccess";
         public const string DepartmentAdminAccess = "DepartmentAdminAccess";
         public const string FieldManagerAccess = "FieldManagerAccess";
         public const string SupervisorAccess = "SupervisorAccess";

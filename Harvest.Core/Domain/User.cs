@@ -34,6 +34,9 @@ namespace Harvest.Core.Domain
 
         public List<Permission> Permissions { get; set; }
 
+        [Display(Name = "Name")]
+        public string Name => FirstName + " " + LastName;
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasIndex(a => a.Kerberos);
