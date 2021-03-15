@@ -1,0 +1,41 @@
+body {
+  background-color: $bg-primary;
+  background: url(/media/rainbow.svg);
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: 101%;
+  padding-top: 3%;
+}
+.site-content {
+  flex: 1;
+}
+.card {
+  box-shadow: $box-shadow;
+  border: none;
+  .card-bg {
+    background-color: $bg-secondary;
+  }
+  .card-body {
+    padding: 0.5rem;
+  }
+}
+.container {
+  padding: 0;
+  width: 85%;
+  max-width: 1440px;
+  @include breakpoint(sm) {
+    width: 90%;
+  }
+  @include breakpoint(md) {
+    width: 95%;
+  }
+  @include breakpoint(lg) {
+    width: 98%;
+  }
+}
+header {
+  margin-bottom: 0.5rem;
+}
+.right-side {
+  margin-top: 31px;
+}
