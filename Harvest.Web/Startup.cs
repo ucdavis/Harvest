@@ -79,7 +79,8 @@ namespace Harvest.Web
             services.AddAuthorization(options =>
             {
                 // no need to specify additional roles for system admin, as an exception is made for it in VerifyRoleAccessHandler
-                options.AddPolicy(AccessCodes.SystemAdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.System)));
+                options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.System)));
+                options.AddPolicy(AccessCodes.AdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin)));
 
                 options.AddPolicy(AccessCodes.DepartmentAdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin, Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));

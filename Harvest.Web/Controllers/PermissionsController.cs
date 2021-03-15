@@ -5,13 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Models;
 using Harvest.Web.Models;
 using Harvest.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    public class PermissionsController : Controller
+    [Authorize(Policy = AccessCodes.AdminAccess)]
+    public class PermissionsController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
@@ -26,7 +29,7 @@ namespace Harvest.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> AddUserRole()
+        public async Task<IActionResult> Create()
         {
             var viewModel = new AddUserRolesModel
             {
@@ -37,7 +40,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddUserRole(AddUserRolesModel model)
+        public async Task<IActionResult> Create(AddUserRolesModel model)
         {
             var viewModel = new AddUserRolesModel
             {
@@ -106,8 +109,8 @@ namespace Harvest.Web.Controllers
                 permission.Role = role;
                 await _dbContext.Permissions.AddAsync(permission);
                 await _dbContext.SaveChangesAsync();
-                
-                //TODO: Return a message
+
+                Message = "User Permission added";
                 //TODO: Redirect to index
             }
 
