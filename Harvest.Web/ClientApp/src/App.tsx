@@ -16,6 +16,6 @@ function App() {
 }
 
 const Home = () => <div>Home</div>;
-const Spa = () => <div>I am a SPA</div>;
+const Spa = () => <div className="sassy">I am a SPA</div>;
 
 export default App;
