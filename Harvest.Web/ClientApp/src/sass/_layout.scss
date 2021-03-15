@@ -1,5 +1,13 @@
-.site-content {
-  flex: 1;
+html,
+body {
+  height: 100%;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+.page-wrap {
+  flex: 1 0 auto;
 }
 .card {
   box-shadow: $box-shadow;
@@ -16,18 +24,29 @@
   width: 85%;
   max-width: 1440px;
   @include breakpoint(sm) {
-    width: 90%;
+    width: 86%;
   }
   @include breakpoint(md) {
-    width: 95%;
+    width: 87%;
   }
   @include breakpoint(lg) {
-    width: 98%;
+    width: 90%;
   }
 }
 header {
   margin-bottom: 0.5rem;
+  background-color: $primary-color;
+  color: #fff;
+  a {
+    color: #fff;
+    &:hover {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
 }
 .right-side {
   margin-top: 31px;
+}
+.footer {
+  flex-shrink: 0;
 }

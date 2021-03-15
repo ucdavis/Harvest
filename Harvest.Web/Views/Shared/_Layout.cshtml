@@ -22,27 +22,26 @@
 <body>
     <div class="page-wrap">
         <header>
+            <div class="container">
             @if (Configuration["Environment:ShowTestBanner"] == "Yes")
             {
                 <h1 style="background-color: red; text-align: center; color: white">----------- Beta Testing. Data will not
                     be retained. -----------</h1>
             }
-            <div class="container">
                 <div class="row justify-content-between align-items-end">
                     <div class="col-sm-8 col-md-5 col-xl-4">
                         <a asp-area="" asp-controller="Home" asp-action="Index">
                             <h1>Harvest</h1>
                             <p class="subtitle">Planting tomorrow's crops today</p>
                         </a>
+                        <a target="_blank" href="https://ucdavis.edu">
+                        ucdavis logo here</a>
                     </div>
                 </div>
-            </div>
-        </header>
-        <div class="head_bleed">
-            <div class="head_divider">
-            </div>
         </div>
-        <nav class="navbar navbar-expand-md nav mb-4">
+        </header>
+        <div class="nav-wrapper">
+        <nav class="navbar navbar-expand-md nav mb-4 container">
             <a class="navbar-brand" href="#">Harvest</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +64,7 @@
                 </div>
             </div>
         </nav>
-
+        </div>
         @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
         {
             <div class="container">
