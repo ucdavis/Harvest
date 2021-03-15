@@ -2,26 +2,26 @@
 // note I removed lodash.  We can add back or use branch if needed in the future
 // Adding the library directly would be good but it is incompatible with the newer leaflet versions
 
-import { PropTypes } from 'prop-types';
-import Draw from 'leaflet-draw'; // eslint-disable-line
-import React, { useRef } from 'react';
-import { useLeafletContext } from '@react-leaflet/core';
+import { PropTypes } from "prop-types";
+import Draw from "leaflet-draw"; // eslint-disable-line
+import React, { useRef } from "react";
+import { useLeafletContext } from "@react-leaflet/core";
 
-import leaflet, { Map, Control } from 'leaflet';
+import leaflet, { Map, Control } from "leaflet";
 
 const eventHandlers = {
-  onEdited: 'draw:edited',
-  onDrawStart: 'draw:drawstart',
-  onDrawStop: 'draw:drawstop',
-  onDrawVertex: 'draw:drawvertex',
-  onEditStart: 'draw:editstart',
-  onEditMove: 'draw:editmove',
-  onEditResize: 'draw:editresize',
-  onEditVertex: 'draw:editvertex',
-  onEditStop: 'draw:editstop',
-  onDeleted: 'draw:deleted',
-  onDeleteStart: 'draw:deletestart',
-  onDeleteStop: 'draw:deletestop',
+  onEdited: "draw:edited",
+  onDrawStart: "draw:drawstart",
+  onDrawStop: "draw:drawstop",
+  onDrawVertex: "draw:drawvertex",
+  onEditStart: "draw:editstart",
+  onEditMove: "draw:editmove",
+  onEditResize: "draw:editresize",
+  onEditVertex: "draw:editvertex",
+  onEditStop: "draw:editstop",
+  onDeleted: "draw:deleted",
+  onDeleteStart: "draw:deletestart",
+  onDeleteStop: "draw:deletestop",
 };
 
 function EditControl(props) {
@@ -29,14 +29,14 @@ function EditControl(props) {
   const drawRef = useRef();
   const propsRef = useRef(props);
 
-  const onDrawCreate = (e) => {
-    const { onCreated } = props;
-    const container = context.layerContainer || context.map;
-    container.addLayer(e.layer);
-    onCreated && onCreated(e);
-  };
-
   React.useEffect(() => {
+    const onDrawCreate = (e) => {
+      const { onCreated } = props;
+      const container = context.layerContainer || context.map;
+      container.addLayer(e.layer);
+      onCreated && onCreated(e);
+    };
+
     const { map } = context;
     const { onMounted } = props;
 
@@ -67,7 +67,7 @@ function EditControl(props) {
         }
       }
     };
-  }, []);
+  }, [context, props]);
 
   React.useEffect(() => {
     if (
@@ -87,7 +87,7 @@ function EditControl(props) {
     onMounted && onMounted(drawRef.current);
 
     return null;
-  }, [props.draw, props.edit, props.position]);
+  }, [context, props, props.draw, props.edit, props.position]);
 
   return null;
 }
