@@ -53,7 +53,7 @@ namespace Harvest.Web.Controllers
         {
             var viewModel = new AddUserRolesModel
             {
-                Roles = await _dbContext.Roles.Where(a => a.Name != "System").ToListAsync()
+                Roles = await _dbContext.Roles.Where(a => a.Name != Role.Codes.System).ToListAsync()
             };
 
             return View(viewModel);
