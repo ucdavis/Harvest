@@ -26,7 +26,7 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            //TODO: Filter out System roles?
+            //TODO: Filter out Role.Codes.System roles?
             var permissions = await _dbContext.Permissions
                 .Include(a => a.User)
                 .Include(a => a.Role)
@@ -64,7 +64,7 @@ namespace Harvest.Web.Controllers
         {
             var viewModel = new AddUserRolesModel
             {
-                Roles = await _dbContext.Roles.Where(a => a.Name != "System").ToListAsync(),
+                Roles = await _dbContext.Roles.Where(a => a.Name != Role.Codes.System).ToListAsync(),
                 UserEmail = model.UserEmail
             };
             if (model.RoleId == 0)
