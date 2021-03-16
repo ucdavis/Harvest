@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="card-content">
-        <table class="table">
+        <table  id="permissions" class="table table-striped table-bordered" >
             <thead>
             <tr>
                 <th>
@@ -49,3 +49,25 @@
         </table>
     </div>
 </div>
+
+@section Styles
+{
+  @{ await Html.RenderPartialAsync("_ReportStylesPartial");}
+}
+
+@section Scripts
+{
+  @{ await Html.RenderPartialAsync("_ReportScriptsPartial");}
+
+  <script type="text/javascript">
+    var table = $('#permissions').DataTable({
+      responsive: true,
+      columnDefs: [
+        { responsivePriority: 1, targets: 0 },
+        { responsivePriority: 2, targets: 1 },
+        { responsivePriority: 3, targets: 2 },
+        { responsivePriority: 4, targets: 3 }
+      ]
+    });
+  </script>
+}
