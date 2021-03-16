@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Harvest.Web.Models
+﻿namespace Harvest.Web.Models.Settings
 {
     public class FinancialLookupSettings
     {
-        public string Account { get; set; }
-        public string Organization { get; set; }
+        public string AccountUrl { get; set; }
+        public string OrganizationUrl { get; set; }
     }
 }

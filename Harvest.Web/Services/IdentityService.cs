@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Web.Models;
+using Harvest.Web.Models.Settings;
 using Microsoft.Extensions.Options;
 using Ietws;
 
