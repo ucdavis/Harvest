@@ -1,4 +1,5 @@
 using System.IO;
+using Elastic.Apm.NetCoreAll;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
@@ -133,6 +134,8 @@ namespace Harvest.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext)
         {
+            app.UseAllElasticApm(Configuration);
+
             ConfigureDb(dbContext);
 
             if (env.IsDevelopment())
