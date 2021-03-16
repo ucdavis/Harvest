@@ -20,6 +20,8 @@ namespace Harvest.Web.Models.FinancialAccountModels
 
         public string ProjectName { get; set; } //Different Lookup
         public string SubAccountName { get; set; } //Different Lookup
+        public string subAccount { get; set; } //Added for harvest
+        public string project { get; set; } //Added for harvest
 
 
         public static implicit operator KfsAccount(string v)

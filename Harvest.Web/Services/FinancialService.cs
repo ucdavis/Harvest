@@ -28,6 +28,9 @@ namespace Harvest.Web.Services
         Task<bool> IsOrgChildOfOrg(string childChart, string childOrg, string parentChart, string parentOrg);
 
         Task<AccountManager> GetFiscalOfficerForAccount(string chart, string account);
+
+        Task<AccountValidationModel> IsValid(string account);
+        Task<AccountValidationModel> IsValid(KfsAccount account);
     }
 
     public class FinancialService : IFinancialService
@@ -222,6 +225,110 @@ namespace Harvest.Web.Services
 
             var contents = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<AccountManager>(contents);
+        }
+
+        public async Task<AccountValidationModel> IsValid(string account)
+        {
+            var rtValue = new AccountValidationModel();
+            try
+            {
+                account = account.Trim();
+                rtValue.KfsAccount = new KfsAccount();
+                var delimiter = new string[] { "-" };
+                var accountArray = account.Split(delimiter, StringSplitOptions.None);
+                if (accountArray.Length < 2)
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Message = "Need chart and account";
+                    rtValue.Field = "Account";
+                    return rtValue;
+                }
+
+                rtValue.KfsAccount.chartOfAccountsCode = accountArray[0].ToUpper();
+                rtValue.KfsAccount.accountNumber = accountArray[1].ToUpper();
+                if (accountArray.Length > 2)
+                {
+                    rtValue.KfsAccount.subAccount = accountArray[2].ToUpper();
+                }
+                //TODO: Maybe a project?
+
+                rtValue = await IsValid(rtValue.KfsAccount);
+            }
+            catch
+            {
+                rtValue.IsValid = false;
+                rtValue.Message = "Unable to parse account string";
+                rtValue.Field = "Account";
+            }
+
+            return rtValue;
+        }
+
+        public async Task<AccountValidationModel> IsValid(KfsAccount account)
+        {
+            var rtValue = new AccountValidationModel();
+            rtValue.KfsAccount = account;
+
+            if (!await IsAccountValid(account.chartOfAccountsCode, account.accountNumber, account.subAccount))
+            {
+                rtValue.IsValid = false;
+                rtValue.Field = "Account";
+                rtValue.Message = "Valid Account Not Found. (Invalid or Expired).";
+
+                return rtValue;
+            }
+
+            if (!string.IsNullOrWhiteSpace(account.subAccount))
+            {
+                //Maybe we don't care for validation?
+                rtValue.KfsAccount.SubAccountName = await GetSubAccountName(account.chartOfAccountsCode, account.accountNumber, account.subAccount);
+            }
+
+            if (!string.IsNullOrWhiteSpace(account.project))
+            {
+                if (!await IsProjectValid(account.project))
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Field = "Project";
+                    rtValue.Message = "Project Not Valid.";
+                    return rtValue;
+                }
+                else
+                {
+                    rtValue.KfsAccount.ProjectName = await GetProjectName(account.project);
+                }
+            }
+
+
+            var accountLookup = new KfsAccount();
+            accountLookup = await GetAccount(account.chartOfAccountsCode, account.accountNumber);
+            rtValue.KfsAccount.accountName = accountLookup.accountName;
+            rtValue.KfsAccount.organizationCode = accountLookup.organizationCode;
+            rtValue.KfsAccount.subFundGroupCode = accountLookup.subFundGroupCode;
+            rtValue.KfsAccount.subFundGroupTypeCode = accountLookup.subFundGroupTypeCode;
+            rtValue.KfsAccount.subFundGroupName = accountLookup.subFundGroupName;
+
+            //TODO:this lookup can get the fiscal officer and account manager populate the account manager?
+
+            //Ok, not check if the org rolls up to our orgs
+            //Decide if we want to check this
+            //if (await IsOrgChildOfOrg(accountLookup.chartOfAccountsCode,
+            //        accountLookup.organizationCode, "3", "AAES") ||
+            //    await IsOrgChildOfOrg(accountLookup.chartOfAccountsCode,
+            //        accountLookup.organizationCode,
+            //        "L", "AAES"))
+            //{
+            //    rtValue.IsValid = true;
+            //}
+            //else
+            //{
+            //    rtValue.IsValid = false;
+            //    rtValue.Field = "Account";
+            //    rtValue.Message = "Account not in CAES org.";
+            //}
+
+
+            return rtValue;
         }
     }
 }
