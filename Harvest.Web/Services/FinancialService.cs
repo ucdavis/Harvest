@@ -27,7 +27,7 @@ namespace Harvest.Web.Services
 
         Task<bool> IsOrgChildOfOrg(string childChart, string childOrg, string parentChart, string parentOrg);
 
-        Task<AccountManager> GetFiscalOfficerForAccount(string chart, string account);
+        Task<KfsUser> GetFiscalOfficerForAccount(string chart, string account);
 
         Task<AccountValidationModel> IsValid(string account);
         Task<AccountValidationModel> IsValid(KfsAccount account);
@@ -214,7 +214,7 @@ namespace Harvest.Web.Services
             return JsonConvert.DeserializeObject<bool>(validationContents);
         }
 
-        public async Task<AccountManager> GetFiscalOfficerForAccount(string chart, string account)
+        public async Task<KfsUser> GetFiscalOfficerForAccount(string chart, string account)
         {
             //https://financials.api.adminit.ucdavis.edu/fau/account/{chart}/{account}/fiscalofficer
             string url = $"{_financialSettings.AccountUrl}/account/{chart}/{account}/fiscalofficer";
@@ -224,7 +224,7 @@ namespace Harvest.Web.Services
             response.EnsureSuccessStatusCode();
 
             var contents = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<AccountManager>(contents);
+            return JsonConvert.DeserializeObject<KfsUser>(contents);
         }
 
         public async Task<AccountValidationModel> IsValid(string account)

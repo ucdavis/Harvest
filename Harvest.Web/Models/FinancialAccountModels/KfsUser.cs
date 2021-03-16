@@ -1,6 +1,6 @@
 ﻿namespace Harvest.Web.Models.FinancialAccountModels
 {
-    public class AccountManager
+    public class KfsUser
     {
         public string PrincipalId { get; set; }
         public string PrincipalName { get; set; }
