@@ -22,12 +22,12 @@
 <body>
     <div class="page-wrap">
         <header>
+            <div class="container">
             @if (Configuration["Environment:ShowTestBanner"] == "Yes")
             {
                 <h1 style="background-color: red; text-align: center; color: white">----------- Beta Testing. Data will not
                     be retained. -----------</h1>
             }
-            <div class="container">
                 <div class="row justify-content-between align-items-end">
                     <div class="col-sm-8 col-md-5 col-xl-4">
                         <a asp-area="" asp-controller="Home" asp-action="Index">
@@ -35,15 +35,15 @@
                             <p class="subtitle">Planting tomorrow's crops today</p>
                         </a>
                     </div>
+                    <div class="text-right col-sm-4">
+                        <a target="_blank" href="https://ucdavis.edu">
+                        ucdavis logo here</a>
+                    </div>
                 </div>
-            </div>
-        </header>
-        <div class="head_bleed">
-            <div class="head_divider">
-            </div>
         </div>
-        <nav class="navbar navbar-expand-md nav mb-4">
-            <a class="navbar-brand" href="#">Harvest</a>
+        </header>
+        <div class="nav-wrapper">
+        <nav class="navbar navbar-expand-md nav container">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
                 aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -56,16 +56,13 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Link</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-                    </li>
                 </ul>
                 <div class="mt-2 mt-md-0">
                     Welcome @User.Identity.Name
                 </div>
             </div>
         </nav>
-
+        </div>
         @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
         {
             <div class="container">
