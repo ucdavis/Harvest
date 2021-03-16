@@ -124,6 +124,7 @@ namespace Harvest.Web
             }
 
             services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
+            services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
 
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
