@@ -41,9 +41,22 @@ export const QuoteContainer = () => {
         </span>
 
         <p className="card-text">
-          Some quick example text to build on the card title and make up the
-          bulk of the card's content.
+          <h4>Requirements</h4>
+          <p>{project.requirements}</p>
         </p>
+        <div>
+          <h4>Status</h4>
+          <p>{project.status}</p>
+          <h4>Type</h4>
+          <p>TODO ROW CROPS</p>
+          <h4>Timeline</h4>
+          <p>
+            {new Date(project.start).toLocaleDateString()} through{" "}
+            {new Date(project.end).toLocaleDateString()}
+          </p>
+          <h4>Crops</h4>
+          <p>{project.crop}</p>
+        </div>
       </div>
     </div>
   );
