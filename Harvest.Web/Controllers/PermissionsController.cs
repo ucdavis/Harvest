@@ -30,6 +30,7 @@ namespace Harvest.Web.Controllers
             var permissions = await _dbContext.Permissions
                 .Include(a => a.User)
                 .Include(a => a.Role)
+                .Where(a=> a.Role.Name != Role.Codes.System)
                 .ToListAsync();
 
             var viewModel = new UserPermissionsListModel();
