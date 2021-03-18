@@ -22,7 +22,8 @@ interface Props {
 export const ProjectDetail = (props: Props) => {
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {
-    const newActivityId = Math.max(...props.quote.activities.map((a) => a.id), 0) + 1;
+    const newActivityId =
+      Math.max(...props.quote.activities.map((a) => a.id), 0) + 1;
     props.updateQuote({
       ...props.quote,
       activities: [
@@ -47,7 +48,14 @@ export const ProjectDetail = (props: Props) => {
           <Label for="projectName">
             <h6>Project Name</h6>
           </Label>
-          <Input type="text" id="projectName" />
+          <Input
+            type="text"
+            id="projectName"
+            value={props.quote.projectName}
+            onChange={(e) =>
+              props.updateQuote({ ...props.quote, projectName: e.target.value })
+            }
+          />
           <br />
           <Row>
             <Col xs="4">
