@@ -81,9 +81,9 @@ namespace Harvest.Web.Controllers
             }
 
             var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
-            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId);
+            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId && r.Name != Role.Codes.System);
 
-            if (role == null)
+            if (role == null || role.Name == Role.Codes.System)
             {
                 ModelState.AddModelError("RoleId", "Role not found!");
                 return View(viewModel);
