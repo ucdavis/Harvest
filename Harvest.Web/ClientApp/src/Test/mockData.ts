@@ -1,0 +1,43 @@
+import { ProjectWithQuotes } from "../types";
+
+export const fakeProject: ProjectWithQuotes = {
+  project: {
+    id: 3,
+    start: new Date("2021-03-15T00:00:00"),
+    end: new Date("2021-03-29T00:00:00"),
+    crop: "Tomato",
+    requirements: "Grow me some tomatoes",
+    name: "Tomato",
+    principalInvestigator: {
+      id: 1,
+      firstName: "Scott",
+      lastName: "Kirkland",
+      email: "srkirkland@ucdavis.edu",
+      iam: "1000029584",
+      kerberos: "postit",
+      name: "Scott Kirkland",
+    },
+    location: null,
+    locationCode: null,
+    quoteId: 0,
+    quote: null,
+    quoteTotal: 0.0,
+    chargedTotal: 0.0,
+    createdOn: new Date("2021-03-15T00:00:00"),
+    status: "Requested",
+    currentAccountVersion: 0,
+    isActive: false,
+    createdBy: {
+      id: 1,
+      firstName: "Scott",
+      lastName: "Kirkland",
+      email: "srkirkland@ucdavis.edu",
+      iam: "1000029584",
+      kerberos: "postit",
+      name: "Scott Kirkland",
+    },
+    accounts: null,
+    quotes: null,
+  },
+  quotes: [],
+};

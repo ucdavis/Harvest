@@ -23,6 +23,11 @@ export interface Project {
 
 export interface User {
   id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  iam: string;
+  kerberos: string;
   name: string;
 }
 
