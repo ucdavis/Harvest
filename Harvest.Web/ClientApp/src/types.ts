@@ -73,29 +73,50 @@ export interface ProjectWithQuotes {
 export interface ActionType {
   id: number;
   name: string;
-};
+}
 
 export interface MeasurementUnit {
   id: number;
   name: string;
-};
+}
 
 export interface Action {
   id: number;
   type: ActionType;
   name: string;
   unit: MeasurementUnit;
-};
+}
 
+export class WorkItemImpl implements WorkItem {
+  id;
+  activityId;
+  type;
+  rate;
+  quantity;
+
+  get total(): number {
+    return this.rate * this.quantity;
+  }
+
+  constructor(activityId: number, id: number, type: string) {
+    this.activityId = activityId;
+    this.id = id;
+    this.type = type;
+    this.rate = 0;
+    this.quantity = 0;
+  }
+}
 export interface WorkItem {
-  id?: string;
+  id: number;
+  activityId: number;
   type: string;
   rate: number;
   quantity: number;
-};
+  readonly total: number;
+}
 
-export interface Activity{
+export interface Activity {
   id: number;
   name: string;
   workItems: WorkItem[];
-};
+}

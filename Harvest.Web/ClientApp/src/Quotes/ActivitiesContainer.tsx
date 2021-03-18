@@ -12,7 +12,7 @@ interface Props {
 
 export const ActivitiesContainer = (props: Props) => {
   const updateActivity = (activity: Activity) => {
-    // TODO: can we get away without copying?  do we need to totally splice/replace?
+    // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
     const allActivities = props.quote.activities;
     const activityIndex = allActivities.findIndex(a => a.id === activity.id);
     allActivities[activityIndex] = { ...activity };

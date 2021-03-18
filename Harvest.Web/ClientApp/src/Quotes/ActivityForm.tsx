@@ -1,7 +1,9 @@
 import React from "react";
 import { Card, CardBody, CardHeader, Input } from "reactstrap";
 
-import { Activity } from "../types";
+import { Activity, WorkItem } from "../types";
+
+import { WorkItemsForm } from "./WorkItemsForm";
 
 interface Props {
   activity: Activity;
@@ -9,6 +11,16 @@ interface Props {
 }
 
 export const ActivityForm = (props: Props) => {
+  const updateWorkItems = (workItem: WorkItem) => {
+    // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
+    const allItems = props.activity.workItems;
+    const itemIndex = allItems.findIndex(
+      (a) => a.id === workItem.id && a.activityId === workItem.activityId
+    );
+    allItems[itemIndex] = { ...workItem };
+
+    props.updateActivity({ ...props.activity, workItems: allItems });
+  };
   return (
     <Card>
       <CardHeader>
@@ -22,11 +34,23 @@ export const ActivityForm = (props: Props) => {
         ></Input>
       </CardHeader>
       <CardBody>
-        <div>
-          <h4>Labor</h4>
-          <h4>Equipment</h4>
-          <h4>Other</h4>
-        </div>
+        <WorkItemsForm
+          category="Labor"
+          workItems={props.activity.workItems.filter((w) => w.type === "labor")}
+          updateWorkItems={updateWorkItems}
+        />
+        <WorkItemsForm
+          category="Equipment"
+          workItems={props.activity.workItems.filter(
+            (w) => w.type === "equipment"
+          )}
+          updateWorkItems={updateWorkItems}
+        />
+        <WorkItemsForm
+          category="Other"
+          workItems={props.activity.workItems.filter((w) => w.type === "other")}
+          updateWorkItems={updateWorkItems}
+        />
       </CardBody>
     </Card>
   );

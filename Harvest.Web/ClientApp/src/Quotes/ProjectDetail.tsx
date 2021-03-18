@@ -1,6 +1,6 @@
 import React from "react";
 
-import { QuoteContent } from "../types";
+import { QuoteContent, WorkItemImpl } from "../types";
 
 import {
   Button,
@@ -20,6 +20,25 @@ interface Props {
 }
 
 export const ProjectDetail = (props: Props) => {
+  // TODO: should we do the work here or pass up to parent?
+  const addActivity = () => {
+    const newActivityId = props.quote.activities.length + 1;
+    props.updateQuote({
+      ...props.quote,
+      activities: [
+        ...props.quote.activities,
+        {
+          id: newActivityId,
+          name: "Activity",
+          workItems: [
+            new WorkItemImpl(newActivityId, 1, "labor"),
+            new WorkItemImpl(newActivityId, 1, "equipment"),
+            new WorkItemImpl(newActivityId, 1, "other"),
+          ],
+        },
+      ],
+    });
+  };
   return (
     <Container>
       <Row>
@@ -86,16 +105,7 @@ export const ProjectDetail = (props: Props) => {
             </Col>
           </Row>
           <br />
-          <Button
-            color="success"
-            size="lg"
-            onClick={() =>
-              props.updateQuote({
-                ...props.quote,
-                activities: [...props.quote.activities, { id: props.quote.activities.length + 1, name: "Activity", workItems: [] }],
-              })
-            }
-          >
+          <Button color="success" size="lg" onClick={addActivity}>
             Add Activity
           </Button>
         </Col>
