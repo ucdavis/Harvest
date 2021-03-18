@@ -47,6 +47,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Labor</div>
               </Col>
               <Col xs="2" sm="2">
+                  {/* TODO: We probably want to store these totals instead of calculating every time.  Perhaps with a useEffect hook in the right places. */}
                 $
                 {props.quote.activities.reduce(
                   (prev, curr) =>
