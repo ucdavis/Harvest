@@ -13,12 +13,12 @@ namespace Harvest.Core.Domain
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "First Name")] 
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
         [StringLength(50)]
-        [Display(Name = "Last Name")] 
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
         [Required]
@@ -34,6 +34,10 @@ namespace Harvest.Core.Domain
 
         public List<Permission> Permissions { get; set; }
 
+        public List<Project> CreatedProjects { get; set; }
+
+        public List<Project> PrincipalInvestigatorProjects { get; set; }
+
         [Display(Name = "Name")]
         public string Name => FirstName + " " + LastName;
 
@@ -47,6 +51,18 @@ namespace Harvest.Core.Domain
                 .HasOne(p => p.User)
                 .WithMany(u => u.Permissions)
                 .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.PrincipalInvestigator)
+                .WithMany(u => u.PrincipalInvestigatorProjects)
+                .HasForeignKey(p => p.PrincipalInvestigatorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.CreatedBy)
+                .WithMany(u => u.CreatedProjects)
+                .HasForeignKey(p => p.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
