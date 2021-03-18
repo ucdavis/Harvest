@@ -26,7 +26,42 @@ export interface User {
   name: string;
 }
 
-export interface Quote {}
+// TODO: should this be a different name or is it ok?  Do we even need an interface?
+
+// the dynamic content which will be stored in Quote.text
+export class QuoteContentImpl implements QuoteContent {
+  projectName: string = ""; // TODO: might be worth removing when feasible
+  acres: number = 0;
+  acreageRate: number = 360;
+  get acreageTotal(): number {
+    return this.acres * this.acreageRate;
+  }
+}
+
+export interface QuoteContent {
+  projectName: string; // TODO: might be worth removing when feasible
+  acres: number;
+  acreageRate: number;
+  readonly acreageTotal: number;
+}
+
+export interface Quote {
+  id: number;
+  projectId: number;
+  text: string;
+  total: number;
+  initatedById: number;
+  currentDocumentId: number | null;
+  approvedById: number | null;
+  approvedOn: string | null;
+  createdDate: string;
+  status: string;
+  project: Project;
+  initiatedBy: User;
+  approvedBy: User;
+  documents: Document[];
+  currentDocument: Document;
+}
 
 export interface ProjectWithQuotes {
   project: Project;
