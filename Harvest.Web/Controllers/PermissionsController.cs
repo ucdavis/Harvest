@@ -30,6 +30,7 @@ namespace Harvest.Web.Controllers
             var permissions = await _dbContext.Permissions
                 .Include(a => a.User)
                 .Include(a => a.Role)
+                .Where(a=> a.Role.Name != Role.Codes.System)
                 .ToListAsync();
 
             var viewModel = new UserPermissionsListModel();
@@ -79,10 +80,16 @@ namespace Harvest.Web.Controllers
                 return View(viewModel);
             }
 
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
-            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId);
+            //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
+            User user = null;
+            var users = await _dbContext.Users.Where(a => a.Email == model.UserEmail || a.Kerberos == model.UserEmail).ToArrayAsync();
+            if(users.Length == 1)
+            {
+                user = users.First();
+            }
+            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId && r.Name != Role.Codes.System);
 
-            if (role == null)
+            if (role == null || role.Name == Role.Codes.System)
             {
                 ModelState.AddModelError("RoleId", "Role not found!");
                 return View(viewModel);
@@ -105,6 +112,12 @@ namespace Harvest.Web.Controllers
             {
                 ModelState.AddModelError("UserEmail", "User Not found.");
                 return View(viewModel);
+            }
+
+            if(addUser && await _dbContext.Users.AnyAsync(a => a.Iam == user.Iam))
+            {
+                addUser = false;
+                user = await _dbContext.Users.SingleAsync(a => a.Iam == user.Iam);
             }
 
             if (addUser)
@@ -137,9 +150,36 @@ namespace Harvest.Web.Controllers
             return View(viewModel);
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            throw new NotImplementedException();
+            var viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync();
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int userId, int[] roles)
+        {
+            //TODO: Make sure you don't remove your own roles?
+            var user = await _dbContext.Users.Where(a => a.Id == userId).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync();
+            if(await _dbContext.Roles.AnyAsync(a => a.Name == Role.Codes.System && roles.Contains(a.Id)))
+            {
+                ErrorMessage = "Unknown Role selected";
+                return RedirectToAction("Index");
+            }
+
+            if(roles.Length <= 0)
+            {
+                ErrorMessage = "No Roles Selected to remove.";
+                return RedirectToAction("Delete", new { id = userId });
+            }
+
+            foreach(var role in roles)
+            {
+               _dbContext.Permissions.Remove(user.Permissions.Where(a => a.Role.Id == role).Single());
+            }
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
     }
 }
