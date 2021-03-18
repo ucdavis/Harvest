@@ -30,18 +30,20 @@ export interface User {
 
 // the dynamic content which will be stored in Quote.text
 export class QuoteContentImpl implements QuoteContent {
-  projectName: string = ""; // TODO: might be worth removing when feasible
-  acres: number = 0;
-  acreageRate: number = 360;
+  projectName = ""; // TODO: might be worth removing when feasible
+  acres = 0;
+  acreageRate = 360;
   get acreageTotal(): number {
     return this.acres * this.acreageRate;
   }
+  activities = [];
 }
 
 export interface QuoteContent {
   projectName: string; // TODO: might be worth removing when feasible
   acres: number;
   acreageRate: number;
+  activities: Activity[];
   readonly acreageTotal: number;
 }
 
@@ -93,5 +95,7 @@ export interface WorkItem {
 };
 
 export interface Activity{
+  id: number;
+  name: string;
   workItems: WorkItem[];
 };

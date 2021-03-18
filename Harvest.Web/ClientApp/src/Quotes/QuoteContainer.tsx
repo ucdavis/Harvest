@@ -1,9 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Project, ProjectWithQuotes, QuoteContent, QuoteContentImpl } from "../types";
+import {
+  Project,
+  ProjectWithQuotes,
+  QuoteContent,
+  QuoteContentImpl,
+} from "../types";
 
-import { ProjectDetail } from './ProjectDetail';
+import { ProjectDetail } from "./ProjectDetail";
+import { ActivitiesContainer } from "./ActivitiesContainer";
 
 interface RouteParams {
   projectId?: string;
@@ -46,10 +52,10 @@ export const QuoteContainer = () => {
           {project.createdBy.name}
         </span>
 
-        <p className="card-text">
+        <div className="card-text">
           <h4>Requirements</h4>
           <p>{project.requirements}</p>
-        </p>
+        </div>
         <div>
           <h4>Status</h4>
           <p>{project.status}</p>
@@ -67,8 +73,10 @@ export const QuoteContainer = () => {
           <h2>Quote Details</h2>
           <hr />
           <ProjectDetail quote={quote} updateQuote={setQuote} />
+          <ActivitiesContainer quote={quote} updateQuote={setQuote} />
         </div>
       </div>
+      <div>Debug: {JSON.stringify(quote)}</div>
     </div>
   );
 };

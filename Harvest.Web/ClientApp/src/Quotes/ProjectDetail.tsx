@@ -86,7 +86,16 @@ export const ProjectDetail = (props: Props) => {
             </Col>
           </Row>
           <br />
-          <Button color="success" size="lg" onClick={() => {}}>
+          <Button
+            color="success"
+            size="lg"
+            onClick={() =>
+              props.updateQuote({
+                ...props.quote,
+                activities: [...props.quote.activities, { id: props.quote.activities.length + 1, name: "Activity", workItems: [] }],
+              })
+            }
+          >
             Add Activity
           </Button>
         </Col>
