@@ -17,6 +17,7 @@ interface Props {
   workItems: WorkItem[];
   updateWorkItems: (workItem: WorkItem) => void;
   addNewWorkItem: (category: string) => void;
+  deleteWorkItem: (workItem: WorkItem) => void;
 }
 
 export const WorkItemsForm = (props: Props) => {
@@ -90,7 +91,7 @@ export const WorkItemsForm = (props: Props) => {
           <Col xs="2">${workItem.rate * workItem.quantity}</Col>
 
           <Col xs="2">
-            <Button color="danger" onClick={() => {}}>
+            <Button color="danger" onClick={() => props.deleteWorkItem(workItem)}>
               Delete
             </Button>
           </Col>

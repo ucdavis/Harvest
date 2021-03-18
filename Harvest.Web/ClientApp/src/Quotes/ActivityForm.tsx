@@ -23,18 +23,27 @@ export const ActivityForm = (props: Props) => {
   };
 
   const addNewWorkItem = (category: string) => {
+    const newId = Math.max(...props.activity.workItems.map((w) => w.id), 0) + 1;
     props.updateActivity({
       ...props.activity,
       workItems: [
         ...props.activity.workItems,
-        new WorkItemImpl(
-          props.activity.id,
-          props.activity.workItems.length + 1,
-          category
-        ),
+        new WorkItemImpl(props.activity.id, newId, category),
       ],
     });
   };
+
+  const deleteWorkItem = (workItem: WorkItem) => {
+    // dump our deleted friend
+    const itemsToKeep = props.activity.workItems.filter(
+      (w) => w.id !== workItem.id
+    );
+    props.updateActivity({
+      ...props.activity,
+      workItems: itemsToKeep,
+    });
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -53,6 +62,7 @@ export const ActivityForm = (props: Props) => {
           workItems={props.activity.workItems.filter((w) => w.type === "labor")}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
+          deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
           category="equipment"
@@ -61,12 +71,14 @@ export const ActivityForm = (props: Props) => {
           )}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
+          deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
           category="other"
           workItems={props.activity.workItems.filter((w) => w.type === "other")}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
+          deleteWorkItem={deleteWorkItem}
         />
       </CardBody>
     </Card>

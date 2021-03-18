@@ -22,7 +22,7 @@ interface Props {
 export const ProjectDetail = (props: Props) => {
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {
-    const newActivityId = props.quote.activities.length + 1;
+    const newActivityId = Math.max(...props.quote.activities.map((a) => a.id), 0) + 1;
     props.updateQuote({
       ...props.quote,
       activities: [
@@ -32,8 +32,8 @@ export const ProjectDetail = (props: Props) => {
           name: "Activity",
           workItems: [
             new WorkItemImpl(newActivityId, 1, "labor"),
-            new WorkItemImpl(newActivityId, 1, "equipment"),
-            new WorkItemImpl(newActivityId, 1, "other"),
+            new WorkItemImpl(newActivityId, 2, "equipment"),
+            new WorkItemImpl(newActivityId, 3, "other"),
           ],
         },
       ],
