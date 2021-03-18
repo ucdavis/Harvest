@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardBody, CardHeader, Input } from "reactstrap";
 
-import { Activity, WorkItem } from "../types";
+import { Activity, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
@@ -21,6 +21,20 @@ export const ActivityForm = (props: Props) => {
 
     props.updateActivity({ ...props.activity, workItems: allItems });
   };
+
+  const addNewWorkItem = (category: string) => {
+    props.updateActivity({
+      ...props.activity,
+      workItems: [
+        ...props.activity.workItems,
+        new WorkItemImpl(
+          props.activity.id,
+          props.activity.workItems.length + 1,
+          category
+        ),
+      ],
+    });
+  };
   return (
     <Card>
       <CardHeader>
@@ -35,21 +49,24 @@ export const ActivityForm = (props: Props) => {
       </CardHeader>
       <CardBody>
         <WorkItemsForm
-          category="Labor"
+          category="labor"
           workItems={props.activity.workItems.filter((w) => w.type === "labor")}
           updateWorkItems={updateWorkItems}
+          addNewWorkItem={addNewWorkItem}
         />
         <WorkItemsForm
-          category="Equipment"
+          category="equipment"
           workItems={props.activity.workItems.filter(
             (w) => w.type === "equipment"
           )}
           updateWorkItems={updateWorkItems}
+          addNewWorkItem={addNewWorkItem}
         />
         <WorkItemsForm
-          category="Other"
+          category="other"
           workItems={props.activity.workItems.filter((w) => w.type === "other")}
           updateWorkItems={updateWorkItems}
+          addNewWorkItem={addNewWorkItem}
         />
       </CardBody>
     </Card>

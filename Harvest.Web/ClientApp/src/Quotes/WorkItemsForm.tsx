@@ -16,6 +16,7 @@ interface Props {
   category: string;
   workItems: WorkItem[];
   updateWorkItems: (workItem: WorkItem) => void;
+  addNewWorkItem: (category: string) => void;
 }
 
 export const WorkItemsForm = (props: Props) => {
@@ -95,6 +96,9 @@ export const WorkItemsForm = (props: Props) => {
           </Col>
         </Row>
       ))}
+      <Button color="link" onClick={() => props.addNewWorkItem(props.category)}>
+        Add {props.category}
+      </Button>
     </div>
   );
 };
