@@ -22,7 +22,7 @@ namespace Harvest.Web.Controllers
         // Get info on the project as well as outstanding quotes (in case we want to edit an in-progess quote)
         public async Task<ActionResult> Get(int id)
         {
-            var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).SingleAsync(p => p.Id == id);
+            var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id);
             var quotes = await _dbContext.Quotes.Where(q => q.ProjectId == id && q.ApprovedOn == null).ToArrayAsync();
 
             var model = new QuoteModel { Project = project, Quotes = quotes };
@@ -32,7 +32,8 @@ namespace Harvest.Web.Controllers
 
         // Create a quote for project ID
         [HttpGet]
-        public ActionResult Create(int id) {
+        public ActionResult Create(int id)
+        {
             return View();
         }
     }

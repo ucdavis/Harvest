@@ -24,7 +24,7 @@ export const QuoteContainer = () => {
     };
 
     cb();
-  });
+  }, [projectId]);
 
   if (!project) {
     return <div>Loading</div>;
@@ -34,9 +34,12 @@ export const QuoteContainer = () => {
     <div className="card">
       <div className="card-body">
         <h5 className="card-title">Field Request #{project.id}</h5>
-        <p>PI: Bob Dobalina</p>
-        <small>Created {new Date(project.createdOn).toDateString()}</small>
-        
+        <p>PI: {project.principalInvestigator.name}</p>
+        <span>
+          Created {new Date(project.createdOn).toDateString()} by{" "}
+          {project.createdBy.name}
+        </span>
+
         <p className="card-text">
           Some quick example text to build on the card title and make up the
           bulk of the card's content.

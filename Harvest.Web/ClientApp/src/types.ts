@@ -5,21 +5,25 @@ export interface Project {
   crop: string;
   requirements: string;
   name: string;
-  principalInvestigator: number;
+  principalInvestigator: User;
   location: null;
   locationCode: null;
   quoteId: number;
   quote: null;
   quoteTotal: number;
   chargedTotal: number;
-  createdById: number;
+  createdBy: User;
   createdOn: Date;
   status: string;
   currentAccountVersion: number;
   isActive: boolean;
-  createdBy: null;
   accounts: null;
   quotes: null;
+}
+
+export interface User {
+  id: number;
+  name: string;
 }
 
 export interface Quote {}

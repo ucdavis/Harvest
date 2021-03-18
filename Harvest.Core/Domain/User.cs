@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -32,10 +33,13 @@ namespace Harvest.Core.Domain
         [StringLength(20)]
         public string Kerberos { get; set; }
 
+        [JsonIgnore]
         public List<Permission> Permissions { get; set; }
 
+        [JsonIgnore]
         public List<Project> CreatedProjects { get; set; }
 
+        [JsonIgnore]
         public List<Project> PrincipalInvestigatorProjects { get; set; }
 
         [Display(Name = "Name")]
