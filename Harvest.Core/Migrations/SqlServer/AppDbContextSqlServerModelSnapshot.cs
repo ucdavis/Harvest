@@ -187,7 +187,7 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("PrincipalInvestigator")
+                    b.Property<int>("PrincipalInvestigatorId")
                         .HasColumnType("int");
 
                     b.Property<int?>("QuoteId")
@@ -215,6 +215,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("PrincipalInvestigatorId");
 
                     b.HasIndex("QuoteId");
 
@@ -440,9 +442,15 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("CreatedProjects")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.User", "PrincipalInvestigator")
+                        .WithMany("PrincipalInvestigatorProjects")
+                        .HasForeignKey("PrincipalInvestigatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Quote", "Quote")
@@ -450,6 +458,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasForeignKey("QuoteId1");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("PrincipalInvestigator");
 
                     b.Navigation("Quote");
                 });
@@ -514,7 +524,11 @@ namespace Harvest.Core.Migrations.SqlServer
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>
                 {
+                    b.Navigation("CreatedProjects");
+
                     b.Navigation("Permissions");
+
+                    b.Navigation("PrincipalInvestigatorProjects");
                 });
 #pragma warning restore 612, 618
         }

@@ -25,8 +25,10 @@ namespace Harvest.Core.Domain
         [StringLength(200)]
         public string Name { get; set; }
         
-        public int PrincipalInvestigator { get; set; }
+        public int PrincipalInvestigatorId { get; set; }
         
+        public User PrincipalInvestigator { get; set; }
+
         public Geometry Location { get; set; }
         
         [StringLength(50)]
@@ -73,6 +75,7 @@ namespace Harvest.Core.Domain
         {
             modelBuilder.Entity<Project>().HasIndex(a => a.Name);
             modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
+            modelBuilder.Entity<Project>().HasIndex(a => a.PrincipalInvestigatorId);
             modelBuilder.Entity<Project>().HasIndex(a => a.QuoteId);
 
             modelBuilder.Entity<Project>().Property(a => a.ChargedTotal).HasPrecision(18, 2);
