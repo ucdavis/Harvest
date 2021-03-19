@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -48,6 +49,8 @@ namespace Harvest.Web.Controllers
 
             project.CreatedBy = user;
             project.Status = StatusTypes.Requested;
+            project.CreatedOn = DateTime.UtcNow;
+            project.PrincipalInvestigator = user;
 
             _dbContext.Projects.Add(project);
 
