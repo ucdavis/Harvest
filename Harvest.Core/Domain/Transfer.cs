@@ -31,7 +31,19 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Transfer>().HasIndex(a => a.ToAccountId);
 
             modelBuilder.Entity<Transfer>().Property(a => a.Amount).HasPrecision(18, 2);
+
+            modelBuilder.Entity<Transfer>()
+                .HasOne(t => t.FromAccount)
+                .WithMany()
+                .HasForeignKey(t => t.FromAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transfer>()
+                .HasOne(t => t.ToAccount)
+                .WithMany()
+                .HasForeignKey(t => t.ToAccountId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
 
-   }
+    }
 }
