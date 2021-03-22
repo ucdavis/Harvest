@@ -50,7 +50,16 @@ namespace Harvest.Core.Services
             }
 
             var debit = await _financialService.IsValid(moneyTransfer.FromAccount.Number);
+            if (!debit.IsValid)
+            {
+                throw new Exception($"Unable to validate debit account {moneyTransfer.FromAccount.Number}: {debit.Message}");
+            }
+
             var credit = await _financialService.IsValid(moneyTransfer.ToAccount.Number);
+            if (!credit.IsValid)
+            {
+                throw new Exception($"Unable to validate credit account {moneyTransfer.ToAccount.Number}: {credit.Message}");
+            }
 
             var model = new TransactionViewModel
             {
@@ -60,7 +69,7 @@ namespace Harvest.Core.Services
 
             model.Transfers.Add(new TransferViewModel
             {
-                Account = moneyTransfer.FromAccount.Number?.ToUpperInvariant(),
+                Account = debit.KfsAccount.AccountNumber,
                 Amount = moneyTransfer.Amount,
                 Chart = debit.KfsAccount.ChartOfAccountsCode, 
                 SubAccount = debit.KfsAccount.SubAccount,
@@ -71,7 +80,7 @@ namespace Harvest.Core.Services
 
             model.Transfers.Add(new TransferViewModel
             {
-                Account = moneyTransfer.ToAccount.Number?.ToUpperInvariant(),
+                Account = credit.KfsAccount.AccountNumber,
                 Amount = moneyTransfer.Amount,
                 Chart = credit.KfsAccount.ChartOfAccountsCode,
                 SubAccount = credit.KfsAccount.SubAccount,

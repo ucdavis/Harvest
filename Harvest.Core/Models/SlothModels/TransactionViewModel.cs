@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Harvest.Core.Models.SlothModels
 {
@@ -16,8 +17,9 @@ namespace Harvest.Core.Models.SlothModels
 
         public DateTime TransactionDate { get; set; }
 
-        public string Source { get; set; } = "ANLAB Internal Recharge";
-        public string SourceType { get; set; } = "Recharge";
+        public string Source { get; set; }
+
+        public string SourceType { get; set; }
 
         public IList<TransferViewModel> Transfers { get; set; }
     }
@@ -25,11 +27,15 @@ namespace Harvest.Core.Models.SlothModels
     public class TransferViewModel
     {
         public Decimal Amount { get; set; }
+        [StringLength(1)]
         public string Chart { get; set; }
+        [StringLength(7)]
         public string Account { get; set; }
+        [StringLength(5)]
         public string SubAccount { get; set; }
+        [StringLength(4)]
         public string ObjectCode { get; set; }
-        //Max 40 characters
+        [StringLength(40)]
         public string Description { get; set; }
         
         public string Direction { get; set; }// Debit or Credit Code associated with the transaction. = ['Credit', 'Debit'],

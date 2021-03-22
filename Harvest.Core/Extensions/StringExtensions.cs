@@ -42,5 +42,19 @@ namespace Harvest.Core.Extensions
         {
             return $"%{q}";
         }
+
+        public static string Truncate(this string value, int maxChars)
+        {
+            const string ellipses = "...";
+            return value.Length <= maxChars ? value : value.Substring(0, maxChars - ellipses.Length) + ellipses;
+        }
+
+        public static string TruncateAndAppend(this string value1, string value2, int maxChars)
+        {
+            var maxValue1Chars = maxChars - value2.Length;
+            return maxValue1Chars > 0
+                ? value1.Truncate(maxValue1Chars) + value2
+                : value2;
+        }
     }
 }
