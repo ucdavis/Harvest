@@ -2,20 +2,23 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 
-public class LogUserNameMiddleware
+namespace Harvest.Web.Middleware
 {
-    private readonly RequestDelegate next;
-
-    public LogUserNameMiddleware(RequestDelegate next)
+    public class LogUserNameMiddleware
     {
-        this.next = next;
-    }
+        private readonly RequestDelegate _next;
 
-    public async Task Invoke(HttpContext context)
-    {
-        using (LogContext.PushProperty("User", context.User.Identity.Name ?? "anonymous"))
+        public LogUserNameMiddleware(RequestDelegate next)
         {
-            await next(context);
+            _next = next;
+        }
+
+        public async Task Invoke(HttpContext context)
+        {
+            using (LogContext.PushProperty("User", context.User.Identity.Name ?? "anonymous"))
+            {
+                await _next(context);
+            }
         }
     }
 }

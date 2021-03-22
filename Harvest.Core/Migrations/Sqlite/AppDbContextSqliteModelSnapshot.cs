@@ -328,6 +328,115 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FromAccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ToAccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromAccountId");
+
+                    b.HasIndex("ToAccountId");
+
+                    b.ToTable("Transfers");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.TransferHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Action")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ActionDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ActorId")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ActorName")
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransferId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TransferId");
+
+                    b.ToTable("TransferHistory");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("KfsTrackingNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RequestedById")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("RequestedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("SlothTransactionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("RequestedById");
+
+                    b.ToTable("TransferRequests");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>
                 {
                     b.Property<int>("Id")
@@ -492,6 +601,53 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Account", "FromAccount")
+                        .WithMany()
+                        .HasForeignKey("FromAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Account", "ToAccount")
+                        .WithMany()
+                        .HasForeignKey("ToAccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromAccount");
+
+                    b.Navigation("ToAccount");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.TransferHistory", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.TransferRequest", null)
+                        .WithMany("History")
+                        .HasForeignKey("TransferId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.User", "RequestedBy")
+                        .WithMany()
+                        .HasForeignKey("RequestedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("RequestedBy");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
                 {
                     b.Navigation("Quote");
@@ -507,6 +663,11 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Quote", b =>
                 {
                     b.Navigation("Documents");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
+                {
+                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>

@@ -3,6 +3,8 @@ using Elastic.Apm.NetCoreAll;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Models.Settings;
+using Harvest.Core.Services;
 using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
 using Harvest.Web.Models;
@@ -27,7 +29,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-
 
 namespace Harvest.Web
 {
@@ -127,11 +128,13 @@ namespace Harvest.Web
 
             services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
+            services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
 
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
+            services.AddScoped<ISlothService, SlothService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
