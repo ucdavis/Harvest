@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.FileProviders;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 
-namespace Harvest.Web
+namespace Harvest.Web.Views.Shared.Components.DynamicStyles
 {
     [ViewComponent(Name = "DynamicStyles")]
     public class DynamicStyles : ViewComponent

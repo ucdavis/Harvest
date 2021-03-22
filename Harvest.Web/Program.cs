@@ -53,8 +53,7 @@ namespace Harvest.Web
                 .WriteTo.Console();
 
             // add in elastic search sink if the uri is valid
-            Uri elasticUri;
-            if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out elasticUri))
+            if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out var elasticUri))
             {
                 loggerConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
                 {
