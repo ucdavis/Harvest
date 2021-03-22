@@ -241,11 +241,11 @@ namespace Harvest.Core.Services
                     return rtValue;
                 }
 
-                rtValue.KfsAccount.chartOfAccountsCode = accountArray[0].ToUpper();
-                rtValue.KfsAccount.accountNumber = accountArray[1].ToUpper();
+                rtValue.KfsAccount.ChartOfAccountsCode = accountArray[0].ToUpper();
+                rtValue.KfsAccount.AccountNumber = accountArray[1].ToUpper();
                 if (accountArray.Length > 2)
                 {
-                    rtValue.KfsAccount.subAccount = accountArray[2].ToUpper();
+                    rtValue.KfsAccount.SubAccount = accountArray[2].ToUpper();
                 }
                 //TODO: Maybe a project?
 
@@ -265,7 +265,7 @@ namespace Harvest.Core.Services
         {
             var rtValue = new AccountValidationModel {KfsAccount = account};
 
-            if (!await IsAccountValid(account.chartOfAccountsCode, account.accountNumber, account.subAccount))
+            if (!await IsAccountValid(account.ChartOfAccountsCode, account.AccountNumber, account.SubAccount))
             {
                 rtValue.IsValid = false;
                 rtValue.Field = "Account";
@@ -274,15 +274,15 @@ namespace Harvest.Core.Services
                 return rtValue;
             }
 
-            if (!string.IsNullOrWhiteSpace(account.subAccount))
+            if (!string.IsNullOrWhiteSpace(account.SubAccount))
             {
                 //Maybe we don't care for validation?
-                rtValue.KfsAccount.SubAccountName = await GetSubAccountName(account.chartOfAccountsCode, account.accountNumber, account.subAccount);
+                rtValue.KfsAccount.SubAccountName = await GetSubAccountName(account.ChartOfAccountsCode, account.AccountNumber, account.SubAccount);
             }
 
-            if (!string.IsNullOrWhiteSpace(account.project))
+            if (!string.IsNullOrWhiteSpace(account.Project))
             {
-                if (!await IsProjectValid(account.project))
+                if (!await IsProjectValid(account.Project))
                 {
                     rtValue.IsValid = false;
                     rtValue.Field = "Project";
@@ -291,16 +291,16 @@ namespace Harvest.Core.Services
                 }
                 else
                 {
-                    rtValue.KfsAccount.ProjectName = await GetProjectName(account.project);
+                    rtValue.KfsAccount.ProjectName = await GetProjectName(account.Project);
                 }
             }
 
-            var accountLookup = await GetAccount(account.chartOfAccountsCode, account.accountNumber);
-            rtValue.KfsAccount.accountName = accountLookup.accountName;
-            rtValue.KfsAccount.organizationCode = accountLookup.organizationCode;
-            rtValue.KfsAccount.subFundGroupCode = accountLookup.subFundGroupCode;
-            rtValue.KfsAccount.subFundGroupTypeCode = accountLookup.subFundGroupTypeCode;
-            rtValue.KfsAccount.subFundGroupName = accountLookup.subFundGroupName;
+            var accountLookup = await GetAccount(account.ChartOfAccountsCode, account.AccountNumber);
+            rtValue.KfsAccount.AccountName = accountLookup.AccountName;
+            rtValue.KfsAccount.OrganizationCode = accountLookup.OrganizationCode;
+            rtValue.KfsAccount.SubFundGroupCode = accountLookup.SubFundGroupCode;
+            rtValue.KfsAccount.SubFundGroupTypeCode = accountLookup.SubFundGroupTypeCode;
+            rtValue.KfsAccount.SubFundGroupName = accountLookup.SubFundGroupName;
 
             //TODO:this lookup can get the fiscal officer and account manager populate the account manager?
 

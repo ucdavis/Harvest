@@ -62,8 +62,8 @@ namespace Harvest.Core.Services
             {
                 Account = moneyTransfer.FromAccount.Number?.ToUpperInvariant(),
                 Amount = moneyTransfer.Amount,
-                Chart = debit.KfsAccount.chartOfAccountsCode, 
-                SubAccount = debit.KfsAccount.subAccount,
+                Chart = debit.KfsAccount.ChartOfAccountsCode, 
+                SubAccount = debit.KfsAccount.SubAccount,
                 Description = moneyTransfer.Description, 
                 Direction = "Debit",
                 ObjectCode = _slothSettings.DebitObjectCode
@@ -73,8 +73,8 @@ namespace Harvest.Core.Services
             {
                 Account = moneyTransfer.ToAccount.Number?.ToUpperInvariant(),
                 Amount = moneyTransfer.Amount,
-                Chart = credit.KfsAccount.chartOfAccountsCode,
-                SubAccount = credit.KfsAccount.subAccount,
+                Chart = credit.KfsAccount.ChartOfAccountsCode,
+                SubAccount = credit.KfsAccount.SubAccount,
                 Description = moneyTransfer.Description,
                 Direction = "Credit",
                 ObjectCode = _slothSettings.CreditObjectCode
