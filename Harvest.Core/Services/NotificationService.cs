@@ -13,7 +13,7 @@ namespace Harvest.Core.Services
 {
     public interface INotificationService
     {
-        Task SendSampleNotificationMessage();
+        Task SendSampleNotificationMessage(string email);
     }
 
     public class NotificationService : INotificationService
@@ -28,11 +28,15 @@ namespace Harvest.Core.Services
             _emailSettings = emailSettings.Value;
             _client = new SmtpClient(_emailSettings.Host, _emailSettings.Port) { Credentials = new NetworkCredential(_emailSettings.UserName, _emailSettings.Password), EnableSsl = true };
         }
-        public async Task SendSampleNotificationMessage()
+        public async Task SendSampleNotificationMessage(string email)
         {
+            if(_emailSettings.DisableSend.Equals("Yes", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
             using (var message = new MailMessage { From = new MailAddress("harvest@notify.ucdavis.edu", "Harvest Notification"), Subject = "Harvest Notification" })
             {
-                message.To.Add(new MailAddress("jsylvestre@ucdavis.edu", "Jason Sylvestre"));
+                message.To.Add(new MailAddress(email, email));
 
                 // body is our fallback text and we'll add an HTML view as an alternate.
                 message.Body = "Sample Email";
