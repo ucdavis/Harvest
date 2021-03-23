@@ -129,12 +129,14 @@ namespace Harvest.Web
             services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
+            services.Configure<SparkpostSettings>(Configuration.GetSection("SparkPost"));
 
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
             services.AddScoped<ISlothService, SlothService>();
+            services.AddScoped<INotificationService, NotificationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
