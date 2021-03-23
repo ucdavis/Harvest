@@ -1,0 +1,45 @@
+﻿
+@model int
+@{
+    ViewData["Title"] = "An Error has occurred";
+}
+
+<h2>Error</h2>
+
+@{
+    var statusCode = Model;
+    var statusmessage = "";
+
+    switch (statusCode)
+    {
+        case 400:
+            statusmessage = "Bad request";
+            break;
+        case 403:
+            statusmessage = "Access Denied";
+            break;
+        case 404:
+            statusmessage = "Page not found";
+            break;
+        default:
+            statusmessage = "Something went wrong";
+            break;
+    }
+
+    <div class="err-container">
+        <h1>@statusmessage</h1>
+    </div>
+}
+
+   @*<style type="text/css">
+        .err-container 
+        {
+            background-image: url('@Url.Content("~/images/error-cat.jpg")');
+            height:960px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+            -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: black;
+        }
+    </style>*@
