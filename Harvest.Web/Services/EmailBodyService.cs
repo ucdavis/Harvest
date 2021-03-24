@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Harvest.Web.Models;
 using Microsoft.Diagnostics.Tracing;
 using RazorLight;
 
@@ -21,17 +22,25 @@ namespace Harvest.Web.Services
         {
             var engine = GetRazorEngine();
 
-            return await engine.CompileRenderStringAsync<string>("home/index.cshtml", null, null);
+            var model = new EmailModel
+            {
+                Name = "Bobby"
+            };
+
+
+            var yyy = await engine.CompileRenderAsync("Test.cshtml", model);
+
+            return yyy;
         }
 
 
         private static RazorLightEngine GetRazorEngine()
         {
-            var path = Path.GetFullPath(".");
+            var path = Path.GetFullPath("./Emails");
 
             var engine = new RazorLightEngineBuilder()
                 .UseFileSystemProject(path)
-                .UseMemoryCachingProvider()
+                .UseMemoryCachingProvider()             
                 .Build();
 
             return engine;
