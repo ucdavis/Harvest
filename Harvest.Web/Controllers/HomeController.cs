@@ -14,16 +14,27 @@ namespace Harvest.Web.Controllers
     {
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
+        private readonly IEmailBodyService _emailBodyService;
 
-        public HomeController(IUserService userService, INotificationService notificationService)
+        public HomeController(IUserService userService, INotificationService notificationService, IEmailBodyService emailBodyService)
         {
             _userService = userService;
             _notificationService = notificationService;
+            _emailBodyService = emailBodyService;
         }
         public ActionResult Index()
         {
             return View();
         }
+
+
+        public async Task<IActionResult> TestBody()
+        {
+            var xxx = await _emailBodyService.BuildEmailBody();
+
+            return Content(xxx);
+        }
+
         [Authorize(Policy = AccessCodes.SystemAccess)]
         public async Task<IActionResult> TestEmail()
         {

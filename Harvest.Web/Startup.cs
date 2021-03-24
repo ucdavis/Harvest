@@ -137,6 +137,7 @@ namespace Harvest.Web
             services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IEmailBodyService, EmailBodyService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
