@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Email.Services;
+using Harvest.Email.Views.Emails;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +32,7 @@ namespace Harvest.Web.Controllers
 
         public async Task<IActionResult> TestBody()
         {
-            var xxx = await _emailBodyService.BuildEmailBody();
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", new TestEmailModel());
 
             return Content(xxx);
         }

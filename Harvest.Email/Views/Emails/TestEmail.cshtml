@@ -1,0 +1,15 @@
+﻿@using Harvest.Email.Views.Emails
+@using Harvest.Email.Views.Shared
+@model TestEmailModel
+
+@{
+    ViewData["EmailTitle"] = "Testing";
+}
+
+<p>
+   This is just a test
+</p>
+
+<br />
+
+@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Me", Model.ButtonUrl))
