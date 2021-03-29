@@ -46,6 +46,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Harvest.Core\Harvest.Core.csproj" />
+    <ProjectReference Include="..\Harvest.Email\Harvest.Email.csproj" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
