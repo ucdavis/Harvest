@@ -41,8 +41,9 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestEmail()
         {
             var user = await _userService.GetCurrentUser();
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", new TestEmailModel());
 
-            await _notificationService.SendSampleNotificationMessage(user.Email);
+            await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
 

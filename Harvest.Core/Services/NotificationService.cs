@@ -13,7 +13,7 @@ namespace Harvest.Core.Services
 {
     public interface INotificationService
     {
-        Task SendSampleNotificationMessage(string email);
+        Task SendSampleNotificationMessage(string email, string body);
     }
 
     public class NotificationService : INotificationService
@@ -28,7 +28,7 @@ namespace Harvest.Core.Services
             _emailSettings = emailSettings.Value;
             _client = new SmtpClient(_emailSettings.Host, _emailSettings.Port) { Credentials = new NetworkCredential(_emailSettings.UserName, _emailSettings.Password), EnableSsl = true };
         }
-        public async Task SendSampleNotificationMessage(string email)
+        public async Task SendSampleNotificationMessage(string email, string body)
         {
             if(_emailSettings.DisableSend.Equals("Yes", StringComparison.OrdinalIgnoreCase))
             {
@@ -39,9 +39,9 @@ namespace Harvest.Core.Services
                 message.To.Add(new MailAddress(email, email));
 
                 // body is our fallback text and we'll add an HTML view as an alternate.
-                message.Body = "Sample Email";
+                message.Body = "Sample Email Text";
 
-                var htmlView = AlternateView.CreateAlternateViewFromString("<p>Sample Email</p>", new ContentType(MediaTypeNames.Text.Html));
+                var htmlView = AlternateView.CreateAlternateViewFromString(body, new ContentType(MediaTypeNames.Text.Html));
                 message.AlternateViews.Add(htmlView);
 
                 await _client.SendMailAsync(message);
