@@ -9,5 +9,6 @@ namespace Harvest.Email.Views.Emails
     public class TestEmailModel
     {
         public string ButtonUrl = "https://harvest.caes.ucdavis.edu";
+        public string Name { get; set; }
     }
 }

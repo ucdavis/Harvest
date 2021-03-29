@@ -32,7 +32,12 @@ namespace Harvest.Web.Controllers
 
         public async Task<IActionResult> TestBody()
         {
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", new TestEmailModel());
+
+            var model = new TestEmailModel()
+            {
+                Name = "REPLACE1"
+            };
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
 
             return Content(xxx);
         }
@@ -41,7 +46,11 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestEmail()
         {
             var user = await _userService.GetCurrentUser();
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", new TestEmailModel());
+            var model = new TestEmailModel()
+            {
+                Name = user.Name
+            };
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
 
             await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
