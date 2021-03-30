@@ -1,4 +1,4 @@
-﻿namespace Anlab.Core.Models.SlothModels
+﻿namespace Harvest.Core.Models.SlothModels
 {
     public static class TransferStatusCodes
     {
