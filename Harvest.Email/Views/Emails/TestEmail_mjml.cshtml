@@ -6,15 +6,23 @@
     Layout = "_EmailLayout_mjml";
 }
 
-<mj-text align="center">
-    <div>This is just a test</div>
-</mj-text>
+
+<mj-section>
+    <mj-column>
+        <mj-text align="center">
+            <div>This is just a test</div>
+        </mj-text>
+    </mj-column>
+</mj-section>
+<mj-section>
+    <mj-column>
+        <mj-text align="center">
+            <h1>Hello REPLACE1</h1>
+            <br />
+        </mj-text>
+    </mj-column>
+</mj-section>
 
 
-<mj-text align="center">
-    <h1>Hello @Model.Name</h1>
-</mj-text>
-
-<br />
 
 @await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Me", Model.ButtonUrl))
