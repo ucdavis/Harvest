@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Anlab.Core.Models.SlothModels;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
