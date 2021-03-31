@@ -1,0 +1,44 @@
+.card-wrapper {
+  border-top: 24px solid $primary-color;
+  border-radius: 4px;
+  background-color: #fff;
+  border-left: 1px solid $borders;
+  border-right: 1px solid $borders;
+  border-bottom: 1px solid $borders;
+  box-shadow: $box-shadow;
+  .card-content {
+    padding: 16px 36px;
+  }
+  h2 {
+    color: $primary-color;
+    font-size: 1.5rem;
+    font-family: $sans-bold;
+  }
+}
+.card-green-bg {
+  background: transparentize($primary-color, 0.9);
+  border-top: 1px solid $borders;
+}
+// quote info area
+.quote-info {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  p.lede {
+    margin-bottom: 0;
+  }
+  .quote-info-box {
+    border: 1px solid $borders;
+    padding-top: 16px;
+    .quote-status {
+      &:before {
+        content: "";
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 5px;
+        background-color: $arboretum;
+        margin-right: 6px;
+      }
+    }
+  }
+}
