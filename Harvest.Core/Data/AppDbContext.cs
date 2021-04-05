@@ -42,6 +42,7 @@ namespace Harvest.Core.Data
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<TransferRequest> TransferRequests { get; set; }
         public DbSet<TransferHistory> TransferHistory { get; set; }
+        public DbSet<Rate> Rates { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -57,6 +58,7 @@ namespace Harvest.Core.Data
             User.OnModelCreating(modelBuilder);
             Transfer.OnModelCreating(modelBuilder);
             TransferRequest.OnModelCreating(modelBuilder);
+            Rate.OnModelCreating(modelBuilder);
         }
     }
 }

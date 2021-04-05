@@ -76,6 +76,7 @@
     <Build Include="dbo\Tables\Transfers.sql" />
     <Build Include="dbo\Tables\TransferRequests.sql" />
     <Build Include="dbo\Tables\TransferHistory.sql" />
+    <Build Include="dbo\Tables\Rates.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SchemaCompare\Sqlexpress.scmp" />

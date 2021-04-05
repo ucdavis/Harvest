@@ -70,7 +70,108 @@ namespace Harvest.Core.Data
             };
             await CheckOrCreatePermission(systemRole, user);
             await _dbContext.SaveChangesAsync();
+
+            await CheckCreateSampleRates();
+            await _dbContext.SaveChangesAsync();
             return;
+        }
+
+        private async Task CheckCreateSampleRates()
+        {
+
+            if (await _dbContext.Rates.AnyAsync())
+            {
+                return;
+            }
+
+            var createdBy = await _dbContext.Users.FirstAsync();
+
+            var rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Acreage;
+            rate.Description = "Russell Ranch Acreage";
+            rate.BillingUnit = "Russell Ranch";
+            rate.Account = "RRACRES";
+            rate.Price = 1150.00m;
+            rate.Unit = "Per Acre per Year";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Acreage;
+            rate.Description = "Plant Sciences Row Crop Acreage";
+            rate.BillingUnit = "Plant Sciences";
+            rate.Account = "APSNFLV";
+            rate.Price = 1150.00m;
+            rate.Unit = "Per Acre per Year";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Labor;
+            rate.Description = "RR Skilled Labor";
+            rate.BillingUnit = "Russell Ranch";
+            rate.Account = "RRACRES";
+            rate.Price = 60.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Labor;
+            rate.Description = "PLS Mechanic";
+            rate.BillingUnit = "Plant Sciences";
+            rate.Account = "APSNFDS";
+            rate.Price = 72.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Other;
+            rate.Description = "Crop Destruction";
+            rate.BillingUnit = "Plant Sciences";
+            rate.Account = "";
+            rate.Price = 66.67m;
+            rate.Unit = "Per acre";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Other;
+            rate.Description = "Century Project Soil Sample";
+            rate.BillingUnit = "Russell Ranch";
+            rate.Account = "RRCNTRY";
+            rate.Price = 70.00m;
+            rate.Unit = "Per sample";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Trencher (large)";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "FRMRATE";
+            rate.Price = 685.00m;
+            rate.Unit = "Daily";
+
+            await _dbContext.Rates.AddAsync(rate);
+            
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "PLS Row Planter";
+            rate.BillingUnit = "Plant Sciences";
+            rate.Account = "APSNFDS";
+            rate.Price = 34.91m;
+            rate.Unit = "Per Acre";
+
+            await _dbContext.Rates.AddAsync(rate);
+        }
+
+        private static Rate DefaultRate(User createdBy)
+        {
+            var rate = new Rate {CreatedById = createdBy.Id, UpdatedById = createdBy.Id, CreatedOn = DateTime.UtcNow};
+            rate.UpdatedOn = rate.CreatedOn;
+            return rate;
         }
 
         private async Task CheckOrCreatePermission(Role systemRole, User user)
