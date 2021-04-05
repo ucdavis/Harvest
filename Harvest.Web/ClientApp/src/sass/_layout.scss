@@ -5,6 +5,7 @@ body {
 body {
   display: flex;
   flex-direction: column;
+  background-color: $bg-primary;
 }
 .page-wrap {
   flex: 1 0 auto;
