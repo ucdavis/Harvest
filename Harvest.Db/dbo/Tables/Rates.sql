@@ -11,8 +11,11 @@
     [UpdatedById] INT             NOT NULL,
     [CreatedOn]   DATETIME2 (7)   NOT NULL,
     [UpdatedOn]   DATETIME2 (7)   NOT NULL,
+    [Unit]        NVARCHAR (50)   NULL,
     CONSTRAINT [PK_Rates] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
 
 GO
