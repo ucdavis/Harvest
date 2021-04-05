@@ -42,3 +42,27 @@
     }
   }
 }
+.card-project-totals {
+  border: 1px solid $primary-color;
+  .card-header {
+    font-weight: bold;
+    border-bottom: 1px solid $primary-color;
+    font-size: 1.1rem;
+    background-color: #fff;
+  }
+  .card-body {
+    padding: 0.8rem 0.8rem 0 0.8rem !important;
+  }
+}
+.total-row {
+  background-color: transparentize($primary-color, 0.75);
+  padding: 12px 0 8px 0;
+  border-top: 1px solid $primary-color;
+  margin: 4px -13px 0 -13px;
+  h6,
+  span {
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding-bottom: 0;
+  }
+}

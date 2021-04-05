@@ -46,7 +46,7 @@ export const QuoteContainer = () => {
     <div className="card-wrapper">
       <div className="card-content">
         <div className="quote-info row">
-          <div className="col">
+          <div className="col-md-6">
             <h2 id="request-title">Field Request #{project.id}</h2>
             <p className="lede">PI: {project.principalInvestigator.name}</p>
             <p>
@@ -56,7 +56,7 @@ export const QuoteContainer = () => {
             <p className="lede">Requirements</p>
             <p>{project.requirements}</p>
           </div>
-          <div className="col quote-info-box">
+          <div className="col-md-6 quote-info-box">
             <div className="row">
               <div className="col">
                 <p className="lede">Status</p>

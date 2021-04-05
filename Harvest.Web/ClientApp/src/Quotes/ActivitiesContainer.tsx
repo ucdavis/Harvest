@@ -28,7 +28,7 @@ export const ActivitiesContainer = (props: Props) => {
           updateActivity={(activity: Activity) => updateActivity(activity)}
         />
       ))}
-      <Card>
+      <Card className="card-project-totals">
         <CardHeader>Project Totals</CardHeader>
         <CardBody>
           <div id="total">
@@ -47,7 +47,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Labor</div>
               </Col>
               <Col xs="2" sm="2">
-                  {/* TODO: We probably want to store these totals instead of calculating every time.  Perhaps with a useEffect hook in the right places. */}
+                {/* TODO: We probably want to store these totals instead of calculating every time.  Perhaps with a useEffect hook in the right places. */}
                 $
                 {props.quote.activities.reduce(
                   (prev, curr) =>
@@ -91,18 +91,23 @@ export const ActivitiesContainer = (props: Props) => {
                 )}
               </Col>
             </Row>
-            <Row>
+            <Row className="total-row">
               <Col xs="10" sm="10">
                 <h6>Total Cost</h6>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {props.quote.activities.reduce(
-                  (prev, curr) =>
-                    prev +
-                    curr.workItems.reduce((p, c) => c.rate * c.quantity + p, 0),
-                  0
-                )}
+                <span>
+                  $
+                  {props.quote.activities.reduce(
+                    (prev, curr) =>
+                      prev +
+                      curr.workItems.reduce(
+                        (p, c) => c.rate * c.quantity + p,
+                        0
+                      ),
+                    0
+                  )}
+                </span>
               </Col>
             </Row>
           </div>
