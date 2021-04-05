@@ -350,6 +350,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasMaxLength(15)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Unit")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("UpdatedById")
                         .HasColumnType("INTEGER");
 
