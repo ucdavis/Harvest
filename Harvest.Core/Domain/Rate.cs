@@ -18,6 +18,12 @@ namespace Harvest.Core.Domain
         [Required]
         [StringLength(250)]
         public string Description { get; set; }
+        /// <summary>
+        /// For example, Per Day, Per Gallon, etc.
+        /// </summary>
+        [StringLength(50)]
+        public string Unit { get; set; }
+
         [StringLength(50)]
         public string BillingUnit { get; set; }
         [Required]
@@ -50,10 +56,10 @@ namespace Harvest.Core.Domain
 
         public class Types
         {
-            public const string Acreage = "Acreage";
-            public const string Labor = "Labor";
+            public const string Acreage   = "Acreage";
+            public const string Labor     = "Labor";
             public const string Equipment = "Equipment";
-            public const string Other = "Other";
+            public const string Other     = "Other";
         }
     }
 }
