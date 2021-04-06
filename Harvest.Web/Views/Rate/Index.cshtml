@@ -1,0 +1,109 @@
+﻿@model IEnumerable<Harvest.Core.Domain.Rate>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Type)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Unit)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.BillingUnit)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Account)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Price)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EffectiveOn)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatedOn)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UpdatedOn)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Unit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BillingUnit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Account)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EffectiveOn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedOn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UpdatedOn)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {/* id=item.PrimaryKey */}) |
+                @Html.ActionLink("Details", "Details", new {/* id=item.PrimaryKey */}) |
+                @Html.ActionLink("Delete", "Delete", new {/* id=item.PrimaryKey */})
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@section Styles
+{
+    @{ await Html.RenderPartialAsync("_ReportStylesPartial");}
+}
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ReportScriptsPartial");}
+
+    <script type="text/javascript">
+        var table = $('.table').DataTable({
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 },
+                { responsivePriority: 2, targets: -1 },
+                { responsivePriority: 3, targets: 1 },
+                { responsivePriority: 4, targets: 4 },
+                { responsivePriority: 5, targets: 2 },
+                { responsivePriority: 6, targets: 3 },
+                { responsivePriority: 7, targets: 5 },
+                { responsivePriority: 8, targets: 6 }
+            ]
+        });
+    </script>
+}
