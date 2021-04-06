@@ -52,8 +52,27 @@ namespace Harvest.Web.Controllers
         // POST: RateController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(RateEditModel model)
+        public async Task<ActionResult> Create(RateEditModel model)
         {
+            model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
+            if (!ModelState.IsValid)
+            {
+                ErrorMessage = "There are validation errors, please correct them and try again.";
+                return View(model);
+            }
+
+            var accountValidation = await _financialService.IsValid(model.Rate.Account);
+            if (!accountValidation.IsValid)
+            {
+                ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ErrorMessage = "There are validation errors, please correct them and try again.";
+                return View(model);
+            }
+
             try
             {
                 return RedirectToAction(nameof(Index));
