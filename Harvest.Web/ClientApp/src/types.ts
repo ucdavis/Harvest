@@ -125,3 +125,36 @@ export interface Activity {
   name: string;
   workItems: WorkItem[];
 }
+
+export enum CropType {
+  Row = "Row",
+  Tree = "Tree"
+}
+
+export interface Crop {
+  id: number;
+  name: string;
+}
+
+export interface Request {
+  id: number;
+  projectId: number;
+  project: Project | null;
+  requirements: string;
+  start: Date;
+  end: Date;
+  initatedById: number;
+  initiatedBy: User | null;
+  cropType: CropType;
+  crops: string;
+  principalInvestigatorId: number;
+  principalInvestigator: User | null;
+
+  approvedById: number | null;
+  approvedBy: User | null;
+  approvedOn: string | null;
+
+  createdDate: Date;
+  status: string;
+}
+

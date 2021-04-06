@@ -45,6 +45,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\tsconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ClientApp\tsconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Harvest.Core\Harvest.Core.csproj" />
     <ProjectReference Include="..\Harvest.Email\Harvest.Email.csproj" />
   </ItemGroup>
