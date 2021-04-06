@@ -10,10 +10,11 @@ import {
   Row,
 } from "reactstrap";
 
-import { WorkItem } from "../types";
+import { Rate, WorkItem } from "../types";
 
 interface Props {
   category: string;
+  rates: Rate[];
   workItems: WorkItem[];
   updateWorkItems: (workItem: WorkItem) => void;
   addNewWorkItem: (category: string) => void;
@@ -21,6 +22,19 @@ interface Props {
 }
 
 export const WorkItemsForm = (props: Props) => {
+  const rateItemChanged = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    workItem: WorkItem
+  ) => {
+    const rate = props.rates.find((r) => r.id === parseInt(e.target.value));
+
+    // rate can be undefinied if they select the default option
+    if (rate !== undefined) {
+      // new rate selected, update the work item with defaults
+      props.updateWorkItems({ ...workItem, rate: rate.price });
+    }
+  };
+
   return (
     <div>
       <Row>
@@ -44,9 +58,17 @@ export const WorkItemsForm = (props: Props) => {
               {props.category === "other" ? (
                 <Input />
               ) : (
-                <Input type="select" name="select">
-                  <option>Hello</option>
-                  <option>Bye</option>
+                <Input
+                  type="select"
+                  name="select"
+                  onChange={(e) => rateItemChanged(e, workItem)}
+                >
+                  <option value="0">-- Select {props.category} --</option>
+                  {props.rates.map((r) => (
+                    <option key={`rate-${r.type}-${r.id}`} value={r.id}>
+                      {r.description}
+                    </option>
+                  ))}
                 </Input>
               )}
             </FormGroup>
@@ -78,6 +100,7 @@ export const WorkItemsForm = (props: Props) => {
               <Input
                 type="number"
                 id="rate"
+                value={workItem.rate}
                 onChange={(e) =>
                   props.updateWorkItems({
                     ...workItem,
@@ -91,7 +114,10 @@ export const WorkItemsForm = (props: Props) => {
           <Col xs="2">${workItem.rate * workItem.quantity}</Col>
 
           <Col xs="2">
-            <Button color="danger" onClick={() => props.deleteWorkItem(workItem)}>
+            <Button
+              color="danger"
+              onClick={() => props.deleteWorkItem(workItem)}
+            >
               Delete
             </Button>
           </Col>
