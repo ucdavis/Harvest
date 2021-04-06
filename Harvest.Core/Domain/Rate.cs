@@ -25,6 +25,7 @@ namespace Harvest.Core.Domain
         public string Unit { get; set; }
 
         [StringLength(50)]
+        [Display(Name = "Billing Unit")]
         public string BillingUnit { get; set; }
         [Required]
         [StringLength(50)]
@@ -32,7 +33,7 @@ namespace Harvest.Core.Domain
 
         [Display(Name = "Rate")] 
         public decimal Price { get; set; }
-
+        [Display(Name = "Effective Date")]
         public DateTime? EffectiveOn { get; set; }
 
         [Required] 
@@ -40,7 +41,9 @@ namespace Harvest.Core.Domain
         [Required] 
         public int UpdatedById { get; set; }
 
+        [Display(Name = "Created Date")]
         public DateTime CreatedOn { get; set; }
+        [Display(Name = "Updated Date")]
         public DateTime UpdatedOn { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
