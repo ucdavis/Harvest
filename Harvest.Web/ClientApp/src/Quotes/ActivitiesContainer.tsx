@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 
 import { Activity, QuoteContent, Rate } from "../types";
