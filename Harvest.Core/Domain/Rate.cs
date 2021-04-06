@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
@@ -63,6 +64,14 @@ namespace Harvest.Core.Domain
             public const string Labor     = "Labor";
             public const string Equipment = "Equipment";
             public const string Other     = "Other";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Acreage,
+                Labor,
+                Equipment,
+                Other,
+            }.ToList();
         }
     }
 }

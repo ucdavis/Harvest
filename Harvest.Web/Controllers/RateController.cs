@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Web.Models.RateModels;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -42,13 +44,15 @@ namespace Harvest.Web.Controllers
         // GET: RateController/Create
         public ActionResult Create()
         {
-            return View();
+            var model = new RateEditModel {Rate = new Rate(), TypeList = Rate.Types.TypeList};
+            model.Rate.Account = "3-";
+            return View(model);
         }
 
         // POST: RateController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(RateEditModel model)
         {
             try
             {

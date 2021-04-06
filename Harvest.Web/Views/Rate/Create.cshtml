@@ -1,4 +1,4 @@
-﻿@model Harvest.Core.Domain.Rate
+﻿@model Harvest.Web.Models.RateModels.RateEditModel
 
 @{
     ViewData["Title"] = "Create";
@@ -13,40 +13,42 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Type" class="control-label"></label>
-                <input asp-for="Type" class="form-control" />
-                <span asp-validation-for="Type" class="text-danger"></span>
+                <label asp-for="Rate.Description" class="control-label"></label>
+                <input asp-for="Rate.Description" class="form-control" />
+                <span asp-validation-for="Rate.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label asp-for="Rate.Type" class="control-label"></label>
+                <select asp-for="Rate.Type" class="form-control" asp-items="@(new SelectList(Model.TypeList))"></select>
+                <span asp-validation-for="Rate.Type" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Unit" class="control-label"></label>
-                <input asp-for="Unit" class="form-control" />
-                <span asp-validation-for="Unit" class="text-danger"></span>
+                <label asp-for="Rate.Unit" class="control-label"></label>
+                <input asp-for="Rate.Unit" class="form-control" />
+                <span asp-validation-for="Rate.Unit" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BillingUnit" class="control-label"></label>
-                <input asp-for="BillingUnit" class="form-control" />
-                <span asp-validation-for="BillingUnit" class="text-danger"></span>
+                <label asp-for="Rate.EffectiveOn" class="control-label"></label>
+                <input asp-for="Rate.EffectiveOn" class="form-control" />
+                <span asp-validation-for="Rate.EffectiveOn" class="text-danger"></span>
+                <p class="text-info">Leave blank to make effective immediately</p>
             </div>
             <div class="form-group">
-                <label asp-for="Account" class="control-label"></label>
-                <input asp-for="Account" class="form-control" />
-                <span asp-validation-for="Account" class="text-danger"></span>
+                <label asp-for="Rate.BillingUnit" class="control-label"></label>
+                <input asp-for="Rate.BillingUnit" class="form-control" />
+                <span asp-validation-for="Rate.BillingUnit" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <label asp-for="Rate.Account" class="control-label"></label>
+                <input asp-for="Rate.Account" class="form-control" />
+                <span asp-validation-for="Rate.Account" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="EffectiveOn" class="control-label"></label>
-                <input asp-for="EffectiveOn" class="form-control" />
-                <span asp-validation-for="EffectiveOn" class="text-danger"></span>
+                <label asp-for="Rate.Price" class="control-label"></label>
+                <input asp-for="Rate.Price" class="form-control" />
+                <span asp-validation-for="Rate.Price" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
