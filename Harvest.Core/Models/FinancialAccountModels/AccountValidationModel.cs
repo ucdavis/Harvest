@@ -2,7 +2,7 @@
 {
     public class AccountValidationModel
     {
-        public bool IsValid { get; set; } = false;
+        public bool IsValid { get; set; } = true;
         public string Field { get; set; }
         public string Message { get; set; }
 
