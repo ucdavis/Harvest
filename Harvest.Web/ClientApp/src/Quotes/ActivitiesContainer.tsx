@@ -108,7 +108,7 @@ export const ActivitiesContainer = (props: Props) => {
                         0
                       ),
                     0
-                  )}
+                  ) + (props.quote.acres * props.quote.acreageRate)}
                 </span>
               </Col>
             </Row>
