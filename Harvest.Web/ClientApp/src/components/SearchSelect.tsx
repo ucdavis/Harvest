@@ -76,14 +76,10 @@ export function SearchSelect<T>(props: PropsWithChildren<ISearchSelectProps<T>>)
     }
   }
 
-
   return (
     <Dropdown isOpen={debouncedIsOpen} toggle={() => { /* the interface may say that toggle is optional, but nope */ }}>
       <div onBlur={() => setIsOpen(false)}>
-        <DropdownToggle
-          tag="span"
-          data-toggle="dropdown"
-          aria-expanded={dropDownOpen}>
+        <DropdownToggle tag="span" data-toggle="dropdown" aria-expanded={dropDownOpen}>
           <Input placeholder={props.placeholder} value={query} onChange={e => setQuery(e.target.value)} onKeyPress={e => handleKeypress(e.charCode)}/>
           {selection.map((item, i) => <span key={`selectedItem_${i}`} ><Badge style={{cursor:"pointer"}} onClick={() => unSelectItem(item)}>{props.getText(item)}</Badge>{" "}</span>)}
         </DropdownToggle>
