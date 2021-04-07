@@ -1,5 +1,5 @@
 ﻿@using Harvest.Core.Extensions
-@model Harvest.Core.Domain.Rate
+@model Harvest.Web.Models.RateModels.RateDetailsModel
 
 @{
     ViewData["Title"] = "Details";
@@ -12,80 +12,102 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
+            @Html.DisplayNameFor(model => model.Rate.IsActive)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
+            @Html.DisplayFor(model => model.Rate.IsActive)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Type)
+            @Html.DisplayNameFor(model => model.Rate.Description)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Type)
+            @Html.DisplayFor(model => model.Rate.Description)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.Rate.Type)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
+            @Html.DisplayFor(model => model.Rate.Type)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Unit)
+            @Html.DisplayNameFor(model => model.Rate.Unit)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Unit)
+            @Html.DisplayFor(model => model.Rate.Unit)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingUnit)
+            @Html.DisplayNameFor(model => model.Rate.Price)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingUnit)
+            @Html.DisplayFor(model => model.Rate.Price)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Account)
+            @Html.DisplayNameFor(model => model.Rate.EffectiveOn)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Account)
+            @(Model.Rate.EffectiveOn.HasValue ? Model.Rate.EffectiveOn.ToPacificTime().Format("d") : "N/A")
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
+            @Html.DisplayNameFor(model => model.Rate.CreatedBy)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
+            @Html.DisplayFor(model => model.Rate.CreatedBy.NameAndEmail)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EffectiveOn)
+            @Html.DisplayNameFor(model => model.Rate.CreatedOn)
         </dt>
         <dd class = "col-sm-10">
-            @(Model.EffectiveOn.HasValue ? Model.EffectiveOn.ToPacificTime().Format("d") : "N/A")
+            @Model.Rate.CreatedOn.ToPacificTime().Format("d")
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedBy)
+            @Html.DisplayNameFor(model => model.Rate.UpdatedBy)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedBy.NameAndEmail)
+            @Html.DisplayFor(model => model.Rate.UpdatedBy.NameAndEmail)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedBy)
+            @Html.DisplayNameFor(model => model.Rate.UpdatedOn)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedBy.NameAndEmail)
+            @Model.Rate.UpdatedOn.ToPacificTime().Format("d")
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedOn)
+            @Html.DisplayNameFor(model => model.Rate.BillingUnit)
         </dt>
         <dd class = "col-sm-10">
-            @Model.CreatedOn.ToPacificTime().Format("d")
+            @Html.DisplayFor(model => model.Rate.BillingUnit)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedOn)
+            @Html.DisplayNameFor(model => model.Rate.Account)
         </dt>
         <dd class = "col-sm-10">
-            @Model.UpdatedOn.ToPacificTime().Format("d")
+            @Html.DisplayFor(model => model.Rate.Account)
         </dd>
+        @if (Model.AccountValidation.IsValid) {
+            <dt class = "col-sm-2">
+                Account Details
+            </dt>
+            <dd class = "col-sm-10">
+                <div><strong>Account Name:</strong> @Model.AccountValidation.KfsAccount.AccountName</div>
+                <div><strong>Organization Code:</strong> @Model.AccountValidation.KfsAccount.OrganizationCode</div>
+                <div><strong>Sub Fund Group Name:</strong> @Model.AccountValidation.KfsAccount.SubFundGroupName</div>
+                <div><strong>Account Expiration Date:</strong> @(Model.AccountValidation.KfsAccount.AccountExpirationDate.HasValue ? Model.AccountValidation.KfsAccount.AccountExpirationDate : "N/A")</div>
+            </dd>
+        }
+        else
+        {
+            <dt class = "col-sm-2">
+                Account Validation
+            </dt>
+            <dd class = "alert-danger col-sm-10">
+                <p>Account is Invalid</p>
+                <p>@Model.AccountValidation.Field <span>: </span> @Model.AccountValidation.Message</p>
+            </dd>
+
+        }
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Rate.Id }) |
     <a asp-action="Index">Back to List</a>
 </div>

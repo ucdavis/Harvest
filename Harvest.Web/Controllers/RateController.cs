@@ -8,6 +8,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Models.FinancialAccountModels;
 using Harvest.Core.Services;
 using Harvest.Web.Models.RateModels;
 using Harvest.Web.Services;
@@ -51,7 +52,10 @@ namespace Harvest.Web.Controllers
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == id);
-            return View(rate);
+            var model = new RateDetailsModel {Rate = rate};
+            model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
+
+            return View(model);
         }
 
         // GET: RateController/Create
