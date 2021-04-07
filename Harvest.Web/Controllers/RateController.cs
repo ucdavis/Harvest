@@ -36,6 +36,14 @@ namespace Harvest.Web.Controllers
             return View(rates);
         }
 
+        // Returns the Active rates via API
+        // GET: RateController/Active
+        public async Task<ActionResult> Active()
+        {
+            var rates = await _dbContext.Rates.Where(a => a.IsActive).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id }).ToArrayAsync();
+            return Ok(rates);
+        }
+
         // GET: RateController/Details/5
         public ActionResult Details(int id)
         {

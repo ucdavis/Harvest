@@ -6,6 +6,7 @@ import {
   ProjectWithQuotes,
   QuoteContent,
   QuoteContentImpl,
+  Rate,
 } from "../types";
 
 import { ProjectDetail } from "./ProjectDetail";
@@ -22,16 +23,29 @@ export const QuoteContainer = () => {
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
   const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
+  const [rates, setRates] = useState<Rate[]>([]);
 
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/Quote/Get/${projectId}`);
+      const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
+      const pricingResponse = await fetch("/Rate/Active");
 
-      if (response.ok) {
-        const projectWithQuotes: ProjectWithQuotes = await response.json();
+      if (quoteResponse.ok && pricingResponse.ok) {
+        const projectWithQuotes: ProjectWithQuotes = await quoteResponse.json();
+        const rateJson: Rate[] = await pricingResponse.json();
         setProject(projectWithQuotes.project);
+        setRates(rateJson);
+
+        // TODO: load up existing quote if it exists
+        // TODO: how do we handle if different fields have different rates?
+        const quoteToUse = new QuoteContentImpl();
+        quoteToUse.acreageRate =
+          rateJson.find((r) => r.type === "Acreage")?.price || 120;
+
+        setQuote(quoteToUse);
       } else {
-        console.error(response);
+        !quoteResponse.ok && console.error(quoteResponse);
+        !pricingResponse.ok && console.error(pricingResponse);
       }
     };
 
@@ -43,40 +57,57 @@ export const QuoteContainer = () => {
   }
 
   return (
-    <div className="card">
-      <div className="card-body">
-        <h5 id="request-title" className="card-title">Field Request #{project.id}</h5>
-        <p>PI: {project.principalInvestigator.name}</p>
-        <span>
-          Created {new Date(project.createdOn).toDateString()} by{" "}
-          {project.createdBy.name}
-        </span>
-
-        <div className="card-text">
-          <h4>Requirements</h4>
-          <p>{project.requirements}</p>
-        </div>
-        <div>
-          <h4>Status</h4>
-          <p>{project.status}</p>
-          <h4>Type</h4>
-          <p>TODO ROW CROPS</p>
-          <h4>Timeline</h4>
-          <p>
-            {new Date(project.start).toLocaleDateString()} through{" "}
-            {new Date(project.end).toLocaleDateString()}
-          </p>
-          <h4>Crops</h4>
-          <p>{project.crop}</p>
-        </div>
-        <div>
-          <h2>Quote Details</h2>
-          <hr />
-          <ProjectDetail quote={quote} updateQuote={setQuote} />
-          <ActivitiesContainer quote={quote} updateQuote={setQuote} />
+    <div className="card-wrapper">
+      <div className="card-content">
+        <div className="quote-info row">
+          <div className="col-md-6">
+            <h2 id="request-title">Field Request #{project.id}</h2>
+            <p className="lede">PI: {project.principalInvestigator.name}</p>
+            <p>
+              Created {new Date(project.createdOn).toDateString()} by{" "}
+              {project.createdBy.name}
+            </p>
+            <p className="lede">Requirements</p>
+            <p>{project.requirements}</p>
+          </div>
+          <div className="col-md-6 quote-info-box">
+            <div className="row">
+              <div className="col">
+                <p className="lede">Status</p>
+                <p className="quote-status">{project.status}</p>
+                <p className="lede">Type</p>
+                <p>TODO ROW CROPS</p>
+              </div>
+              <div className="col">
+                <p className="lede">Timeline</p>
+                <p>
+                  {new Date(project.start).toLocaleDateString()} through{" "}
+                  {new Date(project.end).toLocaleDateString()}
+                </p>
+                <p className="lede">Crops</p>
+                <p>{project.crop}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <div className="card-green-bg">
+        <div className="card-content">
+          <div className="quote-details">
+            <h2>Quote Details</h2>
+            <hr />
+            <ProjectDetail quote={quote} updateQuote={setQuote} />
+            <ActivitiesContainer
+              quote={quote}
+              rates={rates}
+              updateQuote={setQuote}
+            />
+          </div>
+        </div>
+      </div>
+
       <div>Debug: {JSON.stringify(quote)}</div>
+      <div>Debug Rates: {JSON.stringify(rates)}</div>
     </div>
   );
 };

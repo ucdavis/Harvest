@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
 import { QuoteContainer } from "./QuoteContainer";
-import { fakeProject } from "../Test/mockData";
+import { fakeProject, sampleRates } from "../Test/mockData";
 
 let container: Element;
 
@@ -49,7 +49,16 @@ describe("Quote Container", () => {
         json: () => Promise.resolve(fakeProject),
       };
 
-      global.fetch = jest.fn().mockImplementation(() => Promise.resolve(response));
+      const response2 = {
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve(sampleRates),
+      };
+
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(response)) // return project info
+        .mockImplementationOnce(() => Promise.resolve(response2)); // return rate info
 
       render(
         <MemoryRouter initialEntries={["/quote/create/3"]}>
