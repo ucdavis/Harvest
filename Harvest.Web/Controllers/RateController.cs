@@ -75,28 +75,35 @@ namespace Harvest.Web.Controllers
             }
 
             var createTime = DateTime.UtcNow;
-            var user = _userService.GetCurrentUser();
+            var user = await _userService.GetCurrentUser();
 
-            var rateToCreate = new Rate();
-            rateToCreate.IsActive = true;
-            rateToCreate.Account = model.Rate.Account;
-            rateToCreate.BillingUnit = model.Rate.BillingUnit;
-            rateToCreate.Description = model.Rate.Description;
-            rateToCreate.EffectiveOn = model.Rate.EffectiveOn.ToPacificTime();
-            rateToCreate.Price = model.Rate.Price;
-            rateToCreate.Type = model.Rate.Type;
-            rateToCreate.Unit = model.Rate.Unit;
-            rateToCreate.CreatedOn = createTime;
-            rateToCreate.UpdatedOn = createTime;
-            //rateToCreate.CreatedById = user.Id;
+            var rateToCreate = new Rate
+            {
+                IsActive    = true,
+                Account     = model.Rate.Account,
+                BillingUnit = model.Rate.BillingUnit,
+                Description = model.Rate.Description,
+                EffectiveOn = model.Rate.EffectiveOn.ToPacificTime(),
+                Price       = model.Rate.Price,
+                Type        = model.Rate.Type,
+                Unit        = model.Rate.Unit,
+                CreatedOn   = createTime,
+                UpdatedOn   = createTime,
+                CreatedBy   = user,
+                UpdatedBy   = user,
+            };
 
             try
             {
+                await _dbContext.Rates.AddAsync(rateToCreate);
+                await _dbContext.SaveChangesAsync();
+                Message = "Rate Created";
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ErrorMessage = "There was an error trying to create this rate.";
+                return View(model);
             }
         }
 
