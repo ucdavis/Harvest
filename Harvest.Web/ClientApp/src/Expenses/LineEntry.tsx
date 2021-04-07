@@ -15,6 +15,29 @@ export const LineEntry = (props: Props) => {
     return props.rates.filter((r) => r.type === props.expense.type);
   }, [props.expense.type, props.rates]);
 
+  const updateExpenseType = (type: string) => {
+    const rate = props.rates[props.rates.findIndex((r) => r.type === type)];
+
+    props.updateExpense({
+      ...props.expense,
+      type,
+      rate,
+      quantity: 0,
+      total: 0,
+    });
+  };
+
+  const updateRateType = (rateId: number) => {
+    // since we are just updating the rate type, if quantity is entered we'll use it and recalculate total
+    const rate = props.rates[props.rates.findIndex((r) => r.id === rateId)];
+
+    props.updateExpense({
+      ...props.expense,
+      rate,
+      total: props.expense.quantity * rate.price,
+    });
+  };
+
   return (
     <Card>
       <CardBody>
@@ -35,19 +58,11 @@ export const LineEntry = (props: Props) => {
               <Input
                 type="select"
                 name="expenseType"
-                onChange={(e) =>
-                  props.updateExpense({
-                    ...props.expense,
-                    type: e.target.value,
-                    rate:
-                      props.rates[
-                        props.rates.findIndex((r) => r.type === e.target.value)
-                      ],
-                  })
-                }
+                defaultValue={props.expense.type}
+                onChange={(e) => updateExpenseType(e.target.value)}
               >
                 {props.expenseTypes.map((t) => (
-                  <option selected={props.expense.type === t}>{t}</option>
+                  <option key={t}>{t}</option>
                 ))}
               </Input>
             </FormGroup>
@@ -57,23 +72,11 @@ export const LineEntry = (props: Props) => {
               <Input
                 type="select"
                 name="rateType"
-                onChange={(e) =>
-                  props.updateExpense({
-                    ...props.expense,
-                    rate:
-                      props.rates[
-                        props.rates.findIndex(
-                          (r) => r.id === parseInt(e.target.value)
-                        )
-                      ],
-                  })
-                }
+                defaultValue={props.expense.rate.id}
+                onChange={(e) => updateRateType(parseInt(e.target.value))}
               >
                 {validRates.map((r) => (
-                  <option
-                    value={r.id}
-                    selected={props.expense.rate.id === r.id}
-                  >
+                  <option key={r.id} value={r.id}>
                     {r.description}
                   </option>
                 ))}
@@ -90,7 +93,8 @@ export const LineEntry = (props: Props) => {
                   props.updateExpense({
                     ...props.expense,
                     quantity: parseInt(e.target.value),
-                    total: props.expense.rate.price * parseFloat(e.target.value)
+                    total:
+                      props.expense.rate.price * parseFloat(e.target.value),
                   })
                 }
               />

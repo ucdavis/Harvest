@@ -77,7 +77,7 @@ export const ExpenseEntryContainer = () => {
   return (
     <div className="card-wrapper">
       <div className="card-content">
-        <h3>Add Expense for Project #{projectId}</h3>
+        <h3>Add Expenses for Project #{projectId}</h3>
         {expenses.map((expense) => (
           <LineEntry
             key={`expense-line-${expense.id}`}
