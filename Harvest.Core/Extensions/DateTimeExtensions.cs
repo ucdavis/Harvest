@@ -32,6 +32,10 @@ namespace Harvest.Core.Extensions
         {
             return TimeZoneInfo.ConvertTime(dateTime, GetPacificTimeZone(), TimeZoneInfo.Utc);
         }
+        public static DateTime? FromPacificTime(this DateTime? dateTime)
+        {
+            return dateTime.HasValue ? FromPacificTime(dateTime.Value) : (DateTime?) null;
+        }
 
         public static string Format(this DateTime? dateTime, string format = "g")
         {

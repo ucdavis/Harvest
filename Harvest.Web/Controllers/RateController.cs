@@ -83,7 +83,7 @@ namespace Harvest.Web.Controllers
                 Account     = model.Rate.Account,
                 BillingUnit = model.Rate.BillingUnit,
                 Description = model.Rate.Description,
-                EffectiveOn = model.Rate.EffectiveOn.ToPacificTime(),
+                EffectiveOn = model.Rate.EffectiveOn.FromPacificTime(),
                 Price       = model.Rate.Price,
                 Type        = model.Rate.Type,
                 Unit        = model.Rate.Unit,

@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Harvest.Core.Domain.Rate>
+﻿@using Harvest.Core.Extensions
+@model IEnumerable<Harvest.Core.Domain.Rate>
 
 @{
     ViewData["Title"] = "Index";
@@ -64,13 +65,13 @@
                 @Html.DisplayFor(modelItem => item.Price)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EffectiveOn)
+                @item.EffectiveOn.ToPacificTime().Format("d")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedOn)
+                @item.CreatedOn.ToPacificTime().Format("d")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UpdatedOn)
+                @item.UpdatedOn.ToPacificTime().Format("d")
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new {/* id=item.PrimaryKey */}) |
