@@ -665,6 +665,25 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Rate", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
+                        .WithMany("CreatedRates")
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.User", "UpdatedBy")
+                        .WithMany("UpdatedRates")
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("UpdatedBy");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.Account", "FromAccount")
@@ -738,9 +757,13 @@ namespace Harvest.Core.Migrations.Sqlite
                 {
                     b.Navigation("CreatedProjects");
 
+                    b.Navigation("CreatedRates");
+
                     b.Navigation("Permissions");
 
                     b.Navigation("PrincipalInvestigatorProjects");
+
+                    b.Navigation("UpdatedRates");
                 });
 #pragma warning restore 612, 618
         }

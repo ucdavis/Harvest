@@ -40,8 +40,15 @@ namespace Harvest.Core.Domain
 
         [Required] 
         public int CreatedById { get; set; }
+
+        [Display(Name = "Created By")]
+        public User CreatedBy { get; set; }
+
         [Required] 
         public int UpdatedById { get; set; }
+
+        [Display(Name = "Updated By")]
+        public User UpdatedBy { get; set; }
 
         [Display(Name = "Created Date")]
         public DateTime CreatedOn { get; set; }
