@@ -116,9 +116,12 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id);
+            var model = new RateEditModel { Rate = rate, TypeList = Rate.Types.TypeList };
+
+            return View(model);
         }
 
         // POST: RateController/Edit/5
