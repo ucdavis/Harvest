@@ -29,6 +29,14 @@ namespace Harvest.Web.Controllers
             return View(projects);
         }
 
+        // TODO: move or determine proper permissions
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> Active()
+        {
+            // TODO: only show projects where between start and end?
+            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Where(p => p.IsActive).ToArrayAsync());
+        }
+
         public async Task<ActionResult> Details(int id)
         {
             return View(await _dbContext.Projects.SingleAsync(p => p.Id == id));
@@ -51,6 +59,7 @@ namespace Harvest.Web.Controllers
             project.Status = StatusTypes.Requested;
             project.CreatedOn = DateTime.UtcNow;
             project.PrincipalInvestigator = user;
+            project.IsActive = true;
 
             _dbContext.Projects.Add(project);
 

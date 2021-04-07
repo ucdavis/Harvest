@@ -39,6 +39,15 @@ export interface Rate {
   id: number;
 }
 
+export interface Expense {
+  id: number;
+  description: string;
+  type: string;
+  quantity: number;
+  rate: Rate;
+  total: number;
+}
+
 // TODO: should this be a different name or is it ok?  Do we even need an interface?
 
 // the dynamic content which will be stored in Quote.text
