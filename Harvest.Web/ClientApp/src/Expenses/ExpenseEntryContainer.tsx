@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Expense, Rate } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
@@ -18,6 +18,25 @@ export const ExpenseEntryContainer = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
 
+  const getDefaultExpense = useCallback(
+    (currentRates: Rate[], currentExpenses: Expense[]) => {
+      const newId = Math.max(...currentExpenses.map((e) => e.id), 0) + 1;
+      const defaultExpense: Expense = {
+        id: newId,
+        type: expenseTypes[0],
+        rate:
+          currentRates.find((r) => r.type === expenseTypes[0]) ||
+          currentRates[0], // For now we just default to the first choice
+        description: "",
+        quantity: 0,
+        total: 0,
+      };
+
+      return defaultExpense;
+    },
+    []
+  );
+
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
@@ -27,22 +46,13 @@ export const ExpenseEntryContainer = () => {
         const rates: Rate[] = await response.json();
 
         setRates(rates);
-
-        const defaultExpense: Expense = {
-          id: 1,
-          type: expenseTypes[0],
-          rate: rates.find((r) => r.type === expenseTypes[0]) || rates[0], // For now we just default to the first choice
-          description: "",
-          quantity: 0,
-          total: 0,
-        };
-
-        setExpenses([defaultExpense]);
+        const firstExpense = getDefaultExpense(rates, []);
+        setExpenses([firstExpense]);
       }
     };
 
     cb();
-  }, []);
+  }, [getDefaultExpense]);
 
   const changeProject = (projectId: number) => {
     // want to go to /expense/entry/[projectId]
@@ -78,6 +88,13 @@ export const ExpenseEntryContainer = () => {
           ></LineEntry>
         ))}
       </div>
+      <button
+        onClick={() =>
+          setExpenses([...expenses, getDefaultExpense(rates, expenses)])
+        }
+      >
+        Add Expense +
+      </button>
       <div>DEBUG: {JSON.stringify(expenses)}</div>
     </div>
   );

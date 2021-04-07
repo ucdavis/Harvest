@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Card, CardBody, Col, FormGroup, Input, Row } from "reactstrap";
 import { Expense, Rate } from "../types";
 
