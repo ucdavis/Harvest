@@ -127,14 +127,52 @@ namespace Harvest.Web.Controllers
         [HttpPost]
         public async Task<ActionResult> Edit(int id, RateEditModel model)
         {
+            model.Rate.Id = id;
+            model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
+            if (!ModelState.IsValid)
+            {
+                ErrorMessage = "There are validation errors, please correct them and try again.";
+                return View(model);
+            }
+
+            var accountValidation = await _financialService.IsValid(model.Rate.Account);
+            if (!accountValidation.IsValid)
+            {
+                ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ErrorMessage = "There are validation errors, please correct them and try again.";
+                return View(model);
+            }
+
+
             var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
+
+            var user = await _userService.GetCurrentUser();
+
+
+            rateToEdit.Account     = model.Rate.Account;
+            rateToEdit.BillingUnit = model.Rate.BillingUnit;
+            rateToEdit.Description = model.Rate.Description;
+            rateToEdit.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
+            rateToEdit.Price       = model.Rate.Price;
+            rateToEdit.Type        = model.Rate.Type;
+            rateToEdit.Unit        = model.Rate.Unit;
+            rateToEdit.UpdatedOn   = DateTime.UtcNow;
+            rateToEdit.UpdatedBy   = user;
+
             try
             {
+                await _dbContext.SaveChangesAsync();
+                Message = "Rate Updated";
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ErrorMessage = "There was a problem updating the Rate, please try again.";
+                return View(model);
             }
         }
 
