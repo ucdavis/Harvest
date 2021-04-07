@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Harvest.Web.Models.RateModels;
@@ -19,13 +20,13 @@ namespace Harvest.Web.Controllers
     public class RateController : SuperController
     {
         private readonly AppDbContext _dbContext;
-        private readonly IIdentityService _identityService;
+        private readonly IUserService _userService;
         private readonly IFinancialService _financialService;
 
-        public RateController(AppDbContext dbContext, IIdentityService identityService, IFinancialService financialService)
+        public RateController(AppDbContext dbContext, IUserService userService, IFinancialService financialService)
         {
             _dbContext = dbContext;
-            _identityService = identityService;
+            _userService = userService;
             _financialService = financialService;
         }
         // GET: RateController
@@ -72,6 +73,22 @@ namespace Harvest.Web.Controllers
                 ErrorMessage = "There are validation errors, please correct them and try again.";
                 return View(model);
             }
+
+            var createTime = DateTime.UtcNow;
+            var user = _userService.GetCurrentUser();
+
+            var rateToCreate = new Rate();
+            rateToCreate.IsActive = true;
+            rateToCreate.Account = model.Rate.Account;
+            rateToCreate.BillingUnit = model.Rate.BillingUnit;
+            rateToCreate.Description = model.Rate.Description;
+            rateToCreate.EffectiveOn = model.Rate.EffectiveOn.ToPacificTime();
+            rateToCreate.Price = model.Rate.Price;
+            rateToCreate.Type = model.Rate.Type;
+            rateToCreate.Unit = model.Rate.Unit;
+            rateToCreate.CreatedOn = createTime;
+            rateToCreate.UpdatedOn = createTime;
+            //rateToCreate.CreatedById = user.Id;
 
             try
             {
