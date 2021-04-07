@@ -45,9 +45,13 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            return View();
+            var rate = await _dbContext.Rates
+                .Include(a => a.UpdatedBy)
+                .Include(a => a.CreatedBy)
+                .SingleAsync(a => a.Id == id);
+            return View(rate);
         }
 
         // GET: RateController/Create

@@ -51,6 +51,8 @@ namespace Harvest.Core.Domain
         [Display(Name = "Name")]
         public string Name => FirstName + " " + LastName;
 
+        public string NameAndEmail => $"{FirstName} {LastName} ({Email})";
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasIndex(a => a.Kerberos);
