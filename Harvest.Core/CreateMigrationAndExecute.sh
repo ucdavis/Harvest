@@ -4,5 +4,6 @@ dotnet ef migrations add $1 --context AppDbContextSqlite --output-dir Migrations
 dotnet ef migrations add $1 --context AppDbContextSqlServer --output-dir Migrations/SqlServer --startup-project ../Harvest.Web/Harvest.Web.csproj -- --provider SqlServer
 dotnet ef database update --startup-project ../Harvest.Web/Harvest.Web.csproj --context AppDbContextSqlServer
 # dotnet ef database update --startup-project ../Harvest.Web/Harvest.Web.csproj --context AppDbContextSqlite
+# usage from PM console in the Harvest.Core directory: ./CreateMigrationAndExecute.sh <MigrationName>
 
 echo 'All done';
