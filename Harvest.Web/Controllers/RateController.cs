@@ -185,22 +185,38 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            var rate = await _dbContext.Rates
+                .Include(a => a.UpdatedBy)
+                .Include(a => a.CreatedBy)
+                .SingleAsync(a => a.Id == id);
+            var model = new RateDetailsModel { Rate = rate };
+            model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
+
+            return View(model);
         }
 
         // POST: RateController/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
+            var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive);
+            var user = await _userService.GetCurrentUser();
+
+            rateToDelete.IsActive  = false;
+            rateToDelete.UpdatedOn = DateTime.UtcNow;
+            rateToDelete.UpdatedBy = user;
             try
             {
+                await _dbContext.SaveChangesAsync();
+                Message = "Rate deactivated.";
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ErrorMessage = "There was a problem trying to deactivate the Rate.";
+                return RedirectToAction(nameof(Index));
             }
         }
     }

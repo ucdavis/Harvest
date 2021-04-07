@@ -1,0 +1,115 @@
+﻿@using Harvest.Core.Extensions
+@model Harvest.Web.Models.RateModels.RateDetailsModel
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Rate</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.IsActive)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.IsActive)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.Type)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.Type)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.Unit)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.Unit)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.Price)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.Price)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.EffectiveOn)
+        </dt>
+        <dd class = "col-sm-10">
+            @(Model.Rate.EffectiveOn.HasValue ? Model.Rate.EffectiveOn.ToPacificTime().Format("d") : "N/A")
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.CreatedBy)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.CreatedBy.NameAndEmail)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.CreatedOn)
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.Rate.CreatedOn.ToPacificTime().Format("d")
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.UpdatedBy)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.UpdatedBy.NameAndEmail)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.UpdatedOn)
+        </dt>
+        <dd class = "col-sm-10">
+            @Model.Rate.UpdatedOn.ToPacificTime().Format("d")
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.BillingUnit)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.BillingUnit)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Rate.Account)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Rate.Account)
+        </dd>
+        @if (Model.AccountValidation.IsValid) {
+            <dt class = "col-sm-2">
+                Account Details
+            </dt>
+            <dd class = "col-sm-10">
+                <div><strong>Account Name:</strong> @Model.AccountValidation.KfsAccount.AccountName</div>
+                <div><strong>Organization Code:</strong> @Model.AccountValidation.KfsAccount.OrganizationCode</div>
+                <div><strong>Sub Fund Group Name:</strong> @Model.AccountValidation.KfsAccount.SubFundGroupName</div>
+                <div><strong>Account Expiration Date:</strong> @(Model.AccountValidation.KfsAccount.AccountExpirationDate.HasValue ? Model.AccountValidation.KfsAccount.AccountExpirationDate : "N/A")</div>
+            </dd>
+        }
+        else
+        {
+            <dt class = "col-sm-2">
+                Account Validation
+            </dt>
+            <dd class = "alert-danger col-sm-10">
+                <p>Account is Invalid</p>
+                <p>@Model.AccountValidation.Field <span>: </span> @Model.AccountValidation.Message</p>
+            </dd>
+
+        }
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>
