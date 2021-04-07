@@ -40,6 +40,12 @@ namespace Harvest.Core.Domain
         public List<Project> CreatedProjects { get; set; }
 
         [JsonIgnore]
+        public List<Rate> CreatedRates { get; set; }
+
+        [JsonIgnore]
+        public List<Rate> UpdatedRates { get; set; }
+
+        [JsonIgnore]
         public List<Project> PrincipalInvestigatorProjects { get; set; }
 
         [Display(Name = "Name")]
@@ -68,6 +74,19 @@ namespace Harvest.Core.Domain
                 .WithMany(u => u.CreatedProjects)
                 .HasForeignKey(p => p.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Rate>()
+                .HasOne(p => p.CreatedBy)
+                .WithMany(u => u.CreatedRates)
+                .HasForeignKey(p => p.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Rate>()
+                .HasOne(p => p.UpdatedBy)
+                .WithMany(u => u.UpdatedRates)
+                .HasForeignKey(p => p.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
