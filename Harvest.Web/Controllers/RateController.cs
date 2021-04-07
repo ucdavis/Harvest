@@ -60,7 +60,6 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(RateEditModel model)
         {
             model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
@@ -126,9 +125,9 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(int id, RateEditModel model)
         {
+            var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
             try
             {
                 return RedirectToAction(nameof(Index));
@@ -147,7 +146,6 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
             try
