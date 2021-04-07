@@ -12,8 +12,12 @@
     [CreatedOn]   DATETIME2 (7)   NOT NULL,
     [UpdatedOn]   DATETIME2 (7)   NOT NULL,
     [Unit]        NVARCHAR (50)   NULL,
-    CONSTRAINT [PK_Rates] PRIMARY KEY CLUSTERED ([Id] ASC)
+    CONSTRAINT [PK_Rates] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_Rates_Users_CreatedById] FOREIGN KEY ([CreatedById]) REFERENCES [dbo].[Users] ([Id]),
+    CONSTRAINT [FK_Rates_Users_UpdatedById] FOREIGN KEY ([UpdatedById]) REFERENCES [dbo].[Users] ([Id])
 );
+
+
 
 
 
