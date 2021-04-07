@@ -1,11 +1,12 @@
 import React from "react";
 import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 
-import { Activity, QuoteContent } from "../types";
+import { Activity, QuoteContent, Rate } from "../types";
 
 import { ActivityForm } from "./ActivityForm";
 
 interface Props {
+  rates: Rate[];
   quote: QuoteContent;
   updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
 }
@@ -26,6 +27,7 @@ export const ActivitiesContainer = (props: Props) => {
           key={`activity-${activity.id}`}
           activity={activity}
           updateActivity={(activity: Activity) => updateActivity(activity)}
+          rates={props.rates}
         />
       ))}
       <Card className="card-project-totals">
@@ -106,7 +108,7 @@ export const ActivitiesContainer = (props: Props) => {
                         0
                       ),
                     0
-                  )}
+                  ) + (props.quote.acres * props.quote.acreageRate)}
                 </span>
               </Col>
             </Row>

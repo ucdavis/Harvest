@@ -1,13 +1,14 @@
 import React from "react";
 import { Card, CardBody, CardHeader, Input } from "reactstrap";
 
-import { Activity, WorkItem, WorkItemImpl } from "../types";
+import { Activity, Rate, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
 interface Props {
   activity: Activity;
   updateActivity: (activity: Activity) => void;
+  rates: Rate[];
 }
 
 export const ActivityForm = (props: Props) => {
@@ -59,6 +60,7 @@ export const ActivityForm = (props: Props) => {
       <CardBody>
         <WorkItemsForm
           category="labor"
+          rates={props.rates.filter((r) => r.type === "Labor")}
           workItems={props.activity.workItems.filter((w) => w.type === "labor")}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
@@ -66,6 +68,7 @@ export const ActivityForm = (props: Props) => {
         />
         <WorkItemsForm
           category="equipment"
+          rates={props.rates.filter((r) => r.type === "Equipment")}
           workItems={props.activity.workItems.filter(
             (w) => w.type === "equipment"
           )}
@@ -75,6 +78,7 @@ export const ActivityForm = (props: Props) => {
         />
         <WorkItemsForm
           category="other"
+          rates={props.rates.filter((r) => r.type === "Other")}
           workItems={props.activity.workItems.filter((w) => w.type === "other")}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}

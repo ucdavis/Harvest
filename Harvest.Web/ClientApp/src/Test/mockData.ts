@@ -1,4 +1,4 @@
-import { ProjectWithQuotes } from "../types";
+import { ProjectWithQuotes, Rate } from "../types";
 
 export const fakeProject: ProjectWithQuotes = {
   project: {
@@ -41,3 +41,34 @@ export const fakeProject: ProjectWithQuotes = {
   },
   quotes: [],
 };
+
+export const sampleRates: Rate[] = [
+  {
+    price: 1234.0,
+    unit: "Per Acre per Year",
+    type: "Acreage",
+    description: "Russell Ranch Acreage",
+    id: 1,
+  },
+  {
+    price: 60.0,
+    unit: "Hourly",
+    type: "Labor",
+    description: "Skilled Labor",
+    id: 3,
+  },
+  {
+    price: 66.67,
+    unit: "Per acre",
+    type: "Other",
+    description: "Crop Destruction",
+    id: 5,
+  },
+  {
+    price: 34.91,
+    unit: "Per Acre",
+    type: "Equipment",
+    description: "Backhoe",
+    id: 8,
+  },
+];

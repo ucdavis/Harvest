@@ -6,6 +6,7 @@ import {
   ProjectWithQuotes,
   QuoteContent,
   QuoteContentImpl,
+  Rate,
 } from "../types";
 
 import { ProjectDetail } from "./ProjectDetail";
@@ -22,16 +23,29 @@ export const QuoteContainer = () => {
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
   const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
+  const [rates, setRates] = useState<Rate[]>([]);
 
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/Quote/Get/${projectId}`);
+      const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
+      const pricingResponse = await fetch("/Rate/Active");
 
-      if (response.ok) {
-        const projectWithQuotes: ProjectWithQuotes = await response.json();
+      if (quoteResponse.ok && pricingResponse.ok) {
+        const projectWithQuotes: ProjectWithQuotes = await quoteResponse.json();
+        const rateJson: Rate[] = await pricingResponse.json();
         setProject(projectWithQuotes.project);
+        setRates(rateJson);
+
+        // TODO: load up existing quote if it exists
+        // TODO: how do we handle if different fields have different rates?
+        const quoteToUse = new QuoteContentImpl();
+        quoteToUse.acreageRate =
+          rateJson.find((r) => r.type === "Acreage")?.price || 120;
+
+        setQuote(quoteToUse);
       } else {
-        console.error(response);
+        !quoteResponse.ok && console.error(quoteResponse);
+        !pricingResponse.ok && console.error(pricingResponse);
       }
     };
 
@@ -83,12 +97,17 @@ export const QuoteContainer = () => {
             <h2>Quote Details</h2>
             <hr />
             <ProjectDetail quote={quote} updateQuote={setQuote} />
-            <ActivitiesContainer quote={quote} updateQuote={setQuote} />
+            <ActivitiesContainer
+              quote={quote}
+              rates={rates}
+              updateQuote={setQuote}
+            />
           </div>
         </div>
       </div>
 
       <div>Debug: {JSON.stringify(quote)}</div>
+      <div>Debug Rates: {JSON.stringify(rates)}</div>
     </div>
   );
 };
