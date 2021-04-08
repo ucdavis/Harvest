@@ -86,9 +86,10 @@ export const LineEntry = (props: Props) => {
           <Col xs="4">
             <FormGroup>
               <Input
-                type="number"
+                type="text"
                 name="quantity"
-                value={props.expense.quantity}
+                value={props.expense.quantity || ''}
+                placeholder={`${props.expense.rate.unit} total`}
                 onChange={(e) =>
                   props.updateExpense({
                     ...props.expense,
