@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Harvest.Web.Controllers
 {
+    [AutoValidateAntiforgeryToken]
     public abstract class SuperController : Controller
     {
         private const string TempDataMessageKey = "Message";

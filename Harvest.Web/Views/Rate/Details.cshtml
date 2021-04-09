@@ -1,0 +1,18 @@
+﻿@using Harvest.Core.Extensions
+@model Harvest.Web.Models.RateModels.RateDetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Rate</h4>
+    <hr />
+    @await Html.PartialAsync("_RateDetails", Model)
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Rate.Id }) |
+    <a asp-action="Index">Back to List</a>
+</div>

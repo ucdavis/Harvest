@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,14 +33,22 @@ namespace Harvest.Core.Domain
         public string Account { get; set; }
 
         [Display(Name = "Rate")] 
+        [Range(0.01, 1000000.00)]
         public decimal Price { get; set; }
         [Display(Name = "Effective Date")]
         public DateTime? EffectiveOn { get; set; }
 
         [Required] 
         public int CreatedById { get; set; }
+
+        [Display(Name = "Created By")]
+        public User CreatedBy { get; set; }
+
         [Required] 
         public int UpdatedById { get; set; }
+
+        [Display(Name = "Updated By")]
+        public User UpdatedBy { get; set; }
 
         [Display(Name = "Created Date")]
         public DateTime CreatedOn { get; set; }
@@ -63,6 +72,14 @@ namespace Harvest.Core.Domain
             public const string Labor     = "Labor";
             public const string Equipment = "Equipment";
             public const string Other     = "Other";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Acreage,
+                Labor,
+                Equipment,
+                Other,
+            }.ToList();
         }
     }
 }
