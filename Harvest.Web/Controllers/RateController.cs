@@ -160,16 +160,47 @@ namespace Harvest.Web.Controllers
 
             var user = await _userService.GetCurrentUser();
 
+            //TODO: When the rate is actually used, check the db to see if we need to archive. (If I just created it, and edit the rate, we don't need to archive)
+            var archive = rateToEdit.Price != model.Rate.Price;
 
-            rateToEdit.Account     = model.Rate.Account;
-            rateToEdit.BillingUnit = model.Rate.BillingUnit;
-            rateToEdit.Description = model.Rate.Description;
-            rateToEdit.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
-            rateToEdit.Price       = model.Rate.Price;
-            rateToEdit.Type        = model.Rate.Type;
-            rateToEdit.Unit        = model.Rate.Unit;
-            rateToEdit.UpdatedOn   = DateTime.UtcNow;
-            rateToEdit.UpdatedBy   = user;
+            if (archive)
+            {
+                var rateToCreate = new Rate();
+                rateToCreate.IsActive = true;
+                rateToCreate.Price = model.Rate.Price;
+                rateToCreate.Account = model.Rate.Account;
+                rateToCreate.BillingUnit = model.Rate.BillingUnit;
+                rateToCreate.Description = model.Rate.Description;
+                rateToCreate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
+                rateToCreate.Type = model.Rate.Type;
+                rateToCreate.Unit = model.Rate.Unit;
+                rateToCreate.UpdatedOn = DateTime.UtcNow;
+                rateToCreate.UpdatedBy = user;
+                rateToCreate.CreatedBy = rateToEdit.CreatedBy;
+                rateToCreate.CreatedOn = rateToEdit.CreatedOn;
+
+                rateToEdit.IsActive = false;
+                rateToEdit.UpdatedBy = user;
+                rateToEdit.UpdatedOn = rateToCreate.UpdatedOn;
+
+                await _dbContext.AddAsync(rateToCreate);
+
+            }
+            else
+            {
+                rateToEdit.Account = model.Rate.Account;
+                rateToEdit.BillingUnit = model.Rate.BillingUnit;
+                rateToEdit.Description = model.Rate.Description;
+                rateToEdit.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
+                rateToEdit.Price = model.Rate.Price; //When we check if the rate has been used or not, this may get changed
+                rateToEdit.Type = model.Rate.Type;
+                rateToEdit.Unit = model.Rate.Unit;
+                rateToEdit.UpdatedOn = DateTime.UtcNow;
+                rateToEdit.UpdatedBy = user;
+            }
+
+
+
 
             try
             {
