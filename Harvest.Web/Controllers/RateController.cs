@@ -95,7 +95,7 @@ namespace Harvest.Web.Controllers
             var rateToCreate = new Rate
             {
                 IsActive    = true,
-                Account     = model.Rate.Account,
+                Account     = accountValidation.KfsAccount.ToString(),
                 BillingUnit = model.Rate.BillingUnit,
                 Description = model.Rate.Description,
                 EffectiveOn = model.Rate.EffectiveOn.FromPacificTime(),
@@ -161,14 +161,14 @@ namespace Harvest.Web.Controllers
             var user = await _userService.GetCurrentUser();
 
             //TODO: When the rate is actually used, check the db to see if we need to archive. (If I just created it, and edit the rate, we don't need to archive)
-            var archive = rateToEdit.Price != model.Rate.Price;
-
+            var archive = rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString(); 
+             
             if (archive)
             {
                 var rateToCreate = new Rate();
                 rateToCreate.IsActive = true;
                 rateToCreate.Price = model.Rate.Price;
-                rateToCreate.Account = model.Rate.Account;
+                rateToCreate.Account = accountValidation.KfsAccount.ToString();
                 rateToCreate.BillingUnit = model.Rate.BillingUnit;
                 rateToCreate.Description = model.Rate.Description;
                 rateToCreate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
