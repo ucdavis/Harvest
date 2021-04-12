@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
@@ -13,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers
 {
     [Authorize]
-    public class ExpenseController : SuperController
+    public class ExpenseController : Controller
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
@@ -26,7 +27,8 @@ namespace Harvest.Web.Controllers
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
-        public async Task<ActionResult> Create(int projectId, List<Expense> expenses)
+        [Consumes(MediaTypeNames.Application.Json)]
+        public async Task<ActionResult> Create(int id, [FromBody]Expense[] expenses)
         {
             // TODO: validation!
             var user = await _userService.GetCurrentUser();
@@ -35,6 +37,7 @@ namespace Harvest.Web.Controllers
             {
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
+                expense.ProjectId = id;
                 expense.InvoiceId = null;
             }
 
