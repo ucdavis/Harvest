@@ -160,20 +160,17 @@ namespace Harvest.Web.Controllers
 
             var user = await _userService.GetCurrentUser();
 
-            //TODO: When the rate is actually used, check the db to see if we need to archive. (If I just created it, and edit the rate, we don't need to archive)
-            var archive = rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString(); 
-             
-            if (archive)
+            if (ArchiveRate(model, rateToEdit, accountValidation.KfsAccount.ToString()))
             {
                 //Create new rate
                 var rateToCreate = new Rate();
                 UpdateCommonValues(model, rateToCreate, accountValidation, user);
-                rateToCreate.IsActive = true;
+                rateToCreate.IsActive  = true;
                 rateToCreate.CreatedBy = rateToEdit.CreatedBy;
                 rateToCreate.CreatedOn = rateToEdit.CreatedOn;
 
                 //Archive original rate
-                rateToEdit.IsActive = false;
+                rateToEdit.IsActive  = false;
                 rateToEdit.UpdatedBy = user;
                 rateToEdit.UpdatedOn = rateToCreate.UpdatedOn;
 
@@ -197,17 +194,23 @@ namespace Harvest.Web.Controllers
             }
         }
 
-        private static void UpdateCommonValues(RateEditModel model, Rate rateToEdit, AccountValidationModel accountValidation, User user)
+        private static bool ArchiveRate(RateEditModel model, Rate rateToEdit, string account)
         {
-            rateToEdit.Account =  accountValidation.KfsAccount.ToString(); //When we check if the rate has been used or not, this may get changed
-            rateToEdit.BillingUnit = model.Rate.BillingUnit;
-            rateToEdit.Description = model.Rate.Description;
-            rateToEdit.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
-            rateToEdit.Price = model.Rate.Price; //When we check if the rate has been used or not, this may get changed
-            rateToEdit.Type = model.Rate.Type;
-            rateToEdit.Unit = model.Rate.Unit;
-            rateToEdit.UpdatedOn = DateTime.UtcNow;
-            rateToEdit.UpdatedBy = user;
+            //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
+            return rateToEdit.Price != model.Rate.Price || rateToEdit.Account != account;
+        }
+
+        private static void UpdateCommonValues(RateEditModel model, Rate destinationRate, AccountValidationModel accountValidation, User user)
+        {
+            destinationRate.Account     = accountValidation.KfsAccount.ToString(); //When we check if the rate has been used or not, this may get changed
+            destinationRate.BillingUnit = model.Rate.BillingUnit;
+            destinationRate.Description = model.Rate.Description;
+            destinationRate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
+            destinationRate.Price       = model.Rate.Price; //When we check if the rate has been used or not, this may get changed
+            destinationRate.Type        = model.Rate.Type;
+            destinationRate.Unit        = model.Rate.Unit;
+            destinationRate.UpdatedOn   = DateTime.UtcNow;
+            destinationRate.UpdatedBy   = user;
         }
 
         // GET: RateController/Delete/5
