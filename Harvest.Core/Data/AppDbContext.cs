@@ -32,6 +32,8 @@ namespace Harvest.Core.Data
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Document> Documents { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<Project> Projects { get; set; }
@@ -49,6 +51,8 @@ namespace Harvest.Core.Data
         {
             Account.OnModelCreating(modelBuilder);
             Document.OnModelCreating(modelBuilder);
+            Expense.OnModelCreating(modelBuilder);
+            Invoice.OnModelCreating(modelBuilder);
             Notification.OnModelCreating(modelBuilder);
             Permission.OnModelCreating(modelBuilder);
             Project.OnModelCreating(modelBuilder);
