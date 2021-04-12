@@ -92,21 +92,12 @@ namespace Harvest.Web.Controllers
             var createTime = DateTime.UtcNow;
             var user = await _userService.GetCurrentUser();
 
-            var rateToCreate = new Rate
-            {
-                IsActive    = true,
-                Account     = accountValidation.KfsAccount.ToString(),
-                BillingUnit = model.Rate.BillingUnit,
-                Description = model.Rate.Description,
-                EffectiveOn = model.Rate.EffectiveOn.FromPacificTime(),
-                Price       = model.Rate.Price,
-                Type        = model.Rate.Type,
-                Unit        = model.Rate.Unit,
-                CreatedOn   = createTime,
-                UpdatedOn   = createTime,
-                CreatedBy   = user,
-                UpdatedBy   = user,
-            };
+            var rateToCreate = new Rate();
+            UpdateCommonValues(model, rateToCreate, accountValidation, user);
+            rateToCreate.IsActive  = true;
+            rateToCreate.CreatedBy = user;
+            rateToCreate.CreatedOn = rateToCreate.UpdatedOn;
+            
 
             try
             {
