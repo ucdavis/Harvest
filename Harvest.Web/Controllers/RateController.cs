@@ -147,7 +147,7 @@ namespace Harvest.Web.Controllers
             }
 
 
-            var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
+            var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id);
 
             var user = await _userService.GetCurrentUser();
             //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
