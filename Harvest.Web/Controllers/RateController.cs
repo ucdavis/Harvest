@@ -148,10 +148,11 @@ namespace Harvest.Web.Controllers
 
 
             var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
+            var rateUsed = await _dbContext.Expenses.AnyAsync(a => a.RateId == rateToEdit.Id);
 
             var user = await _userService.GetCurrentUser();
             //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
-            var archive = rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString();
+            var archive = rateUsed && ( rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString());
 
             if (archive)
             {
@@ -180,9 +181,9 @@ namespace Harvest.Web.Controllers
                 Message = "Rate Updated";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch(Exception ex)
             {
-                ErrorMessage = "There was a problem updating the Rate, please try again.";
+                ErrorMessage = $"There was a problem updating the Rate, please try again.";
                 return View(model);
             }
         }
