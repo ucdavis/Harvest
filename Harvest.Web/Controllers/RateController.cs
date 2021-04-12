@@ -150,8 +150,10 @@ namespace Harvest.Web.Controllers
             var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
 
             var user = await _userService.GetCurrentUser();
+            //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
+            var archive = rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString();
 
-            if (ArchiveRate(model, rateToEdit, accountValidation.KfsAccount.ToString()))
+            if (archive)
             {
                 //Create new rate
                 var rateToCreate = new Rate();
@@ -183,12 +185,6 @@ namespace Harvest.Web.Controllers
                 ErrorMessage = "There was a problem updating the Rate, please try again.";
                 return View(model);
             }
-        }
-
-        private static bool ArchiveRate(RateEditModel model, Rate rateToEdit, string account)
-        {
-            //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
-            return rateToEdit.Price != model.Rate.Price || rateToEdit.Account != account;
         }
 
         private static void UpdateCommonValues(RateEditModel model, Rate destinationRate, AccountValidationModel accountValidation, User user)
