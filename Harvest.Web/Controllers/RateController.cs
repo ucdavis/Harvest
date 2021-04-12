@@ -181,9 +181,9 @@ namespace Harvest.Web.Controllers
                 Message = "Rate Updated";
                 return RedirectToAction(nameof(Index));
             }
-            catch(Exception ex)
+            catch
             {
-                ErrorMessage = $"There was a problem updating the Rate, please try again.";
+                ErrorMessage = "There was a problem updating the Rate, please try again.";
                 return View(model);
             }
         }
