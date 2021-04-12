@@ -1,5 +1,8 @@
 @model Invoice[]
 
+@if (Model.Any()) { 
+<a asp-controller="Invoice" asp-action="Unbilled" asp-route-projectId="@Model.FirstOrDefault().ProjectId">Unbilled for this project</a>
+}
 <table id="invoices" class="table table-striped table-bordered" style="width:100%">
     <thead>
         <tr>
