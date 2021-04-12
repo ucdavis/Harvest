@@ -147,7 +147,7 @@ namespace Harvest.Web.Controllers
             }
 
 
-            var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
+            var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id);
             var rateUsed = await _dbContext.Expenses.AnyAsync(a => a.RateId == rateToEdit.Id);
 
             var user = await _userService.GetCurrentUser();
