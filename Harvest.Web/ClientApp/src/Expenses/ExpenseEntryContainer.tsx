@@ -67,6 +67,26 @@ export const ExpenseEntryContainer = () => {
     setExpenses(allExpenses);
   };
 
+  const submitExpenses = async () => {
+    // TODO: disable the submit button and maybe just some sort of full screen processing UI
+
+    // transform since we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
+    const expensesBody = expenses.map(exp => ({ ...exp, id: 0, description: exp.rate.description, price: exp.rate.price, rateId: exp.rate.id, rate: null }));
+
+    const response = await fetch(`/Expense/Create/${projectId}`, {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(expensesBody),
+    });
+
+    if (response.ok) {
+      alert("success!");
+    }
+  };
+
   if (projectId === undefined) {
     // need to pick the project we want to use
     return (
@@ -95,6 +115,9 @@ export const ExpenseEntryContainer = () => {
       >
         Add Expense +
       </button>
+
+      <hr />
+      <button onClick={submitExpenses}>Submit!</button>
       <div>DEBUG: {JSON.stringify(expenses)}</div>
     </div>
   );

@@ -90,6 +90,85 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.ToTable("Documents");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Expense", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int?>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("RateId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("RateId");
+
+                    b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Total")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Invoices");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -586,6 +665,51 @@ namespace Harvest.Core.Migrations.SqlServer
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Expense", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
+                        .WithMany("Expenses")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Rate", "Rate")
+                        .WithMany()
+                        .HasForeignKey("RateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Invoice");
+
+                    b.Navigation("Project");
+
+                    b.Navigation("Rate");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Notification", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
@@ -751,6 +875,11 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
                 {
                     b.Navigation("Quote");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
+                {
+                    b.Navigation("Expenses");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
