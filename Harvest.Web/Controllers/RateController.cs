@@ -92,21 +92,12 @@ namespace Harvest.Web.Controllers
             var createTime = DateTime.UtcNow;
             var user = await _userService.GetCurrentUser();
 
-            var rateToCreate = new Rate
-            {
-                IsActive    = true,
-                Account     = model.Rate.Account,
-                BillingUnit = model.Rate.BillingUnit,
-                Description = model.Rate.Description,
-                EffectiveOn = model.Rate.EffectiveOn.FromPacificTime(),
-                Price       = model.Rate.Price,
-                Type        = model.Rate.Type,
-                Unit        = model.Rate.Unit,
-                CreatedOn   = createTime,
-                UpdatedOn   = createTime,
-                CreatedBy   = user,
-                UpdatedBy   = user,
-            };
+            var rateToCreate = new Rate();
+            UpdateCommonValues(model, rateToCreate, accountValidation, user);
+            rateToCreate.IsActive  = true;
+            rateToCreate.CreatedBy = user;
+            rateToCreate.CreatedOn = rateToCreate.UpdatedOn;
+            
 
             try
             {
@@ -159,17 +150,29 @@ namespace Harvest.Web.Controllers
             var rateToEdit = await _dbContext.Rates.SingleAsync(a => a.Id == id);
 
             var user = await _userService.GetCurrentUser();
+            //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
+            var archive = rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString();
 
+            if (archive)
+            {
+                //Create new rate
+                var rateToCreate = new Rate();
+                UpdateCommonValues(model, rateToCreate, accountValidation, user);
+                rateToCreate.IsActive  = true;
+                rateToCreate.CreatedBy = rateToEdit.CreatedBy;
+                rateToCreate.CreatedOn = rateToEdit.CreatedOn;
 
-            rateToEdit.Account     = model.Rate.Account;
-            rateToEdit.BillingUnit = model.Rate.BillingUnit;
-            rateToEdit.Description = model.Rate.Description;
-            rateToEdit.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
-            rateToEdit.Price       = model.Rate.Price;
-            rateToEdit.Type        = model.Rate.Type;
-            rateToEdit.Unit        = model.Rate.Unit;
-            rateToEdit.UpdatedOn   = DateTime.UtcNow;
-            rateToEdit.UpdatedBy   = user;
+                //Archive original rate
+                rateToEdit.IsActive  = false;
+                rateToEdit.UpdatedBy = user;
+                rateToEdit.UpdatedOn = rateToCreate.UpdatedOn;
+
+                await _dbContext.AddAsync(rateToCreate);
+            }
+            else
+            {
+                UpdateCommonValues(model, rateToEdit, accountValidation, user);
+            }
 
             try
             {
@@ -182,6 +185,19 @@ namespace Harvest.Web.Controllers
                 ErrorMessage = "There was a problem updating the Rate, please try again.";
                 return View(model);
             }
+        }
+
+        private static void UpdateCommonValues(RateEditModel model, Rate destinationRate, AccountValidationModel accountValidation, User user)
+        {
+            destinationRate.Account     = accountValidation.KfsAccount.ToString(); //When we check if the rate has been used or not, this may get changed
+            destinationRate.BillingUnit = model.Rate.BillingUnit;
+            destinationRate.Description = model.Rate.Description;
+            destinationRate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
+            destinationRate.Price       = model.Rate.Price; //When we check if the rate has been used or not, this may get changed
+            destinationRate.Type        = model.Rate.Type;
+            destinationRate.Unit        = model.Rate.Unit;
+            destinationRate.UpdatedOn   = DateTime.UtcNow;
+            destinationRate.UpdatedBy   = user;
         }
 
         // GET: RateController/Delete/5
