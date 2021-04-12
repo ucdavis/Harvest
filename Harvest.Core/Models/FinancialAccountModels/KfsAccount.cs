@@ -23,6 +23,15 @@ namespace Harvest.Core.Models.FinancialAccountModels
         public string SubAccount { get; set; } //Added for harvest
         public string Project { get; set; } //Added for harvest
 
+        public override string ToString()
+        {
+            var extraAccountInfo = string.Empty;
+            if (!string.IsNullOrWhiteSpace(SubAccount) || !string.IsNullOrWhiteSpace(Project))
+            {
+                extraAccountInfo = $"-{SubAccount}-{Project}";
+            }
+            return $"{ChartOfAccountsCode}-{AccountNumber}{extraAccountInfo}";
+        }
 
         public static implicit operator KfsAccount(string v)
         {
