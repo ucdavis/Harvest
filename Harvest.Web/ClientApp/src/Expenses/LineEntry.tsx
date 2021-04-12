@@ -88,12 +88,12 @@ export const LineEntry = (props: Props) => {
               <Input
                 type="text"
                 name="quantity"
-                value={props.expense.quantity || ''}
+                defaultValue={props.expense.quantity || ''}
                 placeholder={`${props.expense.rate.unit} total`}
                 onChange={(e) =>
                   props.updateExpense({
                     ...props.expense,
-                    quantity: parseInt(e.target.value),
+                    quantity: parseFloat(e.target.value),
                     total:
                       props.expense.rate.price * parseFloat(e.target.value),
                   })

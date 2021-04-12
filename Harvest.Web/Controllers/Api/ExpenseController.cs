@@ -25,6 +25,10 @@ namespace Harvest.Web.Controllers
             this._userService = userService;
         }
 
+        public ActionResult Entry() {
+            return View();
+        }
+
         [HttpPost]
         [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         [Consumes(MediaTypeNames.Application.Json)]
