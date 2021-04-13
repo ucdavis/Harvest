@@ -29,7 +29,7 @@ namespace Harvest.Web.Controllers
         public async Task<ActionResult> Get(int id)
         {
             var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id);
-            var openQuote = await _dbContext.Quotes.Where(q => q.ProjectId == id && q.ApprovedOn == null).Select(q=> QuoteDetail.Deserialize(q.Text)).SingleOrDefaultAsync();
+            var openQuote = await _dbContext.Quotes.Where(q => q.ProjectId == id && q.ApprovedOn == null).Select(q => QuoteDetail.Deserialize(q.Text)).SingleOrDefaultAsync();
 
             var model = new QuoteModel { Project = project, Quote = openQuote };
 
@@ -75,14 +75,33 @@ namespace Harvest.Web.Controllers
     // JSON quote detail stored in Quote.Text
     public class QuoteDetail
     {
-        public static QuoteDetail Deserialize(string text) {
+        public static QuoteDetail Deserialize(string text)
+        {
             return JsonSerializer.Deserialize<QuoteDetail>(text);
         }
 
         public string ProjectName { get; set; }
         public double Acres { get; set; }
         public double AcreageRate { get; set; }
+        public Activity[] Activities { get; set; }
 
+    }
+
+    public class Activity
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public WorkItem[] WorkItems { get; set; }
+    }
+
+    public partial class WorkItem
+    {
+        public int Id { get; set; }
+        public int ActivityId { get; set; }
+        public string Type { get; set; }
+        public double Rate { get; set; }
+        public int RateId { get; set; }
+        public double Quantity { get; set; }
     }
 
     public class QuoteModel

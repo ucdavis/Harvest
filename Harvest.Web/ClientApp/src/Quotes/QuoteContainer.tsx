@@ -36,13 +36,16 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
-        // TODO: load up existing quote if it exists
-        // TODO: how do we handle if different fields have different rates?
-        const quoteToUse = new QuoteContentImpl();
-        quoteToUse.acreageRate =
-          rateJson.find((r) => r.type === "Acreage")?.price || 120;
+        if (projectWithQuote.quote) {
+          setQuote(projectWithQuote.quote);
+        } else {
+          // TODO: how do we handle if different fields have different rates?
+          const quoteToUse = new QuoteContentImpl();
+          quoteToUse.acreageRate =
+            rateJson.find((r) => r.type === "Acreage")?.price || 120;
 
-        setQuote(quoteToUse);
+          setQuote(quoteToUse);
+        }
       } else {
         !quoteResponse.ok && console.error(quoteResponse);
         !pricingResponse.ok && console.error(pricingResponse);
