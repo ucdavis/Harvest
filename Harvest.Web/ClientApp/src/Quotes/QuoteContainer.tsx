@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import {
   Project,
-  ProjectWithQuotes,
+  ProjectWithQuote,
   QuoteContent,
   QuoteContentImpl,
   Rate,
@@ -31,9 +31,9 @@ export const QuoteContainer = () => {
       const pricingResponse = await fetch("/Rate/Active");
 
       if (quoteResponse.ok && pricingResponse.ok) {
-        const projectWithQuotes: ProjectWithQuotes = await quoteResponse.json();
+        const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
         const rateJson: Rate[] = await pricingResponse.json();
-        setProject(projectWithQuotes.project);
+        setProject(projectWithQuote.project);
         setRates(rateJson);
 
         // TODO: load up existing quote if it exists
@@ -51,6 +51,22 @@ export const QuoteContainer = () => {
 
     cb();
   }, [projectId]);
+
+  const save = async () => {
+    // TODO: add progress and hide info while saving
+    const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(quote),
+    });
+
+    if (saveResponse.ok) {
+      alert("saved");
+    }
+  };
 
   if (!project) {
     return <div>Loading</div>;
@@ -103,6 +119,8 @@ export const QuoteContainer = () => {
               updateQuote={setQuote}
             />
           </div>
+          <h2>Save</h2>
+          <button onClick={save}>Save Quote</button>
         </div>
       </div>
 

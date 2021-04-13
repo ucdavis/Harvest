@@ -87,9 +87,9 @@ export interface Quote {
   currentDocument: Document;
 }
 
-export interface ProjectWithQuotes {
+export interface ProjectWithQuote {
   project: Project;
-  quotes: Quote[];
+  quote: Quote | null;
 }
 
 export interface ActionType {

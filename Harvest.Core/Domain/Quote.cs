@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.SymbolStore;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -36,6 +37,7 @@ namespace Harvest.Core.Domain
         [StringLength(50)]
         public string Status { get; set; }
 
+        [JsonIgnore]
         public Project Project { get; set; }
 
         [Display(Name = "Initiated By")]
