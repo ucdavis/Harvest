@@ -56,7 +56,7 @@ namespace Harvest.Web.Controllers
 
                 // newly created quote, populate defaults
                 var currentUser = await this._userService.GetCurrentUser();
-                quote.InitatedById = currentUser.Id;
+                quote.InitiatedById = currentUser.Id;
                 quote.Status = "New"; // TODO: definte status progression
                 quote.CreatedDate = DateTime.UtcNow;
                 quote.ProjectId = id;
