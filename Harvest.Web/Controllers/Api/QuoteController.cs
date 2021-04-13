@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
@@ -64,6 +65,7 @@ namespace Harvest.Web.Controllers
             }
 
             // TODO: calculate totals and store in db
+            quote.Total = (decimal)Math.Round(quoteDetail.Total, 2);
             quote.Text = JsonSerializer.Serialize(quoteDetail);
 
             await _dbContext.SaveChangesAsync();
@@ -78,6 +80,17 @@ namespace Harvest.Web.Controllers
         public static QuoteDetail Deserialize(string text)
         {
             return JsonSerializer.Deserialize<QuoteDetail>(text);
+        }
+
+        [JsonIgnore]
+        public double Total
+        {
+            get
+            {
+                var acreage = Acres * AcreageRate;
+                var activities = Activities.Sum(a => a.WorkItems.Sum(w => w.Quantity * w.Rate));
+                return acreage + activities;
+            }
         }
 
         public string ProjectName { get; set; }
