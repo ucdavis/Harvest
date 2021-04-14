@@ -39,5 +39,11 @@ namespace Harvest.Core.Models.SlothModels
         public string Description { get; set; }
         
         public string Direction { get; set; }// Debit or Credit Code associated with the transaction. = ['Credit', 'Debit'],
+
+        public class Directions
+        {
+            public const string Debit = "Debit";
+            public const string Credit = "Credit";
+        }
     }
 }

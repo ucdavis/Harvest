@@ -73,7 +73,7 @@ namespace Harvest.Core.Services
                 Chart = debit.KfsAccount.ChartOfAccountsCode, 
                 SubAccount = debit.KfsAccount.SubAccount,
                 Description = moneyTransfer.Description, 
-                Direction = "Debit",
+                Direction = TransferViewModel.Directions.Debit,
                 ObjectCode = _slothSettings.DebitObjectCode
             });
 
@@ -84,7 +84,7 @@ namespace Harvest.Core.Services
                 Chart = credit.KfsAccount.ChartOfAccountsCode,
                 SubAccount = credit.KfsAccount.SubAccount,
                 Description = moneyTransfer.Description,
-                Direction = "Credit",
+                Direction = TransferViewModel.Directions.Credit,
                 ObjectCode = _slothSettings.CreditObjectCode
             });
 
@@ -135,6 +135,10 @@ namespace Harvest.Core.Services
             return rtValue;
         }
 
+        /// <summary>
+        /// This is to see if the money has moved in Sloth. Similar to MoneyHasMoved in Anlab
+        /// </summary>
+        /// <returns></returns>
         public async Task ProcessTransferUpdates()
         {
             Log.Information("Beginning ProcessTransferUpdates");
