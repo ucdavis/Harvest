@@ -24,13 +24,28 @@ namespace Harvest.Jobs.Invoice
 
             // setup di
             var provider = ConfigureServices();
+
+            var invoiceService = provider.GetService<IInvoiceService>();
+            var invoiceCount = invoiceService.CreateInvoices().GetAwaiter().GetResult(); ;
         }
 
         private static ServiceProvider ConfigureServices()
         {
             IServiceCollection services = new ServiceCollection();
             services.AddOptions();
-            services.AddDbContextPool<AppDbContext>(o => o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //TODO: Have a SQL Lite option?
+            services.AddDbContextPool<AppDbContext, AppDbContextSqlServer>((serviceProvider, o) =>
+            {
+                o.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                    {
+                        sqlOptions.MigrationsAssembly("Harvest.Core");
+                        sqlOptions.UseNetTopologySuite();
+                    });
+#if DEBUG
+                o.EnableSensitiveDataLogging();
+#endif
+            });
 
             services.AddTransient<IInvoiceService, InvoiceService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
