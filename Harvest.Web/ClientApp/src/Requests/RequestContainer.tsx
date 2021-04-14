@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
@@ -18,6 +19,25 @@ import { Project } from "../types";
 
 export const RequestContainer = () => {
   const [project, setProject] = useState<Project>({ id: 0 } as Project);
+
+  const create = async () => {
+    // TODO: validation, loading spinner
+    // create a new project
+    const response = await fetch(`/Request/Create`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(project),
+    });
+
+    if (response.ok) {
+      alert("created!");
+    } else {
+      alert("didn't work");
+    }
+  };
 
   return (
     <Card>
@@ -93,6 +113,13 @@ export const RequestContainer = () => {
                   placeholder="Enter a full description of your requirements"
                 />
               </FormGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <Button color="primary" onClick={create}>
+                Create Field Request
+              </Button>
             </Col>
           </Row>
         </Container>
