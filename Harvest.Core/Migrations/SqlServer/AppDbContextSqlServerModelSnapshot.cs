@@ -97,6 +97,11 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
