@@ -16,6 +16,7 @@ namespace Harvest.Core.Domain
         
         public DateTime End { get; set; }
         
+        // TODO: make this biggere in case we have a bunch of crops
         [StringLength(50)]
         public string Crop { get; set; }
         
