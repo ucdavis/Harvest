@@ -57,16 +57,21 @@ namespace Harvest.Web.Controllers
 
             // create PI if needed and assign to project
             var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == project.PrincipalInvestigator.Iam);
-
+            string piName;
             if (pi != null)
             {
                 newProject.PrincipalInvestigatorId = pi.Id;
+                piName = pi.Name;
             }
             else
             {
                 // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
                 newProject.PrincipalInvestigator = project.PrincipalInvestigator;
+                piName = project.PrincipalInvestigator.Name;
             }
+
+            // TODO: when is name determined? Currently by quote creator but can it be changed?
+            newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
 
             await _dbContext.Projects.AddAsync(newProject);
             await _dbContext.SaveChangesAsync();
