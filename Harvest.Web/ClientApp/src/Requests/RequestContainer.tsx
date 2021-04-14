@@ -13,6 +13,7 @@ import {
 import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
+import { Crops } from "./Crops";
 import { Project } from "../types";
 
 export const RequestContainer = () => {
@@ -57,7 +58,10 @@ export const RequestContainer = () => {
             <Col>
               <FormGroup tag="fieldset">
                 <Label>Which type of crop will we grow?</Label>
-                TODO
+                <Crops
+                  crops={project.crop}
+                  setCrops={(c) => setProject({ ...project, crop: c })}
+                ></Crops>
               </FormGroup>
             </Col>
           </Row>
