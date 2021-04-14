@@ -350,10 +350,7 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<int?>("CurrentDocumentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("InitatedById")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("InitiatedById")
+                    b.Property<int>("InitiatedById")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("ProjectId")
@@ -376,8 +373,6 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasIndex("CurrentDocumentId")
                         .IsUnique();
-
-                    b.HasIndex("InitatedById");
 
                     b.HasIndex("InitiatedById");
 
@@ -770,7 +765,9 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasOne("Harvest.Core.Domain.User", "InitiatedBy")
                         .WithMany()
-                        .HasForeignKey("InitiatedById");
+                        .HasForeignKey("InitiatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
                         .WithMany("Quotes")

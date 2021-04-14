@@ -87,9 +87,9 @@ export interface Quote {
   currentDocument: Document;
 }
 
-export interface ProjectWithQuotes {
+export interface ProjectWithQuote {
   project: Project;
-  quotes: Quote[];
+  quote: QuoteContent | null;
 }
 
 export interface ActionType {
@@ -114,6 +114,7 @@ export class WorkItemImpl implements WorkItem {
   activityId;
   type;
   rate;
+  rateId = 0;
   quantity;
 
   get total(): number {
@@ -132,6 +133,7 @@ export interface WorkItem {
   id: number;
   activityId: number;
   type: string;
+  rateId: number;
   rate: number;
   quantity: number;
   readonly total: number;

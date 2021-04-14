@@ -1,6 +1,6 @@
-import { ProjectWithQuotes, Rate } from "../types";
+import { ProjectWithQuote, Rate } from "../types";
 
-export const fakeProject: ProjectWithQuotes = {
+export const fakeProject: ProjectWithQuote = {
   project: {
     id: 3,
     start: new Date("2021-03-15T00:00:00"),
@@ -39,7 +39,7 @@ export const fakeProject: ProjectWithQuotes = {
     accounts: null,
     quotes: null,
   },
-  quotes: [],
+  quote: null
 };
 
 export const sampleRates: Rate[] = [

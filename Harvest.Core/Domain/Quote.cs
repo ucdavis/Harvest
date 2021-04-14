@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.SymbolStore;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -20,7 +21,7 @@ namespace Harvest.Core.Domain
 
         public decimal Total { get; set; }
 
-        public int InitatedById { get; set; }
+        public int InitiatedById { get; set; }
 
         public int? CurrentDocumentId { get; set; }
 
@@ -36,6 +37,7 @@ namespace Harvest.Core.Domain
         [StringLength(50)]
         public string Status { get; set; }
 
+        [JsonIgnore]
         public Project Project { get; set; }
 
         [Display(Name = "Initiated By")]
@@ -53,7 +55,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Quote>().HasIndex(a => a.ProjectId);
             modelBuilder.Entity<Quote>().HasIndex(a => a.ApprovedById);
             modelBuilder.Entity<Quote>().HasIndex(a => a.CurrentDocumentId);
-            modelBuilder.Entity<Quote>().HasIndex(a => a.InitatedById);
+            modelBuilder.Entity<Quote>().HasIndex(a => a.InitiatedById);
 
             modelBuilder.Entity<Quote>().Property(a => a.Total).HasPrecision(18, 2);
         }

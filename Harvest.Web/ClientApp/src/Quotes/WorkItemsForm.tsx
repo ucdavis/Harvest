@@ -26,12 +26,13 @@ export const WorkItemsForm = (props: Props) => {
     e: React.ChangeEvent<HTMLInputElement>,
     workItem: WorkItem
   ) => {
-    const rate = props.rates.find((r) => r.id === parseInt(e.target.value));
+    const rateId = parseInt(e.target.value);
+    const rate = props.rates.find((r) => r.id === rateId);
 
     // rate can be undefinied if they select the default option
     if (rate !== undefined) {
       // new rate selected, update the work item with defaults
-      props.updateWorkItems({ ...workItem, rate: rate.price });
+      props.updateWorkItems({ ...workItem, rateId, rate: rate.price });
     }
   };
 
@@ -61,6 +62,7 @@ export const WorkItemsForm = (props: Props) => {
                 <Input
                   type="select"
                   name="select"
+                  defaultValue={workItem.rateId}
                   onChange={(e) => rateItemChanged(e, workItem)}
                 >
                   <option value="0">-- Select {props.category} --</option>
@@ -82,6 +84,7 @@ export const WorkItemsForm = (props: Props) => {
               <Input
                 type="number"
                 id="units"
+                value={workItem.quantity}
                 onChange={(e) =>
                   props.updateWorkItems({
                     ...workItem,
