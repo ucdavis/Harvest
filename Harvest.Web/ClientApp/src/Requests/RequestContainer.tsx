@@ -10,12 +10,9 @@ import {
   Label,
   Row,
 } from "reactstrap";
+import DatePicker from "react-date-picker";
 
 import { Project } from "../types";
-
-interface RouteParams {
-  projectId?: string;
-}
 
 export const RequestContainer = () => {
   const [project, setProject] = useState<Project>({ id: 0 } as Project);
@@ -29,12 +26,29 @@ export const RequestContainer = () => {
             <Col>
               <FormGroup>
                 <Label>When to Start?</Label>
+                <DatePicker
+                  format="MM/dd/yyyy"
+                  required={true}
+                  clearIcon={null}
+                  value={project.start}
+                  onChange={(date) =>
+                    setProject({ ...project, start: date as Date })
+                  }
+                />
               </FormGroup>
             </Col>
             <Col>
               <FormGroup>
                 <Label>When to Finish?</Label>
-                TODO
+                <DatePicker
+                  format="MM/dd/yyyy"
+                  required={true}
+                  clearIcon={null}
+                  value={project.end}
+                  onChange={(date) =>
+                    setProject({ ...project, end: date as Date })
+                  }
+                />
               </FormGroup>
             </Col>
           </Row>
