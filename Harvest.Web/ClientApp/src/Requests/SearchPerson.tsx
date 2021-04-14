@@ -6,6 +6,7 @@ import { User } from "../types";
 
 interface Props {
   user?: User;
+  setUser: (user: User) => void;
 }
 
 export const SearchPerson = (props: Props) => {
@@ -30,7 +31,10 @@ export const SearchPerson = (props: Props) => {
   };
 
   const onSelect = (selected: User[]) => {
-    console.log(selected);
+    if (selected && selected.length === 1) {
+      // found our match
+      props.setUser(selected[0]);
+    }
   };
 
   return (

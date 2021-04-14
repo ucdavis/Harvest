@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Card,
   CardBody,
@@ -12,7 +12,7 @@ import {
 } from "reactstrap";
 import DatePicker from "react-date-picker";
 
-import { SearchPerson } from './SearchPerson';
+import { SearchPerson } from "./SearchPerson";
 import { Project } from "../types";
 
 export const RequestContainer = () => {
@@ -65,7 +65,12 @@ export const RequestContainer = () => {
             <Col>
               <FormGroup>
                 <Label>Who will be the PI?</Label>
-                <SearchPerson user={undefined}></SearchPerson>
+                <SearchPerson
+                  user={project.principalInvestigator}
+                  setUser={(u) =>
+                    setProject({ ...project, principalInvestigator: u })
+                  }
+                ></SearchPerson>
               </FormGroup>
             </Col>
           </Row>
@@ -77,12 +82,17 @@ export const RequestContainer = () => {
                   type="textarea"
                   name="text"
                   id="requirements"
+                  value={project.requirements}
+                  onChange={(e) =>
+                    setProject({ ...project, requirements: e.target.value })
+                  }
                   placeholder="Enter a full description of your requirements"
                 />
               </FormGroup>
             </Col>
           </Row>
         </Container>
+        <div>DEBUG: {JSON.stringify(project)}</div>
       </CardBody>
     </Card>
   );
