@@ -12,6 +12,7 @@ import {
 } from "reactstrap";
 import DatePicker from "react-date-picker";
 
+import { SearchPerson } from './SearchPerson';
 import { Project } from "../types";
 
 export const RequestContainer = () => {
@@ -64,7 +65,7 @@ export const RequestContainer = () => {
             <Col>
               <FormGroup>
                 <Label>Who will be the PI?</Label>
-                TODO
+                <SearchPerson user={undefined}></SearchPerson>
               </FormGroup>
             </Col>
           </Row>
