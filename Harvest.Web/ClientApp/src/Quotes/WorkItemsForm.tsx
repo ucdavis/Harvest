@@ -11,6 +11,7 @@ import {
 } from "reactstrap";
 
 import { Rate, WorkItem } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   category: string;
@@ -114,7 +115,7 @@ export const WorkItemsForm = (props: Props) => {
             </InputGroup>
           </Col>
 
-          <Col xs="2">${workItem.rate * workItem.quantity}</Col>
+          <Col xs="2">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
 
           <Col xs="2">
             <Button
