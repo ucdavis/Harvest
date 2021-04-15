@@ -102,7 +102,7 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("CreatedById")
+                    b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOn")
@@ -674,9 +674,6 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
                         .WithMany("Expenses")
