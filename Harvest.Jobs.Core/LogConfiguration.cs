@@ -57,16 +57,6 @@ namespace Harvest.Jobs.Core
             return logConfig;
         }
 
-        //private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
-        //{
-        //    if (!_loggingSetup)
-        //    {
-        //        _configuration.ConfigureStackifyLogging();
-        //    }
-
-        //    return logConfig.WriteTo.Stackify();
-        //}
-
         private static LoggerConfiguration WriteToElasticSearchCustom(this LoggerConfiguration logConfig)
         {
             // get logging config for ES endpoint (re-use some stackify settings for now)
