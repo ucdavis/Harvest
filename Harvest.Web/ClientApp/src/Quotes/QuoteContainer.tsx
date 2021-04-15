@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -10,6 +10,7 @@ import {
 } from "../types";
 
 import { ProjectDetail } from "./ProjectDetail";
+import { RequestHeader } from "../Requests/RequestHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 
 interface RouteParams {
@@ -77,39 +78,7 @@ export const QuoteContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <div className="card-content">
-        <div className="quote-info row">
-          <div className="col-md-6">
-            <h2 id="request-title">Field Request #{project.id}</h2>
-            <p className="lede">PI: {project.principalInvestigator.name}</p>
-            <p>
-              Created {new Date(project.createdOn).toDateString()} by{" "}
-              {project.createdBy.name}
-            </p>
-            <p className="lede">Requirements</p>
-            <p>{project.requirements}</p>
-          </div>
-          <div className="col-md-6 quote-info-box">
-            <div className="row">
-              <div className="col">
-                <p className="lede">Status</p>
-                <p className="quote-status">{project.status}</p>
-                <p className="lede">Type</p>
-                <p>TODO ROW CROPS</p>
-              </div>
-              <div className="col">
-                <p className="lede">Timeline</p>
-                <p>
-                  {new Date(project.start).toLocaleDateString()} through{" "}
-                  {new Date(project.end).toLocaleDateString()}
-                </p>
-                <p className="lede">Crops</p>
-                <p>{project.crop}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RequestHeader project={project}></RequestHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <div className="quote-details">
