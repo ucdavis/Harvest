@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { RequestHeader } from "./RequestHeader";
+import { formatCurrency } from '../Util/NumberFormatting';
 
 interface RouteParams {
   projectId?: string;
@@ -67,7 +68,7 @@ export const ApprovalContainer = () => {
         <div className="card-content">
           Quote Details go here
           <hr />
-          Quote Total: $123.45 (TODO: store on quote)
+          Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
           <AccountsInput
             accounts={accounts}
             setAccounts={setAccounts}
