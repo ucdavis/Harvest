@@ -26,7 +26,7 @@ namespace Harvest.Jobs.Core
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
 
-            //LogConfiguration.Setup(Configuration); //TODO: Logging....
+            LogConfiguration.Setup(Configuration); 
         }
     }
 }

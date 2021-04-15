@@ -5,28 +5,30 @@ using Harvest.Jobs.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace Harvest.Jobs.Invoice
 {
     class Program : JobBase
     {
-        //private static ILogger _log;
+        private static ILogger _log;
         static void Main(string[] args)
         {
             Configure();
             var assembyName = typeof(Program).Assembly.GetName();
-            //_log = Log.Logger
-            //    .ForContext("jobname", assembyName.Name)
-            //    .ForContext("jobid", Guid.NewGuid());
+            _log = Log.Logger
+                .ForContext("jobname", assembyName.Name)
+                .ForContext("jobid", Guid.NewGuid());
 
-            //_log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
+            _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
 
             // setup di
             var provider = ConfigureServices();
 
             var invoiceService = provider.GetService<IInvoiceService>();
-            var invoiceCount = invoiceService.CreateInvoices().GetAwaiter().GetResult(); ;
+            var invoiceCount = invoiceService.CreateInvoices().GetAwaiter().GetResult();
+            _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
         }
 
         private static ServiceProvider ConfigureServices()
