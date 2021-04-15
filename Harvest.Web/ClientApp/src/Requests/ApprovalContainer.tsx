@@ -54,7 +54,7 @@ export const ApprovalContainer = () => {
   // TODO: make sure both project and quote are in the correct statuses in order for an approval
   if (
     projectAndQuote.project === undefined ||
-    projectAndQuote.quote === undefined
+    projectAndQuote.quote === undefined || projectAndQuote.quote === null
   ) {
     return <div>No project or open quote found</div>;
   }
