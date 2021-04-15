@@ -22,10 +22,10 @@ namespace Harvest.Core.Domain
 
         public decimal Percentage { get; set; }
 
-        public int ApprovedById { get; set; }
+        public int? ApprovedById { get; set; }
 
         [Display(Name = "Approved On")]
-        public DateTime ApprovedOn { get; set; }
+        public DateTime? ApprovedOn { get; set; }
 
         [Display(Name = "Approved By")]
         public User ApprovedBy { get; set; }

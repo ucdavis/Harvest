@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -36,6 +37,37 @@ namespace Harvest.Web.Controllers
         public ActionResult Create()
         {
             return View("React");
+        }
+
+        // Approve a quote for the project
+        [HttpGet]
+        public ActionResult Approve(int id) {
+            return View("React");
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> ApproveAsync(int id, [FromBody]RequestApprovalModel model) {
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
+
+            // TODO: double check the percentages add up to 100%
+            // TODO: add in fiscal officer info??
+            foreach (var account in model.Accounts)
+            {
+                account.ProjectId = id;
+                account.ApprovedById = null;
+                account.ApprovedOn = null;
+            }
+
+            project.Accounts = new List<Account>(model.Accounts);
+            project.Status = "PendingAccountApproval"; // TODO: update with enumerated values
+
+            // TODO: Maybe inactivate instead?
+            // remove any existing accounts that we no longer need
+            _dbContext.RemoveRange(_dbContext.Accounts.Where(x=>x.ProjectId == id));
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(project);
         }
 
         [HttpPost]
@@ -78,5 +110,9 @@ namespace Harvest.Web.Controllers
 
             return Ok(newProject);
         }
+    }
+
+    public class RequestApprovalModel {
+        public Account[] Accounts { get; set; }
     }
 }
