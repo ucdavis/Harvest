@@ -18,7 +18,7 @@ export const ActivitiesContainer = (props: Props) => {
     const activityIndex = allActivities.findIndex((a) => a.id === activity.id);
     allActivities[activityIndex] = { ...activity };
 
-    props.updateQuote({ ...props.quote, activities: allActivities });
+    props.updateQuote({ ...props.quote, activities: [...allActivities] });
   };
   return (
     <div>
@@ -34,14 +34,14 @@ export const ActivitiesContainer = (props: Props) => {
         <CardHeader>Project Totals</CardHeader>
         <CardBody>
           <div id="total">
-            <h6>TODO: Project Totals</h6>
+            <h6>Project Totals</h6>
             <hr />
             <Row>
               <Col xs="10" sm="10">
                 <div>Acreage Fees</div>
               </Col>
               <Col xs="2" sm="2">
-                ${props.quote.acres * props.quote.acreageRate}
+                ${props.quote.acreageTotal}
               </Col>
             </Row>
             <Row>
@@ -100,15 +100,7 @@ export const ActivitiesContainer = (props: Props) => {
               <Col xs="2" sm="2">
                 <span>
                   $
-                  {props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems.reduce(
-                        (p, c) => c.rate * c.quantity + p,
-                        0
-                      ),
-                    0
-                  ) + (props.quote.acres * props.quote.acreageRate)}
+                  {props.quote.grandTotal}
                 </span>
               </Col>
             </Row>

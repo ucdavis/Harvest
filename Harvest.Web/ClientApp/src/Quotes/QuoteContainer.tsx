@@ -56,6 +56,26 @@ export const QuoteContainer = () => {
     cb();
   }, [projectId]);
 
+  useEffect(() => {
+    setQuote((q) => ({ ...q, acreageTotal: q.acreageRate * q.acres }));
+  }, [quote.acreageRate, quote.acres]);
+
+  useEffect(() => {
+    console.log("setting totals");
+    setQuote((q) => {
+      const activitiesTotal = q.activities.reduce(
+        (prev, curr) =>
+          prev +
+          curr.workItems.reduce(
+            (prevWork, currWork) => prevWork + currWork.quantity * currWork.rate,
+            0
+          ),
+        0
+      );
+      return { ...q, activitiesTotal, grandTotal: activitiesTotal + q.acreageTotal };
+    });
+  }, [quote.activities]);
+
   const save = async () => {
     // TODO: add progress and hide info while saving
     const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
