@@ -1,17 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import {
-  Button,
-  Card,
-  CardBody,
-  CardTitle,
-  Input,
-  Label,
-  Row,
-} from "reactstrap";
-
-import { Project, ProjectWithQuote } from "../types";
+import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { RequestHeader } from "./RequestHeader";
 
@@ -22,6 +12,7 @@ interface RouteParams {
 export const ApprovalContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
+  const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
 
   useEffect(() => {
     const cb = async () => {
@@ -36,6 +27,25 @@ export const ApprovalContainer = () => {
 
     cb();
   }, [projectId]);
+
+  const approve = async () => {
+    const model = { accounts };
+    // TODO: validation, loading spinner
+    const response = await fetch(`/Request/Approve/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(model),
+    });
+
+    if (response.ok) {
+      alert("created!");
+    } else {
+      alert("didn't work");
+    }
+  };
 
   if (projectAndQuote === undefined) {
     return <div>Loading ...</div>;
@@ -58,11 +68,12 @@ export const ApprovalContainer = () => {
           Quote Details go here
           <hr />
           Quote Total: $123.45 (TODO: store on quote)
-
-          <AccountsInput></AccountsInput>
-
-          <hr/>
-          <button>Approve Quote TODO</button>
+          <AccountsInput
+            accounts={accounts}
+            setAccounts={setAccounts}
+          ></AccountsInput>
+          <hr />
+          <button onClick={approve}>Approve Quote TODO</button>
           <button>Reject Quote Somehow</button>
         </div>
       </div>

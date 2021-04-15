@@ -7,16 +7,21 @@ import { Col, Input, Row } from "reactstrap";
 
 import { ProjectAccount } from "../types";
 
-export const AccountsInput = () => {
+interface Props {
+  accounts: ProjectAccount[];
+  setAccounts: (accounts: ProjectAccount[]) => void;
+}
+
+export const AccountsInput = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [searchResultAccounts, setSearchResultAccounts] = useState<
     ProjectAccount[]
   >([]);
-  const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
   const [error, setError] = useState<string>();
 
   const typeaheadRef = createRef<AsyncTypeahead<ProjectAccount>>();
 
+  const { accounts, setAccounts } = props;
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 

@@ -27,10 +27,10 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("ApprovedById")
+                    b.Property<int?>("ApprovedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ApprovedOn")
+                    b.Property<DateTime?>("ApprovedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -641,9 +641,7 @@ namespace Harvest.Core.Migrations.SqlServer
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
                         .WithMany()
-                        .HasForeignKey("ApprovedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApprovedById");
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
                         .WithMany("Accounts")
