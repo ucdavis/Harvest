@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -109,6 +110,19 @@ namespace Harvest.Core.Domain
                 .HasForeignKey(q => q.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+        }
+        public class Statuses
+        {
+            public const string Requested = "Requested";
+            public const string Active    = "Active";
+            public const string Completed = "Completed";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Requested,
+                Active,
+                Completed,
+            }.ToList();
         }
     }
 }

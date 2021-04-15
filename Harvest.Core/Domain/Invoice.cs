@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -20,6 +21,8 @@ namespace Harvest.Core.Domain
         public List<Expense> Expenses { get; set; }
 
         public DateTime CreatedOn { get; set; }
+        public string Notes { get; set; }
+        public string Status { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +35,19 @@ namespace Harvest.Core.Domain
                 .WithMany(p => p.Expenses)
                 .HasForeignKey(a => a.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        public class Statuses
+        {
+            public const string Created = "Created";
+            public const string Pending = "Pending";
+            public const string Completed = "Completed";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Created,
+                Pending,
+                Completed,
+            }.ToList();
         }
     }
 }

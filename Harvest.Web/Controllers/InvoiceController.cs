@@ -52,7 +52,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", new { projectId = projectId });
             }
 
-            var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = projectId, Total = unbilled.Sum(x => x.Total) };
+            var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = projectId, Status = Invoice.Statuses.Created, Total = unbilled.Sum(x => x.Total) };
 
             newInvoice.Expenses = new System.Collections.Generic.List<Expense>(unbilled);
 
