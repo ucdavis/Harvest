@@ -20,20 +20,12 @@ namespace Harvest.Web.Models
             return JsonSerializer.Deserialize<QuoteDetail>(text);
         }
 
-        [JsonIgnore]
-        public double Total
-        {
-            get
-            {
-                var acreage = Acres * AcreageRate;
-                var activities = Activities.Sum(a => a.WorkItems.Sum(w => w.Quantity * w.Rate));
-                return acreage + activities;
-            }
-        }
-
         public string ProjectName { get; set; }
         public double Acres { get; set; }
         public double AcreageRate { get; set; }
+        public double AcreageTotal { get; set; }
+        public double ActivitiesTotal { get; set; }
+        public double GrandTotal { get; set; }
         public Activity[] Activities { get; set; }
 
     }

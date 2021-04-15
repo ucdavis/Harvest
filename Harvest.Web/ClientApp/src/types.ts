@@ -57,21 +57,9 @@ export class QuoteContentImpl implements QuoteContent {
   acreageRate = 360;
   total = 0;
   acreageTotal = 0;
+  activitiesTotal = 0;
+  grandTotal = 0;
 
-  get activitiesTotal(): number {
-    return this.activities.reduce(
-      (prev, curr) =>
-        prev +
-        curr.workItems.reduce(
-          (prevWork, currWork) => prevWork + currWork.total,
-          0
-        ),
-      0
-    );
-  }
-  get grandTotal(): number {
-    return this.acreageTotal + this.activitiesTotal;
-  }
   activities = [] as Activity[];
 }
 
