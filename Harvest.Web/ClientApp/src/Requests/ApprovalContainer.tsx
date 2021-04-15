@@ -60,6 +60,10 @@ export const ApprovalContainer = () => {
           Quote Total: $123.45 (TODO: store on quote)
 
           <AccountsInput></AccountsInput>
+
+          <hr/>
+          <button>Approve Quote TODO</button>
+          <button>Reject Quote Somehow</button>
         </div>
       </div>
     </div>
