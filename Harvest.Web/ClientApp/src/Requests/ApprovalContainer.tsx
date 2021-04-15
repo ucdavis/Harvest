@@ -73,7 +73,7 @@ export const ApprovalContainer = () => {
             setAccounts={setAccounts}
           ></AccountsInput>
           <hr />
-          <button onClick={approve}>Approve Quote TODO</button>
+          <button onClick={approve}>Approve Quote</button>
           <button>Reject Quote Somehow</button>
         </div>
       </div>

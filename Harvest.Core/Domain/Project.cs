@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
@@ -68,8 +69,10 @@ namespace Harvest.Core.Domain
         [Display(Name = "Created By")]
         public User CreatedBy { get; set; }
 
+        [JsonIgnore]
         public List<Account> Accounts { get; set; }
 
+        [JsonIgnore]
         public List<Quote> Quotes { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
