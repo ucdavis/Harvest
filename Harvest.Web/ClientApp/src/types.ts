@@ -144,3 +144,11 @@ export interface Activity {
   name: string;
   workItems: WorkItem[];
 }
+
+export interface ProjectAccount {
+  id: number;
+  projectId: number;
+  number: string;
+  name: string;
+  percentage: number;
+}

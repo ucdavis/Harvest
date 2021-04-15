@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.SymbolStore;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
@@ -58,6 +59,22 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Quote>().HasIndex(a => a.InitiatedById);
 
             modelBuilder.Entity<Quote>().Property(a => a.Total).HasPrecision(18, 2);
+        }
+
+        public class Statuses
+        {
+            public const string Created = "Created";
+            public const string Proposed = "Proposed";
+            public const string Approved = "Approved";
+            public const string Superseded = "Superseded"; // When a newer quote takes the place of an existing approved quote
+
+            public static List<string> TypeList = new List<string>
+            {
+                Created,
+                Proposed,
+                Approved,
+                Superseded
+            }.ToList();
         }
     }
 }

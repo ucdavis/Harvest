@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 
@@ -17,6 +18,7 @@ namespace Harvest.Core.Domain
         
         public DateTime End { get; set; }
         
+        // TODO: make this biggere in case we have a bunch of crops
         [StringLength(50)]
         public string Crop { get; set; }
         
@@ -68,8 +70,10 @@ namespace Harvest.Core.Domain
         [Display(Name = "Created By")]
         public User CreatedBy { get; set; }
 
+        [JsonIgnore]
         public List<Account> Accounts { get; set; }
 
+        [JsonIgnore]
         public List<Quote> Quotes { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)

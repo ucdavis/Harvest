@@ -36,13 +36,14 @@ namespace Harvest.Web.Controllers
         {
             // TODO: validation!
             var user = await _userService.GetCurrentUser();
-
+            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
                 expense.ProjectId = id;
                 expense.InvoiceId = null;
+                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
             }
 
             _dbContext.Expenses.AddRange(expenses);

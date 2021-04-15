@@ -3,15 +3,17 @@ using System;
 using Harvest.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 namespace Harvest.Core.Migrations.Sqlite
 {
     [DbContext(typeof(AppDbContextSqlite))]
-    partial class AppDbContextSqliteModelSnapshot : ModelSnapshot
+    [Migration("20210414182035_ExpenseAccount")]
+    partial class ExpenseAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,10 +25,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("ApprovedById")
+                    b.Property<int>("ApprovedById")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("ApprovedOn")
+                    b.Property<DateTime>("ApprovedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -153,14 +155,8 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("TEXT");
 
                     b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
@@ -628,7 +624,9 @@ namespace Harvest.Core.Migrations.Sqlite
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
                         .WithMany()
-                        .HasForeignKey("ApprovedById");
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
                         .WithMany("Accounts")
@@ -654,7 +652,9 @@ namespace Harvest.Core.Migrations.Sqlite
                 {
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
                         .WithMany("Expenses")

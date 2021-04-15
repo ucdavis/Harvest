@@ -46,6 +46,10 @@ namespace Harvest.Core.Domain
 
         public User CreatedBy { get; set; }
 
+        [Required]
+        [StringLength(50)]
+        public string Account { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Expense>().HasIndex(a => a.ProjectId);

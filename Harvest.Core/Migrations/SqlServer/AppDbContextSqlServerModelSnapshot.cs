@@ -27,10 +27,10 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int>("ApprovedById")
+                    b.Property<int?>("ApprovedById")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ApprovedOn")
+                    b.Property<DateTime?>("ApprovedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -97,7 +97,12 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<int?>("CreatedById")
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedOn")
@@ -642,9 +647,7 @@ namespace Harvest.Core.Migrations.SqlServer
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
                         .WithMany()
-                        .HasForeignKey("ApprovedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ApprovedById");
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
                         .WithMany("Accounts")
@@ -671,6 +674,9 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
                         .WithMany("Expenses")
