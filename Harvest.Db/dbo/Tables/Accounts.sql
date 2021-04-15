@@ -4,12 +4,14 @@
     [Number]       NVARCHAR (100)  NULL,
     [Name]         NVARCHAR (200)  NULL,
     [Percentage]   DECIMAL (18, 2) NOT NULL,
-    [ApprovedById] INT             NOT NULL,
-    [ApprovedOn]   DATETIME2 (7)   NOT NULL,
+    [ApprovedById] INT             NULL,
+    [ApprovedOn]   DATETIME2 (7)   NULL,
     CONSTRAINT [PK_Accounts] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Accounts_Projects_ProjectId] FOREIGN KEY ([ProjectId]) REFERENCES [dbo].[Projects] ([Id]),
-    CONSTRAINT [FK_Accounts_Users_ApprovedById] FOREIGN KEY ([ApprovedById]) REFERENCES [dbo].[Users] ([Id]) ON DELETE CASCADE
+    CONSTRAINT [FK_Accounts_Users_ApprovedById] FOREIGN KEY ([ApprovedById]) REFERENCES [dbo].[Users] ([Id])
 );
+
+
 
 
 GO
