@@ -38,6 +38,12 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        // Approve a quote for the project
+        [HttpGet]
+        public ActionResult Approve(int id) {
+            return View("React");
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] Project project)
         {

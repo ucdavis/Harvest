@@ -1,8 +1,10 @@
 import React from "react";
 
 import { Route } from "react-router-dom";
+
+import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
-import { RequestContainer } from './Requests/RequestContainer';
+import { RequestContainer } from "./Requests/RequestContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { Map } from "./Maps/Map";
 
@@ -12,8 +14,12 @@ function App() {
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create" component={RequestContainer} />
+      <Route path="/request/approve/:projectId" component={ApprovalContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
-      <Route path="/expense/entry/:projectId?" component={ExpenseEntryContainer} />
+      <Route
+        path="/expense/entry/:projectId?"
+        component={ExpenseEntryContainer}
+      />
       <Route path="/home/map" component={Map} />
     </>
   );
