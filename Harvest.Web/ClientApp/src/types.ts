@@ -55,10 +55,12 @@ export class QuoteContentImpl implements QuoteContent {
   projectName = ""; // TODO: might be worth removing when feasible
   acres = 0;
   acreageRate = 360;
-  get acreageTotal(): number {
-    return this.acres * this.acreageRate;
-  }
-  activities = [];
+  total = 0;
+  acreageTotal = 0;
+  activitiesTotal = 0;
+  grandTotal = 0;
+
+  activities = [] as Activity[];
 }
 
 export interface QuoteContent {
@@ -66,7 +68,10 @@ export interface QuoteContent {
   acres: number;
   acreageRate: number;
   activities: Activity[];
-  readonly acreageTotal: number;
+  total: number;
+  acreageTotal: number;
+  activitiesTotal: number;
+  grandTotal: number;
 }
 
 export interface Quote {

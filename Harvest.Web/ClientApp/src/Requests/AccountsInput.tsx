@@ -111,10 +111,13 @@ export const AccountsInput = (props: Props) => {
         onChange={onSelect}
         options={searchResultAccounts}
       />
-      <Row md={6}>
-        <Col>Account To Charge</Col>
-        <Col>Percent %</Col>
-      </Row>
+      {accounts.length > 0 && (
+        <Row md={6}>
+          <Col>Account To Charge</Col>
+          <Col>Percent %</Col>
+        </Row>
+      )}
+
       {accounts.map((account) => (
         <Row key={account.number} md={6}>
           <Col>{account.number}</Col>

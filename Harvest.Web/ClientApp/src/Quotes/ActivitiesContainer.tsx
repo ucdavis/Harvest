@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 
 import { Activity, QuoteContent, Rate } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 import { ActivityForm } from "./ActivityForm";
 
@@ -18,7 +19,7 @@ export const ActivitiesContainer = (props: Props) => {
     const activityIndex = allActivities.findIndex((a) => a.id === activity.id);
     allActivities[activityIndex] = { ...activity };
 
-    props.updateQuote({ ...props.quote, activities: allActivities });
+    props.updateQuote({ ...props.quote, activities: [...allActivities] });
   };
   return (
     <div>
@@ -34,14 +35,14 @@ export const ActivitiesContainer = (props: Props) => {
         <CardHeader>Project Totals</CardHeader>
         <CardBody>
           <div id="total">
-            <h6>TODO: Project Totals</h6>
+            <h6>Project Totals</h6>
             <hr />
             <Row>
               <Col xs="10" sm="10">
                 <div>Acreage Fees</div>
               </Col>
               <Col xs="2" sm="2">
-                ${props.quote.acres * props.quote.acreageRate}
+                ${formatCurrency(props.quote.acreageTotal)}
               </Col>
             </Row>
             <Row>
@@ -49,15 +50,16 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Labor</div>
               </Col>
               <Col xs="2" sm="2">
-                {/* TODO: We probably want to store these totals instead of calculating every time.  Perhaps with a useEffect hook in the right places. */}
                 $
-                {props.quote.activities.reduce(
-                  (prev, curr) =>
-                    prev +
-                    curr.workItems
-                      .filter((w) => w.type === "labor")
-                      .reduce((p, c) => c.rate * c.quantity + p, 0),
-                  0
+                {formatCurrency(
+                  props.quote.activities.reduce(
+                    (prev, curr) =>
+                      prev +
+                      curr.workItems
+                        .filter((w) => w.type === "labor")
+                        .reduce((p, c) => c.rate * c.quantity + p, 0),
+                    0
+                  )
                 )}
               </Col>
             </Row>
@@ -67,13 +69,15 @@ export const ActivitiesContainer = (props: Props) => {
               </Col>
               <Col xs="2" sm="2">
                 $
-                {props.quote.activities.reduce(
-                  (prev, curr) =>
-                    prev +
-                    curr.workItems
-                      .filter((w) => w.type === "equipment")
-                      .reduce((p, c) => c.rate * c.quantity + p, 0),
-                  0
+                {formatCurrency(
+                  props.quote.activities.reduce(
+                    (prev, curr) =>
+                      prev +
+                      curr.workItems
+                        .filter((w) => w.type === "equipment")
+                        .reduce((p, c) => c.rate * c.quantity + p, 0),
+                    0
+                  )
                 )}
               </Col>
             </Row>
@@ -83,13 +87,15 @@ export const ActivitiesContainer = (props: Props) => {
               </Col>
               <Col xs="2" sm="2">
                 $
-                {props.quote.activities.reduce(
-                  (prev, curr) =>
-                    prev +
-                    curr.workItems
-                      .filter((w) => w.type === "other")
-                      .reduce((p, c) => c.rate * c.quantity + p, 0),
-                  0
+                {formatCurrency(
+                  props.quote.activities.reduce(
+                    (prev, curr) =>
+                      prev +
+                      curr.workItems
+                        .filter((w) => w.type === "other")
+                        .reduce((p, c) => c.rate * c.quantity + p, 0),
+                    0
+                  )
                 )}
               </Col>
             </Row>
@@ -98,18 +104,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <h6>Total Cost</h6>
               </Col>
               <Col xs="2" sm="2">
-                <span>
-                  $
-                  {props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems.reduce(
-                        (p, c) => c.rate * c.quantity + p,
-                        0
-                      ),
-                    0
-                  ) + (props.quote.acres * props.quote.acreageRate)}
-                </span>
+                <span>${formatCurrency(props.quote.grandTotal)}</span>
               </Col>
             </Row>
           </div>

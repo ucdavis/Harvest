@@ -12,6 +12,7 @@ import {
   Label,
   Row,
 } from "reactstrap";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   quote: QuoteContent;
@@ -94,10 +95,10 @@ export const ProjectDetail = (props: Props) => {
                 <InputGroupText>$</InputGroupText>
               </InputGroupAddon>
               <Input
-                type="number"
+                type="text"
                 id="rate"
                 readOnly
-                value={props.quote.acres * props.quote.acreageRate}
+                value={formatCurrency(props.quote.acres * props.quote.acreageRate)}
               />
             </InputGroup>
           </Col>

@@ -65,8 +65,7 @@ namespace Harvest.Web.Controllers
                 await _dbContext.Quotes.AddAsync(quote);
             }
 
-            // TODO: calculate totals and store in db
-            quote.Total = (decimal)Math.Round(quoteDetail.Total, 2);
+            quote.Total = (decimal)Math.Round(quoteDetail.GrandTotal, 2);
             quote.Text = JsonSerializer.Serialize(quoteDetail);
 
             await _dbContext.SaveChangesAsync();
