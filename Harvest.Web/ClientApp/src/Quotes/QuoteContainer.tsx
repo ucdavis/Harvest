@@ -61,21 +61,40 @@ export const QuoteContainer = () => {
   }, [quote.acreageRate, quote.acres]);
 
   useEffect(() => {
-    console.log("setting totals");
     setQuote((q) => {
-      const activitiesTotal = q.activities.reduce(
-        (prev, curr) =>
-          prev +
-          curr.workItems.reduce(
-            (prevWork, currWork) =>
-              prevWork + currWork.quantity * currWork.rate,
-            0
-          ),
-        0
-      );
+      let activitiesTotal = 0;
+      let laborTotal = 0;
+      let equipmentTotal = 0;
+      let otherTotal = 0;
+
+      for (let i = 0; i < q.activities.length; i++) {
+        const activity = q.activities[i];
+
+        for (let j = 0; j < activity.workItems.length; j++) {
+          const workItem = activity.workItems[j];
+
+          activitiesTotal += workItem.total || 0;
+
+          switch (workItem.type) {
+            case "labor":
+              laborTotal += workItem.total || 0;
+              break;
+            case "equipment":
+              equipmentTotal += workItem.total || 0;
+              break;
+            case "other":
+              otherTotal += workItem.total || 0;
+              break;
+          }
+        }
+      }
+
       return {
         ...q,
         activitiesTotal,
+        laborTotal,
+        equipmentTotal,
+        otherTotal,
         grandTotal: activitiesTotal + q.acreageTotal,
       };
     });

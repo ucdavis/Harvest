@@ -17,7 +17,13 @@ export const ActivitiesContainer = (props: Props) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
     const allActivities = props.quote.activities;
     const activityIndex = allActivities.findIndex((a) => a.id === activity.id);
-    allActivities[activityIndex] = { ...activity };
+    allActivities[activityIndex] = {
+      ...activity,
+      total: activity.workItems.reduce(
+        (prev, curr) => prev + curr.total || 0,
+        0
+      ),
+    };
 
     props.updateQuote({ ...props.quote, activities: [...allActivities] });
   };
@@ -50,17 +56,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Labor</div>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {formatCurrency(
-                  props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems
-                        .filter((w) => w.type === "labor")
-                        .reduce((p, c) => c.rate * c.quantity + p, 0),
-                    0
-                  )
-                )}
+                ${formatCurrency(props.quote.laborTotal)}
               </Col>
             </Row>
             <Row>
@@ -68,17 +64,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Equipment</div>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {formatCurrency(
-                  props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems
-                        .filter((w) => w.type === "equipment")
-                        .reduce((p, c) => c.rate * c.quantity + p, 0),
-                    0
-                  )
-                )}
+                ${formatCurrency(props.quote.equipmentTotal)}
               </Col>
             </Row>
             <Row>
@@ -86,17 +72,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Materials / Other</div>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {formatCurrency(
-                  props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems
-                        .filter((w) => w.type === "other")
-                        .reduce((p, c) => c.rate * c.quantity + p, 0),
-                    0
-                  )
-                )}
+                ${formatCurrency(props.quote.otherTotal)}
               </Col>
             </Row>
             <Row className="total-row">
