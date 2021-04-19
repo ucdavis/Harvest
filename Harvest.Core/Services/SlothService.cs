@@ -201,11 +201,34 @@ namespace Harvest.Core.Services
             {
                 //Credits
                 //Validate Accounts.
-                
-
-
-                var totalCost = Math.Round(expense.Sum(a => a.Total),2); //Should already be to 2 decimals, but just in case...
-
+                var credit = await _financialService.IsValid(expense.Key);
+                if (!credit.IsValid)
+                {
+                    Log.Information("Invalid Expense Account: {credit.Message}", credit.Message);
+                    throw new Exception($"Unable to validate credit account {expense.Key}: {credit.Message}");
+                }
+                var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
+                model.Transfers.Add(new TransferViewModel
+                {
+                    Account = credit.KfsAccount.AccountNumber,
+                    Amount = totalCost,
+                    Chart = credit.KfsAccount.ChartOfAccountsCode,
+                    SubAccount = credit.KfsAccount.SubAccount,
+                    Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                    Direction = TransferViewModel.Directions.Credit,
+                    ObjectCode = _slothSettings.CreditObjectCode
+                });
+            }
+            var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
+            if (grandTotal != creditTotal)
+            {
+                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
+                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - creditTotal);
+                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit)
+                    .Select(a => a.Amount).Sum())
+                {
+                    throw new Exception($"Couldn't get Credits to balance for invoice {invoice.Id}");
+                }
             }
             throw new NotImplementedException();
         }
