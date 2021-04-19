@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
@@ -151,14 +152,56 @@ namespace Harvest.Core.Services
             if (invoice == null)
             {
                 Log.Error("Invoice not found: {invoiceId}", invoiceId);
-                return null; //Null or some other value?
+                return null;
+            }
+
+            var model = new TransactionViewModel
+            {
+                MerchantTrackingNumber = invoiceId.ToString(),
+                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoiceId}" //Invoice/Details/ but maybe instead an admin page view of the invoce
+            };
+
+            var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
+            foreach (var projectAccount in invoice.Project.Accounts)
+            {
+                //Debits
+                //Validate accounts
+                var debit = await _financialService.IsValid(projectAccount.Number);
+                if (!debit.IsValid)
+                {
+                   Log.Information("Invalid Project Account: {debit.Message}", debit.Message);
+                   throw new Exception($"Unable to validate debit account {projectAccount.Number}: {debit.Message}");
+                }
+                model.Transfers.Add(new TransferViewModel
+                {
+                    Account = debit.KfsAccount.AccountNumber,
+                    Amount = Math.Round(grandTotal * (projectAccount.Percentage / 100), 2),
+                    Chart = debit.KfsAccount.ChartOfAccountsCode,
+                    SubAccount = debit.KfsAccount.SubAccount,
+                    Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                    Direction = TransferViewModel.Directions.Debit,
+                    ObjectCode = _slothSettings.DebitObjectCode
+                });
+            }
+            //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
+            var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Select(a => a.Amount).Sum();
+            if (grandTotal != debitTotal)
+            {
+                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit);
+                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - debitTotal);
+                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit)
+                    .Select(a => a.Amount).Sum())
+                {
+                    throw new Exception($"Couldn't get Debits to balance for invoice {invoice.Id}");
+                }
             }
 
             var expenses = invoice.Expenses.GroupBy(a => a.Account);
             foreach (var expense in expenses)
             {
+                //Credits
                 //Validate Accounts.
-
+                
 
 
                 var totalCost = Math.Round(expense.Sum(a => a.Total),2); //Should already be to 2 decimals, but just in case...
