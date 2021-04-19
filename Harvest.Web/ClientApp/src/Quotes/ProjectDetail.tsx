@@ -98,7 +98,9 @@ export const ProjectDetail = (props: Props) => {
                 type="text"
                 id="rate"
                 readOnly
-                value={formatCurrency(props.quote.acres * props.quote.acreageRate)}
+                value={formatCurrency(
+                  props.quote.acres * props.quote.acreageRate
+                )}
               />
             </InputGroup>
           </Col>
