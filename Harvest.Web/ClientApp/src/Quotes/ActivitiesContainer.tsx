@@ -17,7 +17,13 @@ export const ActivitiesContainer = (props: Props) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
     const allActivities = props.quote.activities;
     const activityIndex = allActivities.findIndex((a) => a.id === activity.id);
-    allActivities[activityIndex] = { ...activity };
+    allActivities[activityIndex] = {
+      ...activity,
+      total: activity.workItems.reduce(
+        (prev, curr) => prev + curr.total || 0,
+        0
+      ),
+    };
 
     props.updateQuote({ ...props.quote, activities: [...allActivities] });
   };
