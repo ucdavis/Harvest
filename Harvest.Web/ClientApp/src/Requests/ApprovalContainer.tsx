@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { RequestHeader } from "./RequestHeader";
+import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
@@ -67,7 +68,7 @@ export const ApprovalContainer = () => {
       <RequestHeader project={projectAndQuote.project}></RequestHeader>
       <div className="card-green-bg">
         <div className="card-content">
-          Quote Details go here
+          <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
           <hr />
           Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
           <AccountsInput
