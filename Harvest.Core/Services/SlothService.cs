@@ -153,6 +153,17 @@ namespace Harvest.Core.Services
                 Log.Error("Invoice not found: {invoiceId}", invoiceId);
                 return null; //Null or some other value?
             }
+
+            var expenses = invoice.Expenses.GroupBy(a => a.Account);
+            foreach (var expense in expenses)
+            {
+                //Validate Accounts.
+
+
+
+                var totalCost = Math.Round(expense.Sum(a => a.Total),2); //Should already be to 2 decimals, but just in case...
+
+            }
             throw new NotImplementedException();
         }
 
