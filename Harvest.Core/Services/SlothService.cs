@@ -230,7 +230,54 @@ namespace Harvest.Core.Services
                     throw new Exception($"Couldn't get Credits to balance for invoice {invoice.Id}");
                 }
             }
-            throw new NotImplementedException();
+            using var client = new HttpClient { BaseAddress = new Uri(url) };
+            client.DefaultRequestHeaders.Add("X-Auth-Token", token);
+
+            Log.Information(JsonConvert.SerializeObject(model));
+
+            var response = await client.PostAsync("Transactions", new StringContent(JsonConvert.SerializeObject(model), System.Text.Encoding.UTF8, "application/json"));
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.NotFound:
+                    Log.Information("Sloth Response Not Found for moneyTransfer id {moneyTransferId}", invoice.Id);
+                    break;
+                case HttpStatusCode.NoContent:
+                    Log.Information("Sloth Response No Content for moneyTransfer id {moneyTransferId}", invoice.Id);
+                    break;
+                case HttpStatusCode.BadRequest:
+                    Log.Error("Sloth Response Bad Request for moneyTransfer {id}", invoice.Id);
+                    var badrequest = await response.Content.ReadAsStringAsync();
+                    Log.ForContext("data", badrequest, true).Information("Sloth message response");
+                    var badRtValue = new SlothResponseModel
+                    {
+                        Success = false,
+                        Message = badrequest
+                    };
+
+                    return badRtValue;
+            }
+
+            //TODO: Capture errors?
+
+            if (response.IsSuccessStatusCode)
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                Log.Information("Sloth Success Response", content);
+
+                //TODO: Update the invoice to pending
+
+
+                return JsonConvert.DeserializeObject<SlothResponseModel>(content);
+            }
+
+
+            Log.Information("Sloth Response didn't have a success code for moneyTransfer {id}", invoice.Id);
+            var badContent = await response.Content.ReadAsStringAsync();
+            Log.ForContext("data", badContent, true).Information("Sloth message response");
+            var rtValue = JsonConvert.DeserializeObject<SlothResponseModel>(badContent);
+            rtValue.Success = false;
+
+            return rtValue;
         }
 
         /// <summary>
