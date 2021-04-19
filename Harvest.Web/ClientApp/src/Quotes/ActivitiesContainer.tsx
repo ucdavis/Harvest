@@ -56,17 +56,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Labor</div>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {formatCurrency(
-                  props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems
-                        .filter((w) => w.type === "labor")
-                        .reduce((p, c) => c.rate * c.quantity + p, 0),
-                    0
-                  )
-                )}
+                ${formatCurrency(props.quote.laborTotal)}
               </Col>
             </Row>
             <Row>
@@ -74,17 +64,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Equipment</div>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {formatCurrency(
-                  props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems
-                        .filter((w) => w.type === "equipment")
-                        .reduce((p, c) => c.rate * c.quantity + p, 0),
-                    0
-                  )
-                )}
+                ${formatCurrency(props.quote.equipmentTotal)}
               </Col>
             </Row>
             <Row>
@@ -92,17 +72,7 @@ export const ActivitiesContainer = (props: Props) => {
                 <div>Materials / Other</div>
               </Col>
               <Col xs="2" sm="2">
-                $
-                {formatCurrency(
-                  props.quote.activities.reduce(
-                    (prev, curr) =>
-                      prev +
-                      curr.workItems
-                        .filter((w) => w.type === "other")
-                        .reduce((p, c) => c.rate * c.quantity + p, 0),
-                    0
-                  )
-                )}
+                ${formatCurrency(props.quote.otherTotal)}
               </Col>
             </Row>
             <Row className="total-row">
