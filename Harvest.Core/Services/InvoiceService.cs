@@ -13,6 +13,7 @@ namespace Harvest.Core.Services
     {
         Task<bool> CreateInvoice(int id);
         Task<int> CreateInvoices();
+        Task<List<int>> GetCreatedInvoiceIds();
     }
 
     public class InvoiceService : IInvoiceService
@@ -88,6 +89,13 @@ namespace Harvest.Core.Services
             }
 
             return counter;
+        }
+
+        public async Task<List<int>> GetCreatedInvoiceIds()
+        {
+            //TODO: Check project status?
+            return await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Created).Select(a => a.Id)
+                .ToListAsync();
         }
     }
 }

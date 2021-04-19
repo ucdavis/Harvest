@@ -18,6 +18,7 @@ namespace Harvest.Core.Services
     public interface ISlothService
     {
         Task<SlothResponseModel> MoveMoney(Transfer moneyTransfer);
+        Task<SlothResponseModel> MoveMoney(int invoiceId);
 
         Task ProcessTransferUpdates();
     }
@@ -133,6 +134,26 @@ namespace Harvest.Core.Services
             rtValue.Success = false;
 
             return rtValue;
+        }
+
+        public async Task<SlothResponseModel> MoveMoney(int invoiceId)
+        {
+            var token = _slothSettings.ApiKey;
+            var url = _slothSettings.ApiUrl;
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                Log.Error("Sloth Token missing");
+            }
+
+            var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
+                .Include(a => a.Project).ThenInclude(a => a.Accounts).SingleOrDefaultAsync();
+            if (invoice == null)
+            {
+                Log.Error("Invoice not found: {invoiceId}", invoiceId);
+                return null; //Null or some other value?
+            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
