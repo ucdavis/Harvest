@@ -71,19 +71,26 @@ export const ExpenseEntryContainer = () => {
     // TODO: disable the submit button and maybe just some sort of full screen processing UI
 
     // transform since we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
-    const expensesBody = expenses.map(exp => ({ ...exp, id: 0, description: exp.rate.description, price: exp.rate.price, rateId: exp.rate.id, rate: null }));
+    const expensesBody = expenses.map((exp) => ({
+      ...exp,
+      id: 0,
+      description: exp.rate.description,
+      price: exp.rate.price,
+      rateId: exp.rate.id,
+      rate: null,
+    }));
 
     const response = await fetch(`/Expense/Create/${projectId}`, {
       method: "POST",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(expensesBody),
     });
 
     if (response.ok) {
-      alert("success!");
+      history.push("/project");
     }
   };
 
