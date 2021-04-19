@@ -67,12 +67,17 @@ export const QuoteContainer = () => {
         (prev, curr) =>
           prev +
           curr.workItems.reduce(
-            (prevWork, currWork) => prevWork + currWork.quantity * currWork.rate,
+            (prevWork, currWork) =>
+              prevWork + currWork.quantity * currWork.rate,
             0
           ),
         0
       );
-      return { ...q, activitiesTotal, grandTotal: activitiesTotal + q.acreageTotal };
+      return {
+        ...q,
+        activitiesTotal,
+        grandTotal: activitiesTotal + q.acreageTotal,
+      };
     });
   }, [quote.activities]);
 

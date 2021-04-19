@@ -1,8 +1,13 @@
 import React from "react";
 
-import { MapContainer, TileLayer, Marker, Popup, FeatureGroup } from "react-leaflet";
-import EditControl from './EditControl';
-
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  FeatureGroup,
+} from "react-leaflet";
+import EditControl from "./EditControl";
 
 export const Map = () => {
   return (
@@ -23,12 +28,12 @@ export const Map = () => {
             draw={{
               polygon: {
                 allowIntersection: false,
-                showArea: true
+                showArea: true,
               },
               polyline: false,
               circle: false,
               circlemarker: false,
-              marker: false
+              marker: false,
             }}
           />
         </FeatureGroup>
