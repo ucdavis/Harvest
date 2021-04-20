@@ -28,6 +28,7 @@ namespace Harvest.Core.Domain
         [Display(Name = "Sloth Transaction Id")]
         public Guid? SlothTransactionId { get; set; }
         [Display(Name = "Kfs Tracking Number")]
+        [StringLength(20)] //Probably only 10, but this gives growth if it changes
         public string KfsTrackingNumber { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)

@@ -161,7 +161,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("datetime2");
 
                     b.Property<string>("KfsTrackingNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
