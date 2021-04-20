@@ -114,12 +114,14 @@ namespace Harvest.Core.Domain
         public class Statuses
         {
             public const string Requested = "Requested";
+            public const string PendingAccountApproval = "Pending Account Approval";
             public const string Active    = "Active";
             public const string Completed = "Completed";
 
             public static List<string> TypeList = new List<string>
             {
                 Requested,
+                PendingAccountApproval,
                 Active,
                 Completed,
             }.ToList();

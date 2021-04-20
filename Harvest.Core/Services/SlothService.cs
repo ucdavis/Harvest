@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
@@ -17,7 +19,7 @@ namespace Harvest.Core.Services
 {
     public interface ISlothService
     {
-        Task<SlothResponseModel> MoveMoney(Transfer moneyTransfer);
+        Task<SlothResponseModel> MoveMoney(int invoiceId);
 
         Task ProcessTransferUpdates();
     }
@@ -36,9 +38,7 @@ namespace Harvest.Core.Services
         }
 
 
-
-        //TODO: Add validation?
-        public async Task<SlothResponseModel> MoveMoney(Transfer moneyTransfer)
+        public async Task<SlothResponseModel> MoveMoney(int invoiceId)
         {
             var token = _slothSettings.ApiKey;
             var url = _slothSettings.ApiUrl;
@@ -48,47 +48,91 @@ namespace Harvest.Core.Services
                 Log.Error("Sloth Token missing");
             }
 
-            var debit = await _financialService.IsValid(moneyTransfer.FromAccount.Number);
-            if (!debit.IsValid)
+            var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
+                .Include(a => a.Project).ThenInclude(a => a.Accounts).SingleOrDefaultAsync();
+            if (invoice == null)
             {
-                throw new Exception($"Unable to validate debit account {moneyTransfer.FromAccount.Number}: {debit.Message}");
-            }
-
-            var credit = await _financialService.IsValid(moneyTransfer.ToAccount.Number);
-            if (!credit.IsValid)
-            {
-                throw new Exception($"Unable to validate credit account {moneyTransfer.ToAccount.Number}: {credit.Message}");
+                Log.Error("Invoice not found: {invoiceId}", invoiceId);
+                return null;
             }
 
             var model = new TransactionViewModel
             {
-                MerchantTrackingNumber = moneyTransfer.Id.ToString(),
-                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{moneyTransfer.Id}"
+                MerchantTrackingNumber = invoiceId.ToString(),
+                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoiceId}" //Invoice/Details/ but maybe instead an admin page view of the invoce
             };
 
-            model.Transfers.Add(new TransferViewModel
+            var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
+            foreach (var projectAccount in invoice.Project.Accounts)
             {
-                Account = debit.KfsAccount.AccountNumber,
-                Amount = moneyTransfer.Amount,
-                Chart = debit.KfsAccount.ChartOfAccountsCode, 
-                SubAccount = debit.KfsAccount.SubAccount,
-                Description = moneyTransfer.Description, 
-                Direction = TransferViewModel.Directions.Debit,
-                ObjectCode = _slothSettings.DebitObjectCode
-            });
-
-            model.Transfers.Add(new TransferViewModel
+                //Debits
+                //Validate accounts
+                var debit = await _financialService.IsValid(projectAccount.Number);
+                if (!debit.IsValid)
+                {
+                   Log.Information("Invalid Project Account: {debit.Message}", debit.Message);
+                   throw new Exception($"Unable to validate debit account {projectAccount.Number}: {debit.Message}");
+                }
+                model.Transfers.Add(new TransferViewModel
+                {
+                    Account = debit.KfsAccount.AccountNumber,
+                    Amount = Math.Round(grandTotal * (projectAccount.Percentage / 100), 2),
+                    Chart = debit.KfsAccount.ChartOfAccountsCode,
+                    SubAccount = debit.KfsAccount.SubAccount,
+                    Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                    Direction = TransferViewModel.Directions.Debit,
+                    ObjectCode = _slothSettings.DebitObjectCode
+                });
+            }
+            //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
+            var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Select(a => a.Amount).Sum();
+            if (grandTotal != debitTotal)
             {
-                Account = credit.KfsAccount.AccountNumber,
-                Amount = moneyTransfer.Amount,
-                Chart = credit.KfsAccount.ChartOfAccountsCode,
-                SubAccount = credit.KfsAccount.SubAccount,
-                Description = moneyTransfer.Description,
-                Direction = TransferViewModel.Directions.Credit,
-                ObjectCode = _slothSettings.CreditObjectCode
-            });
+                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit);
+                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - debitTotal);
+                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit)
+                    .Select(a => a.Amount).Sum())
+                {
+                    throw new Exception($"Couldn't get Debits to balance for invoice {invoice.Id}");
+                }
+            }
 
-            using var client = new HttpClient {BaseAddress = new Uri(url)};
+            var expenses = invoice.Expenses.GroupBy(a => a.Account);
+            foreach (var expense in expenses)
+            {
+                //Credits
+                //Validate Accounts.
+                var credit = await _financialService.IsValid(expense.Key);
+                if (!credit.IsValid)
+                {
+                    Log.Information("Invalid Expense Account: {credit.Message}", credit.Message);
+                    throw new Exception($"Unable to validate credit account {expense.Key}: {credit.Message}");
+                }
+                var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
+                model.Transfers.Add(new TransferViewModel
+                {
+                    Account = credit.KfsAccount.AccountNumber,
+                    Amount = totalCost,
+                    Chart = credit.KfsAccount.ChartOfAccountsCode,
+                    SubAccount = credit.KfsAccount.SubAccount,
+                    Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                    Direction = TransferViewModel.Directions.Credit,
+                    ObjectCode = _slothSettings.CreditObjectCode
+                });
+            }
+            var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
+            if (grandTotal != creditTotal)
+            {
+                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
+                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - creditTotal);
+                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit)
+                    .Select(a => a.Amount).Sum())
+                {
+                    throw new Exception($"Couldn't get Credits to balance for invoice {invoice.Id}");
+                }
+            }
+            
+            using var client = new HttpClient { BaseAddress = new Uri(url) };
             client.DefaultRequestHeaders.Add("X-Auth-Token", token);
 
             Log.Information(JsonConvert.SerializeObject(model));
@@ -97,13 +141,13 @@ namespace Harvest.Core.Services
             switch (response.StatusCode)
             {
                 case HttpStatusCode.NotFound:
-                    Log.Information("Sloth Response Not Found for moneyTransfer id {moneyTransferId}", moneyTransfer.Id);
+                    Log.Information("Sloth Response Not Found for moneyTransfer id {moneyTransferId}", invoice.Id);
                     break;
                 case HttpStatusCode.NoContent:
-                    Log.Information("Sloth Response No Content for moneyTransfer id {moneyTransferId}", moneyTransfer.Id);
+                    Log.Information("Sloth Response No Content for moneyTransfer id {moneyTransferId}", invoice.Id);
                     break;
                 case HttpStatusCode.BadRequest:
-                    Log.Error("Sloth Response Bad Request for moneyTransfer {id}", moneyTransfer.Id);
+                    Log.Error("Sloth Response Bad Request for moneyTransfer {id}", invoice.Id);
                     var badrequest = await response.Content.ReadAsStringAsync();
                     Log.ForContext("data", badrequest, true).Information("Sloth message response");
                     var badRtValue = new SlothResponseModel
@@ -121,13 +165,37 @@ namespace Harvest.Core.Services
             {
                 var content = await response.Content.ReadAsStringAsync();
                 Log.Information("Sloth Success Response", content);
+                var slothResponse = JsonConvert.DeserializeObject<SlothResponseModel>(content);
 
-                return JsonConvert.DeserializeObject<SlothResponseModel>(content);
+                invoice.Transfers = new List<Transfer>();
+                foreach (var transferViewModel in model.Transfers)
+                {
+                    var extraAccountInfo = string.Empty;
+                    if (!string.IsNullOrWhiteSpace(transferViewModel.SubAccount))
+                    {
+                        extraAccountInfo = $"-{transferViewModel.SubAccount}";
+                    }
+                    var transfer = new Transfer();
+                    transfer.Account = $"{transferViewModel.Chart}-{transferViewModel.Account}{{extraAccountInfo}}";
+                    transfer.Total = transferViewModel.Amount;
+                    transfer.Type = transferViewModel.Direction;
+
+                    invoice.Transfers.Add(transfer);
+                }
+
+                invoice.KfsTrackingNumber = slothResponse.KfsTrackingNumber;
+                invoice.SlothTransactionId = slothResponse.Id;
+
+                invoice.Status = Invoice.Statuses.Pending;
+                await _dbContext.SaveChangesAsync();
+
+
+                return slothResponse;
             }
 
 
-            Log.Information("Sloth Response didn't have a success code for moneyTransfer {id}", moneyTransfer.Id);
-            var badContent = await response.Content.ReadAsStringAsync();                    
+            Log.Information("Sloth Response didn't have a success code for moneyTransfer {id}", invoice.Id);
+            var badContent = await response.Content.ReadAsStringAsync();
             Log.ForContext("data", badContent, true).Information("Sloth message response");
             var rtValue = JsonConvert.DeserializeObject<SlothResponseModel>(badContent);
             rtValue.Success = false;
@@ -135,82 +203,66 @@ namespace Harvest.Core.Services
             return rtValue;
         }
 
-        /// <summary>
-        /// This is to see if the money has moved in Sloth. Similar to MoneyHasMoved in Anlab
-        /// </summary>
-        /// <returns></returns>
         public async Task ProcessTransferUpdates()
         {
             Log.Information("Beginning ProcessTransferUpdates");
-            var transferRequests = await _dbContext.TransferRequests.Where(r => r.Status != TransferStatusCodes.Complete).ToListAsync();
-            if (transferRequests.Count == 0)
+            var pendingInvoices = await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
+            if (pendingInvoices.Count == 0)
             {
-                Log.Information("No account transfers to process");
-                return ;
+                Log.Information("No pending invoices to process");
+                return;
             }
 
-            using var client = new HttpClient {BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/")};
+            using var client = new HttpClient { BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/") };
             client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
 
-            Log.Information("Processing {transferCount} transfers", transferRequests.Count);
+            Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
             var updatedCount = 0;
             var rolledBackCount = 0;
-            foreach (var transfer in transferRequests)
+            foreach (var invoice in pendingInvoices)
             {
-                if (!transfer.SlothTransactionId.HasValue)
+                if (string.IsNullOrWhiteSpace(invoice.SlothTransactionId))
                 {
-                    Log.Information("MoneyTransfer {transferId} missing SlothTransactionId", transfer.Id); //TODO: Log it
+                    Log.Information("Invoice {transferId} missing SlothTransactionId", invoice.Id); //TODO: Log it
                     continue;
                 }
-                var response = await client.GetAsync(transfer.SlothTransactionId.ToString());
+                var response = await client.GetAsync(invoice.SlothTransactionId);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    Log.Information("MoneyTransfer {transferId} NotFound. SlothTransactionId {transactionId}",
-                        transfer.Id, transfer.SlothTransactionId); //TODO: Log it
+                    Log.Information("Invoice {transferId} NotFound. SlothTransactionId {transactionId}",
+                        invoice.Id, invoice.SlothTransactionId); //TODO: Log it
                     continue;
                 }
                 if (response.StatusCode == HttpStatusCode.NoContent)
                 {
-                    Log.Information("MoneyTransfer {transferId} NoContent. SlothTransactionId {transactionId}", 
-                        transfer.Id, transfer.SlothTransactionId); //TODO: Log it
+                    Log.Information("Invoice {transferId} NoContent. SlothTransactionId {transactionId}",
+                        invoice.Id, invoice.SlothTransactionId); //TODO: Log it
                     continue;
                 }
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var slothResponse = JsonConvert.DeserializeObject<SlothResponseModel>(content);
-                    Log.Information("MoneyTransfer {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
-                        transfer.Id, slothResponse.Status, transfer.SlothTransactionId);
+                    Log.Information("Invoice {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
+                        invoice.Id, slothResponse.Status, invoice.SlothTransactionId);
                     if (slothResponse.Status == "Completed")
                     {
                         updatedCount++;
-                        transfer.Status = TransferStatusCodes.Complete;
-                        transfer.History.Add(new TransferHistory
-                        {
-                            Action = "Move UCD Money",
-                            Status = transfer.Status,
-                            ActorName = "Job",
-                            Notes = "Money Moved",
-                        });
+                        invoice.Status = Invoice.Statuses.Completed;
+                        await _dbContext.SaveChangesAsync();
                     }
                     if (slothResponse.Status == "Cancelled")
                     {
-                        transfer.History.Add(new TransferHistory
-                        {
-                            Action = "Move UCD Money",
-                            Status = transfer.Status,
-                            ActorName = "Job",
-                            Notes = "Money Movement Cancelled.",
-                        });
-                        Log.Information("Order {transferId} was cancelled. Setting back to unpaid", transfer.Id);
+
+                        Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
                         rolledBackCount++;
                         //TODO: Write to the notes field? Trigger off an email?
-                    }                        
+                    }
                 }
                 else
                 {
-                    Log.Information("Order {transferId} Not Successful. Response code {statusCode}. SlothTransactionId {transactionId}", 
-                        transfer.Id, response.StatusCode, transfer.SlothTransactionId); //TODO: Log it
+                    Log.Information("Invoice {transferId} Not Successful. Response code {statusCode}. SlothTransactionId {transactionId}",
+                        invoice.Id, response.StatusCode, invoice.SlothTransactionId); //TODO: Log it
                 }
             }
 
@@ -218,5 +270,7 @@ namespace Harvest.Core.Services
             Log.Information("Updated {updatedCount} orders. Rolled back {rolledBackCount} orders.", updatedCount, rolledBackCount);
             return;
         }
+
+        
     }
 }

@@ -19,10 +19,18 @@ namespace Harvest.Core.Domain
         public decimal Total { get; set; }
 
         public List<Expense> Expenses { get; set; }
+        public List<Transfer> Transfers { get; set; }
 
         public DateTime CreatedOn { get; set; }
         public string Notes { get; set; }
         public string Status { get; set; }
+
+        [Display(Name = "Sloth Transaction Id")]
+        [StringLength(50)]
+        public string SlothTransactionId { get; set; }
+        [Display(Name = "Kfs Tracking Number")]
+        [StringLength(20)] //Probably only 10, but this gives growth if it changes
+        public string KfsTrackingNumber { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +41,12 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>()
                 .HasOne(a => a.Invoice)
                 .WithMany(p => p.Expenses)
+                .HasForeignKey(a => a.InvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transfer>()
+                .HasOne(a => a.Invoice)
+                .WithMany(p => p.Transfers)
                 .HasForeignKey(a => a.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

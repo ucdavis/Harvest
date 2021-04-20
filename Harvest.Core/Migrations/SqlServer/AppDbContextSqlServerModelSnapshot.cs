@@ -160,11 +160,19 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("KfsTrackingNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
+
+                    b.Property<string>("SlothTransactionId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
@@ -497,109 +505,28 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<decimal>("Amount")
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.Property<int>("FromAccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ToAccountId")
-                        .HasColumnType("int");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromAccountId");
-
-                    b.HasIndex("ToAccountId");
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("Transfers");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Action")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("ActionDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ActorId")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ActorName")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("TransferId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransferId");
-
-                    b.ToTable("TransferHistory");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("KfsTrackingNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RequestedById")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RequestedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("SlothTransactionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("RequestedById");
-
-                    b.ToTable("TransferRequests");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>
@@ -831,49 +758,13 @@ namespace Harvest.Core.Migrations.SqlServer
 
             modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
                 {
-                    b.HasOne("Harvest.Core.Domain.Account", "FromAccount")
-                        .WithMany()
-                        .HasForeignKey("FromAccountId")
+                    b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
+                        .WithMany("Transfers")
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harvest.Core.Domain.Account", "ToAccount")
-                        .WithMany()
-                        .HasForeignKey("ToAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FromAccount");
-
-                    b.Navigation("ToAccount");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferHistory", b =>
-                {
-                    b.HasOne("Harvest.Core.Domain.TransferRequest", null)
-                        .WithMany("History")
-                        .HasForeignKey("TransferId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
-                {
-                    b.HasOne("Harvest.Core.Domain.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Harvest.Core.Domain.User", "RequestedBy")
-                        .WithMany()
-                        .HasForeignKey("RequestedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("RequestedBy");
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
@@ -884,6 +775,8 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.Navigation("Expenses");
+
+                    b.Navigation("Transfers");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
@@ -896,11 +789,6 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Quote", b =>
                 {
                     b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
-                {
-                    b.Navigation("History");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>

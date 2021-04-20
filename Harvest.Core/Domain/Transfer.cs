@@ -10,39 +10,33 @@ namespace Harvest.Core.Domain
     {
         [Key]
         public int Id { get; set; }
+        [Required]
+        [StringLength(10)]
+        public string Type { get; set; }
 
-        public decimal Amount { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Account { get; set; }
 
-        [StringLength(40)]
-        public string Description { get; set; }
+        [Range(0.01, 1000000.00)]
+        public decimal Total { get; set; }
 
-        public int FromAccountId { get; set; }
+        [Required]
+        public int InvoiceId { get; set; }
 
-        public Account FromAccount { get; set; }
-
-        public int ToAccountId { get; set; }
-
-        public Account ToAccount { get; set; }
+        public Invoice Invoice { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Transfer>().HasIndex(a => a.InvoiceId);
 
-            modelBuilder.Entity<Transfer>().HasIndex(a => a.FromAccountId);
-            modelBuilder.Entity<Transfer>().HasIndex(a => a.ToAccountId);
+            modelBuilder.Entity<Transfer>().Property(a => a.Total).HasPrecision(18, 2);
+        }
 
-            modelBuilder.Entity<Transfer>().Property(a => a.Amount).HasPrecision(18, 2);
-
-            modelBuilder.Entity<Transfer>()
-                .HasOne(t => t.FromAccount)
-                .WithMany()
-                .HasForeignKey(t => t.FromAccountId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Transfer>()
-                .HasOne(t => t.ToAccount)
-                .WithMany()
-                .HasForeignKey(t => t.ToAccountId)
-                .OnDelete(DeleteBehavior.Restrict);
+        public class Types
+        {
+            public const string Debit = "Debit";
+            public const string Credit = "Credit";
         }
 
     }

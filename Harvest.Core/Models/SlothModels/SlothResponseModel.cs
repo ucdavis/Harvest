@@ -5,7 +5,7 @@ namespace Harvest.Core.Models.SlothModels
 {
     public class SlothResponseModel
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string KfsTrackingNumber { get; set; }
         public string Status { get; set; }
 
