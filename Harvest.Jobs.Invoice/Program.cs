@@ -54,9 +54,9 @@ namespace Harvest.Jobs.Invoice
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
 
-            services.AddTransient<IInvoiceService, InvoiceService>();
-            services.AddTransient<ISlothService, SlothService>();
-            services.AddTransient<IFinancialService, FinancialService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<ISlothService, SlothService>();
+            services.AddScoped<IFinancialService, FinancialService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
 
             return services.BuildServiceProvider();
