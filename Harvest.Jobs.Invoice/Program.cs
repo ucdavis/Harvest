@@ -58,6 +58,8 @@ namespace Harvest.Jobs.Invoice
                 }
                 _log.Information("Money Moved Invoices: {slothedMoneyMoveCount}", slothMoneyMoveCount);
             }
+
+            slothService.ProcessTransferUpdates().GetAwaiter().GetResult();
         }
 
         private static ServiceProvider ConfigureServices()
