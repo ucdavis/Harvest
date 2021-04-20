@@ -25,6 +25,11 @@ namespace Harvest.Core.Domain
         public string Notes { get; set; }
         public string Status { get; set; }
 
+        [Display(Name = "Sloth Transaction Id")]
+        public Guid? SlothTransactionId { get; set; }
+        [Display(Name = "Kfs Tracking Number")]
+        public string KfsTrackingNumber { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Invoice>().HasIndex(a => a.ProjectId);
