@@ -264,7 +264,8 @@ namespace Harvest.Core.Services
                 var content = await response.Content.ReadAsStringAsync();
                 Log.Information("Sloth Success Response", content);
 
-                //TODO: Update the invoice to pending
+                invoice.Status = Invoice.Statuses.Pending;
+                await _dbContext.SaveChangesAsync();
 
 
                 return JsonConvert.DeserializeObject<SlothResponseModel>(content);
