@@ -42,8 +42,6 @@ namespace Harvest.Core.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
-        public DbSet<TransferRequest> TransferRequests { get; set; }
-        public DbSet<TransferHistory> TransferHistory { get; set; }
         public DbSet<Rate> Rates { get; set; }
 
 
@@ -61,7 +59,6 @@ namespace Harvest.Core.Data
             Role.OnModelCreating(modelBuilder);
             User.OnModelCreating(modelBuilder);
             Transfer.OnModelCreating(modelBuilder);
-            TransferRequest.OnModelCreating(modelBuilder);
             Rate.OnModelCreating(modelBuilder);
         }
     }
