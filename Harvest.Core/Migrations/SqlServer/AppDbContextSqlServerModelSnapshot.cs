@@ -170,8 +170,9 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("SlothTransactionId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("SlothTransactionId")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Status")
                         .HasColumnType("nvarchar(max)");
