@@ -153,11 +153,17 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("KfsTrackingNumber")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<Guid?>("SlothTransactionId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
                         .HasColumnType("TEXT");
