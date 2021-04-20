@@ -24,6 +24,7 @@ namespace Harvest.Jobs.Invoice
 
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
+            // setup di
             var provider = ConfigureServices();
 
             var invoiceService = provider.GetService<IInvoiceService>();
@@ -62,12 +63,9 @@ namespace Harvest.Jobs.Invoice
             return services.BuildServiceProvider();
         }
 
-        private static async Task ProcessInvoices(IInvoiceService? invoiceService, ISlothService? slothService)
+        private static async Task ProcessInvoices(IInvoiceService invoiceService, ISlothService slothService)
         {
-            // setup di
-
-
-            var invoiceCount = await invoiceService.CreateInvoices();
+           var invoiceCount = await invoiceService.CreateInvoices();
             _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
 
             var slothMoneyMoveCount = 0;
@@ -91,7 +89,7 @@ namespace Harvest.Jobs.Invoice
 
                     slothMoneyMoveCount++;
                 }
-                _log.Information("Money Moved Invoices: {slothedMoneyMoveCount}", slothMoneyMoveCount);
+                _log.Information("Money Moved Invoices: {slothMoneyMoveCount}", slothMoneyMoveCount);
             }
 
             await slothService.ProcessTransferUpdates();
