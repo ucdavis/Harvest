@@ -221,7 +221,7 @@ namespace Harvest.Core.Services
             var rolledBackCount = 0;
             foreach (var invoice in pendingInvoices)
             {
-                if (!invoice.SlothTransactionId.HasValue)
+                if (string.IsNullOrWhiteSpace(invoice.SlothTransactionId))
                 {
                     Log.Information("Invoice {transferId} missing SlothTransactionId", invoice.Id); //TODO: Log it
                     continue;
