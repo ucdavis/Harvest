@@ -65,7 +65,8 @@ namespace Harvest.Core.Services
             var model = new TransactionViewModel
             {
                 MerchantTrackingNumber = moneyTransfer.Id.ToString(),
-                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{moneyTransfer.Id}"
+                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{moneyTransfer.Id}",
+                //AutoApprove = some sloth setting? or just remove it and let sloth default to needing approval
             };
 
             model.Transfers.Add(new TransferViewModel
