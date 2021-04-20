@@ -205,82 +205,82 @@ namespace Harvest.Core.Services
 
         public async Task ProcessTransferUpdates()
         {
-            Log.Information("Beginning ProcessTransferUpdates");
-            var pendingInvoices = await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
-            if (pendingInvoices.Count == 0)
-            {
-                Log.Information("No pending invoices to process");
-                return;
-            }
+            //Log.Information("Beginning ProcessTransferUpdates");
+            //var pendingInvoices = await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
+            //if (pendingInvoices.Count == 0)
+            //{
+            //    Log.Information("No pending invoices to process");
+            //    return;
+            //}
 
-            using var client = new HttpClient { BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/") };
-            client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
+            //using var client = new HttpClient { BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/") };
+            //client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
 
-            Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
-            var updatedCount = 0;
-            var rolledBackCount = 0;
-            foreach (var invoice in pendingInvoices)
-            {
-                if (!transfer.SlothTransactionId.HasValue)
-                {
-                    Log.Information("MoneyTransfer {transferId} missing SlothTransactionId", transfer.Id); //TODO: Log it
-                    continue;
-                }
-                var response = await client.GetAsync(transfer.SlothTransactionId.ToString());
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    Log.Information("MoneyTransfer {transferId} NotFound. SlothTransactionId {transactionId}",
-                        transfer.Id, transfer.SlothTransactionId); //TODO: Log it
-                    continue;
-                }
-                if (response.StatusCode == HttpStatusCode.NoContent)
-                {
-                    Log.Information("MoneyTransfer {transferId} NoContent. SlothTransactionId {transactionId}",
-                        transfer.Id, transfer.SlothTransactionId); //TODO: Log it
-                    continue;
-                }
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var slothResponse = JsonConvert.DeserializeObject<SlothResponseModel>(content);
-                    Log.Information("MoneyTransfer {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
-                        transfer.Id, slothResponse.Status, transfer.SlothTransactionId);
-                    if (slothResponse.Status == "Completed")
-                    {
-                        updatedCount++;
-                        transfer.Status = TransferStatusCodes.Complete;
-                        transfer.History.Add(new TransferHistory
-                        {
-                            Action = "Move UCD Money",
-                            Status = transfer.Status,
-                            ActorName = "Job",
-                            Notes = "Money Moved",
-                        });
-                    }
-                    if (slothResponse.Status == "Cancelled")
-                    {
-                        transfer.History.Add(new TransferHistory
-                        {
-                            Action = "Move UCD Money",
-                            Status = transfer.Status,
-                            ActorName = "Job",
-                            Notes = "Money Movement Cancelled.",
-                        });
-                        Log.Information("Order {transferId} was cancelled. Setting back to unpaid", transfer.Id);
-                        rolledBackCount++;
-                        //TODO: Write to the notes field? Trigger off an email?
-                    }
-                }
-                else
-                {
-                    Log.Information("Order {transferId} Not Successful. Response code {statusCode}. SlothTransactionId {transactionId}",
-                        transfer.Id, response.StatusCode, transfer.SlothTransactionId); //TODO: Log it
-                }
-            }
+            //Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
+            //var updatedCount = 0;
+            //var rolledBackCount = 0;
+            //foreach (var invoice in pendingInvoices)
+            //{
+            //    if (!transfer.SlothTransactionId.HasValue)
+            //    {
+            //        Log.Information("MoneyTransfer {transferId} missing SlothTransactionId", transfer.Id); //TODO: Log it
+            //        continue;
+            //    }
+            //    var response = await client.GetAsync(transfer.SlothTransactionId.ToString());
+            //    if (response.StatusCode == HttpStatusCode.NotFound)
+            //    {
+            //        Log.Information("MoneyTransfer {transferId} NotFound. SlothTransactionId {transactionId}",
+            //            transfer.Id, transfer.SlothTransactionId); //TODO: Log it
+            //        continue;
+            //    }
+            //    if (response.StatusCode == HttpStatusCode.NoContent)
+            //    {
+            //        Log.Information("MoneyTransfer {transferId} NoContent. SlothTransactionId {transactionId}",
+            //            transfer.Id, transfer.SlothTransactionId); //TODO: Log it
+            //        continue;
+            //    }
+            //    if (response.IsSuccessStatusCode)
+            //    {
+            //        var content = await response.Content.ReadAsStringAsync();
+            //        var slothResponse = JsonConvert.DeserializeObject<SlothResponseModel>(content);
+            //        Log.Information("MoneyTransfer {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
+            //            transfer.Id, slothResponse.Status, transfer.SlothTransactionId);
+            //        if (slothResponse.Status == "Completed")
+            //        {
+            //            updatedCount++;
+            //            transfer.Status = TransferStatusCodes.Complete;
+            //            transfer.History.Add(new TransferHistory
+            //            {
+            //                Action = "Move UCD Money",
+            //                Status = transfer.Status,
+            //                ActorName = "Job",
+            //                Notes = "Money Moved",
+            //            });
+            //        }
+            //        if (slothResponse.Status == "Cancelled")
+            //        {
+            //            transfer.History.Add(new TransferHistory
+            //            {
+            //                Action = "Move UCD Money",
+            //                Status = transfer.Status,
+            //                ActorName = "Job",
+            //                Notes = "Money Movement Cancelled.",
+            //            });
+            //            Log.Information("Order {transferId} was cancelled. Setting back to unpaid", transfer.Id);
+            //            rolledBackCount++;
+            //            //TODO: Write to the notes field? Trigger off an email?
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Log.Information("Order {transferId} Not Successful. Response code {statusCode}. SlothTransactionId {transactionId}",
+            //            transfer.Id, response.StatusCode, transfer.SlothTransactionId); //TODO: Log it
+            //    }
+            //}
 
-            await _dbContext.SaveChangesAsync();
-            Log.Information("Updated {updatedCount} orders. Rolled back {rolledBackCount} orders.", updatedCount, rolledBackCount);
-            return;
+            //await _dbContext.SaveChangesAsync();
+            //Log.Information("Updated {updatedCount} orders. Rolled back {rolledBackCount} orders.", updatedCount, rolledBackCount);
+            //return;
         }
 
         //Don't delete the commented out code below, I'll use that as a basis for using an invoice
