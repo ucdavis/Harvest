@@ -58,6 +58,9 @@ export class QuoteContentImpl implements QuoteContent {
   total = 0;
   acreageTotal = 0;
   activitiesTotal = 0;
+  laborTotal = 0;
+  equipmentTotal = 0;
+  otherTotal = 0;
   grandTotal = 0;
 
   activities = [] as Activity[];
@@ -71,6 +74,9 @@ export interface QuoteContent {
   total: number;
   acreageTotal: number;
   activitiesTotal: number;
+  laborTotal: number;
+  equipmentTotal: number;
+  otherTotal: number;
   grandTotal: number;
 }
 
@@ -117,14 +123,12 @@ export interface Action {
 export class WorkItemImpl implements WorkItem {
   id;
   activityId;
+  description;
   type;
   rate;
   rateId = 0;
   quantity;
-
-  get total(): number {
-    return this.rate * this.quantity;
-  }
+  total = 0;
 
   constructor(activityId: number, id: number, type: string) {
     this.activityId = activityId;
@@ -132,6 +136,7 @@ export class WorkItemImpl implements WorkItem {
     this.type = type;
     this.rate = 0;
     this.quantity = 0;
+    this.description = "";
   }
 }
 export interface WorkItem {
@@ -140,11 +145,13 @@ export interface WorkItem {
   type: string;
   rateId: number;
   rate: number;
+  description: string;
   quantity: number;
-  readonly total: number;
+  total: number;
 }
 
 export interface Activity {
+  total: number;
   id: number;
   name: string;
   workItems: WorkItem[];

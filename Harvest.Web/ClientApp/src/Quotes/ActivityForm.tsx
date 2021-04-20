@@ -18,7 +18,7 @@ export const ActivityForm = (props: Props) => {
     const itemIndex = allItems.findIndex(
       (a) => a.id === workItem.id && a.activityId === workItem.activityId
     );
-    allItems[itemIndex] = { ...workItem };
+    allItems[itemIndex] = { ...workItem, total: workItem.rate * workItem.quantity };
 
     props.updateActivity({ ...props.activity, workItems: allItems });
   };

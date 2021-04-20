@@ -39,7 +39,7 @@ export const fakeProject: ProjectWithQuote = {
     accounts: null,
     quotes: null,
   },
-  quote: null
+  quote: null,
 };
 
 export const sampleRates: Rate[] = [

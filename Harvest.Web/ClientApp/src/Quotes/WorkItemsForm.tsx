@@ -33,7 +33,7 @@ export const WorkItemsForm = (props: Props) => {
     // rate can be undefinied if they select the default option
     if (rate !== undefined) {
       // new rate selected, update the work item with defaults
-      props.updateWorkItems({ ...workItem, rateId, rate: rate.price });
+      props.updateWorkItems({ ...workItem, description: rate.description, rateId, rate: rate.price, total: 0 });
     }
   };
 

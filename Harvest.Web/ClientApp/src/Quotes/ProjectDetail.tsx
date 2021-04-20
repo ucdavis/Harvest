@@ -31,6 +31,7 @@ export const ProjectDetail = (props: Props) => {
         {
           id: newActivityId,
           name: "Activity",
+          total: 0,
           workItems: [
             new WorkItemImpl(newActivityId, 1, "labor"),
             new WorkItemImpl(newActivityId, 2, "equipment"),
@@ -98,7 +99,9 @@ export const ProjectDetail = (props: Props) => {
                 type="text"
                 id="rate"
                 readOnly
-                value={formatCurrency(props.quote.acres * props.quote.acreageRate)}
+                value={formatCurrency(
+                  props.quote.acres * props.quote.acreageRate
+                )}
               />
             </InputGroup>
           </Col>

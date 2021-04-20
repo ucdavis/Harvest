@@ -4,7 +4,8 @@ import { useParams } from "react-router-dom";
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { RequestHeader } from "./RequestHeader";
-import { formatCurrency } from '../Util/NumberFormatting';
+import { QuoteDisplay } from "../Quotes/QuoteDisplay";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
   projectId?: string;
@@ -55,7 +56,8 @@ export const ApprovalContainer = () => {
   // TODO: make sure both project and quote are in the correct statuses in order for an approval
   if (
     projectAndQuote.project === undefined ||
-    projectAndQuote.quote === undefined || projectAndQuote.quote === null
+    projectAndQuote.quote === undefined ||
+    projectAndQuote.quote === null
   ) {
     return <div>No project or open quote found</div>;
   }
@@ -66,7 +68,7 @@ export const ApprovalContainer = () => {
       <RequestHeader project={projectAndQuote.project}></RequestHeader>
       <div className="card-green-bg">
         <div className="card-content">
-          Quote Details go here
+          <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
           <hr />
           Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
           <AccountsInput
