@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
 {
-    public class InvoiceDebit
+    public class MoneyMovement
     {
         [Key]
         public int Id { get; set; }
+        [Required]
+        [StringLength(10)]
+        public string Type { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -23,9 +26,15 @@ namespace Harvest.Core.Domain
         
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<InvoiceDebit>().HasIndex(a => a.InvoiceId);
+            modelBuilder.Entity<MoneyMovement>().HasIndex(a => a.InvoiceId);
 
-            modelBuilder.Entity<InvoiceDebit>().Property(a => a.Total).HasPrecision(18, 2);
+            modelBuilder.Entity<MoneyMovement>().Property(a => a.Total).HasPrecision(18, 2);
+        }
+
+        public class Types
+        {
+            public const string Debit = "Debit";
+            public const string Credit = "Credit";
         }
     }
 }
