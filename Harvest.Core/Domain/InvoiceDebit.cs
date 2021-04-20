@@ -20,9 +20,7 @@ namespace Harvest.Core.Domain
         public int InvoiceId { get; set; }
 
         public Invoice Invoice { get; set; }
-
-        public DateTime CreatedOn { get; set; }
-
+        
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<InvoiceDebit>().HasIndex(a => a.InvoiceId);
