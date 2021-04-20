@@ -35,7 +35,7 @@ namespace Harvest.Jobs.Invoice
             var invoiceCount = invoiceService.CreateInvoices().GetAwaiter().GetResult();
             _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
 
-            var slothedMoneyMoveCount = 0;
+            var slothMoneyMoveCount = 0;
             var createdInvoices = invoiceService.GetCreatedInvoiceIds().GetAwaiter().GetResult();
             if (createdInvoices != null && createdInvoices.Count > 0)
             {
@@ -54,9 +54,9 @@ namespace Harvest.Jobs.Invoice
                         _log.Information("Invoice error. Id: {createdInvoice}, Error: {error}", createdInvoice, response.Message);
                     }
 
-                    slothedMoneyMoveCount++;
+                    slothMoneyMoveCount++;
                 }
-                _log.Information("Money Moved Invoices: {slothedMoneyMoveCount}", slothedMoneyMoveCount);
+                _log.Information("Money Moved Invoices: {slothedMoneyMoveCount}", slothMoneyMoveCount);
             }
         }
 
