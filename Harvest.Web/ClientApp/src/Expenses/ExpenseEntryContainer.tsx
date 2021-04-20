@@ -90,7 +90,9 @@ export const ExpenseEntryContainer = () => {
     });
 
     if (response.ok) {
-      history.push("/project");
+      window.location.pathname = "/project";
+    } else {
+      alert("Something went wrong, please try again");
     }
   };
 

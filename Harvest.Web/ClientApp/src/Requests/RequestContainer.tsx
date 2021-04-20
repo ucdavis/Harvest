@@ -33,9 +33,10 @@ export const RequestContainer = () => {
     });
 
     if (response.ok) {
-      alert("created!");
+      const data = await response.json();
+      window.location.pathname = `/Project/Details/${data.id}`;
     } else {
-      alert("didn't work");
+      alert("Something went wrong, please try again");
     }
   };
 
