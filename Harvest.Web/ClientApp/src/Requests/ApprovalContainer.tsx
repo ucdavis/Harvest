@@ -43,9 +43,9 @@ export const ApprovalContainer = () => {
     });
 
     if (response.ok) {
-      alert("created!");
+      window.location.pathname = `/Project/Details/${projectId}`;
     } else {
-      alert("didn't work");
+      alert("Something went wrong, please try again");
     }
   };
 

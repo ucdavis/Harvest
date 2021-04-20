@@ -112,7 +112,9 @@ export const QuoteContainer = () => {
     });
 
     if (saveResponse.ok) {
-      alert("saved");
+      window.location.pathname = `/Project/Details/${projectId}`;
+    } else {
+      alert("Something went wrong, please try again");
     }
   };
 
