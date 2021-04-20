@@ -46,6 +46,7 @@ namespace Harvest.Jobs.Invoice
                     if (response == null)
                     {
                         _log.Information("Invoice not found. Id: {createdInvoice}", createdInvoice);
+                        continue;
                     }
 
                     if (!response.Success)
