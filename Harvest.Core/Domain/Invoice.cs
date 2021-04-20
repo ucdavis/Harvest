@@ -19,6 +19,7 @@ namespace Harvest.Core.Domain
         public decimal Total { get; set; }
 
         public List<Expense> Expenses { get; set; }
+        public List<InvoiceDebit> Debits { get; set; }
 
         public DateTime CreatedOn { get; set; }
         public string Notes { get; set; }
@@ -33,6 +34,12 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>()
                 .HasOne(a => a.Invoice)
                 .WithMany(p => p.Expenses)
+                .HasForeignKey(a => a.InvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<InvoiceDebit>()
+                .HasOne(a => a.Invoice)
+                .WithMany(p => p.Debits)
                 .HasForeignKey(a => a.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
