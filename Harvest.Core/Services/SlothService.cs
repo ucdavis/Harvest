@@ -226,7 +226,7 @@ namespace Harvest.Core.Services
                     Log.Information("Invoice {transferId} missing SlothTransactionId", invoice.Id); //TODO: Log it
                     continue;
                 }
-                var response = await client.GetAsync(invoice.SlothTransactionId.ToString());
+                var response = await client.GetAsync(invoice.SlothTransactionId);
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     Log.Information("Invoice {transferId} NotFound. SlothTransactionId {transactionId}",
