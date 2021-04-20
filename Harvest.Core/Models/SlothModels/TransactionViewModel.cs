@@ -19,9 +19,8 @@ namespace Harvest.Core.Models.SlothModels
 
         public DateTime TransactionDate { get; set; }
 
-        public string Source { get; set; }
-
-        public string SourceType { get; set; }
+        public string Source { get; set; } = "Harvest Recharge";
+        public string SourceType { get; set; } = "Recharge";
 
         public IList<TransferViewModel> Transfers { get; set; }
     }
