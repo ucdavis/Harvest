@@ -164,3 +164,22 @@ export interface ProjectAccount {
   name: string;
   percentage: number;
 }
+
+export interface RequestInput {
+  id: number;
+  start: string;
+  end: string;
+  crop: string;
+  principalInvestigator: PrincipalInvestigator;
+}
+
+export interface PrincipalInvestigator {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  iam: string;
+  kerberos: string;
+  name: string;
+  nameAndEmail: string;
+}
