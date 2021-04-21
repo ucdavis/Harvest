@@ -23,6 +23,8 @@ namespace Harvest.Web.Models
         public string ProjectName { get; set; }
         public double Acres { get; set; }
         public double AcreageRate { get; set; }
+        public int AcreageRateId { get; set; }
+        public string AcreageRateDescription { get; set; }
         public double AcreageTotal { get; set; }
         public double ActivitiesTotal { get; set; }
         public double LaborTotal { get; set; }
