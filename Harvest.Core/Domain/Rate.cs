@@ -55,6 +55,9 @@ namespace Harvest.Core.Domain
         [Display(Name = "Updated Date")]
         public DateTime UpdatedOn { get; set; }
 
+        // projects using this rate
+        public List<Project> Projects { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Rate>().HasIndex(a => a.Type);
@@ -64,6 +67,13 @@ namespace Harvest.Core.Domain
 
 
             modelBuilder.Entity<Rate>().Property(a => a.Price).HasPrecision(18, 2);
+
+            modelBuilder.Entity<Project>()
+                .HasOne(a => a.AcreageRate)
+                .WithMany(p => p.Projects)
+                .HasForeignKey(a => a.AcreageRateId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
 
         public class Types
