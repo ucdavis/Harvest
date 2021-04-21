@@ -28,7 +28,7 @@ namespace Harvest.Core.Services
         public async Task<bool> CreateInvoice(int id)
         {
             //Look for an active project
-            var project = await _dbContext.Projects
+            var project = await _dbContext.Projects.Include(a => a.AcreageRate)
                 .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == id).SingleOrDefaultAsync();
             if (project == null)
             {
@@ -89,16 +89,24 @@ namespace Harvest.Core.Services
                 return;
             }
 
-            var expense = new Expense();
-            expense.Rate = project.AcreageRate;
-            expense.Account = project.AcreageRate.Account;
-            expense.Total = amountToCharge;
-            expense.ProjectId = project.Id;
-            expense.InvoiceId = null;
-            expense.CreatedById = null;
+            var expense = new Expense
+            {
+                Type        = project.AcreageRate.Type,
+                Description = project.AcreageRate.Description,
+                Price       = project.AcreageRate.Price / 12, //This can be more than 2 decimals
+                Quantity    = (decimal)project.Acres,
+                Total       = amountToCharge,
+                ProjectId   = project.Id,
+                RateId      = project.AcreageRate.Id,
+                InvoiceId   = null,
+                CreatedOn   = DateTime.UtcNow,
+                CreatedById = null,
+                Account     = project.AcreageRate.Account,
+            };
 
             await _dbContext.Expenses.AddAsync(expense);
             await _dbContext.SaveChangesAsync();
+
         }
 
         public async Task<int> CreateInvoices()
