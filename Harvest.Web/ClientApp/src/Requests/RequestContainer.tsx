@@ -134,7 +134,7 @@ export const RequestContainer = () => {
           />
         </FormGroup>
         <div className="row justify-content-center">
-          <Button color="primary" onClick={create}>
+          <Button className="btn-lg" color="primary" onClick={create}>
             Create Field Request
           </Button>
         </div>
