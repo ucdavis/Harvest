@@ -70,6 +70,8 @@ namespace Harvest.Web.Controllers
 
             project.Accounts = new List<Account>(model.Accounts);
             project.Status = "PendingAccountApproval"; // TODO: update with enumerated values
+            project.QuoteId = quote.Id;
+            project.QuoteTotal = quote.Total;
 
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need
