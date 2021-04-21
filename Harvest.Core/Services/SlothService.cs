@@ -78,7 +78,8 @@ namespace Harvest.Core.Services
                    Log.Information("Invalid Project Account: {debit.Message}", debit.Message);
                    throw new Exception($"Unable to validate debit account {projectAccount.Number}: {debit.Message}");
                 }
-                model.Transfers.Add(new TransferViewModel
+
+                var tvm = new TransferViewModel
                 {
                     Account = debit.KfsAccount.AccountNumber,
                     Amount = Math.Round(grandTotal * (projectAccount.Percentage / 100), 2),
@@ -87,7 +88,12 @@ namespace Harvest.Core.Services
                     Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
                     Direction = TransferViewModel.Directions.Debit,
                     ObjectCode = _slothSettings.DebitObjectCode
-                });
+                };
+                if (tvm.Amount >= 0.01m)
+                {
+                    //Only create this if the amount if 0.01 or greater (sloth requirement)
+                    model.Transfers.Add(tvm);
+                }
             }
             //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
             var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Select(a => a.Amount).Sum();
@@ -114,16 +120,19 @@ namespace Harvest.Core.Services
                     throw new Exception($"Unable to validate credit account {expense.Key}: {credit.Message}");
                 }
                 var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
-                model.Transfers.Add(new TransferViewModel
-                {
-                    Account = credit.KfsAccount.AccountNumber,
-                    Amount = totalCost,
-                    Chart = credit.KfsAccount.ChartOfAccountsCode,
-                    SubAccount = credit.KfsAccount.SubAccount,
-                    Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
-                    Direction = TransferViewModel.Directions.Credit,
-                    ObjectCode = _slothSettings.CreditObjectCode
-                });
+                if(totalCost >= 0.01m)
+                { 
+                    model.Transfers.Add(new TransferViewModel
+                    {
+                        Account = credit.KfsAccount.AccountNumber,
+                        Amount = totalCost,
+                        Chart = credit.KfsAccount.ChartOfAccountsCode,
+                        SubAccount = credit.KfsAccount.SubAccount,
+                        Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                        Direction = TransferViewModel.Directions.Credit,
+                        ObjectCode = _slothSettings.CreditObjectCode
+                    });
+                }
             }
             var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
             if (grandTotal != creditTotal)
