@@ -130,7 +130,7 @@ export const QuoteContainer = () => {
           <div className="quote-details">
             <h2>Quote Details</h2>
             <hr />
-            <ProjectDetail quote={quote} updateQuote={setQuote} />
+            <ProjectDetail rates={rates} quote={quote} updateQuote={setQuote} />
             <ActivitiesContainer
               quote={quote}
               rates={rates}
