@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Harvest.Core.Services
 {
@@ -27,7 +28,7 @@ namespace Harvest.Core.Services
         public async Task<bool> CreateInvoice(int id)
         {
             //Look for an active project
-            var project = await _dbContext.Projects
+            var project = await _dbContext.Projects.Include(a => a.AcreageRate)
                 .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == id).SingleOrDefaultAsync();
             if (project == null)
             {
@@ -55,6 +56,8 @@ namespace Harvest.Core.Services
 
             //TODO: Create the acreage expense with correct amount 
 
+            await CreateMonthlyAcreageExpense(project);
+
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.ProjectId == id).ToArrayAsync();
 
             //Shouldn't happen once we create the acreage expense 
@@ -71,6 +74,38 @@ namespace Harvest.Core.Services
 
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
             return true;
+
+        }
+
+        private async Task CreateMonthlyAcreageExpense(Project project)
+        {
+            var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2);
+
+            //Check for an unbilled acreage expense
+            if (await _dbContext.Expenses.AnyAsync(a =>
+                a.ProjectId == project.Id && a.InvoiceId == null && a.Rate.Type == Rate.Types.Acreage))
+            {
+                Log.Information("Project {project.Id} Unbilled acreage expense already found. Skipping.", project.Id);
+                return;
+            }
+
+            var expense = new Expense
+            {
+                Type        = project.AcreageRate.Type,
+                Description = project.AcreageRate.Description,
+                Price       = project.AcreageRate.Price / 12, //This can be more than 2 decimals
+                Quantity    = (decimal)project.Acres,
+                Total       = amountToCharge,
+                ProjectId   = project.Id,
+                RateId      = project.AcreageRate.Id,
+                InvoiceId   = null,
+                CreatedOn   = DateTime.UtcNow,
+                CreatedById = null,
+                Account     = project.AcreageRate.Account,
+            };
+
+            await _dbContext.Expenses.AddAsync(expense);
+            await _dbContext.SaveChangesAsync();
 
         }
 
