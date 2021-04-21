@@ -55,6 +55,8 @@ export class QuoteContentImpl implements QuoteContent {
   projectName = ""; // TODO: might be worth removing when feasible
   acres = 0;
   acreageRate = 360;
+  acreageRateId = 0;
+  acreageRateDescription = "";
   total = 0;
   acreageTotal = 0;
   activitiesTotal = 0;
@@ -70,6 +72,8 @@ export interface QuoteContent {
   projectName: string; // TODO: might be worth removing when feasible
   acres: number;
   acreageRate: number;
+  acreageRateId: number;
+  acreageRateDescription: string;
   activities: Activity[];
   total: number;
   acreageTotal: number;

@@ -23,8 +23,13 @@ namespace Harvest.Web.Models
         public string ProjectName { get; set; }
         public double Acres { get; set; }
         public double AcreageRate { get; set; }
+        public int AcreageRateId { get; set; }
+        public string AcreageRateDescription { get; set; }
         public double AcreageTotal { get; set; }
         public double ActivitiesTotal { get; set; }
+        public double LaborTotal { get; set; }
+        public double EquipmentTotal { get; set; }
+        public double OtherTotal { get; set; }
         public double GrandTotal { get; set; }
         public Activity[] Activities { get; set; }
 
@@ -34,16 +39,19 @@ namespace Harvest.Web.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public double Total { get; set; }
         public WorkItem[] WorkItems { get; set; }
     }
 
     public partial class WorkItem
     {
         public int Id { get; set; }
+        public string Description { get; set; }
         public int ActivityId { get; set; }
         public string Type { get; set; }
         public double Rate { get; set; }
         public int RateId { get; set; }
         public double Quantity { get; set; }
+        public double Total { get; set; }
     }
 }

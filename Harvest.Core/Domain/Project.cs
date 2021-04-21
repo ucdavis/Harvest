@@ -24,6 +24,11 @@ namespace Harvest.Core.Domain
         
         [MaxLength]
         public string Requirements { get; set; }
+
+        public double Acres { get; set; }
+
+        public int? AcreageRateId { get; set; }
+        public Rate AcreageRate { get; set; }
         
         [StringLength(200)]
         public string Name { get; set; }

@@ -25,10 +25,10 @@ export const WorkItemDisplay = (props: Props) => {
               .filter((w) => w.type === type)
               .map((workItem) => (
                 <tr>
-                  <td>TODO: DESCRIPTION</td>
+                  <td>{workItem.description}</td>
                   <td>{workItem.quantity}</td>
                   <td>{workItem.rate}</td>
-                  <td>${formatCurrency(workItem.rate * workItem.quantity)}</td>
+                  <td>${formatCurrency(workItem.total)}</td>
                 </tr>
               ))}
           </tbody>

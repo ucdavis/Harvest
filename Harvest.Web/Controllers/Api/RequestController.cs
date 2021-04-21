@@ -41,13 +41,18 @@ namespace Harvest.Web.Controllers
 
         // Approve a quote for the project
         [HttpGet]
-        public ActionResult Approve(int id) {
+        public ActionResult Approve(int id)
+        {
             return View("React");
         }
 
         [HttpPost]
-        public async Task<ActionResult> ApproveAsync(int id, [FromBody]RequestApprovalModel model) {
+        public async Task<ActionResult> ApproveAsync(int id, [FromBody] RequestApprovalModel model)
+        {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
+
+            // get the currently unapproved quote for this project
+            var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == id && q.ApprovedOn == null);
 
             // TODO: double check the percentages add up to 100%
             // TODO: add in fiscal officer info??
@@ -58,12 +63,19 @@ namespace Harvest.Web.Controllers
                 account.ApprovedOn = null;
             }
 
+            var quoteDetail = QuoteDetail.Deserialize(quote.Text);
+
+            project.Acres = quoteDetail.Acres;
+            project.AcreageRateId = quoteDetail.AcreageRateId;
+
             project.Accounts = new List<Account>(model.Accounts);
             project.Status = "PendingAccountApproval"; // TODO: update with enumerated values
+            project.QuoteId = quote.Id;
+            project.QuoteTotal = quote.Total;
 
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need
-            _dbContext.RemoveRange(_dbContext.Accounts.Where(x=>x.ProjectId == id));
+            _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == id));
 
             await _dbContext.SaveChangesAsync();
 
@@ -112,7 +124,8 @@ namespace Harvest.Web.Controllers
         }
     }
 
-    public class RequestApprovalModel {
+    public class RequestApprovalModel
+    {
         public Account[] Accounts { get; set; }
     }
 }

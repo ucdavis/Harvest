@@ -251,6 +251,12 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<int?>("AcreageRateId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Acres")
+                        .HasColumnType("float");
+
                     b.Property<decimal>("ChargedTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -309,6 +315,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AcreageRateId");
 
                     b.HasIndex("CreatedById");
 
@@ -671,6 +679,11 @@ namespace Harvest.Core.Migrations.SqlServer
 
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.Rate", "AcreageRate")
+                        .WithMany("Projects")
+                        .HasForeignKey("AcreageRateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany("CreatedProjects")
                         .HasForeignKey("CreatedById")
@@ -686,6 +699,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasOne("Harvest.Core.Domain.Quote", "Quote")
                         .WithMany()
                         .HasForeignKey("QuoteId1");
+
+                    b.Navigation("AcreageRate");
 
                     b.Navigation("CreatedBy");
 
@@ -789,6 +804,11 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Quote", b =>
                 {
                     b.Navigation("Documents");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.Rate", b =>
+                {
+                    b.Navigation("Projects");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>

@@ -63,6 +63,11 @@ namespace Harvest.Core.Services
             };
 
             var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
+            if (invoice.Total != grandTotal)
+            {
+                Log.Information("Invoice Total {invoice.Total} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
+                invoice.Total = grandTotal;
+            }
             foreach (var projectAccount in invoice.Project.Accounts)
             {
                 //Debits
@@ -206,7 +211,7 @@ namespace Harvest.Core.Services
         public async Task ProcessTransferUpdates()
         {
             Log.Information("Beginning ProcessTransferUpdates");
-            var pendingInvoices = await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
+            var pendingInvoices = await _dbContext.Invoices.Include(a => a.Project).Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
             if (pendingInvoices.Count == 0)
             {
                 Log.Information("No pending invoices to process");
@@ -248,6 +253,9 @@ namespace Harvest.Core.Services
                     if (slothResponse.Status == "Completed")
                     {
                         updatedCount++;
+                        //Update Project Running total
+                        invoice.Project.ChargedTotal += invoice.Total;
+
                         invoice.Status = Invoice.Statuses.Completed;
                         await _dbContext.SaveChangesAsync();
                     }
