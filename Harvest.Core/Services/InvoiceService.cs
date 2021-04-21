@@ -79,7 +79,7 @@ namespace Harvest.Core.Services
 
         private async Task CreateMonthlyAcreageExpense(Project project)
         {
-            var amountToCharge = Math.Round(project.Acers * (project.AcreageRate.Price / 12), 2);
+            var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2);
 
             //Check for an unbilled acreage expense
             if (await _dbContext.Expenses.AnyAsync(a =>
