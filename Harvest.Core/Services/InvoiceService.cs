@@ -79,24 +79,14 @@ namespace Harvest.Core.Services
 
         private async Task CreateMonthlyAcreageExpense(Project project)
         {
-            var amountToCharge = project.AcreagePerMonth;
-            if (project.AcreageTotal >= project.AcreageChargedTotal)
-            {
-                Log.Information("Project {project.Id} Acreage total already charged. No more Expenses for Acreage will be charged", project.Id);
-                return;
-            }
+            var amountToCharge = Math.Round(project.Acers * (project.AcreageRate.Price / 12), 2);
+
             //Check for an unbilled acreage expense
             if (await _dbContext.Expenses.AnyAsync(a =>
                 a.ProjectId == project.Id && a.InvoiceId == null && a.Rate.Type == Rate.Types.Acreage))
             {
                 Log.Information("Project {project.Id} Unbilled acreage expense already found. Skipping.", project.Id);
                 return;
-            }
-            //Check for max acreage charge and if the project is ending (so we clear out the remaining charge)
-            if (project.AcreagePerMonth > (project.AcreageTotal - project.AcreageChargedTotal) 
-                || DateTime.UtcNow.Date.AddDays(28) >= project.End.Date)
-            {
-                amountToCharge = project.AcreageTotal - project.AcreageChargedTotal;
             }
 
             var expense = new Expense();
