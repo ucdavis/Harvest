@@ -12,6 +12,7 @@ import {
 import { ProjectDetail } from "./ProjectDetail";
 import { RequestHeader } from "../Requests/RequestHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
+import { QuoteTotals } from "./QuoteTotals";
 
 interface RouteParams {
   projectId?: string;
@@ -137,6 +138,7 @@ export const QuoteContainer = () => {
               updateQuote={setQuote}
             />
           </div>
+          <QuoteTotals quote={quote}></QuoteTotals>
           <h2>Save</h2>
           <button onClick={save}>Save Quote</button>
         </div>
