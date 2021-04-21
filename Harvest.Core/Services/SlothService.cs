@@ -94,6 +94,10 @@ namespace Harvest.Core.Services
                     //Only create this if the amount if 0.01 or greater (sloth requirement)
                     model.Transfers.Add(tvm);
                 }
+                else
+                {
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoice.Id}", invoice.Id);
+                }
             }
             //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
             var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Select(a => a.Amount).Sum();
@@ -132,6 +136,10 @@ namespace Harvest.Core.Services
                         Direction = TransferViewModel.Directions.Credit,
                         ObjectCode = _slothSettings.CreditObjectCode
                     });
+                }
+                else
+                {
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoice.Id}", invoice.Id);
                 }
             }
             var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
