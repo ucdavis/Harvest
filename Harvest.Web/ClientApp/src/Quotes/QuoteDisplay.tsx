@@ -13,6 +13,8 @@ export const QuoteDisplay = (props: Props) => {
   return (
     <div>
       <h2>Quote</h2>
+      {quote.acreageRateDescription}: {quote.acres} @ {formatCurrency(quote.acreageRate)} = ${formatCurrency(quote.acreageTotal)}
+      <hr/>
       {quote.activities.map((activity) => (
         <div key={`${activity.name}-${activity.id}`}>
           <h2>
