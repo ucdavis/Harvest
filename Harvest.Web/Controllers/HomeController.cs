@@ -33,11 +33,21 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestBody()
         {
 
-            var model = new TestEmailModel()
+            //var model = new TestEmailModel()
+            //{
+            //    Name = "REPLACE1"
+            //};
+            //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
+            var model = new ProfessorQuoteModel()
             {
-                Name = "REPLACE1"
+                ProfName     = "@Model.ProfName",
+                ProjectName  = "@Model.ProjectName",
+                ProjectStart = "@Model.ProjectStart",
+                ProjectEnd   = "@Model.ProjectEnd",
+                QuoteAmount  = "@Model.QuoteAmount",
+                ButtonUrl    = "@Model.ButtonUrl"
             };
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification_mjml.cshtml", model);
 
             return Content(xxx);
         }
