@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Harvest.Email.Models
 {
@@ -15,6 +16,21 @@ namespace Harvest.Email.Models
         public string CropType { get; set; }
         public string Crops { get; set; }
         public string Requirements { get; set; }
-        public string ButtonUrl = "https://harvest.caes.ucdavis.edu";
+        public string ButtonUrl { get; set; }
+
+        /// <summary>
+        /// Sets model values when running TestController.TestBody
+        /// </summary>
+        public void InitForMjml()
+        {
+            PI           = "@Model.PI";
+            ProjectName  = "@Model.ProjectName";
+            ProjectStart = "@Model.ProjectStart";
+            ProjectEnd   = "@Model.ProjectEnd";
+            CropType     = "@Model.CropType";
+            Crops        = "@Model.Crops";
+            Requirements = "@Model.Requirements";
+            ButtonUrl    = "@Model.ButtonUrl";
+        }
     }
 }

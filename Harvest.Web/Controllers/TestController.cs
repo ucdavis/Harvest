@@ -41,17 +41,9 @@ namespace Harvest.Web.Controllers
             //    Name = "REPLACE1"
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
-            var model = new NewFieldRequestModel()
-            {
-                PI           = "@Model.PI",
-                ProjectName  = "@Model.ProjectName",
-                ProjectStart = "@Model.ProjectStart",
-                ProjectEnd   = "@Model.ProjectEnd",
-                CropType     = "@Model.CropType",
-                Crops        = "@Model.Crops",
-                Requirements = "@Model.Requirements",
-                ButtonUrl    = "@Model.ButtonUrl"
-            };
+            var model = new NewFieldRequestModel();
+            model.InitForMjml();
+
             var xxx = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
 
             return Content(xxx);
@@ -79,7 +71,7 @@ namespace Harvest.Web.Controllers
 
             var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-            await _notificationService.SendNotification(user.Email, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+            await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
 

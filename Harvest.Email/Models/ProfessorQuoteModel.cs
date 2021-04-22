@@ -11,11 +11,24 @@ namespace Harvest.Email.Models
         /// <summary>
         /// Link to quote
         /// </summary>
-        public string ButtonUrl = "https://harvest.caes.ucdavis.edu";
+        public string ButtonUrl { get; set; }
         public string ProfName { get; set; }
         public string ProjectName { get; set; }
         public string ProjectStart { get; set; }
         public string ProjectEnd { get; set; }
         public string QuoteAmount { get; set; }
+
+        /// <summary>
+        /// Sets model values when running TestController.TestBody
+        /// </summary>
+        public void InitForMjml()
+        {
+            ProfName     = "@Model.ProfName";
+            ProjectName  = "@Model.ProjectName";
+            ProjectStart = "@Model.ProjectStart";
+            ProjectEnd   = "@Model.ProjectEnd";
+            QuoteAmount  = "@Model.QuoteAmount";
+            ButtonUrl    = "@Model.ButtonUrl";
+        }
     }
 }
