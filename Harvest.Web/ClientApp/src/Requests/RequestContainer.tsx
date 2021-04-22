@@ -18,7 +18,7 @@ import { Crops } from "./Crops";
 import { Project, CropType } from "../types";
 
 export const RequestContainer = () => {
-  const [project, setProject] = useState<Project>({ id: 0 } as Project);
+  const [project, setProject] = useState<Project>({ id: 0, cropType: "Row" as CropType } as Project);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -54,8 +54,9 @@ export const RequestContainer = () => {
           <div className="col-md-6">
             <div className="form-group">
               <Label>When to Start?</Label>
-              <div className="input-group">
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
+                  
                   format="MM/dd/yyyy"
                   required={true}
                   clearIcon={null}
@@ -70,7 +71,7 @@ export const RequestContainer = () => {
           <div className="col-md-6">
             <FormGroup>
               <Label>When to Finish?</Label>
-              <div className="input-group">
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
                   required={true}
@@ -94,7 +95,7 @@ export const RequestContainer = () => {
               className="custom-control-input"
               style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
               value="Row"
-              checked={project.cropType === undefined || project.cropType === "Row"}
+              checked={project.cropType === "Row"}
               onChange={handleCropTypeChange}
             />
             <label className="custom-control-label">Row Crops</label>
