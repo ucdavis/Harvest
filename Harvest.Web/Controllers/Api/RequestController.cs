@@ -29,7 +29,7 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Get(int id)
         {
-            return Ok(await _dbContext.Projects.SingleOrDefaultAsync(x => x.Id == id));
+            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).AsNoTracking().SingleOrDefaultAsync(x => x.Id == id));
         }
 
         // create a new request via react
@@ -69,7 +69,7 @@ namespace Harvest.Web.Controllers
             project.AcreageRateId = quoteDetail.AcreageRateId;
 
             project.Accounts = new List<Account>(model.Accounts);
-            project.Status = "PendingAccountApproval"; // TODO: update with enumerated values
+            project.Status = Project.Statuses.PendingAccountApproval;
             project.QuoteId = quote.Id;
             project.QuoteTotal = quote.Total;
 
@@ -96,8 +96,15 @@ namespace Harvest.Web.Controllers
                 CreatedById = currentUser.Id,
                 IsActive = true,
                 Requirements = project.Requirements,
-                Status = "Requested" // TODO: remove once PR with defined steps is merged
+                Status = Project.Statuses.Requested
             };
+
+            if (project.Id > 0)
+            {
+                // this project already exists, so we are requesting a change
+                newProject.Status = Project.Statuses.ChangeRequested;
+                newProject.OriginalProjectId = project.Id;
+            }
 
             // create PI if needed and assign to project
             var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == project.PrincipalInvestigator.Iam);

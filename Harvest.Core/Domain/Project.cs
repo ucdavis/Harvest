@@ -128,6 +128,7 @@ namespace Harvest.Core.Domain
             public const string Requested = "Requested";
             public const string PendingAccountApproval = "Pending Account Approval";
             public const string Active = "Active";
+            public const string ChangeRequested = "ChangeRequested";
             public const string Completed = "Completed";
 
             public static List<string> TypeList = new List<string>

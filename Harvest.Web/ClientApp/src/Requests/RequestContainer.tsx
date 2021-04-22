@@ -28,8 +28,6 @@ export const RequestContainer = () => {
 
   useEffect(() => {
     // load original request if this is a change request
-    console.log("loading original project", projectId);
-
     const cb = async () => {
       const response = await fetch(`/Request/Get/${projectId}`);
 
@@ -39,6 +37,7 @@ export const RequestContainer = () => {
           ...proj,
           start: new Date(proj.start),
           end: new Date(proj.end),
+          requirements: `Original: ${proj.requirements}`,
         });
       }
     };
@@ -150,7 +149,7 @@ export const RequestContainer = () => {
           <Row>
             <Col>
               <Button color="primary" onClick={create}>
-                Create Field Request
+                {projectId ? "Create Change Request" : "Create Field Request"}
               </Button>
             </Col>
           </Row>
