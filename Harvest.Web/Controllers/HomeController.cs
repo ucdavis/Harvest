@@ -17,85 +17,11 @@ namespace Harvest.Web.Controllers
     [Authorize]
     public class HomeController : SuperController
     {
-        private readonly AppDbContext _dbContext;
-        private readonly IUserService _userService;
-        private readonly INotificationService _notificationService;
-        private readonly IEmailBodyService _emailBodyService;
-        private readonly IEmailService _emailService;
-
-        public HomeController(AppDbContext dbContext, IUserService userService, INotificationService notificationService, IEmailBodyService emailBodyService, IEmailService emailService)
-        {
-            _dbContext = dbContext;
-            _userService = userService;
-            _notificationService = notificationService;
-            _emailBodyService = emailBodyService;
-            _emailService = emailService;
-        }
         public ActionResult Index()
         {
             return View();
         }
-
-
-        public async Task<IActionResult> TestBody()
-        {
-
-            //var model = new TestEmailModel()
-            //{
-            //    Name = "REPLACE1"
-            //};
-            //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
-            var model = new ProfessorQuoteModel()
-            {
-                ProfName     = "@Model.ProfName",
-                ProjectName  = "@Model.ProjectName",
-                ProjectStart = "@Model.ProjectStart",
-                ProjectEnd   = "@Model.ProjectEnd",
-                QuoteAmount  = "@Model.QuoteAmount",
-                ButtonUrl    = "@Model.ButtonUrl"
-            };
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification_mjml.cshtml", model);
-
-            return Content(xxx);
-        }
-
-        [Authorize(Policy = AccessCodes.SystemAccess)]
-        public async Task<IActionResult> TestEmail()
-        {
-            var user = await _userService.GetCurrentUser();
-            //var model = new TestEmailModel()
-            //{
-            //    Name = user.Name
-            //};
-            //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
-            //await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
-            var model = new ProfessorQuoteModel()
-            {
-                ProfName = user.Name,
-                ProjectName = "Your Awesome Project",
-                ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
-                ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
-                QuoteAmount = "$20,000.00",
-                //ButtonUrl = "???"
-            };
-
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
-
-            await _notificationService.SendNotification(user.Email, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
-            return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
-        }
-
-        [Authorize(Policy = AccessCodes.SystemAccess)]
-        public async Task<IActionResult> TestQuoteNotify()
-        {
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 7);
-            if (await _emailService.ProfessorQuoteReady(project))
-            {
-                return Content("Done.");
-            }
-            return Content("Looks like there was a problem.");
-        }
-
+        
         public ActionResult Spa() {
             return View();
         }
