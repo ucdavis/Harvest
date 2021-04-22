@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -16,8 +16,14 @@ import DatePicker from "react-date-picker";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { Project, CropType } from "../types";
+import { useParams } from "react-router";
+
+interface RouteParams {
+  projectId?: string;
+}
 
 export const RequestContainer = () => {
+  const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({ id: 0, cropType: "Row" as CropType } as Project);
 
   const create = async () => {
@@ -43,6 +49,11 @@ export const RequestContainer = () => {
   const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProject({ ...project, cropType: e.target.value as CropType });
   };
+
+  if (projectId !== undefined && project.id === 0) {
+    // if we have a project id but it hasn't loaded yet, wait
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="card-wrapper card-medium">

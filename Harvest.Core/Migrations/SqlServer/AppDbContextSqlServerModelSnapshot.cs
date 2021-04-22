@@ -284,6 +284,9 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.Property<Geometry>("Location")
                         .HasColumnType("geography");
 
@@ -294,6 +297,9 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<string>("Name")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+
+                    b.Property<int?>("OriginalProjectId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PrincipalInvestigatorId")
                         .HasColumnType("int");
@@ -325,6 +331,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("OriginalProjectId");
 
                     b.HasIndex("PrincipalInvestigatorId");
 
@@ -694,6 +702,10 @@ namespace Harvest.Core.Migrations.SqlServer
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Harvest.Core.Domain.Project", "OriginalProject")
+                        .WithMany()
+                        .HasForeignKey("OriginalProjectId");
+
                     b.HasOne("Harvest.Core.Domain.User", "PrincipalInvestigator")
                         .WithMany("PrincipalInvestigatorProjects")
                         .HasForeignKey("PrincipalInvestigatorId")
@@ -707,6 +719,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Navigation("AcreageRate");
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("OriginalProject");
 
                     b.Navigation("PrincipalInvestigator");
 
