@@ -7,7 +7,7 @@ interface Props {
   setCrops: (crops: string) => void;
 }
 
-const splitCrops = (crop: string) => crop.split(",");
+const splitCrops = (crop: string) => crop ? crop.split(",") : [];
 
 export const Crops = (props: Props) => {
   const [crops, setCrops] = useState<string[]>(splitCrops(props.crops));
