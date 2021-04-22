@@ -15,7 +15,7 @@ import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
-import { Project } from "../types";
+import { Project, CropType } from "../types";
 import { useParams } from "react-router";
 
 interface RouteParams {
@@ -24,26 +24,7 @@ interface RouteParams {
 
 export const RequestContainer = () => {
   const { projectId } = useParams<RouteParams>();
-  const [project, setProject] = useState<Project>({ id: 0 } as Project);
-
-  useEffect(() => {
-    // load original request if this is a change request
-    const cb = async () => {
-      const response = await fetch(`/Request/Get/${projectId}`);
-
-      if (response.ok) {
-        const proj: Project = await response.json();
-        setProject({
-          ...proj,
-          start: new Date(proj.start),
-          end: new Date(proj.end),
-          requirements: `Original: ${proj.requirements}`,
-        });
-      }
-    };
-
-    cb();
-  }, [projectId]);
+  const [project, setProject] = useState<Project>({ id: 0, cropType: "Row" as CropType } as Project);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -65,21 +46,28 @@ export const RequestContainer = () => {
     }
   };
 
+  const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProject({ ...project, cropType: e.target.value as CropType });
+  };
+
   if (projectId !== undefined && project.id === 0) {
     // if we have a project id but it hasn't loaded yet, wait
     return <div>Loading...</div>;
   }
 
   return (
-    <Card>
-      <CardBody>
-        <CardHeader>Create Field Request</CardHeader>
-        <Container>
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label>When to Start?</Label>
+    <div className="card-wrapper card-medium">
+      <div className="card-content">
+        <div className="card-head">
+          <h2>Create Field Request</h2>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="form-group">
+              <Label>When to Start?</Label>
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
+                  
                   format="MM/dd/yyyy"
                   required={true}
                   clearIcon={null}
@@ -88,11 +76,13 @@ export const RequestContainer = () => {
                     setProject({ ...project, start: date as Date })
                   }
                 />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <Label>When to Finish?</Label>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <FormGroup>
+              <Label>When to Finish?</Label>
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
                   required={true}
@@ -102,60 +92,78 @@ export const RequestContainer = () => {
                     setProject({ ...project, end: date as Date })
                   }
                 />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FormGroup tag="fieldset">
-                <Label>Which type of crop will we grow?</Label>
-                <Crops
-                  crops={project.crop}
-                  setCrops={(c) => setProject({ ...project, crop: c })}
-                ></Crops>
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label>Who will be the PI?</Label>
-                <SearchPerson
-                  user={project.principalInvestigator}
-                  setUser={(u) =>
-                    setProject({ ...project, principalInvestigator: u })
-                  }
-                ></SearchPerson>
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label>What are the requirements?</Label>
-                <Input
-                  type="textarea"
-                  name="text"
-                  id="requirements"
-                  value={project.requirements}
-                  onChange={(e) =>
-                    setProject({ ...project, requirements: e.target.value })
-                  }
-                  placeholder="Enter a full description of your requirements"
-                />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Button color="primary" onClick={create}>
-                {projectId ? "Create Change Request" : "Create Field Request"}
-              </Button>
-            </Col>
-          </Row>
-        </Container>
+              </div>
+            </FormGroup>
+          </div>
+        </div>
+        <FormGroup>
+          <Label>Which type of crop will we grow?</Label>
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              id="customRadio1"
+              name="customRadio"
+              className="custom-control-input"
+              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+              value="Row"
+              checked={project.cropType === "Row"}
+              onChange={handleCropTypeChange}
+            />
+            <label className="custom-control-label">Row Crops</label>
+          </div>
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              id="customRadio2"
+              name="customRadio"
+              className="custom-control-input"
+              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+              value="Tree"
+              checked={project.cropType === "Tree"}
+              onChange={handleCropTypeChange}
+            />
+            <label className="custom-control-label">Tree Crops</label>
+          </div>
+        </FormGroup>
+
+        <FormGroup tag="fieldset">
+          <Label>What crop(s) will we grow?</Label>
+          <Crops
+            crops={project.crop}
+            setCrops={(c) => setProject({ ...project, crop: c })}
+          ></Crops>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>Who will be the PI?</Label>
+          <SearchPerson
+            user={project.principalInvestigator}
+            setUser={(u) =>
+              setProject({ ...project, principalInvestigator: u })
+            }
+          ></SearchPerson>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>What are the requirements?</Label>
+          <Input
+            type="textarea"
+            name="text"
+            id="requirements"
+            value={project.requirements}
+            onChange={(e) =>
+              setProject({ ...project, requirements: e.target.value })
+            }
+            placeholder="Enter a full description of your requirements"
+          />
+        </FormGroup>
+        <div className="row justify-content-center">
+          <Button className="btn-lg" color="primary" onClick={create}>
+            Create Field Request
+          </Button>
+        </div>
         <div>DEBUG: {JSON.stringify(project)}</div>
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };

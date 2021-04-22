@@ -17,11 +17,13 @@ namespace Harvest.Core.Domain
         public DateTime Start { get; set; }
 
         public DateTime End { get; set; }
-
-        // TODO: make this biggere in case we have a bunch of crops
-        [StringLength(50)]
+        
+        [StringLength(512)]
         public string Crop { get; set; }
 
+        [StringLength(50)]
+        public string CropType { get; set; }
+        
         [MaxLength]
         public string Requirements { get; set; }
 
@@ -139,6 +141,18 @@ namespace Harvest.Core.Domain
                 ChangeRequested,
                 Completed,
             }.ToList();
+        }
+
+        public class CropTypes
+        {
+            public const string Row = "Row";
+            public const string Tree = "Tree";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Row,
+                Tree
+            };
         }
     }
 }

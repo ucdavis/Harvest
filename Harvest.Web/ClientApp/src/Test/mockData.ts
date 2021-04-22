@@ -6,6 +6,7 @@ export const fakeProject: ProjectWithQuote = {
     start: new Date("2021-03-15T00:00:00"),
     end: new Date("2021-03-29T00:00:00"),
     crop: "Tomato",
+    cropType: "Row",
     requirements: "Grow me some tomatoes",
     name: "Tomato",
     principalInvestigator: {
