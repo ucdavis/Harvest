@@ -75,12 +75,25 @@ namespace Harvest.Web.Services
                 ProjectName = project.Name,
                 ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                 ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
-                CropType = project.,
-                Crops = project.Crop
+                CropType = project.CropType,
+                Crops = project.Crop,
+                Requirements = project.Requirements,
                 ButtonUrl = $"{url}{project.Id}"
+            };
+
+            try
+            {
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
+
+                await _notificationService.SendNotification(fieldWorkers, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
-            
-            return false;
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
         }
     }
 }
