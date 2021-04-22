@@ -10,21 +10,26 @@ using Harvest.Email.Services;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
     [Authorize]
     public class HomeController : SuperController
     {
+        private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly IEmailBodyService _emailBodyService;
+        private readonly IEmailService _emailService;
 
-        public HomeController(IUserService userService, INotificationService notificationService, IEmailBodyService emailBodyService)
+        public HomeController(AppDbContext dbContext, IUserService userService, INotificationService notificationService, IEmailBodyService emailBodyService, IEmailService emailService)
         {
+            _dbContext = dbContext;
             _userService = userService;
             _notificationService = notificationService;
             _emailBodyService = emailBodyService;
+            _emailService = emailService;
         }
         public ActionResult Index()
         {
@@ -78,6 +83,17 @@ namespace Harvest.Web.Controllers
 
             await _notificationService.SendNotification(user.Email, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
+        }
+
+        [Authorize(Policy = AccessCodes.SystemAccess)]
+        public async Task<IActionResult> TestQuoteNotify()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 7);
+            if (await _emailService.ProfessorQuoteReady(project))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
         }
 
         public ActionResult Spa() {
