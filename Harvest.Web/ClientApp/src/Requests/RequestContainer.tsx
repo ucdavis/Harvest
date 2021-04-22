@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Card,
@@ -16,9 +16,34 @@ import DatePicker from "react-date-picker";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { Project } from "../types";
+import { useParams } from "react-router";
+
+interface RouteParams {
+  projectId?: string;
+}
 
 export const RequestContainer = () => {
+  const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({ id: 0 } as Project);
+
+  useEffect(() => {
+    // load original request if this is a change request
+    const cb = async () => {
+      const response = await fetch(`/Request/Get/${projectId}`);
+
+      if (response.ok) {
+        const proj: Project = await response.json();
+        setProject({
+          ...proj,
+          start: new Date(proj.start),
+          end: new Date(proj.end),
+          requirements: `Original: ${proj.requirements}`,
+        });
+      }
+    };
+
+    cb();
+  }, [projectId]);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -39,6 +64,11 @@ export const RequestContainer = () => {
       alert("Something went wrong, please try again");
     }
   };
+
+  if (projectId !== undefined && project.id === 0) {
+    // if we have a project id but it hasn't loaded yet, wait
+    return <div>Loading...</div>;
+  }
 
   return (
     <Card>
@@ -119,7 +149,7 @@ export const RequestContainer = () => {
           <Row>
             <Col>
               <Button color="primary" onClick={create}>
-                Create Field Request
+                {projectId ? "Create Change Request" : "Create Field Request"}
               </Button>
             </Col>
           </Row>
