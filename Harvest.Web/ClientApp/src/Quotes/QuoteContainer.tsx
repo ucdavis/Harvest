@@ -9,6 +9,7 @@ import {
   Rate,
 } from "../types";
 
+import { FieldContainer } from "../Fields/FieldContainer";
 import { ProjectDetail } from "./ProjectDetail";
 import { RequestHeader } from "../Requests/RequestHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
@@ -121,6 +122,16 @@ export const QuoteContainer = () => {
 
   if (!project) {
     return <div>Loading</div>;
+  }
+
+  // TODO: perhaps we might want to go back and modify the fields as well
+  if (quote.fields.length === 0) {
+    return (
+      <FieldContainer
+        fields={quote.fields}
+        updateFields={(fields) => setQuote({ ...quote, fields })}
+      ></FieldContainer>
+    );
   }
 
   return (
