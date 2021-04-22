@@ -3,15 +3,17 @@ using System;
 using Harvest.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 namespace Harvest.Core.Migrations.Sqlite
 {
     [DbContext(typeof(AppDbContextSqlite))]
-    partial class AppDbContextSqliteModelSnapshot : ModelSnapshot
+    [Migration("20210421225039_PropType")]
+    partial class PropType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,9 +276,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("INTEGER");
-
                     b.Property<Geometry>("Location")
                         .HasColumnType("GEOMETRY");
 
@@ -287,9 +286,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<string>("Name")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("OriginalProjectId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("PrincipalInvestigatorId")
                         .HasColumnType("INTEGER");
@@ -321,8 +317,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Name");
-
-                    b.HasIndex("OriginalProjectId");
 
                     b.HasIndex("PrincipalInvestigatorId");
 
@@ -685,10 +679,6 @@ namespace Harvest.Core.Migrations.Sqlite
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harvest.Core.Domain.Project", "OriginalProject")
-                        .WithMany()
-                        .HasForeignKey("OriginalProjectId");
-
                     b.HasOne("Harvest.Core.Domain.User", "PrincipalInvestigator")
                         .WithMany("PrincipalInvestigatorProjects")
                         .HasForeignKey("PrincipalInvestigatorId")
@@ -702,8 +692,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("AcreageRate");
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("OriginalProject");
 
                     b.Navigation("PrincipalInvestigator");
 
