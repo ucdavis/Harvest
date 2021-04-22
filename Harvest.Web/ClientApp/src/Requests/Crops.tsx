@@ -7,14 +7,16 @@ interface Props {
   setCrops: (crops: string) => void;
 }
 
+const splitCrops = (crop: string) => crop.split(",");
+
 export const Crops = (props: Props) => {
-  const [crops, setCrops] = useState<string[]>([]);
+  const [crops, setCrops] = useState<string[]>(splitCrops(props.crops));
 
   useEffect(() => {
     if (!props.crops) {
       setCrops([]);
     } else {
-      setCrops(props.crops.split(","));
+      setCrops(splitCrops(props.crops));
     }
   }, [props.crops]);
 

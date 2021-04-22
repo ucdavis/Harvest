@@ -13,7 +13,7 @@ function App() {
     <>
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
-      <Route path="/request/create" component={RequestContainer} />
+      <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
       <Route

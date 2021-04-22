@@ -29,7 +29,7 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Get(int id)
         {
-            return Ok();
+            return Ok(await _dbContext.Projects.SingleOrDefaultAsync(x => x.Id == id));
         }
 
         // create a new request via react
