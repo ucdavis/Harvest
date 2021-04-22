@@ -141,6 +141,7 @@ namespace Harvest.Web
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailBodyService, EmailBodyService>();
+            services.AddScoped<IEmailService, EmailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

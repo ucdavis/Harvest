@@ -14,6 +14,7 @@ namespace Harvest.Core.Services
     public interface INotificationService
     {
         Task SendSampleNotificationMessage(string email, string body);
+        Task SendNotification(string email, string body, string textVersion, string subject = "Harvest Notification");
     }
 
     public class NotificationService : INotificationService
@@ -40,6 +41,26 @@ namespace Harvest.Core.Services
 
                 // body is our fallback text and we'll add an HTML view as an alternate.
                 message.Body = "Sample Email Text";
+
+                var htmlView = AlternateView.CreateAlternateViewFromString(body, new ContentType(MediaTypeNames.Text.Html));
+                message.AlternateViews.Add(htmlView);
+
+                await _client.SendMailAsync(message);
+            }
+        }
+
+        public async Task SendNotification(string email, string body, string textVersion, string subject = "Harvest Notification")
+        {
+            if (_emailSettings.DisableSend.Equals("Yes", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+            using (var message = new MailMessage { From = new MailAddress("harvest@notify.ucdavis.edu", "Harvest Notification"), Subject = subject })
+            {
+                message.To.Add(new MailAddress(email, email));
+
+                // body is our fallback text and we'll add an HTML view as an alternate.
+                message.Body = textVersion;
 
                 var htmlView = AlternateView.CreateAlternateViewFromString(body, new ContentType(MediaTypeNames.Text.Html));
                 message.AlternateViews.Add(htmlView);
