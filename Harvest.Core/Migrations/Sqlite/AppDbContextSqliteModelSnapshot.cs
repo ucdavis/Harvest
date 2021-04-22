@@ -144,6 +144,36 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Expenses");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Field", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Crop")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Polygon>("Location")
+                        .HasColumnType("POLYGON");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Crop");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Fields");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.Property<int>("Id")
@@ -276,13 +306,6 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
-
-                    b.Property<Geometry>("Location")
-                        .HasColumnType("GEOMETRY");
-
-                    b.Property<string>("LocationCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
@@ -631,6 +654,17 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Rate");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Field", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany("Fields")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
@@ -798,6 +832,8 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
                     b.Navigation("Accounts");
+
+                    b.Navigation("Fields");
 
                     b.Navigation("Quotes");
                 });
