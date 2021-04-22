@@ -42,7 +42,7 @@ namespace Harvest.Core.Services
             }
 
             var now = DateTime.UtcNow;
-            if (project.Start.AddDays(30) > now) //Start doing invoices 30 days after the project starts
+            if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
             {
                 //Project hasn't started yet. (Is Start UTC? if not, it should be)
                 return false;
