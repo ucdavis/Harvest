@@ -63,6 +63,7 @@ namespace Harvest.Web.Controllers
             //    Name = user.Name
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
+            //await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
             var model = new ProfessorQuoteModel()
             {
                 ProfName = user.Name,
@@ -73,9 +74,9 @@ namespace Harvest.Web.Controllers
                 //ButtonUrl = "???"
             };
 
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-            await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
+            await _notificationService.SendNotification(user.Email, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
 
