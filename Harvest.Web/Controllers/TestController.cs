@@ -41,18 +41,12 @@ namespace Harvest.Web.Controllers
             //    Name = "REPLACE1"
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
-            var model = new ProfessorQuoteModel()
-            {
-                ProfName = "@Model.ProfName",
-                ProjectName = "@Model.ProjectName",
-                ProjectStart = "@Model.ProjectStart",
-                ProjectEnd = "@Model.ProjectEnd",
-                QuoteAmount = "@Model.QuoteAmount",
-                ButtonUrl = "@Model.ButtonUrl"
-            };
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification_mjml.cshtml", model);
+            var model = new NewFieldRequestModel();
+            model.InitForMjml();
 
-            return Content(xxx);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
+
+            return Content(results);
         }
 
         [Authorize(Policy = AccessCodes.SystemAccess)]
@@ -77,15 +71,24 @@ namespace Harvest.Web.Controllers
 
             var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-            await _notificationService.SendNotification(user.Email, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+            await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
 
-        [Authorize(Policy = AccessCodes.SystemAccess)]
         public async Task<IActionResult> TestQuoteNotify()
         {
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 7);
             if (await _emailService.ProfessorQuoteReady(project))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
+
+        public async Task<IActionResult> TestNewFieldNotify()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 11);
+            if (await _emailService.NewFieldRequest(project))
             {
                 return Content("Done.");
             }

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
 using Harvest.Email.Services;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace Harvest.Web.Services
@@ -14,15 +16,18 @@ namespace Harvest.Web.Services
     public interface IEmailService
     {
         Task<bool> ProfessorQuoteReady(Project project);
+        Task<bool> NewFieldRequest(Project project);
     }
 
     public class EmailService : IEmailService
     {
+        private readonly AppDbContext _dbContext;
         private readonly IEmailBodyService _emailBodyService;
         private readonly INotificationService _notificationService;
 
-        public EmailService(IEmailBodyService emailBodyService, INotificationService notificationService)
+        public EmailService(AppDbContext dbContext, IEmailBodyService emailBodyService, INotificationService notificationService)
         {
+            _dbContext = dbContext;
             _emailBodyService = emailBodyService;
             _notificationService = notificationService;
         }
@@ -47,7 +52,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(project.PrincipalInvestigator.Email, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(new string[] {project.PrincipalInvestigator.Email}, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -57,6 +62,38 @@ namespace Harvest.Web.Services
 
             return true;
 
+        }
+
+        public async Task<bool> NewFieldRequest(Project project)
+        {
+            var fieldWorkers = await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
+            var url = "https://harvest.caes.ucdavis.edu//quote/create/";
+
+            var model = new NewFieldRequestModel()
+            {
+                PI = project.PrincipalInvestigator.NameAndEmail,
+                ProjectName = project.Name,
+                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                CropType = project.CropType,
+                Crops = project.Crop,
+                Requirements = project.Requirements,
+                ButtonUrl = $"{url}{project.Id}"
+            };
+
+            try
+            {
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
+
+                await _notificationService.SendNotification(fieldWorkers, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
         }
     }
 }

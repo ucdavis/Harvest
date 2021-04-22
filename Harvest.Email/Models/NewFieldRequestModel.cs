@@ -3,31 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Harvest.Email.Models
 {
-    public class ProfessorQuoteModel
+    public class NewFieldRequestModel
     {
-        /// <summary>
-        /// Link to quote
-        /// </summary>
-        public string ButtonUrl { get; set; }
-        public string ProfName { get; set; }
+        public string PI { get; set; }
         public string ProjectName { get; set; }
-        public string ProjectStart { get; set; }
         public string ProjectEnd { get; set; }
-        public string QuoteAmount { get; set; }
+        public string ProjectStart { get; set; }
+        public string CropType { get; set; }
+        public string Crops { get; set; }
+        public string Requirements { get; set; }
+        public string ButtonUrl { get; set; }
 
         /// <summary>
         /// Sets model values when running TestController.TestBody
         /// </summary>
         public void InitForMjml()
         {
-            ProfName     = "@Model.ProfName";
+            PI           = "@Model.PI";
             ProjectName  = "@Model.ProjectName";
             ProjectStart = "@Model.ProjectStart";
             ProjectEnd   = "@Model.ProjectEnd";
-            QuoteAmount  = "@Model.QuoteAmount";
+            CropType     = "@Model.CropType";
+            Crops        = "@Model.Crops";
+            Requirements = "@Model.Requirements";
             ButtonUrl    = "@Model.ButtonUrl";
         }
     }
