@@ -1,0 +1,30 @@
+﻿@using Harvest.Email.Views.Shared
+@model Harvest.Email.Models.NewFieldRequestModel
+
+@{
+    ViewData["EmailTitle"] = "Testing";
+    Layout = "_EmailLayout_mjml";
+}
+
+
+<mj-section>
+    <mj-column>
+        <mj-text align="center">
+            <h1>New Field Request</h1>
+
+            <p><strong>PI: </strong>@Model.PI</p>
+            <p><strong>Request: </strong>@Model.ProjectName</p>
+            <p><strong>Project Start: </strong>@Model.ProjectStart</p>
+            <p><strong>Project End: </strong>@Model.ProjectEnd</p>
+            <p><strong>Crop Type: </strong>@Model.CropType</p>
+            <p><strong>Crops: </strong>@Model.Crops</p>
+            <h3>Requirements</h3>
+            <p>@Model.Requirements</p>
+        </mj-text>
+
+    </mj-column>
+</mj-section>
+
+
+
+@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to go to the Quote", @Model.ButtonUrl))

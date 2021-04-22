@@ -41,16 +41,18 @@ namespace Harvest.Web.Controllers
             //    Name = "REPLACE1"
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
-            var model = new ProfessorQuoteModel()
+            var model = new NewFieldRequestModel()
             {
-                ProfName = "@Model.ProfName",
-                ProjectName = "@Model.ProjectName",
+                PI           = "@Model.PI",
+                ProjectName  = "@Model.ProjectName",
                 ProjectStart = "@Model.ProjectStart",
-                ProjectEnd = "@Model.ProjectEnd",
-                QuoteAmount = "@Model.QuoteAmount",
-                ButtonUrl = "@Model.ButtonUrl"
+                ProjectEnd   = "@Model.ProjectEnd",
+                CropType     = "@Model.CropType",
+                Crops        = "@Model.Crops",
+                Requirements = "@Model.Requirements",
+                ButtonUrl    = "@Model.ButtonUrl"
             };
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification_mjml.cshtml", model);
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
 
             return Content(xxx);
         }
