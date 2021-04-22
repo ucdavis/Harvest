@@ -18,9 +18,11 @@ namespace Harvest.Core.Domain
         
         public DateTime End { get; set; }
         
-        // TODO: make this biggere in case we have a bunch of crops
-        [StringLength(50)]
+        [StringLength(512)]
         public string Crop { get; set; }
+
+        [StringLength(50)]
+        public string CropType { get; set; }
         
         [MaxLength]
         public string Requirements { get; set; }
@@ -114,7 +116,6 @@ namespace Harvest.Core.Domain
                 .WithMany(p => p.Quotes)
                 .HasForeignKey(q => q.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
         public class Statuses
         {
@@ -130,6 +131,18 @@ namespace Harvest.Core.Domain
                 Active,
                 Completed,
             }.ToList();
+        }
+
+        public class CropTypes
+        {
+            public const string Row = "Row";
+            public const string Tree = "Tree";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Row,
+                Tree
+            };
         }
     }
 }

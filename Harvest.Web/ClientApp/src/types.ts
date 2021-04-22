@@ -1,8 +1,11 @@
+export type CropType = "Row" | "Tree"
+
 export interface Project {
   id: number;
   start: Date;
   end: Date;
   crop: string;
+  cropType: CropType;
   requirements: string;
   name: string;
   principalInvestigator: User;

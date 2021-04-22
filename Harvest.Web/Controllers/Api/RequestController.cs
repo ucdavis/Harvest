@@ -90,6 +90,7 @@ namespace Harvest.Web.Controllers
             var newProject = new Project
             {
                 Crop = project.Crop,
+                CropType = project.CropType,
                 Start = project.Start,
                 End = project.End,
                 CreatedOn = DateTime.UtcNow,

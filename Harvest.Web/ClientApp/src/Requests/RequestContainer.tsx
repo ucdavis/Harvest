@@ -15,7 +15,7 @@ import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
-import { Project } from "../types";
+import { Project, CropType } from "../types";
 
 export const RequestContainer = () => {
   const [project, setProject] = useState<Project>({ id: 0 } as Project);
@@ -38,6 +38,10 @@ export const RequestContainer = () => {
     } else {
       alert("Something went wrong, please try again");
     }
+  };
+
+  const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProject({ ...project, cropType: e.target.value as CropType });
   };
 
   return (
@@ -88,6 +92,10 @@ export const RequestContainer = () => {
               id="customRadio1"
               name="customRadio"
               className="custom-control-input"
+              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+              value="Row"
+              checked={project.cropType === undefined || project.cropType === "Row"}
+              onChange={handleCropTypeChange}
             />
             <label className="custom-control-label">Row Crops</label>
           </div>
@@ -97,6 +105,10 @@ export const RequestContainer = () => {
               id="customRadio2"
               name="customRadio"
               className="custom-control-input"
+              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+              value="Tree"
+              checked={project.cropType === "Tree"}
+              onChange={handleCropTypeChange}
             />
             <label className="custom-control-label">Tree Crops</label>
           </div>

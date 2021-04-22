@@ -268,6 +268,10 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Crop")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("CropType")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
