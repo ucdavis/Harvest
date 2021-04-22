@@ -44,9 +44,9 @@ namespace Harvest.Web.Controllers
             var model = new NewFieldRequestModel();
             model.InitForMjml();
 
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
 
-            return Content(xxx);
+            return Content(results);
         }
 
         [Authorize(Policy = AccessCodes.SystemAccess)]
