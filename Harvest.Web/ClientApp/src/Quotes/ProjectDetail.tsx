@@ -12,7 +12,9 @@ import {
   Label,
   Row,
 } from "reactstrap";
+
 import { formatCurrency } from "../Util/NumberFormatting";
+import { Location } from "../Fields/Location";
 
 interface Props {
   rates: Rate[];
@@ -167,7 +169,7 @@ export const ProjectDetail = (props: Props) => {
       {/* Right Details */}
       <Col md="6">
         <Label for="projectLocation">Project Location</Label>
-        <Input type="text" id="projectLocation" />
+        <Location fields={props.quote.fields}></Location>
         <br />
         <div id="map" />
       </Col>

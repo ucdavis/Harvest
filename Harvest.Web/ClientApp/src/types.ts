@@ -94,7 +94,7 @@ export interface Field {
   name: string;
   crop: string;
   details: string;
-  geometry: any; // TODO: geojson type probably, TBD
+  geometry: GeoJSON.FeatureCollection;
 }
 
 export interface Quote {
