@@ -126,7 +126,7 @@ namespace Harvest.Core.Domain
         public class Statuses
         {
             public const string Requested = "Requested";
-            public const string PendingAccountApproval = "Pending Account Approval";
+            public const string PendingAccountApproval = "PendingAccountApproval";
             public const string Active = "Active";
             public const string ChangeRequested = "ChangeRequested";
             public const string Completed = "Completed";
@@ -136,6 +136,7 @@ namespace Harvest.Core.Domain
                 Requested,
                 PendingAccountApproval,
                 Active,
+                ChangeRequested,
                 Completed,
             }.ToList();
         }
