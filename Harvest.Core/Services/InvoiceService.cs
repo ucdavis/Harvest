@@ -42,12 +42,13 @@ namespace Harvest.Core.Services
             }
 
             var now = DateTime.UtcNow;
-            if (project.Start > now)
+            if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
             {
                 //Project hasn't started yet. (Is Start UTC? if not, it should be)
                 return false;
             }
 
+            //TODO: Review this later
             if (project.End < now)
             {
                 //Ok, so the project has ended, we should probably create the last invoice, and close it out. Setting the project to completed.
