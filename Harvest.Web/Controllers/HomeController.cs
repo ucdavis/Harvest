@@ -1,6 +1,8 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
@@ -56,11 +58,22 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestEmail()
         {
             var user = await _userService.GetCurrentUser();
-            var model = new TestEmailModel()
+            //var model = new TestEmailModel()
+            //{
+            //    Name = user.Name
+            //};
+            //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
+            var model = new ProfessorQuoteModel()
             {
-                Name = user.Name
+                ProfName = user.Name,
+                ProjectName = "Your Awesome Project",
+                ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
+                ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
+                QuoteAmount = "$20,000.00",
+                //ButtonUrl = "???"
             };
-            var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
+
+            var xxx = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
             await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
