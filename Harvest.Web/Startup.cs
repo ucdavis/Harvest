@@ -52,7 +52,7 @@ namespace Harvest.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
-            });
+            }).AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

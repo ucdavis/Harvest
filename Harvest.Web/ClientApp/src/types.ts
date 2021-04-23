@@ -67,6 +67,7 @@ export class QuoteContentImpl implements QuoteContent {
   equipmentTotal = 0;
   otherTotal = 0;
   grandTotal = 0;
+  fields = [];
 
   activities = [] as Activity[];
 }
@@ -85,6 +86,15 @@ export interface QuoteContent {
   equipmentTotal: number;
   otherTotal: number;
   grandTotal: number;
+  fields: Field[];
+}
+
+export interface Field {
+  id: number;
+  name: string;
+  crop: string;
+  details: string;
+  geometry: GeoJSON.FeatureCollection;
 }
 
 export interface Quote {
