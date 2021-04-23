@@ -29,7 +29,7 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Get(int id)
         {
-            return Ok();
+            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).AsNoTracking().SingleOrDefaultAsync(x => x.Id == id));
         }
 
         // create a new request via react
@@ -41,13 +41,18 @@ namespace Harvest.Web.Controllers
 
         // Approve a quote for the project
         [HttpGet]
-        public ActionResult Approve(int id) {
+        public ActionResult Approve(int id)
+        {
             return View("React");
         }
 
         [HttpPost]
-        public async Task<ActionResult> ApproveAsync(int id, [FromBody]RequestApprovalModel model) {
+        public async Task<ActionResult> ApproveAsync(int id, [FromBody] RequestApprovalModel model)
+        {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
+
+            // get the currently unapproved quote for this project
+            var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == id && q.ApprovedOn == null);
 
             // TODO: double check the percentages add up to 100%
             // TODO: add in fiscal officer info??
@@ -58,12 +63,19 @@ namespace Harvest.Web.Controllers
                 account.ApprovedOn = null;
             }
 
+            var quoteDetail = QuoteDetail.Deserialize(quote.Text);
+
+            project.Acres = quoteDetail.Acres;
+            project.AcreageRateId = quoteDetail.AcreageRateId;
+
             project.Accounts = new List<Account>(model.Accounts);
-            project.Status = "PendingAccountApproval"; // TODO: update with enumerated values
+            project.Status = Project.Statuses.PendingAccountApproval;
+            project.QuoteId = quote.Id;
+            project.QuoteTotal = quote.Total;
 
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need
-            _dbContext.RemoveRange(_dbContext.Accounts.Where(x=>x.ProjectId == id));
+            _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == id));
 
             await _dbContext.SaveChangesAsync();
 
@@ -78,14 +90,22 @@ namespace Harvest.Web.Controllers
             var newProject = new Project
             {
                 Crop = project.Crop,
+                CropType = project.CropType,
                 Start = project.Start,
                 End = project.End,
                 CreatedOn = DateTime.UtcNow,
                 CreatedById = currentUser.Id,
                 IsActive = true,
                 Requirements = project.Requirements,
-                Status = "Requested" // TODO: remove once PR with defined steps is merged
+                Status = Project.Statuses.Requested
             };
+
+            if (project.Id > 0)
+            {
+                // this project already exists, so we are requesting a change
+                newProject.Status = Project.Statuses.ChangeRequested;
+                newProject.OriginalProjectId = project.Id;
+            }
 
             // create PI if needed and assign to project
             var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == project.PrincipalInvestigator.Iam);
@@ -112,7 +132,8 @@ namespace Harvest.Web.Controllers
         }
     }
 
-    public class RequestApprovalModel {
+    public class RequestApprovalModel
+    {
         public Account[] Accounts { get; set; }
     }
 }

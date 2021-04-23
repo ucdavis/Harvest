@@ -144,6 +144,36 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Expenses");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Field", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Crop")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Polygon>("Location")
+                        .HasColumnType("POLYGON");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Crop");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Fields");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.Property<int>("Id")
@@ -153,11 +183,19 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("KfsTrackingNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("SlothTransactionId")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
                         .HasColumnType("TEXT");
@@ -233,6 +271,12 @@ namespace Harvest.Core.Migrations.Sqlite
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AcreageRateId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Acres")
+                        .HasColumnType("REAL");
+
                     b.Property<decimal>("ChargedTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
@@ -244,6 +288,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Crop")
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CropType")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
@@ -256,16 +304,15 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER");
 
-                    b.Property<Geometry>("Location")
-                        .HasColumnType("GEOMETRY");
-
-                    b.Property<string>("LocationCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("OriginalProjectId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("PrincipalInvestigatorId")
                         .HasColumnType("INTEGER");
@@ -292,9 +339,13 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AcreageRateId");
+
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("OriginalProjectId");
 
                     b.HasIndex("PrincipalInvestigatorId");
 
@@ -481,107 +532,28 @@ namespace Harvest.Core.Migrations.Sqlite
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Amount")
+                    b.Property<string>("Account")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(40)
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(10)
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("FromAccountId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ToAccountId")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FromAccountId");
-
-                    b.HasIndex("ToAccountId");
+                    b.HasIndex("InvoiceId");
 
                     b.ToTable("Transfers");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Action")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ActionDateTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ActorId")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ActorName")
-                        .HasMaxLength(250)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("TransferId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TransferId");
-
-                    b.ToTable("TransferHistory");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(40)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("KfsTrackingNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RequestedById")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("RequestedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("SlothTransactionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("RequestedById");
-
-                    b.ToTable("TransferRequests");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>
@@ -682,6 +654,17 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Rate");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Field", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany("Fields")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
@@ -725,11 +708,20 @@ namespace Harvest.Core.Migrations.Sqlite
 
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.Rate", "AcreageRate")
+                        .WithMany("Projects")
+                        .HasForeignKey("AcreageRateId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany("CreatedProjects")
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Project", "OriginalProject")
+                        .WithMany()
+                        .HasForeignKey("OriginalProjectId");
 
                     b.HasOne("Harvest.Core.Domain.User", "PrincipalInvestigator")
                         .WithMany("PrincipalInvestigatorProjects")
@@ -741,7 +733,11 @@ namespace Harvest.Core.Migrations.Sqlite
                         .WithMany()
                         .HasForeignKey("QuoteId1");
 
+                    b.Navigation("AcreageRate");
+
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("OriginalProject");
 
                     b.Navigation("PrincipalInvestigator");
 
@@ -812,49 +808,13 @@ namespace Harvest.Core.Migrations.Sqlite
 
             modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
                 {
-                    b.HasOne("Harvest.Core.Domain.Account", "FromAccount")
-                        .WithMany()
-                        .HasForeignKey("FromAccountId")
+                    b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
+                        .WithMany("Transfers")
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harvest.Core.Domain.Account", "ToAccount")
-                        .WithMany()
-                        .HasForeignKey("ToAccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("FromAccount");
-
-                    b.Navigation("ToAccount");
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferHistory", b =>
-                {
-                    b.HasOne("Harvest.Core.Domain.TransferRequest", null)
-                        .WithMany("History")
-                        .HasForeignKey("TransferId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
-                {
-                    b.HasOne("Harvest.Core.Domain.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Harvest.Core.Domain.User", "RequestedBy")
-                        .WithMany()
-                        .HasForeignKey("RequestedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
-
-                    b.Navigation("RequestedBy");
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
@@ -865,11 +825,15 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.Navigation("Expenses");
+
+                    b.Navigation("Transfers");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
                     b.Navigation("Accounts");
+
+                    b.Navigation("Fields");
 
                     b.Navigation("Quotes");
                 });
@@ -879,9 +843,9 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Documents");
                 });
 
-            modelBuilder.Entity("Harvest.Core.Domain.TransferRequest", b =>
+            modelBuilder.Entity("Harvest.Core.Domain.Rate", b =>
                 {
-                    b.Navigation("History");
+                    b.Navigation("Projects");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.User", b =>

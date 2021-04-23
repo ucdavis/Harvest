@@ -1,0 +1,30 @@
+﻿@using Harvest.Email.Views.Shared
+@model Harvest.Email.Models.QuoteDecisionModel
+
+@{
+    ViewData["EmailTitle"] = "Testing";
+    Layout = "_EmailLayout_mjml";
+}
+
+
+<mj-section >
+    <mj-column background-color="@Model.DecisionColor">
+        <mj-text align="center">
+            <p>Quote has been</p>
+            <h1>@Model.Decision</h1>
+        </mj-text>
+    </mj-column>
+</mj-section>
+<mj-section >
+    <mj-column>
+        <mj-text align="center">
+            <p><strong>PI: </strong>@Model.PI</p>
+            <p><strong>Request: </strong>@Model.ProjectName</p>
+            <p><strong>Project Start: </strong>@Model.ProjectStart</p>
+            <p><strong>Project End: </strong>@Model.ProjectEnd</p>
+        </mj-text>
+
+    </mj-column>
+</mj-section>
+
+@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to open Project", @Model.ButtonUrl))

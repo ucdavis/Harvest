@@ -150,29 +150,8 @@ namespace Harvest.Web.Controllers
             var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id);
 
             var user = await _userService.GetCurrentUser();
-            //TODO: When the rate is actually used, check to see if this was used for any expenses (and maybe quotes)
-            var archive = rateToEdit.Price != model.Rate.Price || rateToEdit.Account != accountValidation.KfsAccount.ToString();
 
-            if (archive)
-            {
-                //Create new rate
-                var rateToCreate = new Rate();
-                UpdateCommonValues(model, rateToCreate, accountValidation, user);
-                rateToCreate.IsActive  = true;
-                rateToCreate.CreatedBy = rateToEdit.CreatedBy;
-                rateToCreate.CreatedOn = rateToEdit.CreatedOn;
-
-                //Archive original rate
-                rateToEdit.IsActive  = false;
-                rateToEdit.UpdatedBy = user;
-                rateToEdit.UpdatedOn = rateToCreate.UpdatedOn;
-
-                await _dbContext.AddAsync(rateToCreate);
-            }
-            else
-            {
-                UpdateCommonValues(model, rateToEdit, accountValidation, user);
-            }
+            UpdateCommonValues(model, rateToEdit, accountValidation, user);
 
             try
             {
@@ -189,11 +168,11 @@ namespace Harvest.Web.Controllers
 
         private static void UpdateCommonValues(RateEditModel model, Rate destinationRate, AccountValidationModel accountValidation, User user)
         {
-            destinationRate.Account     = accountValidation.KfsAccount.ToString(); //When we check if the rate has been used or not, this may get changed
+            destinationRate.Account     = accountValidation.KfsAccount.ToString(); 
             destinationRate.BillingUnit = model.Rate.BillingUnit;
             destinationRate.Description = model.Rate.Description;
             destinationRate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
-            destinationRate.Price       = model.Rate.Price; //When we check if the rate has been used or not, this may get changed
+            destinationRate.Price       = model.Rate.Price; 
             destinationRate.Type        = model.Rate.Type;
             destinationRate.Unit        = model.Rate.Unit;
             destinationRate.UpdatedOn   = DateTime.UtcNow;

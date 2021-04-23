@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Harvest.Core.Services
 {
@@ -13,6 +14,7 @@ namespace Harvest.Core.Services
     {
         Task<bool> CreateInvoice(int id);
         Task<int> CreateInvoices();
+        Task<List<int>> GetCreatedInvoiceIds();
     }
 
     public class InvoiceService : IInvoiceService
@@ -26,7 +28,7 @@ namespace Harvest.Core.Services
         public async Task<bool> CreateInvoice(int id)
         {
             //Look for an active project
-            var project = await _dbContext.Projects
+            var project = await _dbContext.Projects.Include(a => a.AcreageRate)
                 .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == id).SingleOrDefaultAsync();
             if (project == null)
             {
@@ -40,12 +42,13 @@ namespace Harvest.Core.Services
             }
 
             var now = DateTime.UtcNow;
-            if (project.Start > now)
+            if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
             {
                 //Project hasn't started yet. (Is Start UTC? if not, it should be)
                 return false;
             }
 
+            //TODO: Review this later
             if (project.End < now)
             {
                 //Ok, so the project has ended, we should probably create the last invoice, and close it out. Setting the project to completed.
@@ -53,6 +56,8 @@ namespace Harvest.Core.Services
             }
 
             //TODO: Create the acreage expense with correct amount 
+
+            await CreateMonthlyAcreageExpense(project);
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.ProjectId == id).ToArrayAsync();
 
@@ -73,6 +78,38 @@ namespace Harvest.Core.Services
 
         }
 
+        private async Task CreateMonthlyAcreageExpense(Project project)
+        {
+            var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2);
+
+            //Check for an unbilled acreage expense
+            if (await _dbContext.Expenses.AnyAsync(a =>
+                a.ProjectId == project.Id && a.InvoiceId == null && a.Rate.Type == Rate.Types.Acreage))
+            {
+                Log.Information("Project {project.Id} Unbilled acreage expense already found. Skipping.", project.Id);
+                return;
+            }
+
+            var expense = new Expense
+            {
+                Type        = project.AcreageRate.Type,
+                Description = project.AcreageRate.Description,
+                Price       = project.AcreageRate.Price / 12, //This can be more than 2 decimals
+                Quantity    = (decimal)project.Acres,
+                Total       = amountToCharge,
+                ProjectId   = project.Id,
+                RateId      = project.AcreageRate.Id,
+                InvoiceId   = null,
+                CreatedOn   = DateTime.UtcNow,
+                CreatedById = null,
+                Account     = project.AcreageRate.Account,
+            };
+
+            await _dbContext.Expenses.AddAsync(expense);
+            await _dbContext.SaveChangesAsync();
+
+        }
+
         public async Task<int> CreateInvoices()
         {
             var activeProjects = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active)
@@ -88,6 +125,13 @@ namespace Harvest.Core.Services
             }
 
             return counter;
+        }
+
+        public async Task<List<int>> GetCreatedInvoiceIds()
+        {
+            //TODO: Check project status?
+            return await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Created).Select(a => a.Id)
+                .ToListAsync();
         }
     }
 }

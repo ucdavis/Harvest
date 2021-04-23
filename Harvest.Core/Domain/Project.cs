@@ -2,66 +2,73 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
-
 namespace Harvest.Core.Domain
 {
     public class Project
     {
         [Key]
         public int Id { get; set; }
-        
+
         public DateTime Start { get; set; }
-        
+
         public DateTime End { get; set; }
-        
-        // TODO: make this biggere in case we have a bunch of crops
-        [StringLength(50)]
+
+        [StringLength(512)]
         public string Crop { get; set; }
-        
+
+        [StringLength(50)]
+        public string CropType { get; set; }
+
         [MaxLength]
         public string Requirements { get; set; }
-        
+
+        public double Acres { get; set; }
+
+        public int? AcreageRateId { get; set; }
+        public Rate AcreageRate { get; set; }
+
         [StringLength(200)]
         public string Name { get; set; }
-        
+
         public int PrincipalInvestigatorId { get; set; }
-        
+
         public User PrincipalInvestigator { get; set; }
 
-        public Geometry Location { get; set; }
-        
-        [StringLength(50)]
-        public string LocationCode { get; set; }
-        
         public int? QuoteId { get; set; }
-        
+
         public Quote Quote { get; set; }
-        // public decimal AcreagePerMonth  { get; set; }
-        
+
+        // Change request will refer back to original project
+        public int? OriginalProjectId { get; set; }
+
+        [JsonIgnore]
+        public Project OriginalProject { get; set; }
+
         [Required]
         [Display(Name = "Quote Total")]
         public decimal QuoteTotal { get; set; }
-        
+
         [Required]
         [Display(Name = "Charged Total")]
         public decimal ChargedTotal { get; set; }
-        
+
         [Required]
         public int CreatedById { get; set; }
 
         public DateTime CreatedOn { get; set; }
-        
+
         [StringLength(50)]
         public string Status { get; set; }
-        
+
         [Required]
         [Display(Name = "Current Account Version")]
         public int CurrentAccountVersion { get; set; }
-        
+
+        [Required]
+        public bool IsApproved { get; set; } = true;
+
         [Required]
         // need or can we filter?
         [Display(Name = "Is Active")]
@@ -75,6 +82,9 @@ namespace Harvest.Core.Domain
 
         [JsonIgnore]
         public List<Quote> Quotes { get; set; }
+
+        [JsonIgnore]
+        public List<Field> Fields { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -110,19 +120,40 @@ namespace Harvest.Core.Domain
                 .HasForeignKey(q => q.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Field>()
+                .HasOne(f => f.Project)
+                .WithMany(f => f.Fields)
+                .HasForeignKey(f => f.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
         public class Statuses
         {
             public const string Requested = "Requested";
-            public const string Active    = "Active";
+            public const string PendingAccountApproval = "PendingAccountApproval";
+            public const string Active = "Active";
+            public const string ChangeRequested = "ChangeRequested";
             public const string Completed = "Completed";
 
             public static List<string> TypeList = new List<string>
             {
                 Requested,
+                PendingAccountApproval,
                 Active,
+                ChangeRequested,
                 Completed,
             }.ToList();
+        }
+
+        public class CropTypes
+        {
+            public const string Row = "Row";
+            public const string Tree = "Tree";
+
+            public static List<string> TypeList = new List<string>
+            {
+                Row,
+                Tree
+            };
         }
     }
 }

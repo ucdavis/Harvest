@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Jobs.Core;
 using Microsoft.EntityFrameworkCore;
@@ -22,14 +24,15 @@ namespace Harvest.Jobs.Invoice
 
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
-
             // setup di
             var provider = ConfigureServices();
 
             var invoiceService = provider.GetService<IInvoiceService>();
-            var invoiceCount = invoiceService.CreateInvoices().GetAwaiter().GetResult();
-            _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
+            var slothService = provider.GetService<ISlothService>();
+
+            ProcessInvoices(invoiceService, slothService).GetAwaiter().GetResult();
         }
+
 
         private static ServiceProvider ConfigureServices()
         {
@@ -49,10 +52,47 @@ namespace Harvest.Jobs.Invoice
 #endif
             });
 
-            services.AddTransient<IInvoiceService, InvoiceService>();
+            services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
+            services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
+
+            services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<ISlothService, SlothService>();
+            services.AddScoped<IFinancialService, FinancialService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
 
             return services.BuildServiceProvider();
+        }
+
+        private static async Task ProcessInvoices(IInvoiceService invoiceService, ISlothService slothService)
+        {
+           var invoiceCount = await invoiceService.CreateInvoices();
+            _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
+
+            var slothMoneyMoveCount = 0;
+            var createdInvoices = await invoiceService.GetCreatedInvoiceIds();
+            if (createdInvoices != null && createdInvoices.Count > 0)
+            {
+                _log.Information("Processing {count} invoices", createdInvoices.Count);
+                foreach (var createdInvoice in createdInvoices)
+                {
+                    var response = await slothService.MoveMoney(createdInvoice);
+                    if (response == null)
+                    {
+                        _log.Information("Invoice not found. Id: {createdInvoice}", createdInvoice);
+                        continue;
+                    }
+
+                    if (!response.Success)
+                    {
+                        _log.Information("Invoice error. Id: {createdInvoice}, Error: {error}", createdInvoice, response.Message);
+                    }
+
+                    slothMoneyMoveCount++;
+                }
+                _log.Information("Money Moved Invoices: {slothMoneyMoveCount}", slothMoneyMoveCount);
+            }
+
+            await slothService.ProcessTransferUpdates();
         }
     }
 }

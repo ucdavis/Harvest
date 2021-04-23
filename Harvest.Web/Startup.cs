@@ -52,7 +52,7 @@ namespace Harvest.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
-            });
+            }).AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()));
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -141,6 +141,7 @@ namespace Harvest.Web
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailBodyService, EmailBodyService>();
+            services.AddScoped<IEmailService, EmailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

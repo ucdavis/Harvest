@@ -9,9 +9,11 @@ import {
   Rate,
 } from "../types";
 
+import { FieldContainer } from "../Fields/FieldContainer";
 import { ProjectDetail } from "./ProjectDetail";
 import { RequestHeader } from "../Requests/RequestHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
+import { QuoteTotals } from "./QuoteTotals";
 
 interface RouteParams {
   projectId?: string;
@@ -38,7 +40,11 @@ export const QuoteContainer = () => {
         setRates(rateJson);
 
         if (projectWithQuote.quote) {
-          setQuote(projectWithQuote.quote);
+          // TODO: remove once we standardize on new quote format
+          setQuote({
+            ...projectWithQuote.quote,
+            fields: projectWithQuote.quote.fields ?? [],
+          });
         } else {
           // TODO: how do we handle if different fields have different rates?
           const quoteToUse = new QuoteContentImpl();
@@ -122,6 +128,16 @@ export const QuoteContainer = () => {
     return <div>Loading</div>;
   }
 
+  // TODO: perhaps we might want to go back and modify the fields as well
+  if (quote.fields.length === 0) {
+    return (
+      <FieldContainer
+        fields={quote.fields}
+        updateFields={(fields) => setQuote({ ...quote, fields })}
+      ></FieldContainer>
+    );
+  }
+
   return (
     <div className="card-wrapper">
       <RequestHeader project={project}></RequestHeader>
@@ -130,13 +146,14 @@ export const QuoteContainer = () => {
           <div className="quote-details">
             <h2>Quote Details</h2>
             <hr />
-            <ProjectDetail quote={quote} updateQuote={setQuote} />
+            <ProjectDetail rates={rates} quote={quote} updateQuote={setQuote} />
             <ActivitiesContainer
               quote={quote}
               rates={rates}
               updateQuote={setQuote}
             />
           </div>
+          <QuoteTotals quote={quote}></QuoteTotals>
           <h2>Save</h2>
           <button onClick={save}>Save Quote</button>
         </div>

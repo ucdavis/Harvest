@@ -33,6 +33,7 @@ namespace Harvest.Core.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<Expense> Expenses { get; set; }
+        public DbSet<Field> Fields { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Permission> Permissions { get; set; }
@@ -42,8 +43,6 @@ namespace Harvest.Core.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
-        public DbSet<TransferRequest> TransferRequests { get; set; }
-        public DbSet<TransferHistory> TransferHistory { get; set; }
         public DbSet<Rate> Rates { get; set; }
 
 
@@ -52,6 +51,7 @@ namespace Harvest.Core.Data
             Account.OnModelCreating(modelBuilder);
             Document.OnModelCreating(modelBuilder);
             Expense.OnModelCreating(modelBuilder);
+            Field.OnModelCreating(modelBuilder);
             Invoice.OnModelCreating(modelBuilder);
             Notification.OnModelCreating(modelBuilder);
             Permission.OnModelCreating(modelBuilder);
@@ -61,7 +61,6 @@ namespace Harvest.Core.Data
             Role.OnModelCreating(modelBuilder);
             User.OnModelCreating(modelBuilder);
             Transfer.OnModelCreating(modelBuilder);
-            TransferRequest.OnModelCreating(modelBuilder);
             Rate.OnModelCreating(modelBuilder);
         }
     }

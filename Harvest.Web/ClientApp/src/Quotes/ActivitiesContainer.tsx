@@ -1,8 +1,6 @@
 import React from "react";
-import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 
 import { Activity, QuoteContent, Rate } from "../types";
-import { formatCurrency } from "../Util/NumberFormatting";
 
 import { ActivityForm } from "./ActivityForm";
 
@@ -37,55 +35,6 @@ export const ActivitiesContainer = (props: Props) => {
           rates={props.rates}
         />
       ))}
-      <Card className="card-project-totals">
-        <CardHeader>Project Totals</CardHeader>
-        <CardBody>
-          <div id="total">
-            <h6>Project Totals</h6>
-            <hr />
-            <Row>
-              <Col xs="10" sm="10">
-                <div>Acreage Fees</div>
-              </Col>
-              <Col xs="2" sm="2">
-                ${formatCurrency(props.quote.acreageTotal)}
-              </Col>
-            </Row>
-            <Row>
-              <Col xs="10" sm="10">
-                <div>Labor</div>
-              </Col>
-              <Col xs="2" sm="2">
-                ${formatCurrency(props.quote.laborTotal)}
-              </Col>
-            </Row>
-            <Row>
-              <Col xs="10" sm="10">
-                <div>Equipment</div>
-              </Col>
-              <Col xs="2" sm="2">
-                ${formatCurrency(props.quote.equipmentTotal)}
-              </Col>
-            </Row>
-            <Row>
-              <Col xs="10" sm="10">
-                <div>Materials / Other</div>
-              </Col>
-              <Col xs="2" sm="2">
-                ${formatCurrency(props.quote.otherTotal)}
-              </Col>
-            </Row>
-            <Row className="total-row">
-              <Col xs="10" sm="10">
-                <h6>Total Cost</h6>
-              </Col>
-              <Col xs="2" sm="2">
-                <span>${formatCurrency(props.quote.grandTotal)}</span>
-              </Col>
-            </Row>
-          </div>
-        </CardBody>
-      </Card>
     </div>
   );
 };

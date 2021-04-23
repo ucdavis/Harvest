@@ -1,6 +1,6 @@
 import React from "react";
 
-import { QuoteContent, WorkItemImpl } from "../types";
+import { QuoteContent, Rate, WorkItemImpl } from "../types";
 
 import {
   Button,
@@ -12,9 +12,12 @@ import {
   Label,
   Row,
 } from "reactstrap";
+
 import { formatCurrency } from "../Util/NumberFormatting";
+import { Location } from "../Fields/Location";
 
 interface Props {
+  rates: Rate[];
   quote: QuoteContent;
   updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
 }
@@ -41,6 +44,24 @@ export const ProjectDetail = (props: Props) => {
       ],
     });
   };
+
+  const setAcreageRate = (rate: Rate | undefined) => {
+    if (rate) {
+      props.updateQuote({
+        ...props.quote,
+        acreageRate: rate.price,
+        acreageRateId: rate.id,
+        acreageRateDescription: rate.description,
+      });
+    } else {
+      props.updateQuote({
+        ...props.quote,
+        acreageRate: 0,
+        acreageRateId: 0,
+        acreageRateDescription: "",
+      });
+    }
+  };
   return (
     <Row className="align-items-baseline">
       {/* Left Details */}
@@ -56,56 +77,84 @@ export const ProjectDetail = (props: Props) => {
         />
         <br />
         <Row className="align-items-baseline">
-          <Col md="4">
-            <Label for="acres">Number of Acres</Label>
+          <Col>
+            <Label>Acreage Rate</Label>
             <Input
-              type="number"
-              id="acres"
-              value={props.quote.acres}
+              type="select"
+              name="acreageRate"
+              value={props.quote.acreageRateId}
               onChange={(e) =>
-                props.updateQuote({
-                  ...props.quote,
-                  acres: parseInt(e.target.value ?? 0),
-                })
+                setAcreageRate(
+                  props.rates.find((r) => r.id === parseInt(e.target.value))
+                )
               }
-            />
+            >
+              <option value="0">-- Select Acreage Rate --</option>
+              {props.rates
+                .filter((r) => r.type === "Acreage")
+                .map((r) => (
+                  <option key={`rate-${r.type}-${r.id}`} value={r.id}>
+                    {r.description}
+                  </option>
+                ))}
+            </Input>
           </Col>
-          <Col md="4">
-            <Label for="rate">Rate</Label>
-            <InputGroup>
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>$</InputGroupText>
-              </InputGroupAddon>
+        </Row>
+        <br />
+        {props.quote.acreageRateId > 0 && (
+          <Row className="align-items-baseline">
+            <Col md="4">
+              <Label for="acres">Number of Acres</Label>
               <Input
                 type="number"
-                id="rate"
-                value={props.quote.acreageRate}
+                id="acres"
+                value={props.quote.acres}
                 onChange={(e) =>
                   props.updateQuote({
                     ...props.quote,
-                    acreageRate: parseInt(e.target.value ?? 0),
+                    acres: parseInt(e.target.value ?? 0),
                   })
                 }
               />
-            </InputGroup>
-          </Col>
-          <Col md="4">
-            <Label>Total Acreage Fee</Label>
-            <InputGroup>
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>$</InputGroupText>
-              </InputGroupAddon>
-              <Input
-                type="text"
-                id="rate"
-                readOnly
-                value={formatCurrency(
-                  props.quote.acres * props.quote.acreageRate
-                )}
-              />
-            </InputGroup>
-          </Col>
-        </Row>
+            </Col>
+            <Col md="4">
+              <Label for="rate">Rate</Label>
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">
+                  <InputGroupText>$</InputGroupText>
+                </InputGroupAddon>
+                <Input
+                  type="number"
+                  id="rate"
+                  value={props.quote.acreageRate}
+                  onChange={(e) =>
+                    props.updateQuote({
+                      ...props.quote,
+                      acreageRate: parseInt(e.target.value ?? 0),
+                    })
+                  }
+                />
+              </InputGroup>
+            </Col>
+            <Col md="4">
+              <Label>Total Acreage Fee</Label>
+              <InputGroup>
+                <InputGroupAddon addonType="prepend">
+                  <InputGroupText>$</InputGroupText>
+                </InputGroupAddon>
+                <Input
+                  type="text"
+                  id="rate"
+                  readOnly
+                  value={formatCurrency(
+                    props.quote.acres * props.quote.acreageRate
+                  )}
+                />
+              </InputGroup>
+            </Col>
+          </Row>
+        )}
+
         <br />
         <Button
           className="mb-4"
@@ -120,7 +169,7 @@ export const ProjectDetail = (props: Props) => {
       {/* Right Details */}
       <Col md="6">
         <Label for="projectLocation">Project Location</Label>
-        <Input type="text" id="projectLocation" />
+        <Location fields={props.quote.fields}></Location>
         <br />
         <div id="map" />
       </Col>

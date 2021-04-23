@@ -1,25 +1,20 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Container,
-  FormGroup,
-  Input,
-  Label,
-  Row,
-} from "reactstrap";
+import { useParams } from "react-router";
+import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import { Project } from "../types";
+import { Project, CropType } from "../types";
+
+interface RouteParams {
+  projectId?: string;
+}
 
 export const RequestContainer = () => {
+  const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({ id: 0 } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
@@ -45,32 +40,43 @@ export const RequestContainer = () => {
       }
     }
 
-    const response = await fetch(`/Request/Create`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(project),
-    });
+    // const response = await fetch(`/Request/Create`, {
+    //   method: "POST",
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(project),
+    // });
 
-    if (response.ok) {
-      const data = await response.json();
-      window.location.pathname = `/Project/Details/${data.id}`;
-    } else {
-      alert("Something went wrong, please try again");
-    }
+    // if (response.ok) {
+    //   const data = await response.json();
+    //   window.location.pathname = `/Project/Details/${data.id}`;
+    // } else {
+    //   alert("Something went wrong, please try again");
+    // }
   };
 
+  const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProject({ ...project, cropType: e.target.value as CropType });
+  };
+
+  if (projectId !== undefined && project.id === 0) {
+    // if we have a project id but it hasn't loaded yet, wait
+    return <div>Loading...</div>;
+  }
+
   return (
-    <Card>
-      <CardBody>
-        <CardHeader>Create Field Request</CardHeader>
-        <Container>
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label>When to Start?</Label>
+    <div className="card-wrapper card-medium">
+      <div className="card-content">
+        <div className="card-head">
+          <h2>Create Field Request</h2>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="form-group">
+              <Label>When to Start?</Label>
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
                   required={true}
@@ -80,11 +86,13 @@ export const RequestContainer = () => {
                     setProject({ ...project, start: date as Date })
                   }
                 />
-              </FormGroup>
-            </Col>
-            <Col>
-              <FormGroup>
-                <Label>When to Finish?</Label>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-6">
+            <FormGroup>
+              <Label>When to Finish?</Label>
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
                   required={true}
@@ -94,69 +102,87 @@ export const RequestContainer = () => {
                     setProject({ ...project, end: date as Date })
                   }
                 />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FormGroup tag="fieldset">
-                <Label>Which type of crop will we grow?</Label>
-                <Crops
-                  crops={project.crop}
-                  setCrops={(c) => setProject({ ...project, crop: c })}
-                ></Crops>
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label>Who will be the PI?</Label>
-                <SearchPerson
-                  user={project.principalInvestigator}
-                  setUser={(u) =>
-                    setProject({ ...project, principalInvestigator: u })
-                  }
-                ></SearchPerson>
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label>What are the requirements?</Label>
-                <Input
-                  type="textarea"
-                  name="text"
-                  id="requirements"
-                  value={project.requirements}
-                  onChange={(e) =>
-                    setProject({ ...project, requirements: e.target.value })
-                  }
-                  placeholder="Enter a full description of your requirements"
-                />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <ul>
-                {inputErrors.map((error, i) => {
-                  return (
-                    <li style={{ color: "red" }} key={`error-${i}`}>
-                      {error}
-                    </li>
-                  );
-                })}
-              </ul>
-              <Button color="primary" onClick={create}>
-                Create Field Request
-              </Button>
-            </Col>
-          </Row>
-        </Container>
+              </div>
+            </FormGroup>
+          </div>
+        </div>
+        <FormGroup>
+          <Label>Which type of crop will we grow?</Label>
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              id="customRadio1"
+              name="customRadio"
+              className="custom-control-input"
+              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+              value="Row"
+              checked={project.cropType === "Row"}
+              onChange={handleCropTypeChange}
+            />
+            <label className="custom-control-label">Row Crops</label>
+          </div>
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              id="customRadio2"
+              name="customRadio"
+              className="custom-control-input"
+              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+              value="Tree"
+              checked={project.cropType === "Tree"}
+              onChange={handleCropTypeChange}
+            />
+            <label className="custom-control-label">Tree Crops</label>
+          </div>
+        </FormGroup>
+
+        <FormGroup tag="fieldset">
+          <Label>What crop(s) will we grow?</Label>
+          <Crops
+            crops={project.crop}
+            setCrops={(c) => setProject({ ...project, crop: c })}
+          ></Crops>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>Who will be the PI?</Label>
+          <SearchPerson
+            user={project.principalInvestigator}
+            setUser={(u) =>
+              setProject({ ...project, principalInvestigator: u })
+            }
+          ></SearchPerson>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>What are the requirements?</Label>
+          <Input
+            type="textarea"
+            name="text"
+            id="requirements"
+            value={project.requirements}
+            onChange={(e) =>
+              setProject({ ...project, requirements: e.target.value })
+            }
+            placeholder="Enter a full description of your requirements"
+          />
+        </FormGroup>
+        <div className="row justify-content-center">
+          <ul>
+            {inputErrors.map((error, i) => {
+              return (
+                <li style={{ color: "red" }} key={`error-${i}`}>
+                  {error}
+                </li>
+              );
+            })}
+          </ul>
+          <Button className="btn-lg" color="primary" onClick={create}>
+            Create Field Request
+          </Button>
+        </div>
         <div>DEBUG: {JSON.stringify(project)}</div>
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };

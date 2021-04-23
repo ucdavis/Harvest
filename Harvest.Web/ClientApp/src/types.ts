@@ -1,8 +1,11 @@
+export type CropType = "Row" | "Tree"
+
 export interface Project {
   id: number;
   start: Date;
   end: Date;
   crop: string;
+  cropType: CropType;
   requirements: string;
   name: string;
   principalInvestigator: User;
@@ -55,6 +58,8 @@ export class QuoteContentImpl implements QuoteContent {
   projectName = ""; // TODO: might be worth removing when feasible
   acres = 0;
   acreageRate = 360;
+  acreageRateId = 0;
+  acreageRateDescription = "";
   total = 0;
   acreageTotal = 0;
   activitiesTotal = 0;
@@ -62,6 +67,7 @@ export class QuoteContentImpl implements QuoteContent {
   equipmentTotal = 0;
   otherTotal = 0;
   grandTotal = 0;
+  fields = [];
 
   activities = [] as Activity[];
 }
@@ -70,6 +76,8 @@ export interface QuoteContent {
   projectName: string; // TODO: might be worth removing when feasible
   acres: number;
   acreageRate: number;
+  acreageRateId: number;
+  acreageRateDescription: string;
   activities: Activity[];
   total: number;
   acreageTotal: number;
@@ -78,6 +86,15 @@ export interface QuoteContent {
   equipmentTotal: number;
   otherTotal: number;
   grandTotal: number;
+  fields: Field[];
+}
+
+export interface Field {
+  id: number;
+  name: string;
+  crop: string;
+  details: string;
+  geometry: GeoJSON.FeatureCollection;
 }
 
 export interface Quote {

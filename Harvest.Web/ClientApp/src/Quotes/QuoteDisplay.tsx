@@ -1,6 +1,7 @@
 import React from "react";
 
 import { QuoteContent } from "../types";
+import { QuoteTotals } from "./QuoteTotals";
 import { WorkItemDisplay } from "./WorkItemDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
 
@@ -13,20 +14,19 @@ export const QuoteDisplay = (props: Props) => {
   return (
     <div>
       <h2>Quote</h2>
+      {quote.acreageRateDescription}: {quote.acres} @{" "}
+      {formatCurrency(quote.acreageRate)} = $
+      {formatCurrency(quote.acreageTotal)}
+      <hr />
       {quote.activities.map((activity) => (
         <div key={`${activity.name}-${activity.id}`}>
           <h2>
-            {activity.name} -- Activity Total: $
-            {formatCurrency(
-              activity.workItems.reduce(
-                (prev, curr) => prev + curr.rate * curr.quantity,
-                0
-              )
-            )}
+            {activity.name} -- Activity Total: ${formatCurrency(activity.total)}
           </h2>
           <WorkItemDisplay workItems={activity.workItems}></WorkItemDisplay>
         </div>
       ))}
+      <QuoteTotals quote={props.quote}></QuoteTotals>
       DEBUG: {JSON.stringify(quote)}
     </div>
   );
