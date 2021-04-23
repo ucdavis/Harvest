@@ -11,18 +11,40 @@ import {
   Label,
   Row,
 } from "reactstrap";
+import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
+import { requestSchema } from "../schemas";
 import { Project } from "../types";
 
 export const RequestContainer = () => {
   const [project, setProject] = useState<Project>({ id: 0 } as Project);
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
+
+  const checkRequestValidity = async (inputs: any) => {
+    try {
+      await requestSchema.validate(inputs, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        return err.errors;
+      }
+    }
+  };
 
   const create = async () => {
     // TODO: validation, loading spinner
     // create a new project
+    const requestErrors = await checkRequestValidity(project);
+
+    if (requestErrors) {
+      if (requestErrors.length > 0) {
+        setInputErrors(requestErrors);
+        return;
+      }
+    }
+
     const response = await fetch(`/Request/Create`, {
       method: "POST",
       headers: {
@@ -118,6 +140,15 @@ export const RequestContainer = () => {
           </Row>
           <Row>
             <Col>
+              <ul>
+                {inputErrors.map((error, i) => {
+                  return (
+                    <li style={{ color: "red" }} key={`error-${i}`}>
+                      {error}
+                    </li>
+                  );
+                })}
+              </ul>
               <Button color="primary" onClick={create}>
                 Create Field Request
               </Button>
