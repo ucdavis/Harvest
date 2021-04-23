@@ -40,7 +40,11 @@ export const QuoteContainer = () => {
         setRates(rateJson);
 
         if (projectWithQuote.quote) {
-          setQuote(projectWithQuote.quote);
+          // TODO: remove once we standardize on new quote format
+          setQuote({
+            ...projectWithQuote.quote,
+            fields: projectWithQuote.quote.fields ?? [],
+          });
         } else {
           // TODO: how do we handle if different fields have different rates?
           const quoteToUse = new QuoteContentImpl();
