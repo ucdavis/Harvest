@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Models.FinancialAccountModels;
 using Harvest.Core.Models.Settings;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Harvest.Core.Services
@@ -61,7 +61,7 @@ namespace Harvest.Core.Services
             validationResponse.EnsureSuccessStatusCode();
 
             var validationContents = await validationResponse.Content.ReadAsStringAsync();
-            if (!JsonConvert.DeserializeObject<bool>(validationContents))
+            if (!JsonSerializer.Deserialize<bool>(validationContents))
             {
                 Log.Information("Account not valid {account}", account);
                 throw new Exception("Invalid Account");
@@ -85,7 +85,7 @@ namespace Harvest.Core.Services
 
             var contents = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<KfsAccount>(contents);
+            return JsonSerializer.Deserialize<KfsAccount>(contents);
         }
 
         public async Task<bool> IsAccountValid(string chart, string account, string subAccount)
@@ -106,7 +106,7 @@ namespace Harvest.Core.Services
 
             var validationContents = await validationResponse.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<bool>(validationContents);
+            return JsonSerializer.Deserialize<bool>(validationContents);
         }
 
         public async Task<bool> IsObjectValid(string chart, string objectCode)
@@ -120,7 +120,7 @@ namespace Harvest.Core.Services
 
             var validationContents = await validationResponse.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<bool>(validationContents); 
+            return JsonSerializer.Deserialize<bool>(validationContents); 
         }
 
         public async Task<bool> IsSubObjectValid(string chart, string account, string objectCode, string subObject)
@@ -134,7 +134,7 @@ namespace Harvest.Core.Services
 
             var validationContents = await validationResponse.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<bool>(validationContents); //TEST THIS!!!
+            return JsonSerializer.Deserialize<bool>(validationContents); //TEST THIS!!!
         }
 
         public async Task<bool> IsProjectValid(string project)
@@ -148,7 +148,7 @@ namespace Harvest.Core.Services
 
             var validationContents = await validationResponse.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<bool>(validationContents); 
+            return JsonSerializer.Deserialize<bool>(validationContents); 
         }
 
         public async Task<string> GetProjectName(string project)
@@ -208,7 +208,7 @@ namespace Harvest.Core.Services
 
             var validationContents = await validationResponse.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<bool>(validationContents);
+            return JsonSerializer.Deserialize<bool>(validationContents);
         }
 
         public async Task<KfsUser> GetFiscalOfficerForAccount(string chart, string account)
@@ -221,7 +221,7 @@ namespace Harvest.Core.Services
             response.EnsureSuccessStatusCode();
 
             var contents = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<KfsUser>(contents);
+            return JsonSerializer.Deserialize<KfsUser>(contents);
         }
 
         public async Task<AccountValidationModel> IsValid(string account)
