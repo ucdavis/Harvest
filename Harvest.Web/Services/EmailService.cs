@@ -107,7 +107,7 @@ namespace Harvest.Web.Services
         public async Task<bool> ChangeRequest(Project project)
         {
             var quoteUrl   = "https://harvest.caes.ucdavis.edu/quote/create/";
-            var projectUrl = "https://harvest.caes.ucdavis.edu/quote/create/";
+            var projectUrl = "https://harvest.caes.ucdavis.edu/Project/Details/";
 
             var model = new ChangeRequestModel()
             {
