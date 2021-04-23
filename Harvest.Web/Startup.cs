@@ -1,10 +1,13 @@
 using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Elastic.Apm.NetCoreAll;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Harvest.Email.Services;
 using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
@@ -52,6 +55,13 @@ namespace Harvest.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
+            }).AddJsonOptions(options =>
+            {
+                var o = StandardJsonOptions.GetOptions();
+                options.JsonSerializerOptions.PropertyNamingPolicy = o.PropertyNamingPolicy;
+                options.JsonSerializerOptions.NumberHandling = o.NumberHandling;
+                options.JsonSerializerOptions.AllowTrailingCommas = o.AllowTrailingCommas;
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = o.PropertyNameCaseInsensitive;
             });
 
             // In production, the React files will be served from this directory
@@ -142,6 +152,7 @@ namespace Harvest.Web
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailBodyService, EmailBodyService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped(provder => StandardJsonOptions.GetOptions());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
