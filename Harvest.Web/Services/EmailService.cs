@@ -17,6 +17,9 @@ namespace Harvest.Web.Services
     {
         Task<bool> ProfessorQuoteReady(Project project);
         Task<bool> NewFieldRequest(Project project);
+
+        Task<bool> QuoteApproved(Project project);
+        Task<bool> QuoteDenied(Project project);
     }
 
     public class EmailService : IEmailService
@@ -64,10 +67,14 @@ namespace Harvest.Web.Services
 
         }
 
+        private async Task<string[]> FieldWorkersEmails()
+        {
+            return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
+        }
+
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var fieldWorkers = await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
-            var url = "https://harvest.caes.ucdavis.edu//quote/create/";
+            var url = "https://harvest.caes.ucdavis.edu/quote/create/";
 
             var model = new NewFieldRequestModel()
             {
@@ -85,7 +92,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(fieldWorkers, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldWorkersEmails(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
@@ -94,6 +101,48 @@ namespace Harvest.Web.Services
             }
 
             return true;
+        }
+
+        private async Task<bool> QuoteDecision(Project project, bool approved)
+        {
+            var url = "https://harvest.caes.ucdavis.edu/Project/Details/";
+
+            var model = new QuoteDecisionModel()
+            {
+                PI = project.PrincipalInvestigator.NameAndEmail,
+                ProjectName = project.Name,
+                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                Decision = approved ? "Approved":"Denied",
+                DecisionColor = approved ? QuoteDecisionModel.Colors.Approved : QuoteDecisionModel.Colors.Denied,
+                ButtonUrl = $"{url}{project.Id}"
+            };
+
+            var textVersion = $"A quote has been {model.Decision} for project {model.ProjectName} by {model.PI}";
+
+            try
+            {
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
+
+                await _notificationService.SendNotification(await FieldWorkersEmails(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> QuoteApproved(Project project)
+        {
+            return await QuoteDecision(project, true);
+        }
+
+        public async Task<bool> QuoteDenied(Project project)
+        {
+            return await QuoteDecision(project, false);
         }
     }
 }

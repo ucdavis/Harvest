@@ -35,16 +35,10 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-
-            //var model = new TestEmailModel()
-            //{
-            //    Name = "REPLACE1"
-            //};
-            //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
-            var model = new NewFieldRequestModel();
+            var model = new QuoteDecisionModel();
             model.InitForMjml();
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail_mjnl.cshtml", model);
 
             return Content(results);
         }
@@ -59,17 +53,18 @@ namespace Harvest.Web.Controllers
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
             //await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
-            var model = new ProfessorQuoteModel()
+            var model = new QuoteDecisionModel()
             {
-                ProfName = user.Name,
+                PI = user.NameAndEmail,
                 ProjectName = "Your Awesome Project",
                 ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
                 ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
-                QuoteAmount = "$20,000.00",
+                Decision = "Approved",
+                DecisionColor = QuoteDecisionModel.Colors.Approved,
                 //ButtonUrl = "???"
             };
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
             await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
@@ -89,6 +84,25 @@ namespace Harvest.Web.Controllers
         {
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 11);
             if (await _emailService.NewFieldRequest(project))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
+
+        public async Task<IActionResult> TestQuoteApproved()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 11);
+            if (await _emailService.QuoteApproved(project))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
+        public async Task<IActionResult> TestQuoteDenied()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 11);
+            if (await _emailService.QuoteDenied(project))
             {
                 return Content("Done.");
             }
