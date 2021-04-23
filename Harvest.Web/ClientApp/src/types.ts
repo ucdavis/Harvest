@@ -187,6 +187,8 @@ export interface RequestInput {
   start: string;
   end: string;
   crop: string;
+  cropType: string;
+  requirements?: string;
   principalInvestigator: PrincipalInvestigator;
 }
 

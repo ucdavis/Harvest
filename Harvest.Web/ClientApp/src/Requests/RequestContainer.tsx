@@ -15,7 +15,9 @@ interface RouteParams {
 
 export const RequestContainer = () => {
   const { projectId } = useParams<RouteParams>();
-  const [project, setProject] = useState<Project>({ id: 0 } as Project);
+  const [project, setProject] = useState<Project>({
+    id: 0
+  } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
   const checkRequestValidity = async (inputs: any) => {
@@ -40,21 +42,21 @@ export const RequestContainer = () => {
       }
     }
 
-    // const response = await fetch(`/Request/Create`, {
-    //   method: "POST",
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(project),
-    // });
+    const response = await fetch(`/Request/Create`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(project),
+    });
 
-    // if (response.ok) {
-    //   const data = await response.json();
-    //   window.location.pathname = `/Project/Details/${data.id}`;
-    // } else {
-    //   alert("Something went wrong, please try again");
-    // }
+    if (response.ok) {
+      const data = await response.json();
+      window.location.pathname = `/Project/Details/${data.id}`;
+    } else {
+      alert("Something went wrong, please try again");
+    }
   };
 
   const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {

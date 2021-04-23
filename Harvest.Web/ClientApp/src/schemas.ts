@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
+import { string } from "yup/lib/locale";
 import { PrincipalInvestigator, RequestInput } from "./types";
 
 export const investigatorSchema: SchemaOf<PrincipalInvestigator> = yup
@@ -20,5 +21,7 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   start: yup.string().required(),
   end: yup.string().required(),
   crop: yup.string().required(),
+  cropType: yup.string().required(),
+  requirements: yup.string(),
   principalInvestigator: investigatorSchema,
 });
