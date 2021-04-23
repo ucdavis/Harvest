@@ -17,6 +17,7 @@ namespace Harvest.Web.Services
     {
         Task<bool> ProfessorQuoteReady(Project project);
         Task<bool> NewFieldRequest(Project project);
+        Task<bool> ChangeRequest(Project project);
 
         Task<bool> QuoteApproved(Project project);
         Task<bool> QuoteDenied(Project project);
@@ -67,7 +68,7 @@ namespace Harvest.Web.Services
 
         }
 
-        private async Task<string[]> FieldWorkersEmails()
+        private async Task<string[]> FieldManagersEmails()
         {
             return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
         }
@@ -92,7 +93,42 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldWorkersEmails(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ChangeRequest(Project project)
+        {
+            var quoteUrl   = "https://harvest.caes.ucdavis.edu/quote/create/";
+            var projectUrl = "https://harvest.caes.ucdavis.edu/quote/create/";
+
+            var model = new ChangeRequestModel()
+            {
+                PI = project.PrincipalInvestigator.NameAndEmail,
+                ProjectName = project.Name,
+                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                CropType = project.CropType,
+                Crops = project.Crop,
+                Requirements = project.Requirements,
+                ButtonUrlForQuote = $"{quoteUrl}{project.Id}",
+                ButtonUrlForProject = $"{projectUrl}{project.OriginalProjectId}",
+            };
+
+            try
+            {
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest.cshtml", model);
+
+                var textVersion = $"A change request has been made by {model.PI} for project {model.ProjectName}.";
+
+                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - Change Request");
             }
             catch (Exception e)
             {
@@ -124,7 +160,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldWorkersEmails(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {

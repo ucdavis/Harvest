@@ -35,10 +35,10 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-            var model = new QuoteDecisionModel();
+            var model = new ChangeRequestModel();
             model.InitForMjml();
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail_mjnl.cshtml", model);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -103,6 +103,16 @@ namespace Harvest.Web.Controllers
         {
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 11);
             if (await _emailService.QuoteDenied(project))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
+
+        public async Task<IActionResult> TestChangeRequest()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.OriginalProject).SingleAsync(a => a.Id == 10);
+            if (await _emailService.ChangeRequest(project))
             {
                 return Content("Done.");
             }
