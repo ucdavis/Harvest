@@ -62,6 +62,7 @@ namespace Harvest.Web
                 options.JsonSerializerOptions.NumberHandling = o.NumberHandling;
                 options.JsonSerializerOptions.AllowTrailingCommas = o.AllowTrailingCommas;
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = o.PropertyNameCaseInsensitive;
+                options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory())
             });
 
             // In production, the React files will be served from this directory

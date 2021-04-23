@@ -25,7 +25,7 @@ afterEach(() => {
   // container = null;
 });
 
-describe("Quote Container", () => {
+describe.skip("Quote Container", () => {
   it("Shows loading screen", async () => {
     await act(async () => {
       render(

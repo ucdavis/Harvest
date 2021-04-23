@@ -9,6 +9,7 @@ import {
   Rate,
 } from "../types";
 
+import { FieldContainer } from "../Fields/FieldContainer";
 import { ProjectDetail } from "./ProjectDetail";
 import { RequestHeader } from "../Requests/RequestHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
@@ -39,7 +40,11 @@ export const QuoteContainer = () => {
         setRates(rateJson);
 
         if (projectWithQuote.quote) {
-          setQuote(projectWithQuote.quote);
+          // TODO: remove once we standardize on new quote format
+          setQuote({
+            ...projectWithQuote.quote,
+            fields: projectWithQuote.quote.fields ?? [],
+          });
         } else {
           // TODO: how do we handle if different fields have different rates?
           const quoteToUse = new QuoteContentImpl();
@@ -121,6 +126,16 @@ export const QuoteContainer = () => {
 
   if (!project) {
     return <div>Loading</div>;
+  }
+
+  // TODO: perhaps we might want to go back and modify the fields as well
+  if (quote.fields.length === 0) {
+    return (
+      <FieldContainer
+        fields={quote.fields}
+        updateFields={(fields) => setQuote({ ...quote, fields })}
+      ></FieldContainer>
+    );
   }
 
   return (

@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
-
 namespace Harvest.Core.Domain
 {
     public class Project
@@ -17,13 +14,13 @@ namespace Harvest.Core.Domain
         public DateTime Start { get; set; }
 
         public DateTime End { get; set; }
-        
+
         [StringLength(512)]
         public string Crop { get; set; }
 
         [StringLength(50)]
         public string CropType { get; set; }
-        
+
         [MaxLength]
         public string Requirements { get; set; }
 
@@ -38,11 +35,6 @@ namespace Harvest.Core.Domain
         public int PrincipalInvestigatorId { get; set; }
 
         public User PrincipalInvestigator { get; set; }
-
-        public Geometry Location { get; set; }
-
-        [StringLength(50)]
-        public string LocationCode { get; set; }
 
         public int? QuoteId { get; set; }
 
@@ -91,6 +83,9 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Quote> Quotes { get; set; }
 
+        [JsonIgnore]
+        public List<Field> Fields { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Project>().HasIndex(a => a.Name);
@@ -123,6 +118,12 @@ namespace Harvest.Core.Domain
                 .HasOne(q => q.Project)
                 .WithMany(p => p.Quotes)
                 .HasForeignKey(q => q.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Field>()
+                .HasOne(f => f.Project)
+                .WithMany(f => f.Fields)
+                .HasForeignKey(f => f.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
         public class Statuses
