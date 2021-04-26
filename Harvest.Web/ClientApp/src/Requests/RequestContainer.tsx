@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Button,
-  FormGroup,
-  Input,
-  Label,
-} from "reactstrap";
+import { Button, FormGroup, Input, Label } from "reactstrap";
 import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
@@ -18,7 +13,10 @@ interface RouteParams {
 
 export const RequestContainer = () => {
   const { projectId } = useParams<RouteParams>();
-  const [project, setProject] = useState<Project>({ id: 0, cropType: "Row" as CropType } as Project);
+  const [project, setProject] = useState<Project>({
+    id: 0,
+    cropType: "Row" as CropType,
+  } as Project);
 
   useEffect(() => {
     // load original request if this is a change request
@@ -72,7 +70,9 @@ export const RequestContainer = () => {
     <div className="card-wrapper card-medium">
       <div className="card-content">
         <div className="card-head">
-          <h2>Create Field Request</h2>
+          <h2>
+            {projectId ? "Create Change Request" : "Create Field Request"}
+          </h2>
         </div>
         <div className="row">
           <div className="col-md-6">
@@ -80,7 +80,6 @@ export const RequestContainer = () => {
               <Label>When to Start?</Label>
               <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
-                  
                   format="MM/dd/yyyy"
                   required={true}
                   clearIcon={null}
@@ -172,7 +171,7 @@ export const RequestContainer = () => {
         </FormGroup>
         <div className="row justify-content-center">
           <Button className="btn-lg" color="primary" onClick={create}>
-            Create Field Request
+            {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
         </div>
         <div>DEBUG: {JSON.stringify(project)}</div>
