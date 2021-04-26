@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   FormGroup,
@@ -19,6 +19,25 @@ interface RouteParams {
 export const RequestContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({ id: 0, cropType: "Row" as CropType } as Project);
+
+  useEffect(() => {
+    // load original request if this is a change request
+    const cb = async () => {
+      const response = await fetch(`/Request/Get/${projectId}`);
+
+      if (response.ok) {
+        const proj: Project = await response.json();
+        setProject({
+          ...proj,
+          start: new Date(proj.start),
+          end: new Date(proj.end),
+          requirements: `Original: ${proj.requirements}`,
+        });
+      }
+    };
+
+    cb();
+  }, [projectId]);
 
   const create = async () => {
     // TODO: validation, loading spinner
