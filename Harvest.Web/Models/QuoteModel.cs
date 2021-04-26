@@ -2,6 +2,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Harvest.Core.Domain;
+using NetTopologySuite.Geometries;
 
 namespace Harvest.Web.Models
 {
@@ -17,7 +18,18 @@ namespace Harvest.Web.Models
     {
         public static QuoteDetail Deserialize(string text)
         {
-            return JsonSerializer.Deserialize<QuoteDetail>(text);
+            return JsonSerializer.Deserialize<QuoteDetail>(text, GetJsonSerializerOptions());
+        }
+
+        public static string Serialize(QuoteDetail value)
+        {
+            return JsonSerializer.Serialize<QuoteDetail>(value, GetJsonSerializerOptions());
+        }
+
+        public static JsonSerializerOptions GetJsonSerializerOptions() {
+            var serializationOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            serializationOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+            return serializationOptions;
         }
 
         public string ProjectName { get; set; }
@@ -31,8 +43,18 @@ namespace Harvest.Web.Models
         public double EquipmentTotal { get; set; }
         public double OtherTotal { get; set; }
         public double GrandTotal { get; set; }
+        public Field[] Fields { get; set; }
         public Activity[] Activities { get; set; }
 
+    }
+
+    public class Field
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Crop { get; set; }
+        public string Details { get; set; }
+        public Polygon Geometry { get; set; }
     }
 
     public class Activity

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
@@ -66,7 +65,7 @@ namespace Harvest.Web.Controllers
             }
 
             quote.Total = (decimal)Math.Round(quoteDetail.GrandTotal, 2);
-            quote.Text = JsonSerializer.Serialize(quoteDetail);
+            quote.Text = QuoteDetail.Serialize(quoteDetail);
 
             await _dbContext.SaveChangesAsync();
 
