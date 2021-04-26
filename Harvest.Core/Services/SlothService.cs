@@ -85,7 +85,7 @@ namespace Harvest.Core.Services
                     Amount = Math.Round(grandTotal * (projectAccount.Percentage / 100), 2),
                     Chart = debit.KfsAccount.ChartOfAccountsCode,
                     SubAccount = debit.KfsAccount.SubAccount,
-                    Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                    Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                     Direction = TransferViewModel.Directions.Debit,
                     ObjectCode = _slothSettings.DebitObjectCode
                 };
@@ -132,7 +132,7 @@ namespace Harvest.Core.Services
                         Amount = totalCost,
                         Chart = credit.KfsAccount.ChartOfAccountsCode,
                         SubAccount = credit.KfsAccount.SubAccount,
-                        Description = $"Invoice {invoice.Id}".TruncateAndAppend($" Project: {invoice.Project.Name}", 40),
+                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                         Direction = TransferViewModel.Directions.Credit,
                         ObjectCode = _slothSettings.CreditObjectCode
                     });
