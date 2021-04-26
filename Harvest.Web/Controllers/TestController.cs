@@ -35,10 +35,14 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-            var model = new ChangeRequestModel();
-            model.InitForMjml();
+            //var model = new ChangeRequestModel();
+            //model.InitForMjml();
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest_mjml.cshtml", model);
+            //var results = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest_mjml.cshtml", model);
+
+            var model = new TestEmailModel();
+            model.InitForMjml();
+            var results = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -53,18 +57,27 @@ namespace Harvest.Web.Controllers
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
             //await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
-            var model = new QuoteDecisionModel()
-            {
-                PI = user.NameAndEmail,
-                ProjectName = "Your Awesome Project",
-                ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
-                ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
-                Decision = "Approved",
-                DecisionColor = QuoteDecisionModel.Colors.Approved,
-                //ButtonUrl = "???"
-            };
+            //var model = new QuoteDecisionModel()
+            //{
+            //    PI = user.NameAndEmail,
+            //    ProjectName = "Your Awesome Project",
+            //    ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
+            //    ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
+            //    Decision = "Approved",
+            //    DecisionColor = QuoteDecisionModel.Colors.Approved,
+            //    //ButtonUrl = "???"
+            //};
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
+            //var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
+
+            var model = new TestEmailModel();
+            model.Name = "Jason";
+            model.MyList = new List<string>();
+            model.MyList.Add("Test Line 1");
+            model.MyList.Add("Test Line 2");
+            model.MyList.Add("For The WIN");
+            model.MyList.Add("Last Line");
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
 
             await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");

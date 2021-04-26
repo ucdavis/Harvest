@@ -19,6 +19,10 @@
         <mj-text align="center">
             <h1>Hello REPLACE1</h1>
             <br />
+            @foreach (var item in Model.MyList)
+            {
+                @Html.Raw(@item)
+            }
         </mj-text>
     </mj-column>
 </mj-section>
