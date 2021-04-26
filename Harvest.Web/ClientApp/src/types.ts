@@ -189,16 +189,5 @@ export interface RequestInput {
   crop: string;
   cropType: string;
   requirements?: string;
-  principalInvestigator: PrincipalInvestigator;
-}
-
-export interface PrincipalInvestigator {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  iam: string;
-  kerberos: string;
-  name: string;
-  nameAndEmail: string;
+  principalInvestigator: User;
 }

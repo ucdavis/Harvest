@@ -1,9 +1,8 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import { string } from "yup/lib/locale";
-import { PrincipalInvestigator, RequestInput } from "./types";
+import { RequestInput, User } from "./types";
 
-export const investigatorSchema: SchemaOf<PrincipalInvestigator> = yup
+export const investigatorSchema: SchemaOf<User> = yup
   .object()
   .shape({
     id: yup.number().required(),
@@ -13,7 +12,7 @@ export const investigatorSchema: SchemaOf<PrincipalInvestigator> = yup
     iam: yup.string().required(),
     kerberos: yup.string().required(),
     name: yup.string().required(),
-    nameAndEmail: yup.string().required(),
+    nameAndEmail: yup.string(),
   });
 
 export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
