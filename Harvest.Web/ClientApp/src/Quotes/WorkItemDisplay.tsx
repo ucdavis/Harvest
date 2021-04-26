@@ -11,7 +11,7 @@ export const WorkItemDisplay = (props: Props) => {
   return (
     <div>
       {types.map((type) => (
-        <table className="table">
+        <table key={`type-${type}`} className="table">
           <thead>
             <tr>
               <th>{type}</th>
@@ -24,7 +24,7 @@ export const WorkItemDisplay = (props: Props) => {
             {props.workItems
               .filter((w) => w.type === type)
               .map((workItem) => (
-                <tr>
+                <tr key={`item-${workItem.id}`}>
                   <td>{workItem.description}</td>
                   <td>{workItem.quantity}</td>
                   <td>{workItem.rate}</td>
