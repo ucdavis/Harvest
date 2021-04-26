@@ -2,7 +2,14 @@
 
 @Model.Name
 
-@Model.Status
+<h2>
+    @Model.Status
+</h2>
 
-<a href="/quote/create/@Model.Id">Create Quote</a>
-<a href="/request/approve/@Model.Id">Approve Quote</a>
+<ul>
+    <li><a href="/quote/create/@Model.Id">Create Quote</a></li>
+    <li><a href="/request/approve/@Model.Id">Approve Quote</a></li>
+    <li><a href="/project/accountApproval/@Model.Id">Approve Accounts</a></li>
+</ul>
+
+
