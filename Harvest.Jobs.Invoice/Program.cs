@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Harvest.Jobs.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -59,6 +60,7 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<IFinancialService, FinancialService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
+            services.AddSingleton(provder => StandardJsonOptions.GetOptions());
 
             return services.BuildServiceProvider();
         }

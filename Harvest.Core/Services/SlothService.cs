@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
@@ -12,7 +13,6 @@ using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Harvest.Core.Services
@@ -29,12 +29,14 @@ namespace Harvest.Core.Services
         private readonly AppDbContext _dbContext;
         private readonly SlothSettings _slothSettings;
         private readonly IFinancialService _financialService;
+        private readonly JsonSerializerOptions _serializerOptions;
 
-        public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService)
+        public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService, JsonSerializerOptions serializerOptions)
         {
             _dbContext = dbContext;
             _slothSettings = slothSettings.Value;
             _financialService = financialService;
+            _serializerOptions = serializerOptions;
         }
 
 
@@ -157,9 +159,9 @@ namespace Harvest.Core.Services
             using var client = new HttpClient { BaseAddress = new Uri(url) };
             client.DefaultRequestHeaders.Add("X-Auth-Token", token);
 
-            Log.Information(JsonConvert.SerializeObject(model));
+            Log.Information(JsonSerializer.Serialize(model, _serializerOptions));
 
-            var response = await client.PostAsync("Transactions", new StringContent(JsonConvert.SerializeObject(model), System.Text.Encoding.UTF8, "application/json"));
+            var response = await client.PostAsync("Transactions", new StringContent(JsonSerializer.Serialize(model, _serializerOptions), System.Text.Encoding.UTF8, "application/json"));
             switch (response.StatusCode)
             {
                 case HttpStatusCode.NotFound:
@@ -187,7 +189,7 @@ namespace Harvest.Core.Services
             {
                 var content = await response.Content.ReadAsStringAsync();
                 Log.Information("Sloth Success Response", content);
-                var slothResponse = JsonConvert.DeserializeObject<SlothResponseModel>(content);
+                var slothResponse = JsonSerializer.Deserialize<SlothResponseModel>(content, _serializerOptions);
 
                 invoice.Transfers = new List<Transfer>();
                 foreach (var transferViewModel in model.Transfers)
@@ -219,7 +221,7 @@ namespace Harvest.Core.Services
             Log.Information("Sloth Response didn't have a success code for moneyTransfer {id}", invoice.Id);
             var badContent = await response.Content.ReadAsStringAsync();
             Log.ForContext("data", badContent, true).Information("Sloth message response");
-            var rtValue = JsonConvert.DeserializeObject<SlothResponseModel>(badContent);
+            var rtValue = JsonSerializer.Deserialize<SlothResponseModel>(badContent, _serializerOptions);
             rtValue.Success = false;
 
             return rtValue;
@@ -264,7 +266,7 @@ namespace Harvest.Core.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var slothResponse = JsonConvert.DeserializeObject<SlothResponseModel>(content);
+                    var slothResponse = JsonSerializer.Deserialize<SlothResponseModel>(content, _serializerOptions);
                     Log.Information("Invoice {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
                         invoice.Id, slothResponse.Status, invoice.SlothTransactionId);
                     if (slothResponse.Status == "Completed")
