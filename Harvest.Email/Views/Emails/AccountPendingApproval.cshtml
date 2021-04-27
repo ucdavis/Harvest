@@ -1,4 +1,7 @@
-﻿<!doctype html>
+﻿@using Harvest.Email.Views.Shared
+@model Harvest.Email.Models.AccountPendingApprovalModel
+
+<!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 
 <head>
@@ -150,57 +153,28 @@
                   <tr>
                     <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                       <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:center;color:#000000;">
-                        <div>This is just a test</div>
+                        <h1>Account Approval For Project</h1>
+                        <p><strong>Project: </strong>@Model.ProjectName</p>
+                        <p><strong>Project Start: </strong>@Model.ProjectStart</p>
+                        <p><strong>Project End: </strong>@Model.ProjectEnd</p>
+                        <br />
+                        <p>The account(s) listed below need approval for use in the project. Please click on the button below to be taken to the page to approve the use of these account(s).</p>
                       </div>
                     </td>
                   </tr>
-                </table>
-              </div>
-              <!--[if mso | IE]>
-            </td>
-          
-        </tr>
-      
-                  </table>
-                <![endif]-->
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <!--[if mso | IE]>
-          </td>
-        </tr>
-      </table>
-      
-      <table
-         align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600"
-      >
-        <tr>
-          <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
-      <![endif]-->
-    <div style="margin:0px auto;max-width:600px;">
-      <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width:100%;">
-        <tbody>
-          <tr>
-            <td style="direction:ltr;font-size:0px;padding:20px 0;text-align:center;">
-              <!--[if mso | IE]>
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
-                
-        <tr>
-      
-            <td
-               class="" style="vertical-align:top;width:600px;"
-            >
-          <![endif]-->
-              <div class="mj-column-per-100 mj-outlook-group-fix" style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
-                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;" width="100%">
                   <tr>
-                    <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                      <div style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:center;color:#000000;">
-                        <h1>Hello REPLACE1</h1>
-                        <br /> @foreach (var item in Model.MyList){<div> @item </div>}
-                      </div>
+                    <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                      <table cellpadding="0" cellspacing="0" width="100%" border="0" style="color:#000000;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:22px;table-layout:auto;width:100%;border:none;">
+                        <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+                          <th style="padding: 0 15px 0 0;">Account</th>
+                          <th style="padding: 0 15px;">Name</th>
+                          <th style="padding: 0 0 0 15px;">Percent</th>
+                        </tr> @foreach (var item in Model.AccountsList) { <tr>
+                          <td style="padding: 0 15px 0 0;">@item.Account</td>
+                          <td style="padding: 0 15px;">@item.Name</td>
+                          <td style="padding: 0 0 0 15px;">@item.Percent</td>
+                        </tr> }
+                      </table>
                     </td>
                   </tr>
                 </table>
@@ -249,7 +223,7 @@
                       <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:separate;line-height:100%;">
                         <tr>
                           <td align="center" bgcolor="#352CC7" role="presentation" style="border:none;border-radius:10px;cursor:auto;mso-padding-alt:10px 25px;background:#352CC7;" valign="middle">
-                            <a href="https://harvest.caes.ucdavis.edu" style="display:inline-block;background:#352CC7;color:#FFFFFF;font-family:Helvetica;font-size:14px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:10px;" target="_blank"> Click Me </a>
+                            <a href="@Model.ButtonUrl" style="display:inline-block;background:#352CC7;color:#FFFFFF;font-family:Helvetica;font-size:14px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:10px;" target="_blank"> Click Here To Continue </a>
                           </td>
                         </tr>
                       </table>

@@ -17,18 +17,5 @@ namespace Harvest.Email.Models
         public string ProjectStart { get; set; }
         public string ProjectEnd { get; set; }
         public string QuoteAmount { get; set; }
-
-        /// <summary>
-        /// Sets model values when running TestController.TestBody
-        /// </summary>
-        public void InitForMjml()
-        {
-            ProfName     = "@Model.ProfName";
-            ProjectName  = "@Model.ProjectName";
-            ProjectStart = "@Model.ProjectStart";
-            ProjectEnd   = "@Model.ProjectEnd";
-            QuoteAmount  = "@Model.QuoteAmount";
-            ButtonUrl    = "@Model.ButtonUrl";
-        }
     }
 }

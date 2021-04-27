@@ -7,21 +7,23 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Harvest.Email.Models
 {
-    public class QuoteDecisionModel
+    public class AccountPendingApprovalModel
     {
         public string PI { get; set; }
         public string ProjectName { get; set; }
         public string ProjectEnd { get; set; }
         public string ProjectStart { get; set; }
-        public string Decision { get; set; }
+
         public string ButtonUrl { get; set; }
-        public string DecisionColor { get; set; } = "#7aeb34";
+        public List<AccountsForApprovalModel> AccountsList { get; set; }
 
-        public class Colors
-        {
-            public const string Approved = "#7aeb34";
-            public const string Denied = "#cf3c3c";
 
-        }
+
+    }
+    public class AccountsForApprovalModel
+    {
+        public string Account { get; set; }
+        public string Name { get; set; }
+        public string Percent { get; set; }
     }
 }
