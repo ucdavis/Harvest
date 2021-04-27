@@ -69,6 +69,13 @@ export const ExpenseEntryContainer = () => {
 
   const submitExpenses = async () => {
     // TODO: disable the submit button and maybe just some sort of full screen processing UI
+    
+    for (let i = 0; i < expenses.length; i++) {
+      if (isNaN(expenses[i].quantity) || expenses[i].quantity === 0) {
+        alert("Quantity is null or empty. Please input a value.")
+        return;
+      }
+    }
 
     // transform since we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
     const expensesBody = expenses.map((exp) => ({
