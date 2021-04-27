@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import { Button, FormGroup, Input, Label } from "reactstrap";
+import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
+import { requestSchema } from "../schemas";
 import { Project, CropType } from "../types";
-import { useParams } from "react-router";
 
 interface RouteParams {
   projectId?: string;
@@ -17,6 +19,17 @@ export const RequestContainer = () => {
     id: 0,
     cropType: "Row" as CropType,
   } as Project);
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
+
+  const checkRequestValidity = async (inputs: any) => {
+    try {
+      await requestSchema.validate(inputs, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        return err.errors;
+      }
+    }
+  };
 
   useEffect(() => {
     // load original request if this is a change request
@@ -40,6 +53,15 @@ export const RequestContainer = () => {
   const create = async () => {
     // TODO: validation, loading spinner
     // create a new project
+    const requestErrors = await checkRequestValidity(project);
+
+    if (requestErrors) {
+      if (requestErrors.length > 0) {
+        setInputErrors(requestErrors);
+        return;
+      }
+    }
+
     const response = await fetch(`/Request/Create`, {
       method: "POST",
       headers: {
@@ -170,6 +192,15 @@ export const RequestContainer = () => {
           />
         </FormGroup>
         <div className="row justify-content-center">
+          <ul>
+            {inputErrors.map((error, i) => {
+              return (
+                <li style={{ color: "red" }} key={`error-${i}`}>
+                  {error}
+                </li>
+              );
+            })}
+          </ul>
           <Button className="btn-lg" color="primary" onClick={create}>
             {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>

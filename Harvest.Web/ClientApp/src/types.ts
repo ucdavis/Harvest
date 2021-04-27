@@ -181,3 +181,13 @@ export interface ProjectAccount {
   name: string;
   percentage: number;
 }
+
+export interface RequestInput {
+  id: number;
+  start: string;
+  end: string;
+  crop: string;
+  cropType: string;
+  requirements?: string;
+  principalInvestigator: User;
+}
