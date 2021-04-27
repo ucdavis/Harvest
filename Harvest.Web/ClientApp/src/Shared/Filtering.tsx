@@ -26,7 +26,7 @@ export const GlobalFilter = ({
 // Define a default UI for filtering
 export const DefaultColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter },
-}) => {
+}: any) => {
 
   return (
     <input className="form-control"

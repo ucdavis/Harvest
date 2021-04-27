@@ -1,6 +1,6 @@
 export class ReactTableUtil {
-  public static setPageSize(pageSize: number) {
-    localStorage.setItem("HarvestDefaultPageSize", pageSize.toString());
+  public static setPageSize(pageSize: string) {
+    localStorage.setItem("HarvestDefaultPageSize", pageSize);
   }
 
   public static getPageSize(): number {
