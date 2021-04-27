@@ -17,19 +17,6 @@ namespace Harvest.Email.Models
         public string ButtonUrl { get; set; }
         public string DecisionColor { get; set; } = "#7aeb34";
 
-        /// <summary>
-        /// Sets model values when running TestController.TestBody
-        /// </summary>
-        public void InitForMjml()
-        {
-            PI            = "@Model.PI";
-            ProjectName   = "@Model.ProjectName";
-            ProjectStart  = "@Model.ProjectStart";
-            ProjectEnd    = "@Model.ProjectEnd";
-            Decision      = "@Model.Decision";
-            DecisionColor = "@Model.DecisionColor";
-            ButtonUrl     = "@Model.ButtonUrl";
-        }
         public class Colors
         {
             public const string Approved = "#7aeb34";
