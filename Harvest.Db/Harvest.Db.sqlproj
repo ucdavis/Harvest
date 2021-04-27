@@ -79,6 +79,7 @@
     <Build Include="dbo\Tables\Rates.sql" />
     <Build Include="dbo\Tables\Invoices.sql" />
     <Build Include="dbo\Tables\Expenses.sql" />
+    <Build Include="dbo\Tables\Fields.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SchemaCompare\Sqlexpress.scmp" />
