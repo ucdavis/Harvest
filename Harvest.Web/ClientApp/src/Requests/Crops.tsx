@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from "react";
 
 import { Typeahead } from "react-bootstrap-typeahead";
+import { CropType } from "../types"
 
 interface Props {
   crops: string;
   setCrops: (crops: string) => void;
+  cropType: CropType;
 }
 
 const splitCrops = (crop: string) => crop ? crop.split(",") : [];
 
 export const Crops = (props: Props) => {
   const [crops, setCrops] = useState<string[]>(splitCrops(props.crops));
+  const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!props.crops) {
@@ -19,6 +22,11 @@ export const Crops = (props: Props) => {
       setCrops(splitCrops(props.crops));
     }
   }, [props.crops]);
+
+  useEffect(() => {
+    setOptions(CommonCrops[props.cropType]);
+  },
+    [props.cropType]);
 
   const onSelect = (selected: (string | { label: string })[]) => {
     if (selected && selected.length > 0) {
@@ -37,7 +45,7 @@ export const Crops = (props: Props) => {
       allowNew
       multiple
       defaultSelected={crops}
-      options={CommonCrops}
+      options={options}
       placeholder="Search for common crops or add your own"
       onChange={onSelect}
     />
@@ -45,4 +53,8 @@ export const Crops = (props: Props) => {
 };
 
 // TODO: where should we keep this list?  Worth querying every time?
-const CommonCrops = ["corn", "cabbage", "celery"];
+const CommonCrops = {
+  "Row": ["corn", "cabbage", "celery"],
+  "Tree": ["almond", "orange"]
+} as { [c: string]: string[] };
+
