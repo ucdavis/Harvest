@@ -165,6 +165,7 @@ export const RequestContainer = () => {
           <Crops
             crops={project.crop}
             setCrops={(c) => setProject({ ...project, crop: c })}
+            cropType={project.cropType}
           ></Crops>
         </FormGroup>
 
