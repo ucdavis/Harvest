@@ -41,5 +41,40 @@ namespace Harvest.Web.Controllers
         {
             return View(await _dbContext.Projects.SingleAsync(p => p.Id == id));
         }
+
+        [HttpGet]
+        public async Task<ActionResult> AccountApproval(int id)
+        {
+            var project = await _dbContext.Projects.Include(p => p.Accounts).SingleAsync(p => p.Id == id);
+
+            return View(project);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> AccountApproval(int id, bool approved)
+        {
+            // TODO: Handle account not approved condition
+            // TODO: IF we want to approve accounts individually, handle that here
+            var project = await _dbContext.Projects.Include(x => x.Accounts).SingleAsync(p => p.Id == id);
+            var user = await _userService.GetCurrentUser();
+
+            // assume all accounts are approved
+            foreach (var account in project.Accounts)
+            {
+                account.ApprovedOn = DateTime.UtcNow;
+                account.ApprovedById = user.Id;
+            }
+
+            project.IsApproved = true;
+            project.Status = Project.Statuses.Active;
+
+            // TODO: log history
+
+            await _dbContext.SaveChangesAsync();
+
+            Message = "Accounts Approved. Project is now active";
+
+            return RedirectToAction("Details", new { id });
+        }
     }
 }

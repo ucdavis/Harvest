@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
@@ -16,7 +16,8 @@ interface RouteParams {
 export const RequestContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({
-    id: 0
+    id: 0,
+    cropType: "Row" as CropType,
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
@@ -29,6 +30,25 @@ export const RequestContainer = () => {
       }
     }
   };
+
+  useEffect(() => {
+    // load original request if this is a change request
+    const cb = async () => {
+      const response = await fetch(`/Request/Get/${projectId}`);
+
+      if (response.ok) {
+        const proj: Project = await response.json();
+        setProject({
+          ...proj,
+          start: new Date(proj.start),
+          end: new Date(proj.end),
+          requirements: `Original: ${proj.requirements}`,
+        });
+      }
+    };
+
+    cb();
+  }, [projectId]);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -72,7 +92,9 @@ export const RequestContainer = () => {
     <div className="card-wrapper card-medium">
       <div className="card-content">
         <div className="card-head">
-          <h2>Create Field Request</h2>
+          <h2>
+            {projectId ? "Create Change Request" : "Create Field Request"}
+          </h2>
         </div>
         <div className="row">
           <div className="col-md-6">
@@ -180,7 +202,7 @@ export const RequestContainer = () => {
             })}
           </ul>
           <Button className="btn-lg" color="primary" onClick={create}>
-            Create Field Request
+            {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
         </div>
         <div>DEBUG: {JSON.stringify(project)}</div>

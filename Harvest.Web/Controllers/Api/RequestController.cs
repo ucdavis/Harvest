@@ -10,6 +10,7 @@ using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 
 namespace Harvest.Web.Controllers
 {
@@ -72,6 +73,20 @@ namespace Harvest.Web.Controllers
             project.Status = Project.Statuses.PendingAccountApproval;
             project.QuoteId = quote.Id;
             project.QuoteTotal = quote.Total;
+
+            foreach (var quoteField in quoteDetail.Fields)
+            {
+                // now that fields are locked in, add to new db fields
+                // SQL Server requires polygons be counter clock-wise, so if it isn't then reverse it
+                var poly = quoteField.Geometry;
+                if (!poly.Shell.IsCCW) {
+                    poly = (Polygon)poly.Reverse();
+                }
+
+                var field = new Field { Crop = quoteField.Crop, Details = quoteField.Details, IsActive = true, ProjectId = project.Id, Location = poly };
+
+                project.Fields.Add(field);
+            }
 
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need

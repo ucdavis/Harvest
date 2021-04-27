@@ -1,0 +1,15 @@
+@model Project
+
+<h3>@Model.Name</h3>
+
+@foreach (var account in Model.Accounts)
+{
+    <p>@account.Name (@account.Number) - @account.Percentage%</p>
+}
+
+<form asp-action="AccountApproval" method="POST">
+    <div class="form-group">
+        <input type="hidden" value="true" name="approved" />
+        <input type="submit" value="Approve all accounts" class="btn btn-primary" />
+    </div>
+</form>

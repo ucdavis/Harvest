@@ -8,6 +8,13 @@ namespace Harvest.Core.Domain
 {
     public class Project
     {
+        public Project()
+        {
+            Fields = new List<Field>();
+            Accounts = new List<Account>();
+            Quotes = new List<Quote>();
+        }
+        
         [Key]
         public int Id { get; set; }
 

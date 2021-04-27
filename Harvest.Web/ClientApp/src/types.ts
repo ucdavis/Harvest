@@ -94,7 +94,7 @@ export interface Field {
   name: string;
   crop: string;
   details: string;
-  geometry: GeoJSON.FeatureCollection;
+  geometry: GeoJSON.Polygon;
 }
 
 export interface Quote {
