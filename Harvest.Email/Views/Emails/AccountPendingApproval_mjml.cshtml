@@ -11,9 +11,9 @@
     <mj-column>
         <mj-text align="center">
             <h1>Account Approval For Project</h1>
-            <p><strong>Project: </strong>@Model.ProjectName</p>
-            <p><strong>Project Start: </strong>@Model.ProjectStart</p>
-            <p><strong>Project End: </strong>@Model.ProjectEnd</p>
+            <p><strong>Project: </strong>@@Model.ProjectName</p>
+            <p><strong>Project Start: </strong>@@Model.ProjectStart</p>
+            <p><strong>Project End: </strong>@@Model.ProjectEnd</p>
             <br />
             <p>The account(s) listed below need approval for use in the project. Please click on the button below to be taken to the page to approve the use of these account(s).</p>
 
@@ -24,14 +24,21 @@
                 <th style="padding: 0 15px;">Name</th>
                 <th style="padding: 0 0 0 15px;">Percent</th>
             </tr>
-            @Html.Raw(Model.MjmlListOnly)
+            @@foreach (var item in Model.AccountsList)
+            {
+                <tr>
+                <td style="padding: 0 15px 0 0;">@@item.Account</td>
+                <td style="padding: 0 15px;">@@item.Name</td>
+                <td style="padding: 0 0 0 15px;">@@item.Percent</td>
+                </tr>
+            }
         </mj-table>
     </mj-column>
 </mj-section>
 
 <mj-section background-color="#b2c72c" padding-bottom="20px" padding-top="20px">
     <mj-column>
-        <mj-button background-color="#352CC7" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="@Model.ButtonUrl" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">Click Here To Continue</mj-button>
+        <mj-button background-color="#352CC7" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="@@Model.ButtonUrl" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">Click Here To Continue</mj-button>
     </mj-column>
 </mj-section>
 

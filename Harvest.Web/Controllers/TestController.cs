@@ -45,7 +45,9 @@ namespace Harvest.Web.Controllers
             //var results = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
 
             var model = new AccountPendingApprovalModel();
-            model.InitForMjml();
+            model.AccountsList = new List<AccountsForApprovalModel>();
+            model.AccountsList.Add(new AccountsForApprovalModel() {Account = "test", Name = "test2", Percent = "50%"});
+            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "test33", Name = "test32", Percent = "50%" });
 
             var results = await _emailBodyService.RenderBody("/Views/Emails/AccountPendingApproval_mjml.cshtml", model);
 

@@ -16,28 +16,8 @@ namespace Harvest.Email.Models
 
         public string ButtonUrl { get; set; }
         public List<AccountsForApprovalModel> AccountsList { get; set; }
-        public string MjmlListOnly { get; private set; }
 
-        /// <summary>
-        /// Sets model values when running TestController.TestBody
-        /// </summary>
-        public void InitForMjml()
-        {
-            PI                  = "@Model.PI";
-            ProjectName         = "@Model.ProjectName";
-            ProjectStart        = "@Model.ProjectStart";
-            ProjectEnd          = "@Model.ProjectEnd";
-            ButtonUrl           = "@Model.ButtonUrl";
-            var sb = new StringBuilder();
-            sb.AppendLine("@foreach (var item in Model.AccountsList){");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<td style=\"padding: 0 15px 0 0;\">@item.Account</td>");
-            sb.AppendLine("<td style=\"padding: 0 15px;\">@item.Name</td>");
-            sb.AppendLine("<td style=\"padding: 0 0 0 15px;\">@item.Percent</td>");
-            sb.AppendLine("</tr>");
-            sb.AppendLine("}");
-            MjmlListOnly = sb.ToString();
-        }
+
 
     }
     public class AccountsForApprovalModel
