@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { Project } from "../types";
 import { ProjectTable } from "./ProjectTable";
@@ -19,5 +20,10 @@ export const ProjectListContainer = () => {
     cb();
   }, []);
 
-  return <ProjectTable projects={projects}></ProjectTable>;
+  return (
+    <div>
+      <Link to="/request/create">Create New</Link>
+      <ProjectTable projects={projects}></ProjectTable>
+    </div>
+  );
 };
