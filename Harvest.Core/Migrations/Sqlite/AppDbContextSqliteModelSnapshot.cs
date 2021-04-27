@@ -320,9 +320,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<int?>("QuoteId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("QuoteId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<decimal>("QuoteTotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
@@ -350,8 +347,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.HasIndex("PrincipalInvestigatorId");
 
                     b.HasIndex("QuoteId");
-
-                    b.HasIndex("QuoteId1");
 
                     b.ToTable("Projects");
                 });
@@ -731,7 +726,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasOne("Harvest.Core.Domain.Quote", "Quote")
                         .WithMany()
-                        .HasForeignKey("QuoteId1");
+                        .HasForeignKey("QuoteId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("AcreageRate");
 

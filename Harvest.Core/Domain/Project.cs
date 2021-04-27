@@ -127,6 +127,12 @@ namespace Harvest.Core.Domain
                 .HasForeignKey(q => q.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Quote)
+                .WithMany()
+                .HasForeignKey(p => p.QuoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Field>()
                 .HasOne(f => f.Project)
                 .WithMany(f => f.Fields)
