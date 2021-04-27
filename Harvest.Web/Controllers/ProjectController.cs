@@ -22,11 +22,12 @@ namespace Harvest.Web.Controllers
             this._dbContext = dbContext;
             this._userService = userService;
         }
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            // TODO: only show user's projects
-            var projects = await _dbContext.Projects.Take(20).ToArrayAsync();
-            return View(projects);
+            // // TODO: only show user's projects
+            // var projects = await _dbContext.Projects.Take(20).ToArrayAsync();
+            // return View(projects);
+            return View("React");
         }
 
         // TODO: move or determine proper permissions
