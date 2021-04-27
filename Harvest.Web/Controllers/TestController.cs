@@ -151,5 +151,16 @@ namespace Harvest.Web.Controllers
             }
             return Content("Looks like there was a problem.");
         }
+
+        public async Task<IActionResult> TestAccountApproval()
+        {
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
+            if (await _emailService.ApproveAccounts(project, new []{user.Email}))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
     }
 }
