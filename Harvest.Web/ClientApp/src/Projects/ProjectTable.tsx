@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Cell, Column, TableState } from "react-table";
+import { Progress } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Project } from "../types";
@@ -27,6 +28,12 @@ export const ProjectTable = (props: Props) => {
       {
         Header: "PI",
         accessor: (row) => row.principalInvestigator.name,
+      },
+      {
+        Cell: (data: Cell<Project>) => (
+          <Progress style={{ width: "10em" }} value={Math.random() * 100} />
+        ),
+        Header: "Progress",
       },
       {
         Header: "Crop Type",
