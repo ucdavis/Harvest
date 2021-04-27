@@ -60,7 +60,7 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<IFinancialService, FinancialService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
-            services.AddScoped(provder => StandardJsonOptions.GetOptions());
+            services.AddSingleton(provder => StandardJsonOptions.GetOptions());
 
             return services.BuildServiceProvider();
         }
