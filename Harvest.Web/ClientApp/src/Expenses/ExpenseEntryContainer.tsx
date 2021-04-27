@@ -17,6 +17,7 @@ export const ExpenseEntryContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   const getDefaultExpense = useCallback(
     (currentRates: Rate[], currentExpenses: Expense[]) => {
@@ -69,13 +70,6 @@ export const ExpenseEntryContainer = () => {
 
   const submitExpenses = async () => {
     // TODO: disable the submit button and maybe just some sort of full screen processing UI
-    
-    for (let i = 0; i < expenses.length; i++) {
-      if (isNaN(expenses[i].quantity) || expenses[i].quantity === 0) {
-        alert("Quantity is null or empty. Please input a value.")
-        return;
-      }
-    }
 
     // transform since we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
     const expensesBody = expenses.map((exp) => ({
@@ -118,22 +112,26 @@ export const ExpenseEntryContainer = () => {
           <LineEntry
             key={`expense-line-${expense.id}`}
             expense={expense}
-            updateExpense={updateExpense}
             expenseTypes={expenseTypes}
             rates={rates}
+            setDisabled={setDisabled}
+            updateExpense={updateExpense}
           ></LineEntry>
         ))}
       </div>
       <button
-        onClick={() =>
-          setExpenses([...expenses, getDefaultExpense(rates, expenses)])
-        }
+        onClick={() => {
+          setExpenses([...expenses, getDefaultExpense(rates, expenses)]);
+          setDisabled(true);
+        }}
       >
         Add Expense +
       </button>
 
       <hr />
-      <button onClick={submitExpenses}>Submit!</button>
+      <button onClick={submitExpenses} disabled={disabled}>
+        Submit!
+      </button>
       <div>DEBUG: {JSON.stringify(expenses)}</div>
     </div>
   );
