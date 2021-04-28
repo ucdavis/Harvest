@@ -6,7 +6,7 @@ using Harvest.Core.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Harvest.Web.Services
+namespace Harvest.Core.Services
 {
     public interface IUserService
     {
