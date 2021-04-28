@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { Link } from "react-router-dom";
 import { Cell, Column, TableState } from "react-table";
 import { Progress } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
@@ -16,9 +17,9 @@ export const ProjectTable = (props: Props) => {
       {
         Cell: (data: Cell<Project>) => (
           <div>
-            <a href={`/project/details/${data.row.original.id}`}>
+            <Link to={`/project/details/${data.row.original.id}`}>
               #{data.row.original.id}
-            </a>
+            </Link>
             <p>{data.row.original.name}</p>
           </div>
         ),

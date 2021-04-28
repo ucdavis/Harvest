@@ -38,9 +38,17 @@ namespace Harvest.Web.Controllers
             return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Where(p => p.IsActive).ToArrayAsync());
         }
 
-        public async Task<ActionResult> Details(int id)
+        public ActionResult Details(int id)
         {
-            return View(await _dbContext.Projects.SingleAsync(p => p.Id == id));
+            // TODO: move routes so react handles this natively and place API stuff in own controller
+            return View("React");
+        }
+
+        // TODO: permissions
+        // Returns JSON info of the project
+        public async Task<ActionResult> Get(int id)
+        {
+            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).SingleAsync(p => p.Id == id));
         }
 
         [HttpGet]
