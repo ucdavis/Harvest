@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
-import { RequestHeader } from "./RequestHeader";
+import { ProjectHeader } from "./ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
 
@@ -65,7 +65,7 @@ export const ApprovalContainer = () => {
   // we have a project with a quote, time for the approval step
   return (
     <div className="card-wrapper">
-      <RequestHeader project={projectAndQuote.project}></RequestHeader>
+      <ProjectHeader project={projectAndQuote.project}></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
