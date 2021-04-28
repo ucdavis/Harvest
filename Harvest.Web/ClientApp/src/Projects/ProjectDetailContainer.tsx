@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { ProjectHeader } from "../Requests/ProjectHeader";
 
 import { Project } from "../types";
 
@@ -31,8 +32,24 @@ export const ProjectDetailContainer = () => {
   }
 
   return (
-    <div>
-      <p>{project.id}</p>
+    <div className="card-wrapper">
+      <ProjectHeader project={project}></ProjectHeader>
+      <div className="card-green-bg">
+        <div className="card-content">
+          <ul>
+            <li>
+              <Link to={`/quote/create/${project.id}`}>Create Quote</Link>
+            </li>
+            <li>
+            <Link to={`/request/approve/${project.id}`}>Approve Quote</Link>
+            </li>
+            <li>
+              {/* TODO: Update approve accounts page to react once we know what it should do */}
+              <a href={`/project/accountApproval/${project.id}`}>Approve Accounts</a>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };

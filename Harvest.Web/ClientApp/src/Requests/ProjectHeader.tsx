@@ -4,7 +4,7 @@ interface Props {
   project: Project;
 }
 
-export const RequestHeader = (props: Props) => {
+export const ProjectHeader = (props: Props) => {
   const { project } = props;
   return (
     <div className="card-content">
