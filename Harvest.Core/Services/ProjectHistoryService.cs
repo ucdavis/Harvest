@@ -8,12 +8,12 @@ using Harvest.Core.Domain;
 
 namespace Harvest.Core.Services
 {
-    //public interface IProjectHistoryService
-    //{
-    //    ProjectHistory AddAction(int projectId, string)
-    //}
+    public interface IProjectHistoryService
+    {
+        Task<ProjectHistory> AddProjectHistory(Project project, string action, string description, User user = null);
+    }
 
-    public class ProjectHistoryService
+    public class ProjectHistoryService : IProjectHistoryService
     {
         private readonly IUserService _userService;
         private readonly AppDbContext _dbContext;
@@ -24,7 +24,7 @@ namespace Harvest.Core.Services
             _dbContext = dbContext;
         }
 
-        public async Task<ProjectHistory> AddProjectHistory(Project project, string action, string description, User user=null)
+        public async Task<ProjectHistory> AddProjectHistory(Project project, string action, string description, User user = null)
         {
             user ??= await _userService.GetCurrentUser();
 
