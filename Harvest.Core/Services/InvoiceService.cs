@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -20,10 +21,12 @@ namespace Harvest.Core.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly AppDbContext _dbContext;
+        private IProjectHistoryService _historyService;
 
-        public InvoiceService(AppDbContext dbContext)
+        public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService)
         {
             _dbContext = dbContext;
+            _historyService = historyService;
         }
         public async Task<bool> CreateInvoice(int id)
         {
@@ -73,6 +76,8 @@ namespace Harvest.Core.Services
 
             _dbContext.Invoices.Add(newInvoice);
 
+            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), newInvoice.Summarize("Created invoice"));
+
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
             return true;
 
@@ -106,6 +111,7 @@ namespace Harvest.Core.Services
             };
 
             await _dbContext.Expenses.AddAsync(expense);
+            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), expense.Summarize("Created monthly acreage expense"));
             await _dbContext.SaveChangesAsync();
 
         }
