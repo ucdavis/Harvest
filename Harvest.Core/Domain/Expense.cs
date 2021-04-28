@@ -17,13 +17,13 @@ namespace Harvest.Core.Domain
         public string Description { get; set; }
 
         [Display(Name = "Rate")] 
-        [Range(0.01, 1000000.00)]
+        [Range(0.01, Double.MaxValue, ErrorMessage = "Rate must be greater than 0.01")]
         public decimal Price { get; set; }
 
-        [Range(0.01, 1000000.00)]
+        [Range(0.01, Double.MaxValue, ErrorMessage = "Quantity must be greater than 0.01")]
         public decimal Quantity { get; set; }
 
-        [Range(0.01, 1000000.00)]
+        [Range(0.01, Double.MaxValue, ErrorMessage = "Total must be greater than 0.01")]
         public decimal Total { get; set; }
 
         [Required]
