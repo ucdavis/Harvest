@@ -41,7 +41,7 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public ActionResult Create(int id)
         {
-            return View();
+            return View("React");
         }
 
         [HttpPost]

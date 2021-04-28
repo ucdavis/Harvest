@@ -26,7 +26,7 @@ namespace Harvest.Web.Controllers
         }
 
         public ActionResult Entry() {
-            return View();
+            return View("React");
         }
 
         [HttpPost]
