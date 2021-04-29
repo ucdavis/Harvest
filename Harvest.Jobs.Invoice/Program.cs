@@ -5,6 +5,7 @@ using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Core.Utilities;
 using Harvest.Jobs.Core;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,8 +61,10 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
+            services.AddScoped<IUserService, UserService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
             services.AddSingleton(provder => StandardJsonOptions.GetOptions());
+            services.AddSingleton<IHttpContextAccessor, NullHttpContextAccessor>();
 
             return services.BuildServiceProvider();
         }
