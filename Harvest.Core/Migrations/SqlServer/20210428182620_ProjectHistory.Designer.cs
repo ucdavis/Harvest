@@ -4,15 +4,17 @@ using Harvest.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 namespace Harvest.Core.Migrations.SqlServer
 {
     [DbContext(typeof(AppDbContextSqlServer))]
-    partial class AppDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20210428182620_ProjectHistory")]
+    partial class ProjectHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,9 +382,6 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProjectId")

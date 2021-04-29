@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -30,13 +31,16 @@ namespace Harvest.Core.Services
         private readonly SlothSettings _slothSettings;
         private readonly IFinancialService _financialService;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly IProjectHistoryService _historyService;
 
-        public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService, JsonSerializerOptions serializerOptions)
+        public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService,
+            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService)
         {
             _dbContext = dbContext;
             _slothSettings = slothSettings.Value;
             _financialService = financialService;
             _serializerOptions = serializerOptions;
+            _historyService = historyService;
         }
 
 
@@ -211,6 +215,8 @@ namespace Harvest.Core.Services
                 invoice.SlothTransactionId = slothResponse.Id;
 
                 invoice.Status = Invoice.Statuses.Pending;
+
+                await _historyService.AddProjectHistory(invoice.Project, nameof(MoveMoney), "Sloth money movement requested", invoice);
                 await _dbContext.SaveChangesAsync();
 
 
@@ -276,12 +282,14 @@ namespace Harvest.Core.Services
                         invoice.Project.ChargedTotal += invoice.Total;
 
                         invoice.Status = Invoice.Statuses.Completed;
+                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", invoice);
                         await _dbContext.SaveChangesAsync();
                     }
                     if (slothResponse.Status == "Cancelled")
                     {
 
                         Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
+                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice cancelled", invoice);
                         rolledBackCount++;
                         //TODO: Write to the notes field? Trigger off an email?
                     }

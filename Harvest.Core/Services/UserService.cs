@@ -6,7 +6,7 @@ using Harvest.Core.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace Harvest.Web.Services
+namespace Harvest.Core.Services
 {
     public interface IUserService
     {
@@ -15,7 +15,7 @@ namespace Harvest.Web.Services
 
     public class UserService : IUserService
     {
-        private IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _dbContext;
         public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {

@@ -2,7 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
-using Harvest.Web.Services;
+using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
