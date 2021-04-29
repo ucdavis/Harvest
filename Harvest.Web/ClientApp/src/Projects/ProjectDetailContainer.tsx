@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ProjectHeader } from "../Requests/ProjectHeader";
+import { InvoiceListContainer } from "./InvoiceListContainer";
 
 import { Project } from "../types";
 
@@ -49,7 +50,8 @@ export const ProjectDetailContainer = () => {
             </li>
           </ul>
         </div>
+          </div>
+          <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
       </div>
-    </div>
   );
 };

@@ -38,6 +38,13 @@ namespace Harvest.Web.Controllers
             return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Where(p => p.IsActive).ToArrayAsync());
         }
 
+        // TODO: move or determine proper permissions
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> Invoices(int id)
+        {
+            return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == id).ToArrayAsync());
+        }
+
         public ActionResult Details(int id)
         {
             // TODO: move routes so react handles this natively and place API stuff in own controller
