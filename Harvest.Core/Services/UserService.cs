@@ -15,7 +15,7 @@ namespace Harvest.Core.Services
 
     public class UserService : IUserService
     {
-        private IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _dbContext;
         public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {

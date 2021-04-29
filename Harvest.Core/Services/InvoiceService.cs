@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
@@ -21,7 +22,7 @@ namespace Harvest.Core.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly AppDbContext _dbContext;
-        private IProjectHistoryService _historyService;
+        private readonly IProjectHistoryService _historyService;
 
         public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService)
         {
@@ -76,7 +77,7 @@ namespace Harvest.Core.Services
 
             _dbContext.Invoices.Add(newInvoice);
 
-            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), newInvoice.Summarize("Created invoice"));
+            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), "Invoice created", newInvoice);
 
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
             return true;
@@ -111,7 +112,7 @@ namespace Harvest.Core.Services
             };
 
             await _dbContext.Expenses.AddAsync(expense);
-            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), expense.Summarize("Created monthly acreage expense"));
+            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), "Monthly acreage expense created", expense);
             await _dbContext.SaveChangesAsync();
 
         }
