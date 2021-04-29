@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -13,7 +14,7 @@ namespace Harvest.Core.Domain
 
         [Required]
         public int ProjectId { get; set; }
-
+        [JsonIgnore]
         public Project Project { get; set; }
 
         public decimal Total { get; set; }

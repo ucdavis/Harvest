@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -28,22 +29,22 @@ namespace Harvest.Core.Domain
 
         [Required]
         public int ProjectId { get; set; }
-
+        [JsonIgnore]
         public Project Project { get; set; }
 
         [Required]
         public int RateId { get; set; }
-
+        [JsonIgnore]
         public Rate Rate { get; set; }
 
         public int? InvoiceId { get; set; }
-
+        [JsonIgnore]
         public Invoice Invoice { get; set; }
 
         public DateTime CreatedOn { get; set; }
 
         public int? CreatedById { get; set; }
-
+        [JsonIgnore]
         public User CreatedBy { get; set; }
 
         [Required]
