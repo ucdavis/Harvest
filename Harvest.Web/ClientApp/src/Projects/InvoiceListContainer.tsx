@@ -23,7 +23,7 @@ export const InvoiceListContainer = (props: Props) => {
     };
 
     cb();
-  }, []);
+    }, [props.projectId]);
 
   return (
       <div>
