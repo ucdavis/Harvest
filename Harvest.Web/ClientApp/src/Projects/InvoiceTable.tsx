@@ -17,9 +17,9 @@ export const InvoiceTable = (props: Props) => {
       {
         Cell: (data: Cell<Invoice>) => (
           <div>
-                  <Link to={`/Invoice/Details/${data.row.original.id}`}>
+                  <a href={`/Invoice/Details/${data.row.original.id}`}>
               #{data.row.original.id}
-            </Link>
+            </a>
           </div>
         ),
         Header: " ",
