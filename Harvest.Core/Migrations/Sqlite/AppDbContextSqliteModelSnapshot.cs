@@ -370,6 +370,9 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Details")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
 

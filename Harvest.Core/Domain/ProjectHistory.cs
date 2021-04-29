@@ -17,6 +17,9 @@ namespace Harvest.Core.Domain
         [MaxLength]
         public string Description { get; set; }
 
+        [MaxLength]
+        public string Details { get; set; }
+
         [Required]
         [Display(Name = "Action Date")]
         public DateTime ActionDate { get; set; }
