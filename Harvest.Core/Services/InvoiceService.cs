@@ -92,7 +92,7 @@ namespace Harvest.Core.Services
             if (await _dbContext.Expenses.AnyAsync(a =>
                 a.ProjectId == project.Id && a.InvoiceId == null && a.Rate.Type == Rate.Types.Acreage))
             {
-                Log.Information("Project {project.Id} Unbilled acreage expense already found. Skipping.", project.Id);
+                Log.Information("Project {projectId} Unbilled acreage expense already found. Skipping.", project.Id);
                 return;
             }
 
