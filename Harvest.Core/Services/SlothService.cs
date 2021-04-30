@@ -71,7 +71,7 @@ namespace Harvest.Core.Services
             var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
             if (invoice.Total != grandTotal)
             {
-                Log.Information("Invoice Total {invoice.Total} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
+                Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
                 invoice.Total = grandTotal;
             }
             foreach (var projectAccount in invoice.Project.Accounts)
@@ -81,7 +81,7 @@ namespace Harvest.Core.Services
                 var debit = await _financialService.IsValid(projectAccount.Number);
                 if (!debit.IsValid)
                 {
-                   Log.Information("Invalid Project Account: {debit.Message}", debit.Message);
+                   Log.Information("Invalid Project Account: {debitMessage}", debit.Message);
                    throw new Exception($"Unable to validate debit account {projectAccount.Number}: {debit.Message}");
                 }
 
@@ -102,7 +102,7 @@ namespace Harvest.Core.Services
                 }
                 else
                 {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoice.Id}", invoice.Id);
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
                 }
             }
             //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
@@ -126,7 +126,7 @@ namespace Harvest.Core.Services
                 var credit = await _financialService.IsValid(expense.Key);
                 if (!credit.IsValid)
                 {
-                    Log.Information("Invalid Expense Account: {credit.Message}", credit.Message);
+                    Log.Information("Invalid Expense Account: {creditMessage}", credit.Message);
                     throw new Exception($"Unable to validate credit account {expense.Key}: {credit.Message}");
                 }
                 var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
@@ -145,7 +145,7 @@ namespace Harvest.Core.Services
                 }
                 else
                 {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoice.Id}", invoice.Id);
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
                 }
             }
             var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
