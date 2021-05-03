@@ -376,25 +376,21 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<DateTime>("ActionDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Actor")
-                        .HasMaxLength(20)
+                    b.Property<int?>("ActorId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ActorName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
 
                     b.HasIndex("ProjectId");
 
@@ -760,11 +756,17 @@ namespace Harvest.Core.Migrations.SqlServer
 
             modelBuilder.Entity("Harvest.Core.Domain.ProjectHistory", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.User", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId");
+
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Actor");
 
                     b.Navigation("Project");
                 });

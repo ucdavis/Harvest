@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
-using Harvest.Web.Services;
+using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +26,7 @@ namespace Harvest.Web.Controllers
         }
 
         public ActionResult Entry() {
-            return View();
+            return View("React");
         }
 
         [HttpPost]

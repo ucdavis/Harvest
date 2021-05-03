@@ -6,6 +6,8 @@ import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
+import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
+import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { Map } from "./Maps/Map";
 
 function App() {
@@ -16,6 +18,11 @@ function App() {
       <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
+      <Route exact path="/project" component={ProjectListContainer} />
+      <Route
+        path="/project/details/:projectId"
+        component={ProjectDetailContainer}
+      />
       <Route
         path="/expense/entry/:projectId?"
         component={ExpenseEntryContainer}

@@ -10,17 +10,17 @@
 <mj-section>
     <mj-column>
         <mj-text align="center">
-            <h1>Hello @Model.ProfName</h1>
-            <h3>Your quote for project @Model.ProjectName</h3>
+            <h1>Hello @@Model.ProfName</h1>
+            <h3>Your quote for project @@Model.ProjectName</h3>
             <h3>Is ready for your review and approval.</h3>
             <br/>
-            <p>Project Start: @Model.ProjectStart</p>
-            <p>Project End: @Model.ProjectEnd</p>
-            <p>Quote amount: @Model.QuoteAmount</p>
+            <p>Project Start: @@Model.ProjectStart</p>
+            <p>Project End: @@Model.ProjectEnd</p>
+            <p>Quote amount: @@Model.QuoteAmount</p>
         </mj-text>
     </mj-column>
 </mj-section>
 
 
 
-@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to go to the Quote", @Model.ButtonUrl))
+@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to go to the Quote", "@Model.ButtonUrl"))

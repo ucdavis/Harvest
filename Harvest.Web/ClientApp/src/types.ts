@@ -24,6 +24,14 @@ export interface Project {
   quotes: null;
 }
 
+export interface Invoice {
+    id: number;
+    total: number;
+    createdOn: Date;
+    notes: string;
+    status: string;
+}
+
 export interface User {
   id: number;
   firstName: string;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -30,13 +31,16 @@ namespace Harvest.Core.Services
         private readonly SlothSettings _slothSettings;
         private readonly IFinancialService _financialService;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly IProjectHistoryService _historyService;
 
-        public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService, JsonSerializerOptions serializerOptions)
+        public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService,
+            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService)
         {
             _dbContext = dbContext;
             _slothSettings = slothSettings.Value;
             _financialService = financialService;
             _serializerOptions = serializerOptions;
+            _historyService = historyService;
         }
 
 
@@ -67,7 +71,7 @@ namespace Harvest.Core.Services
             var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
             if (invoice.Total != grandTotal)
             {
-                Log.Information("Invoice Total {invoice.Total} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
+                Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
                 invoice.Total = grandTotal;
             }
             foreach (var projectAccount in invoice.Project.Accounts)
@@ -77,7 +81,7 @@ namespace Harvest.Core.Services
                 var debit = await _financialService.IsValid(projectAccount.Number);
                 if (!debit.IsValid)
                 {
-                   Log.Information("Invalid Project Account: {debit.Message}", debit.Message);
+                   Log.Information("Invalid Project Account: {debitMessage}", debit.Message);
                    throw new Exception($"Unable to validate debit account {projectAccount.Number}: {debit.Message}");
                 }
 
@@ -98,7 +102,7 @@ namespace Harvest.Core.Services
                 }
                 else
                 {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoice.Id}", invoice.Id);
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
                 }
             }
             //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
@@ -122,7 +126,7 @@ namespace Harvest.Core.Services
                 var credit = await _financialService.IsValid(expense.Key);
                 if (!credit.IsValid)
                 {
-                    Log.Information("Invalid Expense Account: {credit.Message}", credit.Message);
+                    Log.Information("Invalid Expense Account: {creditMessage}", credit.Message);
                     throw new Exception($"Unable to validate credit account {expense.Key}: {credit.Message}");
                 }
                 var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
@@ -141,7 +145,7 @@ namespace Harvest.Core.Services
                 }
                 else
                 {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoice.Id}", invoice.Id);
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
                 }
             }
             var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
@@ -211,6 +215,8 @@ namespace Harvest.Core.Services
                 invoice.SlothTransactionId = slothResponse.Id;
 
                 invoice.Status = Invoice.Statuses.Pending;
+
+                await _historyService.AddProjectHistory(invoice.Project, nameof(MoveMoney), "Sloth money movement requested", invoice);
                 await _dbContext.SaveChangesAsync();
 
 
@@ -276,12 +282,14 @@ namespace Harvest.Core.Services
                         invoice.Project.ChargedTotal += invoice.Total;
 
                         invoice.Status = Invoice.Statuses.Completed;
+                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", invoice);
                         await _dbContext.SaveChangesAsync();
                     }
                     if (slothResponse.Status == "Cancelled")
                     {
 
                         Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
+                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice cancelled", invoice);
                         rolledBackCount++;
                         //TODO: Write to the notes field? Trigger off an email?
                     }

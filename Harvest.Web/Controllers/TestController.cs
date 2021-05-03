@@ -35,10 +35,19 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-            var model = new ChangeRequestModel();
-            model.InitForMjml();
+            //var model = new ChangeRequestModel();
+            //model.InitForMjml();
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest_mjml.cshtml", model);
+            //var results = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest_mjml.cshtml", model);
+
+            //var model = new TestEmailModel();
+            //model.InitForMjml();
+            //var results = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
+
+            var model = new NewFieldRequestModel();
+
+
+            var results = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -53,20 +62,44 @@ namespace Harvest.Web.Controllers
             //};
             //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
             //await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
-            var model = new QuoteDecisionModel()
-            {
-                PI = user.NameAndEmail,
-                ProjectName = "Your Awesome Project",
-                ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
-                ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
-                Decision = "Approved",
-                DecisionColor = QuoteDecisionModel.Colors.Approved,
-                //ButtonUrl = "???"
-            };
+            //var model = new QuoteDecisionModel()
+            //{
+            //    PI = user.NameAndEmail,
+            //    ProjectName = "Your Awesome Project",
+            //    ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
+            //    ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
+            //    Decision = "Approved",
+            //    DecisionColor = QuoteDecisionModel.Colors.Approved,
+            //    //ButtonUrl = "???"
+            //};
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
+            //var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-            await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+            //var model = new TestEmailModel();
+            //model.Name = "Jason";
+            //model.MyList = new List<string>();
+            //model.MyList.Add("Test Line 1");
+            //model.MyList.Add("Test Line 2");
+            //model.MyList.Add("For The WIN");
+            //model.MyList.Add("Last Line");
+            //var emailBody = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
+
+            //await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+
+            var model = new AccountPendingApprovalModel();
+            model.PI = user.NameAndEmail;
+            model.ProjectName = "Jason's Awesome Project";
+            model.ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d");
+            model.ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d");
+            model.ButtonUrl = "https://harvest.caes.ucdavis.edu";
+            model.AccountsList = new List<AccountsForApprovalModel>();
+            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "3-CRU9033", Name = "COMPUTING RESOURCES UNIT- GETCHELL", Percent = "75%" });
+            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "3-APSNFDS", Name = "PS:FIELD:DAVIS SHOP ACCOUNT", Percent = "15%" });
+            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "3-RRCNTRY", Name = "RUSSELL RANCH CENTURY PROJECT", Percent = "10%" });
+
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/AccountPendingApproval.cshtml", model);
+            await _notificationService.SendNotification(new string[] { user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Accounts Need Approval");
+
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
 
@@ -113,6 +146,17 @@ namespace Harvest.Web.Controllers
         {
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.OriginalProject).SingleAsync(a => a.Id == 10);
             if (await _emailService.ChangeRequest(project))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
+
+        public async Task<IActionResult> TestAccountApproval()
+        {
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
+            if (await _emailService.ApproveAccounts(project, new []{user.Email}))
             {
                 return Content("Done.");
             }

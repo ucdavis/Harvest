@@ -21,6 +21,8 @@ namespace Harvest.Web.Services
 
         Task<bool> QuoteApproved(Project project);
         Task<bool> QuoteDenied(Project project);
+
+        Task<bool> ApproveAccounts(Project project, string[] emails);
     }
 
     public class EmailService : IEmailService
@@ -179,6 +181,41 @@ namespace Harvest.Web.Services
         public async Task<bool> QuoteDenied(Project project)
         {
             return await QuoteDecision(project, false);
+        }
+
+        public async Task<bool> ApproveAccounts(Project project, string[] emails)
+        {
+            var url = "https://harvest.caes.ucdavis.edu/Project/AccountApproval/";
+
+            var model = new AccountPendingApprovalModel()
+            {
+                PI = project.PrincipalInvestigator.NameAndEmail,
+                ProjectName = project.Name,
+                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                AccountsList = new List<AccountsForApprovalModel>(),
+                ButtonUrl = $"{url}{project.Id}"
+            };
+            foreach (var account in project.Accounts.Where(a => a.ApprovedBy == null))
+            {
+                model.AccountsList.Add(new AccountsForApprovalModel(){Account = account.Number, Name = account.Name, Percent = $"{account.Percentage}%"});
+            }
+
+            var textVersion = $"Accounts require your approval for use in project {model.ProjectName} by {model.PI}";
+
+            try
+            {
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/AccountPendingApproval.cshtml", model);
+
+                await _notificationService.SendNotification(emails, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
         }
     }
 }

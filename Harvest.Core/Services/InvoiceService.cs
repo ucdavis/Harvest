@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -20,10 +22,12 @@ namespace Harvest.Core.Services
     public class InvoiceService : IInvoiceService
     {
         private readonly AppDbContext _dbContext;
+        private readonly IProjectHistoryService _historyService;
 
-        public InvoiceService(AppDbContext dbContext)
+        public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService)
         {
             _dbContext = dbContext;
+            _historyService = historyService;
         }
         public async Task<bool> CreateInvoice(int id)
         {
@@ -73,6 +77,8 @@ namespace Harvest.Core.Services
 
             _dbContext.Invoices.Add(newInvoice);
 
+            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), "Invoice created", newInvoice);
+
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
             return true;
 
@@ -86,7 +92,7 @@ namespace Harvest.Core.Services
             if (await _dbContext.Expenses.AnyAsync(a =>
                 a.ProjectId == project.Id && a.InvoiceId == null && a.Rate.Type == Rate.Types.Acreage))
             {
-                Log.Information("Project {project.Id} Unbilled acreage expense already found. Skipping.", project.Id);
+                Log.Information("Project {projectId} Unbilled acreage expense already found. Skipping.", project.Id);
                 return;
             }
 
@@ -106,6 +112,7 @@ namespace Harvest.Core.Services
             };
 
             await _dbContext.Expenses.AddAsync(expense);
+            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), "Monthly acreage expense created", expense);
             await _dbContext.SaveChangesAsync();
 
         }

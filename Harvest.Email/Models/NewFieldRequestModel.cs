@@ -17,20 +17,5 @@ namespace Harvest.Email.Models
         public string Crops { get; set; }
         public string Requirements { get; set; }
         public string ButtonUrl { get; set; }
-
-        /// <summary>
-        /// Sets model values when running TestController.TestBody
-        /// </summary>
-        public void InitForMjml()
-        {
-            PI           = "@Model.PI";
-            ProjectName  = "@Model.ProjectName";
-            ProjectStart = "@Model.ProjectStart";
-            ProjectEnd   = "@Model.ProjectEnd";
-            CropType     = "@Model.CropType";
-            Crops        = "@Model.Crops";
-            Requirements = "@Model.Requirements";
-            ButtonUrl    = "@Model.ButtonUrl";
-        }
     }
 }

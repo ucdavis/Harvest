@@ -5,8 +5,9 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
-namespace Harvest.Web.Services
+namespace Harvest.Core.Services
 {
     public interface IUserService
     {
@@ -15,7 +16,7 @@ namespace Harvest.Web.Services
 
     public class UserService : IUserService
     {
-        private IHttpContextAccessor _httpContextAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly AppDbContext _dbContext;
         public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
@@ -26,6 +27,12 @@ namespace Harvest.Web.Services
         // Get the current user, creating them if necessary
         public async Task<User> GetCurrentUser()
         {
+            if (_httpContextAccessor.HttpContext == null)
+            {
+                Log.Warning("No HttpContext found. Unable to retrieve or create User.");
+                return null;
+            }
+
             var username = _httpContextAccessor.HttpContext.User.Identity.Name;
             var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
             string iamId = userClaims.Single(c => c.Type == IamIdClaimType).Value;

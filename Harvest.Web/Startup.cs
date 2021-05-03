@@ -57,7 +57,7 @@ namespace Harvest.Web
                 options.Filters.Add<SerilogControllerActionFilter>();
             }).AddJsonOptions(options =>
             {
-                var o = StandardJsonOptions.GetOptions();
+                var o = JsonOptions.Standard;
                 options.JsonSerializerOptions.PropertyNamingPolicy = o.PropertyNamingPolicy;
                 options.JsonSerializerOptions.NumberHandling = o.NumberHandling;
                 options.JsonSerializerOptions.AllowTrailingCommas = o.AllowTrailingCommas;
@@ -153,7 +153,8 @@ namespace Harvest.Web
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailBodyService, EmailBodyService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped(provder => StandardJsonOptions.GetOptions());
+            services.AddScoped(provder => JsonOptions.Standard);
+            services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

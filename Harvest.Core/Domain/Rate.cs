@@ -33,7 +33,7 @@ namespace Harvest.Core.Domain
         public string Account { get; set; }
 
         [Display(Name = "Rate")] 
-        [Range(0.01, 1000000.00)]
+        [Range(0.01, Double.MaxValue, ErrorMessage = "Rate must be greater than 0.01")]
         public decimal Price { get; set; }
         [Display(Name = "Effective Date")]
         public DateTime? EffectiveOn { get; set; }

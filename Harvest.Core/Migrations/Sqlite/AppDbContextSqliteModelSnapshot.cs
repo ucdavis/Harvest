@@ -364,25 +364,21 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<DateTime>("ActionDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Actor")
-                        .HasMaxLength(20)
+                    b.Property<int?>("ActorId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ActorName")
-                        .HasMaxLength(50)
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("Details")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("ActorId");
 
                     b.HasIndex("ProjectId");
 
@@ -742,11 +738,17 @@ namespace Harvest.Core.Migrations.Sqlite
 
             modelBuilder.Entity("Harvest.Core.Domain.ProjectHistory", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.User", "Actor")
+                        .WithMany()
+                        .HasForeignKey("ActorId");
+
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Actor");
 
                     b.Navigation("Project");
                 });

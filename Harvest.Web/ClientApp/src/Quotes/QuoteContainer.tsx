@@ -11,7 +11,7 @@ import {
 
 import { FieldContainer } from "../Fields/FieldContainer";
 import { ProjectDetail } from "./ProjectDetail";
-import { RequestHeader } from "../Requests/RequestHeader";
+import { ProjectHeader } from "../Requests/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
@@ -140,7 +140,7 @@ export const QuoteContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <RequestHeader project={project}></RequestHeader>
+      <ProjectHeader project={project}></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <div className="quote-details">
