@@ -62,12 +62,10 @@ export const QuoteContainer = () => {
     cb();
   }, [projectId]);
 
-  useEffect(() => {
-    setQuote((q) => ({ ...q, acreageTotal: q.acreageRate * q.acres }));
-  }, [quote.acreageRate, quote.acres]);
 
   useEffect(() => {
     setQuote((q) => {
+      let acreageTotal = q.acreageRate * q.acres;
       let activitiesTotal = 0;
       let laborTotal = 0;
       let equipmentTotal = 0;
@@ -97,14 +95,15 @@ export const QuoteContainer = () => {
 
       return {
         ...q,
+        acreageTotal,
         activitiesTotal,
         laborTotal,
         equipmentTotal,
         otherTotal,
-        grandTotal: activitiesTotal + q.acreageTotal,
+        grandTotal: activitiesTotal + acreageTotal,
       };
     });
-  }, [quote.activities]);
+  }, [quote.activities, quote.acreageRate, quote.acres]);
 
   const save = async () => {
     // TODO: add progress and hide info while saving
