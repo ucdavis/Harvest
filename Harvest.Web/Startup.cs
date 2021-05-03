@@ -153,7 +153,8 @@ namespace Harvest.Web
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailBodyService, EmailBodyService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped(provder => StandardJsonOptions.GetOptions());
+            // JsonSerializerOptions is transient so that it can be  modified as needed
+            services.AddTransient(provder => StandardJsonOptions.GetOptions());
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
         }
 

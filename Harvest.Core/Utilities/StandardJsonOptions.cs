@@ -19,5 +19,11 @@ namespace Harvest.Core.Utilities
                 ReferenceHandler = ReferenceHandler.Preserve
             };
         }
+
+        public static JsonSerializerOptions WithGeoJson(this JsonSerializerOptions options)
+        {
+            options.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+            return options;
+        }
     }
 }
