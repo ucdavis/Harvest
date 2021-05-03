@@ -63,7 +63,7 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IUserService, UserService>();
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
-            services.AddSingleton(provder => StandardJsonOptions.GetOptions());
+            services.AddSingleton(provder => JsonOptions.Standard);
             services.AddSingleton<IHttpContextAccessor, NullHttpContextAccessor>();
 
             return services.BuildServiceProvider();
