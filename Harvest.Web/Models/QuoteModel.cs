@@ -19,12 +19,12 @@ namespace Harvest.Web.Models
     {
         public static QuoteDetail Deserialize(string text)
         {
-            return JsonSerializer.Deserialize<QuoteDetail>(text, StandardJsonOptions.GetOptions().WithGeoJson());
+            return JsonSerializer.Deserialize<QuoteDetail>(text, JsonOptions.Standard.WithGeoJson());
         }
 
         public static string Serialize(QuoteDetail value)
         {
-            return JsonSerializer.Serialize<QuoteDetail>(value, StandardJsonOptions.GetOptions().WithGeoJson());
+            return JsonSerializer.Serialize<QuoteDetail>(value, JsonOptions.Standard.WithGeoJson());
         }
 
         public string ProjectName { get; set; }
