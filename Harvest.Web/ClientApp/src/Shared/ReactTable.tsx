@@ -58,7 +58,7 @@ export const ReactTable = ({
   return (
     <>
       <table
-        className="table table-bordered table-striped"
+        className="table harvest-table table-bordered table-striped"
         {...getTableProps()}
       >
         <thead>

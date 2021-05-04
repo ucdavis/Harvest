@@ -22,7 +22,9 @@ export const ProjectListContainer = () => {
 
   return (
     <div>
-      <Link to="/request/create">Create New</Link>
+      <button className="primary-btn btn">
+        <a href="/request/create">Create New</a>
+      </button>
       <ProjectTable projects={projects}></ProjectTable>
     </div>
   );

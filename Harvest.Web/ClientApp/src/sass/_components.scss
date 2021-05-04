@@ -6,3 +6,24 @@
 .btn-group-lg > .btn {
   padding: 1rem 1.5rem;
 }
+.harvest-table {
+  th {
+    background-color: $primary-light;
+    color: $secondary-font;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+  }
+  .progress-bar {
+    background-color: $primary-color;
+  }
+  a {
+    color: $primary-color;
+    &:hover {
+      color: darken($primary-color, 3);
+    }
+  }
+  td {
+    padding: 0.5rem;
+    vertical-align: middle;
+  }
+}
