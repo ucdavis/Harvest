@@ -30,13 +30,15 @@ export const LineEntry = (props: Props) => {
   };
 
   const updateHourlyRate = (value: string) => {
+    const newQuantity = parseFloat(value);
+
     props.updateExpense({
       ...props.expense,
       quantity: parseFloat(value),
       total: props.expense.rate.price * parseFloat(value),
     });
 
-    if (isNaN(props.expense.quantity) || props.expense.quantity === 0) {
+    if (isNaN(newQuantity) || newQuantity === 0) {
       setError("Hourly rate is empty or 0");
       props.setDisabled(true);
     } else {
@@ -104,7 +106,8 @@ export const LineEntry = (props: Props) => {
           <Col xs="4">
             <FormGroup>
               <Input
-                type="text"
+                type="number"
+                step="any"
                 name="quantity"
                 defaultValue={props.expense.quantity || ""}
                 placeholder={`${props.expense.rate.unit} total`}
