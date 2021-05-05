@@ -112,6 +112,7 @@ export const ExpenseEntryContainer = () => {
           <LineEntry
             key={`expense-line-${expense.id}`}
             expense={expense}
+            expenses={expenses}
             expenseTypes={expenseTypes}
             rates={rates}
             setDisabled={setDisabled}

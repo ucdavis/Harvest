@@ -4,6 +4,7 @@ import { Expense, Rate } from "../types";
 
 interface Props {
   expense: Expense;
+  expenses: Expense[];
   expenseTypes: string[];
   rates: Rate[];
   setDisabled: (value: boolean) => void;
@@ -38,12 +39,19 @@ export const LineEntry = (props: Props) => {
       total: props.expense.rate.price * parseFloat(value),
     });
 
-    if (isNaN(newQuantity) || newQuantity === 0) {
-      setError("Hourly rate is empty or 0");
-      props.setDisabled(true);
+    if (isNaN(newQuantity) || newQuantity <= 0) {
+      setError("Hourly rate is empty or below 0");
     } else {
       setError("");
-      props.setDisabled(false);
+    }
+
+    props.setDisabled(false);
+
+    for (let i = 0; i < props.expenses.length; i++) {
+      if (isNaN(props.expenses[i].quantity)  || props.expenses[i].quantity <= 0) {
+        props.setDisabled(true);
+        return;
+      }
     }
   };
 
