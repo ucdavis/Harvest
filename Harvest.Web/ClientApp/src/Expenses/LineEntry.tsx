@@ -1,16 +1,19 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Card, CardBody, Col, FormGroup, Input, Row } from "reactstrap";
 import { Expense, Rate } from "../types";
 
 interface Props {
   expense: Expense;
+  expenses: Expense[];
   expenseTypes: string[];
   rates: Rate[];
+  setDisabled: (value: boolean) => void;
   updateExpense: (expense: Expense) => void;
 }
 
 export const LineEntry = (props: Props) => {
   // update the matching valid rates whenever the expense type changes
+  const [error, setError] = useState<string>("Hourly rate is empty or 0");
   const validRates = useMemo(() => {
     return props.rates.filter((r) => r.type === props.expense.type);
   }, [props.expense.type, props.rates]);
@@ -25,6 +28,31 @@ export const LineEntry = (props: Props) => {
       quantity: 0,
       total: 0,
     });
+  };
+
+  const updateHourlyRate = (value: string) => {
+    const newQuantity = parseFloat(value);
+
+    props.updateExpense({
+      ...props.expense,
+      quantity: parseFloat(value),
+      total: props.expense.rate.price * parseFloat(value),
+    });
+
+    if (isNaN(newQuantity) || newQuantity <= 0) {
+      setError("Hourly rate is empty or below 0");
+    } else {
+      setError("");
+    }
+
+    props.setDisabled(false);
+
+    for (let i = 0; i < props.expenses.length; i++) {
+      if (isNaN(props.expenses[i].quantity)  || props.expenses[i].quantity <= 0) {
+        props.setDisabled(true);
+        return;
+      }
+    }
   };
 
   const updateRateType = (rateId: number) => {
@@ -86,22 +114,17 @@ export const LineEntry = (props: Props) => {
           <Col xs="4">
             <FormGroup>
               <Input
-                type="text"
+                type="number"
+                step="any"
                 name="quantity"
                 defaultValue={props.expense.quantity || ""}
                 placeholder={`${props.expense.rate.unit} total`}
-                onChange={(e) =>
-                  props.updateExpense({
-                    ...props.expense,
-                    quantity: parseFloat(e.target.value),
-                    total:
-                      props.expense.rate.price * parseFloat(e.target.value),
-                  })
-                }
+                onChange={(e) => updateHourlyRate(e.target.value)}
               />
             </FormGroup>
           </Col>
         </Row>
+        <div style={{ color: "red" }}>{error}</div>
       </CardBody>
     </Card>
   );
