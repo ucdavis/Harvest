@@ -81,3 +81,15 @@
 .form-group {
   margin-bottom: 1.5rem;
 }
+.navbar {
+  .nav-item {
+    .nav-link {
+      font-size: 1.2rem;
+      color: $primary-font;
+      padding: 0.75rem;
+      &:hover {
+        color: $primary-color;
+      }
+    }
+  }
+}
