@@ -1,6 +1,23 @@
 .btn {
   font-family: $sans-bold;
   font-size: 1.2rem;
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
+  }
+}
+.btn:focus,
+.btn.focus {
+  box-shadow: 0 0 0 0.2rem rgba(38, 96, 65, 0.25);
+}
+.btn-link {
+  color: $primary-color;
+  background: rgba(0, 0, 0, 0);
+  border: 0px;
+  box-shadow: none;
+  &:hover {
+    color: darken($primary-color, 3);
+  }
 }
 .btn-lg,
 .btn-group-lg > .btn {
@@ -29,4 +46,11 @@
   tr {
     background-color: #fff !important;
   }
+}
+.page-item.active .page-link {
+  background-color: transparentize($primary-color, 0.3);
+  border-color: transparentize($primary-color, 0.3);
+}
+.page-link {
+  color: $primary-color;
 }
