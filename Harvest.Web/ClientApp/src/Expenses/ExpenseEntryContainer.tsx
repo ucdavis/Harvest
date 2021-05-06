@@ -17,6 +17,7 @@ export const ExpenseEntryContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   const getDefaultExpense = useCallback(
     (currentRates: Rate[], currentExpenses: Expense[]) => {
@@ -111,22 +112,27 @@ export const ExpenseEntryContainer = () => {
           <LineEntry
             key={`expense-line-${expense.id}`}
             expense={expense}
-            updateExpense={updateExpense}
+            expenses={expenses}
             expenseTypes={expenseTypes}
             rates={rates}
+            setDisabled={setDisabled}
+            updateExpense={updateExpense}
           ></LineEntry>
         ))}
       </div>
       <button
-        onClick={() =>
-          setExpenses([...expenses, getDefaultExpense(rates, expenses)])
-        }
+        onClick={() => {
+          setExpenses([...expenses, getDefaultExpense(rates, expenses)]);
+          setDisabled(true);
+        }}
       >
         Add Expense +
       </button>
 
       <hr />
-      <button onClick={submitExpenses}>Submit!</button>
+      <button onClick={submitExpenses} disabled={disabled}>
+        Submit!
+      </button>
       <div>DEBUG: {JSON.stringify(expenses)}</div>
     </div>
   );
