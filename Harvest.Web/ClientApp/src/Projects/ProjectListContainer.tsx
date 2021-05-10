@@ -27,9 +27,9 @@ export const ProjectListContainer = () => {
           <h1>Projects</h1>
         </div>
         <div className="col text-right">
-          <a className="btn btn-sm btn-link " href="/request/create">
+          <Link to="/request/create" className="btn btn-sm btn-link ">
             fontaweomse PLus Icon here Create New
-          </a>
+          </Link>
         </div>
       </div>
 
