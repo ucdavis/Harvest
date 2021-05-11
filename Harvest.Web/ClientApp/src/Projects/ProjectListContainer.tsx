@@ -22,7 +22,17 @@ export const ProjectListContainer = () => {
 
   return (
     <div>
-      <Link to="/request/create">Create New</Link>
+      <div className="row justify-content-between mb-3">
+        <div className="col">
+          <h1>Projects</h1>
+        </div>
+        <div className="col text-right">
+          <Link to="/request/create" className="btn btn-sm btn-link ">
+            fontaweomse PLus Icon here Create New
+          </Link>
+        </div>
+      </div>
+
       <ProjectTable projects={projects}></ProjectTable>
     </div>
   );
