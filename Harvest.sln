@@ -10,7 +10,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2F1EC784-359B-4A83-BECD-BABDECB29161}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		azure-pipelines-mobile.yml = azure-pipelines-mobile.yml
 		azure-pipelines-web.yml = azure-pipelines-web.yml
 		LICENSE = LICENSE
 		README.md = README.md
@@ -22,9 +21,9 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Harvest.Db", "Harvest.Db\Ha
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{881707AF-05A1-41B0-9F8A-676A8CD552BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvest.Jobs.Core", "Harvest.Jobs.Core\Harvest.Jobs.Core.csproj", "{D3E1A5C3-FFC7-4413-9E43-293CE0C32720}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Core", "Harvest.Jobs.Core\Harvest.Jobs.Core.csproj", "{D3E1A5C3-FFC7-4413-9E43-293CE0C32720}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvest.Jobs.Invoice", "Harvest.Jobs.Invoice\Harvest.Jobs.Invoice.csproj", "{2C3D598F-7188-4D44-B9CD-932C7F574696}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Invoice", "Harvest.Jobs.Invoice\Harvest.Jobs.Invoice.csproj", "{2C3D598F-7188-4D44-B9CD-932C7F574696}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
