@@ -31,6 +31,15 @@ namespace Harvest.Core.Services
         }
         public async Task<bool> CreateInvoice(int id)
         {
+            var now = DateTime.UtcNow;
+
+            //Make sure we are running on a business day
+            var day = now.DayOfWeek;
+            if (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday)
+            {
+                return false;
+            }
+
             //Look for an active project
             var project = await _dbContext.Projects.Include(a => a.AcreageRate)
                 .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == id).SingleOrDefaultAsync();
@@ -38,14 +47,14 @@ namespace Harvest.Core.Services
             {
                 return false;
             }
-            //Check to see if there is an invoice within the last 28 days
-            if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == id && a.CreatedOn >= DateTime.UtcNow.AddDays(-28)))
+            
+            //Check to see if there is an invoice within current month
+            if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == id && a.CreatedOn.Year == DateTime.UtcNow.Year && a.CreatedOn.Month == DateTime.UtcNow.Month))
             {
-                //Already invoice within the last 28 days.
+                //Already invoice within current month
                 return false;
             }
 
-            var now = DateTime.UtcNow;
             if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
             {
                 //Project hasn't started yet. (Is Start UTC? if not, it should be)
