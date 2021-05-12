@@ -14,8 +14,6 @@ export const QuoteTotals = (props: Props) => {
       <CardHeader>Project Totals</CardHeader>
       <CardBody>
         <div id="total">
-          <h6>Project Totals</h6>
-          <hr />
           <Row>
             <Col xs="10" sm="10">
               <div>Acreage Fees</div>

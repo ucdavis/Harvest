@@ -13,6 +13,9 @@ import {
 import { Rate, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+
 interface Props {
   category: string;
   rates: Rate[];
@@ -46,10 +49,10 @@ export const WorkItemsForm = (props: Props) => {
   return (
     <div className="activity-line">
       <Row>
-        <Col xs="4">
+        <Col xs="5">
           <label>{props.category}</label>
         </Col>
-        <Col xs="2">
+        <Col xs="3">
           <label>Time</label>
         </Col>
         <Col xs="2">
@@ -64,7 +67,7 @@ export const WorkItemsForm = (props: Props) => {
           className="activity-line-item"
           key={`workItem-${workItem.id}-activity-${workItem.activityId}`}
         >
-          <Col xs="4">
+          <Col xs="5">
             <FormGroup>
               {props.category === "other" ? (
                 <Input />
@@ -86,7 +89,7 @@ export const WorkItemsForm = (props: Props) => {
             </FormGroup>
           </Col>
 
-          <Col xs="2">
+          <Col xs="3">
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>hr</InputGroupText>
@@ -124,12 +127,12 @@ export const WorkItemsForm = (props: Props) => {
             </InputGroup>
           </Col>
 
-          <Col xs="2">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
+          <Col xs="1">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
 
-          <Col xs="2">
-            <Button color="link" onClick={() => props.deleteWorkItem(workItem)}>
-              Delete
-            </Button>
+          <Col xs="1">
+            <a onClick={() => props.deleteWorkItem(workItem)}>
+              <FontAwesomeIcon icon={faTrashAlt} />
+            </a>
           </Col>
         </Row>
       ))}

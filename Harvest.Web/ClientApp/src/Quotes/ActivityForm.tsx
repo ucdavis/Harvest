@@ -49,7 +49,7 @@ export const ActivityForm = (props: Props) => {
   };
 
   return (
-    <div className="card-wrapper no-green">
+    <div className="card-wrapper mb-4 no-green">
       <div className="card-content">
         <Input
           type="text"
