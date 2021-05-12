@@ -3,7 +3,6 @@ import React from "react";
 import {
   MapContainer,
   TileLayer,
-  Marker,
   Popup,
   GeoJSON,
   FeatureGroup,
@@ -14,6 +13,7 @@ import {
 
 import { EditControl } from "react-leaflet-draw";
 
+import { EditField } from "./EditField";
 import { Field } from "../types";
 
 interface Props {
@@ -21,8 +21,20 @@ interface Props {
   updateFields: (fields: Field[]) => void;
 }
 
+interface State {
+  editFieldId: number | undefined;
+}
+
 // NOTE: leaflet-draw plugin is not compatible with react hooks so we use a full component here
-export class FieldContainer extends React.Component<Props> {
+export class FieldContainer extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      editFieldId: undefined,
+    };
+  }
+
   _addDefaultField = (e: any) => {
     const { layer } = e;
     console.log(e);
@@ -39,6 +51,9 @@ export class FieldContainer extends React.Component<Props> {
 
     this.props.updateFields([...this.props.fields, newField]);
 
+    // immediately set the new field for editing
+    this.setState({ editFieldId: newId });
+
     // immediately remove added layer because we are going to let react handle rendering layers
     this._editableFG?.removeLayer(layer);
   };
@@ -46,7 +61,6 @@ export class FieldContainer extends React.Component<Props> {
   render() {
     return (
       <div>
-        <button onClick={this._addDefaultField}>Add Field</button>
         <MapContainer
           style={{ height: window.innerHeight }}
           center={[38.5449, -121.7405]}
@@ -79,21 +93,28 @@ export class FieldContainer extends React.Component<Props> {
           </FeatureGroup>
           {this.props.fields.map((field) => (
             <GeoJSON key={`field-${field.id}`} data={field.geometry}>
-              <Popup>
-                Some content here
-              </Popup>
+              <Popup>Some content here</Popup>
             </GeoJSON>
           ))}
-
-          <Marker position={[38.5449, -121.7405]}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
         </MapContainer>
+        {this._renderModal()}
       </div>
     );
   }
+
+  _renderModal = () => {
+    if (this.state.editFieldId) {
+      const field = this.props.fields.find(
+        (f) => f.id === this.state.editFieldId
+      );
+
+      if (field) {
+        return  <EditField field={field} saveFieldChanges={() => {}}></EditField>
+      }
+    }
+
+    return null;
+  };
 
   // our render feature group, only used for dynamic drawing
   // once drawing is finished, a field is added and react-leaflet takes over with rendering and control
