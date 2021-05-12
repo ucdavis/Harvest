@@ -18,7 +18,10 @@ export const ActivityForm = (props: Props) => {
     const itemIndex = allItems.findIndex(
       (a) => a.id === workItem.id && a.activityId === workItem.activityId
     );
-    allItems[itemIndex] = { ...workItem, total: workItem.rate * workItem.quantity };
+    allItems[itemIndex] = {
+      ...workItem,
+      total: workItem.rate * workItem.quantity,
+    };
 
     props.updateActivity({ ...props.activity, workItems: allItems });
   };
@@ -46,8 +49,8 @@ export const ActivityForm = (props: Props) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
+    <div className="card-wrapper no-green">
+      <div className="card-content">
         <Input
           type="text"
           id="activityName"
@@ -56,8 +59,6 @@ export const ActivityForm = (props: Props) => {
             props.updateActivity({ ...props.activity, name: e.target.value })
           }
         ></Input>
-      </CardHeader>
-      <CardBody>
         <WorkItemsForm
           category="labor"
           rates={props.rates.filter((r) => r.type === "Labor")}
@@ -84,7 +85,7 @@ export const ActivityForm = (props: Props) => {
           addNewWorkItem={addNewWorkItem}
           deleteWorkItem={deleteWorkItem}
         />
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };

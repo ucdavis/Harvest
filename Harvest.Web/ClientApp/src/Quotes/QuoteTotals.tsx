@@ -2,8 +2,7 @@ import React from "react";
 import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 
 import { QuoteContent } from "../types";
-import { formatCurrency } from '../Util/NumberFormatting';
-
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   quote: QuoteContent;
@@ -11,7 +10,7 @@ interface Props {
 
 export const QuoteTotals = (props: Props) => {
   return (
-    <Card className="card-project-totals">
+    <Card className="card-project-totals mt-4">
       <CardHeader>Project Totals</CardHeader>
       <CardBody>
         <div id="total">

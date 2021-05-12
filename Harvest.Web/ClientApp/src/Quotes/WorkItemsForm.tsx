@@ -33,28 +33,37 @@ export const WorkItemsForm = (props: Props) => {
     // rate can be undefinied if they select the default option
     if (rate !== undefined) {
       // new rate selected, update the work item with defaults
-      props.updateWorkItems({ ...workItem, description: rate.description, rateId, rate: rate.price, total: 0 });
+      props.updateWorkItems({
+        ...workItem,
+        description: rate.description,
+        rateId,
+        rate: rate.price,
+        total: 0,
+      });
     }
   };
 
   return (
-    <div>
+    <div className="activity-line">
       <Row>
         <Col xs="4">
-          <h6>{props.category}</h6>
+          <label>{props.category}</label>
         </Col>
         <Col xs="2">
-          <h6>Time</h6>
+          <label>Time</label>
         </Col>
         <Col xs="2">
-          <h6>Rate</h6>
+          <label>Rate</label>
         </Col>
         <Col xs="2">
-          <h6>Total</h6>
+          <label>Total</label>
         </Col>
       </Row>
       {props.workItems.map((workItem) => (
-        <Row key={`workItem-${workItem.id}-activity-${workItem.activityId}`}>
+        <Row
+          className="activity-line-item"
+          key={`workItem-${workItem.id}-activity-${workItem.activityId}`}
+        >
           <Col xs="4">
             <FormGroup>
               {props.category === "other" ? (
@@ -118,16 +127,17 @@ export const WorkItemsForm = (props: Props) => {
           <Col xs="2">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
 
           <Col xs="2">
-            <Button
-              color="danger"
-              onClick={() => props.deleteWorkItem(workItem)}
-            >
+            <Button color="link" onClick={() => props.deleteWorkItem(workItem)}>
               Delete
             </Button>
           </Col>
         </Row>
       ))}
-      <Button color="link" onClick={() => props.addNewWorkItem(props.category)}>
+      <Button
+        className="btn-sm"
+        color="link"
+        onClick={() => props.addNewWorkItem(props.category)}
+      >
         Add {props.category}
       </Button>
     </div>

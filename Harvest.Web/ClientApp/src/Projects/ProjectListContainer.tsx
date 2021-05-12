@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import { Project } from "../types";
 import { ProjectTable } from "./ProjectTable";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+
 export const ProjectListContainer = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
@@ -28,7 +31,7 @@ export const ProjectListContainer = () => {
         </div>
         <div className="col text-right">
           <Link to="/request/create" className="btn btn-sm btn-link ">
-            fontaweomse PLus Icon here Create New
+            Create New <FontAwesomeIcon icon={faPlus} />
           </Link>
         </div>
       </div>
