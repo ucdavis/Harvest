@@ -1,21 +1,30 @@
 import React, { useMemo } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+
+import { getBoundingBox } from "../Util/Geography";
+
 import { Field } from "../types";
+import { LatLngBoundsExpression } from "leaflet";
 
 interface Props {
   fields: Field[];
 }
 
 export const Location = (props: Props) => {
-  // TODO: calculate center based on fields, or perhaps use bounds[] to set map just to include all fields
+  const bounds: LatLngBoundsExpression = useMemo(() => {
+    const bounds = getBoundingBox(props.fields.map((f) => f.geometry));
+    return [
+      [bounds.yMin, bounds.xMin],
+      [bounds.yMax, bounds.xMax],
+    ];
+  }, [props.fields]);
 
-  // TODO: use field data to determine center and then pass props.fields into dependency array
-  const center: any = useMemo(() => {
-    return [38.53441977139934, -121.7362572473126];
-  }, []);
+  if (!props.fields || props.fields.length === 0) {
+    return null;
+  }
 
   return (
-    <MapContainer style={{ height: 200 }} center={center} zoom={16}>
+    <MapContainer style={{ height: 200 }} bounds={bounds}>
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
