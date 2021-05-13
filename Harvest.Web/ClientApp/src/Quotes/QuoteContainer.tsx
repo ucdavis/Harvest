@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import {
@@ -62,7 +62,6 @@ export const QuoteContainer = () => {
     cb();
   }, [projectId]);
 
-
   useEffect(() => {
     setQuote((q) => {
       let acreageTotal = q.acreageRate * q.acres;
@@ -105,6 +104,10 @@ export const QuoteContainer = () => {
     });
   }, [quote.activities, quote.acreageRate, quote.acres]);
 
+  const cropArray = useMemo(() => (project ? project.crop.split(",") : []), [
+    project,
+  ]);
+
   const save = async () => {
     // TODO: add progress and hide info while saving
     const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
@@ -128,12 +131,17 @@ export const QuoteContainer = () => {
   }
 
   // TODO: perhaps we might want to go back and modify the fields as well
-  if (quote.fields.length === 0) {
+  if (quote.fields.length < 3) {
     return (
-      <FieldContainer
-        fields={quote.fields}
-        updateFields={(fields) => setQuote({ ...quote, fields })}
-      ></FieldContainer>
+      <div>
+        <ProjectHeader project={project}></ProjectHeader>
+        <FieldContainer
+          crops={cropArray}
+          fields={quote.fields}
+          updateFields={(fields) => setQuote({ ...quote, fields })}
+        ></FieldContainer>
+        <div>Debug: {JSON.stringify(quote)}</div>
+      </div>
     );
   }
 

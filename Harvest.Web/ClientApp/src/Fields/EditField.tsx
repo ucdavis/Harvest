@@ -5,8 +5,9 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 import { Field } from "../types";
 
 interface Props {
+  crops: string[];
   field: Field;
-  saveFieldChanges: (field: Field) => void;
+  updateField: (field: Field) => void;
 }
 
 export const EditField = (props: Props) => {
@@ -27,19 +28,61 @@ export const EditField = (props: Props) => {
   return (
     <div>
       <Modal isOpen={isOpen}>
-        <ModalHeader>Modal title</ModalHeader>
+        <ModalHeader>Field #{props.field.id}</ModalHeader>
         <ModalBody>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
+          <form>
+            <div className="form-group">
+              <label htmlFor="fieldName">Field Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="fieldName"
+                aria-describedby="fieldNameHelp"
+                value={props.field.name}
+                onChange={(e) =>
+                  props.updateField({ ...props.field, name: e.target.value })
+                }
+              />
+              <small id="fieldNameHelp" className="form-text text-muted">
+                A short, useful name to refer to this field later by
+              </small>
+            </div>
+            <div className="form-group">
+              <label htmlFor="crop">Crop</label>
+              <select
+                className="form-control"
+                id="crop"
+                defaultValue={props.field.crop}
+                onChange={(e) =>
+                  props.updateField({
+                    ...props.field,
+                    crop: e.target.value,
+                  })
+                }
+              >
+                {props.crops.map((crop) => (
+                  <option>{crop}</option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="exampleFormControlTextarea1">Description</label>
+              <textarea
+                className="form-control"
+                id="exampleFormControlTextarea1"
+                placeholder="Optional description and notes specific to this field"
+                rows={3}
+                value={props.field.details}
+                onChange={(e) =>
+                  props.updateField({ ...props.field, details: e.target.value })
+                }
+              ></textarea>
+            </div>
+          </form>
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={update}>
-            Do Something
+            Close
           </Button>
         </ModalFooter>
       </Modal>

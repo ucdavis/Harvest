@@ -17,6 +17,7 @@ import { EditField } from "./EditField";
 import { Field } from "../types";
 
 interface Props {
+  crops: string[];
   fields: Field[];
   updateFields: (fields: Field[]) => void;
 }
@@ -43,8 +44,8 @@ export class FieldContainer extends React.Component<Props, State> {
     const newId = Math.max(...this.props.fields.map((f) => f.id), 0) + 1;
     const newField: Field = {
       id: newId,
-      name: "Default",
-      crop: "Corn",
+      name: `field-${newId}`,
+      crop: this.props.crops[0],
       details: "",
       geometry: layer.toGeoJSON(), // TODO: for now just a hardcoded polygon
     };
@@ -56,6 +57,17 @@ export class FieldContainer extends React.Component<Props, State> {
 
     // immediately remove added layer because we are going to let react handle rendering layers
     this._editableFG?.removeLayer(layer);
+  };
+
+  _updateField = (field: Field) => {
+    // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
+    const allItems = this.props.fields;
+    const itemIndex = allItems.findIndex((a) => a.id === field.id);
+    allItems[itemIndex] = {
+      ...field,
+    };
+
+    this.props.updateFields([...allItems]);
   };
 
   render() {
@@ -109,7 +121,13 @@ export class FieldContainer extends React.Component<Props, State> {
       );
 
       if (field) {
-        return  <EditField field={field} saveFieldChanges={() => {}}></EditField>
+        return (
+          <EditField
+            crops={this.props.crops}
+            field={field}
+            updateField={this._updateField}
+          ></EditField>
+        );
       }
     }
 
