@@ -6,6 +6,9 @@
     text-decoration: none;
   }
 }
+.btn-sm {
+  font-size: 0.9rem;
+}
 .btn:focus,
 .btn.focus {
   box-shadow: 0 0 0 0.2rem rgba(38, 96, 65, 0.25);
@@ -53,4 +56,7 @@
 }
 .page-link {
   color: $primary-color;
+}
+.svg-inline--fa {
+  padding-left: 4px;
 }

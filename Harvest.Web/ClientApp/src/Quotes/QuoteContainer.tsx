@@ -62,7 +62,6 @@ export const QuoteContainer = () => {
     cb();
   }, [projectId]);
 
-
   useEffect(() => {
     setQuote((q) => {
       let acreageTotal = q.acreageRate * q.acres;
@@ -153,8 +152,10 @@ export const QuoteContainer = () => {
             />
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
-          <h2>Save</h2>
-          <button onClick={save}>Save Quote</button>
+
+          <button className="btn btn-primary mt-4" onClick={save}>
+            Save Quote
+          </button>
         </div>
       </div>
 

@@ -4,7 +4,8 @@ import { Card, CardBody, CardHeader, Input } from "reactstrap";
 import { Activity, Rate, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 interface Props {
   activity: Activity;
   updateActivity: (activity: Activity) => void;
@@ -18,7 +19,10 @@ export const ActivityForm = (props: Props) => {
     const itemIndex = allItems.findIndex(
       (a) => a.id === workItem.id && a.activityId === workItem.activityId
     );
-    allItems[itemIndex] = { ...workItem, total: workItem.rate * workItem.quantity };
+    allItems[itemIndex] = {
+      ...workItem,
+      total: workItem.rate * workItem.quantity,
+    };
 
     props.updateActivity({ ...props.activity, workItems: allItems });
   };
@@ -46,18 +50,29 @@ export const ActivityForm = (props: Props) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <Input
-          type="text"
-          id="activityName"
-          value={props.activity.name}
-          onChange={(e) =>
-            props.updateActivity({ ...props.activity, name: e.target.value })
-          }
-        ></Input>
-      </CardHeader>
-      <CardBody>
+    <div className="card-wrapper mb-4 no-green">
+      <div className="card-content">
+        <div className="row justify-content-between align-items-center">
+          <div className="col-md-8">
+            <Input
+              type="text"
+              id="activityName"
+              value={props.activity.name}
+              onChange={(e) =>
+                props.updateActivity({
+                  ...props.activity,
+                  name: e.target.value,
+                })
+              }
+            ></Input>
+          </div>
+          <div className="col-md-4">
+            <a className="btn btn-link btn-sm" href="#">
+              Remove activity <FontAwesomeIcon icon={faMinusCircle} />
+            </a>
+          </div>
+        </div>
+
         <WorkItemsForm
           category="labor"
           rates={props.rates.filter((r) => r.type === "Labor")}
@@ -84,7 +99,7 @@ export const ActivityForm = (props: Props) => {
           addNewWorkItem={addNewWorkItem}
           deleteWorkItem={deleteWorkItem}
         />
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };
