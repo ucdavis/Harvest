@@ -48,8 +48,7 @@ export const QuoteContainer = () => {
             fields: projectWithQuote.quote.fields ?? [],
           });
 
-          if (projectWithQuote.quote.fields.length === 0) {
-            // TODO: i'm not sure it's possible for a quote to have no fields...
+          if (!projectWithQuote.quote.fields || projectWithQuote.quote.fields.length === 0) {
             setEditFields(true);
           }
         } else {
@@ -183,7 +182,7 @@ export const QuoteContainer = () => {
           <div className="quote-details">
             <h2>Quote Details</h2>
             <hr />
-            <ProjectDetail rates={rates} quote={quote} updateQuote={setQuote} />
+            <ProjectDetail rates={rates} quote={quote} updateQuote={setQuote} setEditFields={setEditFields} />
             <ActivitiesContainer
               quote={quote}
               rates={rates}

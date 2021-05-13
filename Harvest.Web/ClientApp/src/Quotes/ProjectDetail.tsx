@@ -20,6 +20,7 @@ interface Props {
   rates: Rate[];
   quote: QuoteContent;
   updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
+  setEditFields: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const ProjectDetail = (props: Props) => {
@@ -168,7 +169,14 @@ export const ProjectDetail = (props: Props) => {
 
       {/* Right Details */}
       <Col md="6">
-        <Label for="projectLocation">Project Location</Label>
+        <Row>
+          <Col>
+            <Label for="projectLocation">Project Location</Label>
+          </Col>
+          <Col>
+            <button className="btn btn-link" onClick={_ => props.setEditFields(true)}>Edit Fields</button>
+          </Col>
+        </Row>
         <Location fields={props.quote.fields}></Location>
         <br />
         <div id="map" />
