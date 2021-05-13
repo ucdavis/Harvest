@@ -48,7 +48,7 @@ export class FieldContainer extends React.Component<Props, State> {
       name: `field-${newId}`,
       crop: this.props.crops[0],
       details: "",
-      geometry: layer.toGeoJSON(), // TODO: for now just a hardcoded polygon
+      geometry: layer.toGeoJSON().geometry,
     };
 
     this.props.updateFields([...this.props.fields, newField]);
