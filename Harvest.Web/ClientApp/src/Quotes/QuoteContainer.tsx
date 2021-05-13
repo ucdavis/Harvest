@@ -28,6 +28,8 @@ export const QuoteContainer = () => {
   const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
   const [rates, setRates] = useState<Rate[]>([]);
 
+  const [editFields, setEditFields] = useState(false);
+
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
@@ -45,6 +47,11 @@ export const QuoteContainer = () => {
             ...projectWithQuote.quote,
             fields: projectWithQuote.quote.fields ?? [],
           });
+
+          if (projectWithQuote.quote.fields.length === 0) {
+            // TODO: i'm not sure it's possible for a quote to have no fields...
+            setEditFields(true);
+          }
         } else {
           // TODO: how do we handle if different fields have different rates?
           const quoteToUse = new QuoteContentImpl();
@@ -52,6 +59,7 @@ export const QuoteContainer = () => {
             rateJson.find((r) => r.type === "Acreage")?.price || 120;
 
           setQuote(quoteToUse);
+          setEditFields(true); // we have no existing quote, start with editing fields
         }
       } else {
         !quoteResponse.ok && console.error(quoteResponse);
@@ -130,11 +138,33 @@ export const QuoteContainer = () => {
     return <div>Loading</div>;
   }
 
-  // TODO: perhaps we might want to go back and modify the fields as well
-  if (quote.fields.length < 3) {
+  // TODO: we might want to move this all into a separate component
+  if (editFields) {
     return (
       <div>
         <ProjectHeader project={project}></ProjectHeader>
+        <div>
+          <h3>Choose a location</h3>
+          Instructions:
+          <ol>
+            <li>
+              Draw your field boundaries using the rectangle or polygon tool in
+              the upper-right
+            </li>
+            <li>Fill in the field details and click "Confirm"</li>
+            <li>
+              You can add in as many fields as you like, or click an existing
+              field for more info and actions
+            </li>
+            <li>When you are finished, click confirm below</li>
+          </ol>
+          <button
+            className="btn btn-primary"
+            onClick={(_) => setEditFields(false)}
+          >
+            Confirm Field Locations
+          </button>
+        </div>
         <FieldContainer
           crops={cropArray}
           fields={quote.fields}

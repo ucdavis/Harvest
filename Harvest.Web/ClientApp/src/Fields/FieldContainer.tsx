@@ -14,6 +14,7 @@ import {
 import { EditControl } from "react-leaflet-draw";
 
 import { EditField } from "./EditField";
+import { FieldPopup } from "./FieldPopup";
 import { Field } from "../types";
 
 interface Props {
@@ -70,6 +71,11 @@ export class FieldContainer extends React.Component<Props, State> {
     this.props.updateFields([...allItems]);
   };
 
+  _removeField = (field: Field) => {
+    const itemsToKeep = this.props.fields.filter((w) => w.id !== field.id);
+    this.props.updateFields(itemsToKeep);
+  };
+
   render() {
     return (
       <div>
@@ -105,7 +111,12 @@ export class FieldContainer extends React.Component<Props, State> {
           </FeatureGroup>
           {this.props.fields.map((field) => (
             <GeoJSON key={`field-${field.id}`} data={field.geometry}>
-              <Popup>Some content here</Popup>
+              <Popup>
+                <FieldPopup
+                  field={field}
+                  removeField={this._removeField}
+                ></FieldPopup>
+              </Popup>
             </GeoJSON>
           ))}
         </MapContainer>

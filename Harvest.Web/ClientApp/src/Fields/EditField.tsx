@@ -30,10 +30,11 @@ export const EditField = (props: Props) => {
       <Modal isOpen={isOpen}>
         <ModalHeader>Field #{props.field.id}</ModalHeader>
         <ModalBody>
-          <form>
+          <form onSubmit={e => e.preventDefault()}>
             <div className="form-group">
               <label htmlFor="fieldName">Field Name</label>
               <input
+                required
                 type="text"
                 className="form-control"
                 id="fieldName"
@@ -61,7 +62,7 @@ export const EditField = (props: Props) => {
                 }
               >
                 {props.crops.map((crop) => (
-                  <option>{crop}</option>
+                  <option key={crop}>{crop}</option>
                 ))}
               </select>
             </div>
@@ -82,7 +83,7 @@ export const EditField = (props: Props) => {
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={update}>
-            Close
+            Confirm
           </Button>
         </ModalFooter>
       </Modal>
