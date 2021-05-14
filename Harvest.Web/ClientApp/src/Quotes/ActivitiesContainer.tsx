@@ -25,6 +25,11 @@ export const ActivitiesContainer = (props: Props) => {
 
     props.updateQuote({ ...props.quote, activities: [...allActivities] });
   };
+  const deleteActivity = (activity: Activity) => {
+    const allActivities = props.quote.activities.filter((a) => a.id !== activity.id);
+    props.updateQuote({ ...props.quote, activities: [...allActivities] });
+  }
+
   return (
     <div>
       {props.quote.activities.map((activity) => (
@@ -32,6 +37,7 @@ export const ActivitiesContainer = (props: Props) => {
           key={`activity-${activity.id}`}
           activity={activity}
           updateActivity={(activity: Activity) => updateActivity(activity)}
+          deleteActivity={(activity: Activity) => deleteActivity(activity)}
           rates={props.rates}
         />
       ))}
