@@ -116,6 +116,10 @@ export const QuoteContainer = () => {
   ]);
 
   const save = async () => {
+    // remove unused workitems and empty activities and apply to state only after successfully saving
+    quote.activities.forEach((a) => a.workItems = a.workItems.filter((w) => w.quantity !== 0 || w.total !== 0));
+    quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
+
     // TODO: add progress and hide info while saving
     const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
       method: "POST",

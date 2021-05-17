@@ -9,6 +9,7 @@ import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 interface Props {
   activity: Activity;
   updateActivity: (activity: Activity) => void;
+  deleteActivity: (activity: Activity) => void;
   rates: Rate[];
 }
 
@@ -67,7 +68,7 @@ export const ActivityForm = (props: Props) => {
             ></Input>
           </div>
           <div className="col-md-4">
-            <a className="btn btn-link btn-sm" href="#">
+            <a className="btn btn-link btn-sm" onClick={() => props.deleteActivity(props.activity)}>
               Remove activity <FontAwesomeIcon icon={faMinusCircle} />
             </a>
           </div>
