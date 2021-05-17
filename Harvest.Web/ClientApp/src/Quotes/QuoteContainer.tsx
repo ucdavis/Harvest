@@ -14,7 +14,6 @@ import { ProjectDetail } from "./ProjectDetail";
 import { ProjectHeader } from "../Requests/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
-import { clone } from "../Util/state-helpers";
 
 interface RouteParams {
   projectId?: string;
@@ -107,9 +106,8 @@ export const QuoteContainer = () => {
 
   const save = async () => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
-    const savingQuote = clone(quote);
-    savingQuote.activities.forEach((a) => a.workItems = a.workItems.filter((w) => w.quantity !== 0 || w.total !== 0));
-    savingQuote.activities = savingQuote.activities.filter(a => a.workItems.length > 0);
+    quote.activities.forEach((a) => a.workItems = a.workItems.filter((w) => w.quantity !== 0 || w.total !== 0));
+    quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
     // TODO: add progress and hide info while saving
     const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
@@ -118,11 +116,10 @@ export const QuoteContainer = () => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(savingQuote),
+      body: JSON.stringify(quote),
     });
 
     if (saveResponse.ok) {
-      setQuote(savingQuote);
       window.location.pathname = `/Project/Details/${projectId}`;
     } else {
       alert("Something went wrong, please try again");
