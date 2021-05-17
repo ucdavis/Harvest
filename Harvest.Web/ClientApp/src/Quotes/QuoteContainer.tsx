@@ -48,7 +48,10 @@ export const QuoteContainer = () => {
             fields: projectWithQuote.quote.fields ?? [],
           });
 
-          if (!projectWithQuote.quote.fields || projectWithQuote.quote.fields.length === 0) {
+          if (
+            !projectWithQuote.quote.fields ||
+            projectWithQuote.quote.fields.length === 0
+          ) {
             setEditFields(true);
           }
         } else {
@@ -117,7 +120,12 @@ export const QuoteContainer = () => {
 
   const save = async () => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
-    quote.activities.forEach((a) => a.workItems = a.workItems.filter((w) => w.quantity !== 0 || w.total !== 0));
+    quote.activities.forEach(
+      (a) =>
+        (a.workItems = a.workItems.filter(
+          (w) => w.quantity !== 0 || w.total !== 0
+        ))
+    );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
     // TODO: add progress and hide info while saving
@@ -145,34 +153,44 @@ export const QuoteContainer = () => {
   if (editFields) {
     return (
       <div>
-        <ProjectHeader project={project}></ProjectHeader>
-        <div>
-          <h3>Choose a location</h3>
-          Instructions:
-          <ol>
-            <li>
-              Draw your field boundaries using the rectangle or polygon tool in
-              the upper-right
-            </li>
-            <li>Fill in the field details and click "Confirm"</li>
-            <li>
-              You can add in as many fields as you like, or click an existing
-              field for more info and actions
-            </li>
-            <li>When you are finished, click confirm below</li>
-          </ol>
-          <button
-            className="btn btn-primary"
-            onClick={(_) => setEditFields(false)}
-          >
-            Confirm Field Locations
-          </button>
+        <div className="card-wrapper">
+          <ProjectHeader project={project}></ProjectHeader>
+
+          <div className="card-green-bg">
+            <div className="card-content">
+              <div className="row">
+                <div className="col-md-6">
+                  <h3>Choose a location</h3>
+                  Instructions:
+                  <ol>
+                    <li>
+                      Draw your field boundaries using the rectangle or polygon
+                      tool in the upper-right
+                    </li>
+                    <li>Fill in the field details and click "Confirm"</li>
+                    <li>
+                      You can add in as many fields as you like, or click an
+                      existing field for more info and actions
+                    </li>
+                    <li>When you are finished, click confirm below</li>
+                  </ol>
+                  <button
+                    className="btn btn-primary"
+                    onClick={(_) => setEditFields(false)}
+                  >
+                    Confirm Field Locations
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <FieldContainer
+            crops={cropArray}
+            fields={quote.fields}
+            updateFields={(fields) => setQuote({ ...quote, fields })}
+          ></FieldContainer>
         </div>
-        <FieldContainer
-          crops={cropArray}
-          fields={quote.fields}
-          updateFields={(fields) => setQuote({ ...quote, fields })}
-        ></FieldContainer>
         <div>Debug: {JSON.stringify(quote)}</div>
       </div>
     );
@@ -186,7 +204,12 @@ export const QuoteContainer = () => {
           <div className="quote-details">
             <h2>Quote Details</h2>
             <hr />
-            <ProjectDetail rates={rates} quote={quote} updateQuote={setQuote} setEditFields={setEditFields} />
+            <ProjectDetail
+              rates={rates}
+              quote={quote}
+              updateQuote={setQuote}
+              setEditFields={setEditFields}
+            />
             <ActivitiesContainer
               quote={quote}
               rates={rates}
