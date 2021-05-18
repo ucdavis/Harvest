@@ -38,13 +38,20 @@ export const WorkItemsForm = (props: Props) => {
       // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
-        description: rate.description,
+        description: requiresCustomDescription(rate.unit)
+          ? ""
+          : rate.description,
         rateId,
         rate: rate.price,
         unit: rate.unit,
         total: 0,
       });
     }
+  };
+
+  // TODO: Determine a better way of working out which other options need extra description text
+  const requiresCustomDescription = (unit: string) => {
+    return props.category === "other" && unit === "Unit";
   };
 
   return (
@@ -83,6 +90,20 @@ export const WorkItemsForm = (props: Props) => {
                   </option>
                 ))}
               </Input>
+              {requiresCustomDescription(workItem.unit) && (
+                <Input
+                  type="text"
+                  name="OtherDescription"
+                  value={workItem.description}
+                  placeholder="Description"
+                  onChange={(e) =>
+                    props.updateWorkItems({
+                      ...workItem,
+                      description: e.target.value,
+                    })
+                  }
+                ></Input>
+              )}
             </FormGroup>
           </Col>
 
