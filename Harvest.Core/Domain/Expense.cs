@@ -12,6 +12,10 @@ namespace Harvest.Core.Domain
         [Required]
         [StringLength(15)]
         public string Type { get; set; }
+
+        [StringLength(256)]
+        public string Activity { get; set; }
+
         [Required]
         [StringLength(250)]
         public string Description { get; set; }
