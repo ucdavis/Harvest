@@ -152,6 +152,7 @@ export class WorkItemImpl implements WorkItem {
   type;
   rate;
   rateId = 0;
+  unit = 'hr';
   quantity;
   total = 0;
 
@@ -162,6 +163,7 @@ export class WorkItemImpl implements WorkItem {
     this.rate = 0;
     this.quantity = 0;
     this.description = "";
+    this.unit = "";
   }
 }
 export interface WorkItem {
@@ -172,6 +174,7 @@ export interface WorkItem {
   rate: number;
   description: string;
   quantity: number;
+  unit: string;
   total: number;
 }
 
