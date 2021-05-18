@@ -78,3 +78,17 @@
     margin-top: 8px;
   }
 }
+.map-wrapper {
+  border-top: 1px solid $borders;
+}
+
+//modal
+
+.modal-header {
+  background-color: $primary-light;
+}
+.leaflet-popup-content {
+  p {
+    margin: 0;
+  }
+}

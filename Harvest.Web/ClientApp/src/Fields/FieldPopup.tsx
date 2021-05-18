@@ -9,11 +9,13 @@ interface Props {
 export const FieldPopup = (props: Props) => {
   return (
     <div>
-      <h2>{props.field.name}</h2>
-      <h2>{props.field.crop}</h2>
+      <p>
+        <b>{props.field.name}</b>
+      </p>
+      <p>{props.field.crop}</p>
       <p>{props.field.details}</p>
       <button
-        className="btn btn-danger"
+        className="btn btn-primary btn-sm mt-4"
         onClick={() => props.removeField(props.field)}
       >
         Remove

@@ -78,7 +78,7 @@ export class FieldContainer extends React.Component<Props, State> {
 
   render() {
     return (
-      <div>
+      <div className="map-wrapper">
         <MapContainer
           style={{ height: window.innerHeight }}
           center={[38.5449, -121.7405]}
