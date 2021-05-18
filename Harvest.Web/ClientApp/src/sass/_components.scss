@@ -26,6 +26,39 @@
 .btn-group-lg > .btn {
   padding: 1rem 1.5rem;
 }
+
+.page-item.active .page-link {
+  background-color: transparentize($primary-color, 0.3);
+  border-color: transparentize($primary-color, 0.3);
+}
+.page-link {
+  color: $primary-color;
+}
+.svg-inline--fa {
+  padding-left: 4px;
+}
+.primary-color {
+  color: $primary-color;
+}
+.primary-font {
+  color: $primary-font;
+}
+.bold-font {
+  font-family: $sans-bold;
+}
+//modal
+
+.modal-header {
+  background-color: $primary-light;
+}
+.leaflet-popup-content {
+  p {
+    margin: 0;
+  }
+}
+
+// tables
+
 .harvest-table {
   th {
     background-color: $primary-light;
@@ -50,13 +83,40 @@
     background-color: #fff !important;
   }
 }
-.page-item.active .page-link {
-  background-color: transparentize($primary-color, 0.3);
-  border-color: transparentize($primary-color, 0.3);
-}
-.page-link {
-  color: $primary-color;
-}
-.svg-inline--fa {
-  padding-left: 4px;
+
+.activity-table {
+  th {
+    color: $primary-font;
+    font-family: $sans-bold;
+    font-size: 1.1rem;
+    text-transform: capitalize;
+    border-top: 0;
+    &:nth-child(2) {
+      text-align: right;
+      width: 12%;
+    }
+    &:nth-child(3) {
+      text-align: right;
+      width: 12%;
+    }
+    &:nth-child(4) {
+      text-align: right;
+      width: 12%;
+    }
+  }
+  td {
+    border-top: 0;
+    &:nth-child(2) {
+      text-align: right;
+      width: 12%;
+    }
+    &:nth-child(3) {
+      text-align: right;
+      width: 12%;
+    }
+    &:nth-child(4) {
+      text-align: right;
+      width: 12%;
+    }
+  }
 }

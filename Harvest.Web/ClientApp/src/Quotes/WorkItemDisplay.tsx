@@ -11,7 +11,7 @@ export const WorkItemDisplay = (props: Props) => {
   return (
     <div>
       {types.map((type) => (
-        <table key={`type-${type}`} className="table">
+        <table key={`type-${type}`} className="table activity-table">
           <thead>
             <tr>
               <th>{type}</th>

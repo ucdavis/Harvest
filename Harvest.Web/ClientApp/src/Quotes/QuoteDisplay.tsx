@@ -13,17 +13,25 @@ export const QuoteDisplay = (props: Props) => {
   const { quote } = props;
   return (
     <div>
-      <h2>Quote</h2>
+      <h1>Quote</h1>
       {quote.acreageRateDescription}: {quote.acres} @{" "}
       {formatCurrency(quote.acreageRate)} = $
       {formatCurrency(quote.acreageTotal)}
       <hr />
       {quote.activities.map((activity) => (
-        <div key={`${activity.name}-${activity.id}`}>
-          <h2>
-            {activity.name} -- Activity Total: ${formatCurrency(activity.total)}
-          </h2>
-          <WorkItemDisplay workItems={activity.workItems}></WorkItemDisplay>
+        <div
+          className="quote-actvitiy-item card-wrapper mb-4 gray-top"
+          key={`${activity.name}-${activity.id}`}
+        >
+          <div className="card-header">
+            <h4>
+              <span className="primary-color bold-font">{activity.name}</span> |
+              Activity Total: ${formatCurrency(activity.total)}
+            </h4>
+          </div>
+          <div className="card-content">
+            <WorkItemDisplay workItems={activity.workItems}></WorkItemDisplay>
+          </div>
         </div>
       ))}
       <QuoteTotals quote={props.quote}></QuoteTotals>
