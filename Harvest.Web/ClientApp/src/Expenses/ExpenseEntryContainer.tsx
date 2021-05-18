@@ -11,7 +11,7 @@ interface RouteParams {
 
 const getDefaultActivity = (id: number) => ({
   id,
-  name: "Activity",
+  name: "Generic Activity",
   total: 0,
   workItems: [
     new WorkItemImpl(id, 1, "labor"),
@@ -25,7 +25,7 @@ export const ExpenseEntryContainer = () => {
 
   const { projectId } = useParams<RouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
-  const [disabled, setDisabled] = useState<boolean>(true);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([
@@ -54,36 +54,41 @@ export const ExpenseEntryContainer = () => {
     history.push(`/expense/entry/${projectId}`);
   };
 
-  // const submitExpenses = async () => {
-  //   // TODO: disable the submit button and maybe just some sort of full screen processing UI
+  const submit = async () => {
+    // TODO: disable the submit button and maybe just some sort of full screen processing UI
 
-  //   // transform since we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
-  //   const expensesBody = expenses.map((exp) => ({
-  //     ...exp,
-  //     id: 0,
-  //     description: exp.rate.description,
-  //     price: exp.rate.price,
-  //     rateId: exp.rate.id,
-  //     rate: null,
-  //   }));
+    // transform activity workItems to expenses
+    // we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
+    const expensesBody = activities.flatMap((activity) =>
+      activity.workItems.filter(w=>w.rateId !== 0).flatMap((workItem) => ({
+        id: 0,
+        description: workItem.description,
+        price: workItem.rate,
+        type: workItem.type,
+        quantity: workItem.quantity,
+        total: workItem.total,
+        rateId: workItem.rateId,
+        rate: null,
+      }))
+    );
 
-  //   const response = await fetch(`/Expense/Create/${projectId}`, {
-  //     method: "POST",
-  //     headers: {
-  //       Accept: "application/json",
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(expensesBody),
-  //   });
+    console.log("expenses", expensesBody);
 
-  //   if (response.ok) {
-  //     window.location.pathname = "/project";
-  //   } else {
-  //     alert("Something went wrong, please try again");
-  //   }
-  // };
+    const response = await fetch(`/Expense/Create/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(expensesBody),
+    });
 
-  const submit = () => {};
+    if (response.ok) {
+      window.location.pathname = "/project";
+    } else {
+      alert("Something went wrong, please try again");
+    }
+  };
 
   const updateActivity = (activity: Activity) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
