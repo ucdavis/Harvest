@@ -52,10 +52,13 @@ export interface Rate {
 
 export interface Expense {
   id: number;
+  activity: string;
   description: string;
   type: string;
   quantity: number;
-  rate: Rate;
+  rate: Rate | null;
+  rateId: number;
+  price: number;
   total: number;
 }
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Activity, Rate, WorkItemImpl } from "../types";
+import { Activity, Expense, Rate, WorkItemImpl } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button } from "reactstrap";
@@ -60,8 +60,9 @@ export const ExpenseEntryContainer = () => {
     // transform activity workItems to expenses
     // we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
     const expensesBody = activities.flatMap((activity) =>
-      activity.workItems.filter(w=>w.rateId !== 0).flatMap((workItem) => ({
+      activity.workItems.filter(w=>w.rateId !== 0).flatMap((workItem): Expense => ({
         id: 0,
+        activity: activity.name,
         description: workItem.description,
         price: workItem.rate,
         type: workItem.type,
