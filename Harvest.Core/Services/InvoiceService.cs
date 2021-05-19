@@ -42,13 +42,6 @@ namespace Harvest.Core.Services
                 return Result.Error("No active project found for given projectId");
             }
 
-            //TODO: Review this later
-            if (project.End < now)
-            {
-                //Ok, so the project has ended, we should probably create the last invoice, and close it out. Setting the project to completed.
-                project.Status = Project.Statuses.Completed;
-            }
-
             if (!manualOverride)
             {
                 //Make sure we are running on a business day
@@ -71,9 +64,15 @@ namespace Harvest.Core.Services
 
             }
 
+            //TODO: Review this later
+            if (project.End < now)
+            {
+                //Ok, so the project has ended, we should probably create the last invoice, and close it out. Setting the project to completed.
+                project.Status = Project.Statuses.Completed;
+            }
+
             //Acreage fees are ignored for manually created invoices
             //TODO: Create the acreage expense with correct amount 
-
             await CreateMonthlyAcreageExpense(project);
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
