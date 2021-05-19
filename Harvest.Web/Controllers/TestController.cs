@@ -44,10 +44,10 @@ namespace Harvest.Web.Controllers
             //model.InitForMjml();
             //var results = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
 
-            var model = new NewFieldRequestModel();
+            var model = new InvoiceExceedsQuoteModel();
 
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount_mjml.cshtml", model);
 
             return Content(results);
         }
