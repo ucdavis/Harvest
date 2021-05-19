@@ -35,7 +35,7 @@ namespace Harvest.Core.Services
             var now = DateTime.UtcNow;
 
             //Make sure we are running on a business day
-            var day = now.DayOfWeek;
+            var day = now.ToPacificTime().DayOfWeek;
             if (!manualOverride && (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday))
             {
                 return Result.Error("Invoices can only be created Monday through Friday");
@@ -136,7 +136,7 @@ namespace Harvest.Core.Services
             var counter = 0;
             foreach (var activeProject in activeProjects)
             {
-                if (await CreateInvoice(activeProject.Id) != null)
+                if (!(await CreateInvoice(activeProject.Id)).IsError)
                 {
                     //Log something if invoice created?
                     counter++;
