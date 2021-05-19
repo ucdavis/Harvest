@@ -23,6 +23,8 @@ namespace Harvest.Web.Services
         Task<bool> QuoteDenied(Project project);
 
         Task<bool> ApproveAccounts(Project project, string[] emails);
+
+        Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining);
     }
 
     public class EmailService : IEmailService
@@ -212,6 +214,38 @@ namespace Harvest.Web.Services
             catch (Exception e)
             {
                 Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining)
+        {
+            var url = "https://harvest.caes.ucdavis.edu/Project/Details/";
+
+            var model = new InvoiceExceedsQuoteModel()
+            {
+                PI              = project.PrincipalInvestigator.NameAndEmail,
+                ProjectName     = project.Name,
+                ProjectStart    = project.Start.ToPacificTime().Date.Format("d"),
+                ProjectEnd      = project.End.ToPacificTime().Date.Format("d"),
+                InvoiceAmount   = invoiceAmount.ToString("C"),
+                RemainingAmount = quoteRemaining.ToString("C"),
+                ButtonUrl       = $"{url}{project.Id}"
+            };
+
+            var textVersion = $"An invoice can't be created for project {model.ProjectName} because it exceeds the remaining amount for the quote. RED ALERT!!!";
+
+            try
+            {
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
+
+                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Invoice can't be created", e);
                 return false;
             }
 

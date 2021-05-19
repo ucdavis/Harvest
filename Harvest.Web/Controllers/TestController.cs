@@ -161,5 +161,15 @@ namespace Harvest.Web.Controllers
             }
             return Content("Looks like there was a problem.");
         }
+
+        public async Task<IActionResult> TestInvoiceTooBig()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
+            if (await _emailService.InvoiceExceedsQuote(project, 12345.67000m, 530.00000m))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
     }
 }
