@@ -7,6 +7,9 @@ import { ProjectHeader } from "./ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -69,15 +72,48 @@ export const ApprovalContainer = () => {
       <div className="card-green-bg">
         <div className="card-content">
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
-          <hr />
-          Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
-          <AccountsInput
-            accounts={accounts}
-            setAccounts={setAccounts}
-          ></AccountsInput>
-          <hr />
-          <button onClick={approve}>Approve Quote</button>
-          <button>Reject Quote Somehow</button>
+          <div className="row">
+            <div className="col-md-6">
+              <h2 className="primary-font bold-font">
+                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
+              </h2>
+              <a className="btn btn-link btn-sm" href="#">
+                Download PDF <FontAwesomeIcon icon={faDownload} />
+              </a>
+
+              <AccountsInput
+                accounts={accounts}
+                setAccounts={setAccounts}
+              ></AccountsInput>
+            </div>
+            <div className="col-md-6">
+              <p>
+                <b>Terms and Conditions</b>
+              </p>
+              <ol>
+                <li>
+                  This estimate is approximate based on the information provided
+                  by the client. A change order is required if substantial
+                  elements of the project are altered. Estimate valid for 30
+                  days.
+                  <li>
+                    Payment for initial materials/supplies due prior to work
+                    performed.
+                  </li>
+                  <li>
+                    Payment for work performed due immediately upon completion
+                    of job.
+                  </li>
+                </li>
+              </ol>
+              <div className="text-right mt-5">
+                <button className="btn btn-link mr-2">Reject</button>
+                <button className="btn btn-primary" onClick={approve}>
+                  Approve Quote
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
