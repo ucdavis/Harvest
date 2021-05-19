@@ -38,12 +38,20 @@ export const WorkItemsForm = (props: Props) => {
       // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
-        description: rate.description,
+        description: requiresCustomDescription(rate.unit)
+          ? ""
+          : rate.description,
         rateId,
         rate: rate.price,
+        unit: rate.unit,
         total: 0,
       });
     }
+  };
+
+  // TODO: Determine a better way of working out which other options need extra description text
+  const requiresCustomDescription = (unit: string) => {
+    return props.category === "other" && unit === "Unit";
   };
 
   return (
@@ -53,7 +61,7 @@ export const WorkItemsForm = (props: Props) => {
           <label>{props.category}</label>
         </Col>
         <Col xs="3">
-          <label>Time</label>
+          <label>{props.category === "labor" ? "Time" : "Unit"}</label>
         </Col>
         <Col xs="2">
           <label>Rate</label>
@@ -69,22 +77,32 @@ export const WorkItemsForm = (props: Props) => {
         >
           <Col xs="5">
             <FormGroup>
-              {props.category === "other" ? (
-                <Input />
-              ) : (
+              <Input
+                type="select"
+                name="select"
+                defaultValue={workItem.rateId}
+                onChange={(e) => rateItemChanged(e, workItem)}
+              >
+                <option value="0">-- Select {props.category} --</option>
+                {props.rates.map((r) => (
+                  <option key={`rate-${r.type}-${r.id}`} value={r.id}>
+                    {r.description}
+                  </option>
+                ))}
+              </Input>
+              {requiresCustomDescription(workItem.unit) && (
                 <Input
-                  type="select"
-                  name="select"
-                  defaultValue={workItem.rateId}
-                  onChange={(e) => rateItemChanged(e, workItem)}
-                >
-                  <option value="0">-- Select {props.category} --</option>
-                  {props.rates.map((r) => (
-                    <option key={`rate-${r.type}-${r.id}`} value={r.id}>
-                      {r.description}
-                    </option>
-                  ))}
-                </Input>
+                  type="text"
+                  name="OtherDescription"
+                  value={workItem.description}
+                  placeholder="Description"
+                  onChange={(e) =>
+                    props.updateWorkItems({
+                      ...workItem,
+                      description: e.target.value,
+                    })
+                  }
+                ></Input>
               )}
             </FormGroup>
           </Col>
@@ -92,7 +110,7 @@ export const WorkItemsForm = (props: Props) => {
           <Col xs="3">
             <InputGroup>
               <InputGroupAddon addonType="prepend">
-                <InputGroupText>hr</InputGroupText>
+                <InputGroupText>{workItem.unit || ""}</InputGroupText>
               </InputGroupAddon>
               <Input
                 type="number"
@@ -130,9 +148,12 @@ export const WorkItemsForm = (props: Props) => {
           <Col xs="1">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
 
           <Col xs="1">
-            <a onClick={() => props.deleteWorkItem(workItem)}>
+            <button
+              className="btn btn-link"
+              onClick={() => props.deleteWorkItem(workItem)}
+            >
               <FontAwesomeIcon icon={faTrashAlt} />
-            </a>
+            </button>
           </Col>
         </Row>
       ))}

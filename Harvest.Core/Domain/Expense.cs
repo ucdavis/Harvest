@@ -12,6 +12,10 @@ namespace Harvest.Core.Domain
         [Required]
         [StringLength(15)]
         public string Type { get; set; }
+
+        [StringLength(256)]
+        public string Activity { get; set; }
+
         [Required]
         [StringLength(250)]
         public string Description { get; set; }
@@ -46,6 +50,8 @@ namespace Harvest.Core.Domain
 
         public User CreatedBy { get; set; }
 
+        public bool Approved { get; set; } = true;
+
         [Required]
         [StringLength(50)]
         public string Account { get; set; }
@@ -55,6 +61,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>().HasIndex(a => a.ProjectId);
 
             modelBuilder.Entity<Expense>().Property(a => a.Total).HasPrecision(18, 2);
+
+            modelBuilder.Entity<Expense>().Property(a => a.Approved).HasDefaultValue(true);
         }
     }
 }

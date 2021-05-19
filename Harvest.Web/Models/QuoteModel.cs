@@ -70,5 +70,6 @@ namespace Harvest.Web.Models
         public int RateId { get; set; }
         public double Quantity { get; set; }
         public double Total { get; set; }
+        public string Unit { get; set; }
     }
 }

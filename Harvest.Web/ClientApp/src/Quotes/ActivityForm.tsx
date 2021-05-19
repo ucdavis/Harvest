@@ -1,11 +1,13 @@
 import React from "react";
-import { Card, CardBody, CardHeader, Input } from "reactstrap";
+
+import { Input } from "reactstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 
 import { Activity, Rate, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+
 interface Props {
   activity: Activity;
   updateActivity: (activity: Activity) => void;
@@ -68,9 +70,9 @@ export const ActivityForm = (props: Props) => {
             ></Input>
           </div>
           <div className="col-md-4">
-            <a className="btn btn-link btn-sm" onClick={() => props.deleteActivity(props.activity)}>
+            <button className="btn btn-link btn-sm" onClick={() => props.deleteActivity(props.activity)}>
               Remove activity <FontAwesomeIcon icon={faMinusCircle} />
-            </a>
+            </button>
           </div>
         </div>
 

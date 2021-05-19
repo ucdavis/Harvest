@@ -1,42 +1,36 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Expense, Rate } from "../types";
+import { Activity, Expense, Rate, WorkItemImpl } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
-import { LineEntry } from "./LineEntry";
+import { ActivityForm } from "../Quotes/ActivityForm";
+import { Button } from "reactstrap";
 
 interface RouteParams {
   projectId?: string;
 }
 
-// TODO: is it beter to read from rates state or just hard code because of the efficiency?
-const expenseTypes = ["Labor", "Equipment", "Other"];
+const getDefaultActivity = (id: number) => ({
+  id,
+  name: "Generic Activity",
+  total: 0,
+  workItems: [
+    new WorkItemImpl(id, 1, "labor"),
+    new WorkItemImpl(id, 2, "equipment"),
+    new WorkItemImpl(id, 3, "other"),
+  ],
+});
 
 export const ExpenseEntryContainer = () => {
   const history = useHistory();
 
   const { projectId } = useParams<RouteParams>();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [rates, setRates] = useState<Rate[]>([]);
-  const [disabled, setDisabled] = useState<boolean>(true);
+  const [disabled, setDisabled] = useState<boolean>(false);
 
-  const getDefaultExpense = useCallback(
-    (currentRates: Rate[], currentExpenses: Expense[]) => {
-      const newId = Math.max(...currentExpenses.map((e) => e.id), 0) + 1;
-      const defaultExpense: Expense = {
-        id: newId,
-        type: expenseTypes[0],
-        rate:
-          currentRates.find((r) => r.type === expenseTypes[0]) ||
-          currentRates[0], // For now we just default to the first choice
-        description: "",
-        quantity: 0,
-        total: 0,
-      };
-
-      return defaultExpense;
-    },
-    []
-  );
+  // activities are groups of expenses
+  const [activities, setActivities] = useState<Activity[]>([
+    getDefaultActivity(1),
+  ]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -47,39 +41,39 @@ export const ExpenseEntryContainer = () => {
         const rates: Rate[] = await response.json();
 
         setRates(rates);
-        const firstExpense = getDefaultExpense(rates, []);
-        setExpenses([firstExpense]);
+
+        // create default activity
       }
     };
 
     cb();
-  }, [getDefaultExpense]);
+  }, []);
 
   const changeProject = (projectId: number) => {
     // want to go to /expense/entry/[projectId]
     history.push(`/expense/entry/${projectId}`);
   };
 
-  const updateExpense = (expense: Expense) => {
-    const allExpenses = [...expenses];
-    const idx = expenses.findIndex((a) => a.id === expense.id);
-    allExpenses[idx] = { ...expense };
-
-    setExpenses(allExpenses);
-  };
-
-  const submitExpenses = async () => {
+  const submit = async () => {
     // TODO: disable the submit button and maybe just some sort of full screen processing UI
 
-    // transform since we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
-    const expensesBody = expenses.map((exp) => ({
-      ...exp,
-      id: 0,
-      description: exp.rate.description,
-      price: exp.rate.price,
-      rateId: exp.rate.id,
-      rate: null,
-    }));
+    // transform activity workItems to expenses
+    // we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
+    const expensesBody = activities.flatMap((activity) =>
+      activity.workItems.filter(w=>w.rateId !== 0).flatMap((workItem): Expense => ({
+        id: 0,
+        activity: activity.name,
+        description: workItem.description,
+        price: workItem.rate,
+        type: workItem.type,
+        quantity: workItem.quantity,
+        total: workItem.total,
+        rateId: workItem.rateId,
+        rate: null,
+      }))
+    );
+
+    console.log("expenses", expensesBody);
 
     const response = await fetch(`/Expense/Create/${projectId}`, {
       method: "POST",
@@ -97,6 +91,28 @@ export const ExpenseEntryContainer = () => {
     }
   };
 
+  const updateActivity = (activity: Activity) => {
+    // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
+    const activityIndex = activities.findIndex((a) => a.id === activity.id);
+    activities[activityIndex] = {
+      ...activity,
+      total: activity.workItems.reduce(
+        (prev, curr) => prev + curr.total || 0,
+        0
+      ),
+    };
+
+    setActivities([...activities]);
+  };
+  const deleteActivity = (activity: Activity) => {
+    setActivities((acts) => acts.filter((a) => a.id !== activity.id));
+  };
+
+  const addActivity = () => {
+    const newActivityId = Math.max(...activities.map((a) => a.id), 0) + 1;
+    setActivities((acts) => [...acts, getDefaultActivity(newActivityId)]);
+  };
+
   if (projectId === undefined) {
     // need to pick the project we want to use
     return (
@@ -108,32 +124,27 @@ export const ExpenseEntryContainer = () => {
     <div className="card-wrapper">
       <div className="card-content">
         <h3>Add Expenses for Project #{projectId}</h3>
-        {expenses.map((expense) => (
-          <LineEntry
-            key={`expense-line-${expense.id}`}
-            expense={expense}
-            expenses={expenses}
-            expenseTypes={expenseTypes}
-            rates={rates}
-            setDisabled={setDisabled}
-            updateExpense={updateExpense}
-          ></LineEntry>
-        ))}
+        <div>
+          {activities.map((activity) => (
+            <ActivityForm
+              key={`activity-${activity.id}`}
+              activity={activity}
+              updateActivity={(activity: Activity) => updateActivity(activity)}
+              deleteActivity={(activity: Activity) => deleteActivity(activity)}
+              rates={rates}
+            />
+          ))}
+        </div>
       </div>
-      <button
-        onClick={() => {
-          setExpenses([...expenses, getDefaultExpense(rates, expenses)]);
-          setDisabled(true);
-        }}
-      >
-        Add Expense +
-      </button>
+      <Button className="mb-4" color="primary" size="lg" onClick={addActivity}>
+        Add Activity
+      </Button>
 
       <hr />
-      <button onClick={submitExpenses} disabled={disabled}>
+      <button onClick={submit} disabled={disabled}>
         Submit!
       </button>
-      <div>DEBUG: {JSON.stringify(expenses)}</div>
+      <div>DEBUG: {JSON.stringify(activities)}</div>
     </div>
   );
 };
