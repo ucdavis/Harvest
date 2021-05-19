@@ -72,7 +72,7 @@ namespace Harvest.Core.Services
 
             await CreateMonthlyAcreageExpense(project);
 
-            var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.ProjectId == id).ToArrayAsync();
+            var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == id).ToArrayAsync();
 
             //Shouldn't happen once we create the acreage expense 
             if (unbilledExpenses.Length == 0)
