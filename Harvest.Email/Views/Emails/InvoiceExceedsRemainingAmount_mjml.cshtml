@@ -1,0 +1,32 @@
+﻿@using Harvest.Email.Views.Shared
+@model Harvest.Email.Models.InvoiceExceedsQuoteModel
+
+@{
+    ViewData["EmailTitle"] = "Testing";
+    Layout = "_EmailLayout_mjml";
+}
+
+
+<mj-section >
+    <mj-column background-color="#cf3c3c">
+        <mj-text align="center">
+            <h1>Invoice will Exceed Remaining Amount!!!</h1>
+            <p>Action required before the invoice can be created.</p>
+            <p><strong>Invoice Amount: </strong>@@Model.InvoiceAmount</p>
+            <p><strong>Quote Remaining Amount: </strong>@@Model.RemainingAmount</p>
+        </mj-text>
+    </mj-column>
+</mj-section>
+<mj-section >
+    <mj-column>
+        <mj-text align="center">
+            <p><strong>PI: </strong>@@Model.PI</p>
+            <p><strong>Project: </strong>@@Model.ProjectName</p>
+            <p><strong>Project Start: </strong>@@Model.ProjectStart</p>
+            <p><strong>Project End: </strong>@@Model.ProjectEnd</p>
+        </mj-text>
+
+    </mj-column>
+</mj-section>
+
+@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to open Project", "@Model.ButtonUrl"))
