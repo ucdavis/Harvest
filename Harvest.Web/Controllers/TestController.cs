@@ -44,10 +44,10 @@ namespace Harvest.Web.Controllers
             //model.InitForMjml();
             //var results = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
 
-            var model = new NewFieldRequestModel();
+            var model = new InvoiceExceedsQuoteModel();
 
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -86,18 +86,17 @@ namespace Harvest.Web.Controllers
 
             //await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
 
-            var model = new AccountPendingApprovalModel();
+            var model = new InvoiceExceedsQuoteModel();
             model.PI = user.NameAndEmail;
             model.ProjectName = "Jason's Awesome Project";
             model.ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d");
             model.ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d");
+            model.RemainingAmount = "$100.00";
+            model.InvoiceAmount = "$50,000.00";
             model.ButtonUrl = "https://harvest.caes.ucdavis.edu";
-            model.AccountsList = new List<AccountsForApprovalModel>();
-            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "3-CRU9033", Name = "COMPUTING RESOURCES UNIT- GETCHELL", Percent = "75%" });
-            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "3-APSNFDS", Name = "PS:FIELD:DAVIS SHOP ACCOUNT", Percent = "15%" });
-            model.AccountsList.Add(new AccountsForApprovalModel() { Account = "3-RRCNTRY", Name = "RUSSELL RANCH CENTURY PROJECT", Percent = "10%" });
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/AccountPendingApproval.cshtml", model);
+
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
             await _notificationService.SendNotification(new string[] { user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Accounts Need Approval");
 
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
@@ -157,6 +156,16 @@ namespace Harvest.Web.Controllers
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
             if (await _emailService.ApproveAccounts(project, new []{user.Email}))
+            {
+                return Content("Done.");
+            }
+            return Content("Looks like there was a problem.");
+        }
+
+        public async Task<IActionResult> TestInvoiceTooBig()
+        {
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
+            if (await _emailService.InvoiceExceedsQuote(project, 12345.67000m, 530.00000m))
             {
                 return Content("Done.");
             }
