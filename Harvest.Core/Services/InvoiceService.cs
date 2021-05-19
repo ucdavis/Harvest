@@ -34,30 +34,12 @@ namespace Harvest.Core.Services
         {
             var now = DateTime.UtcNow;
 
-            //Make sure we are running on a business day
-            var day = now.ToPacificTime().DayOfWeek;
-            if (!manualOverride && (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday))
-            {
-                return Result.Error("Invoices can only be created Monday through Friday");
-            }
-
             //Look for an active project
             var project = await _dbContext.Projects.Include(a => a.AcreageRate)
                 .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == projectId).SingleOrDefaultAsync();
             if (project == null)
             {
                 return Result.Error("No active project found for given projectId");
-            }
-            
-            //Check to see if there is an invoice within current month
-            if (!manualOverride && await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == DateTime.UtcNow.Year && a.CreatedOn.Month == DateTime.UtcNow.Month))
-            {
-                return Result.Error("An invoice already exists for current month");
-            }
-
-            if (!manualOverride && project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
-            {
-                return Result.Error("Project has not yet started");
             }
 
             //TODO: Review this later
@@ -69,11 +51,30 @@ namespace Harvest.Core.Services
 
             if (!manualOverride)
             {
-                //Acreage fees are ignored for manually created invoices
-                //TODO: Create the acreage expense with correct amount 
+                //Make sure we are running on a business day
+                var day = now.ToPacificTime().DayOfWeek;
+                if (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday)
+                {
+                    return Result.Error("Invoices can only be created Monday through Friday");
+                }
 
-                await CreateMonthlyAcreageExpense(project);
+                //Check to see if there is an invoice within current month
+                if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == DateTime.UtcNow.Year && a.CreatedOn.Month == DateTime.UtcNow.Month))
+                {
+                    return Result.Error("An invoice already exists for current month");
+                }
+
+                if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
+                {
+                    return Result.Error("Project has not yet started");
+                }
+
             }
+
+            //Acreage fees are ignored for manually created invoices
+            //TODO: Create the acreage expense with correct amount 
+
+            await CreateMonthlyAcreageExpense(project);
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
 
@@ -110,17 +111,17 @@ namespace Harvest.Core.Services
 
             var expense = new Expense
             {
-                Type        = project.AcreageRate.Type,
+                Type = project.AcreageRate.Type,
                 Description = project.AcreageRate.Description,
-                Price       = project.AcreageRate.Price / 12, //This can be more than 2 decimals
-                Quantity    = (decimal)project.Acres,
-                Total       = amountToCharge,
-                ProjectId   = project.Id,
-                RateId      = project.AcreageRate.Id,
-                InvoiceId   = null,
-                CreatedOn   = DateTime.UtcNow,
+                Price = project.AcreageRate.Price / 12, //This can be more than 2 decimals
+                Quantity = (decimal)project.Acres,
+                Total = amountToCharge,
+                ProjectId = project.Id,
+                RateId = project.AcreageRate.Id,
+                InvoiceId = null,
+                CreatedOn = DateTime.UtcNow,
                 CreatedById = null,
-                Account     = project.AcreageRate.Account,
+                Account = project.AcreageRate.Account,
             };
 
             await _dbContext.Expenses.AddAsync(expense);
