@@ -16,11 +16,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IInvoiceService _invoiceService;
 
-        public InvoiceController(AppDbContext dbContext, IUserService userService)
+        public InvoiceController(AppDbContext dbContext, IUserService userService, IInvoiceService invoiceService)
         {
-            this._dbContext = dbContext;
-            this._userService = userService;
+            _dbContext = dbContext;
+            _userService = userService;
+            _invoiceService = invoiceService;
         }
 
         // view all invoices for a given project
@@ -42,26 +44,20 @@ namespace Harvest.Web.Controllers
         // Manually create an invoice for the given project based on all currently unbilled expenses
         // Acreage fees will be ignored for manually created invoices
         [HttpPost]
+        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         public async Task<ActionResult> Create(int projectId)
         {
-            var unbilled = await _dbContext.Expenses.Where(e => e.Invoice == null && e.ProjectId == projectId).ToArrayAsync();
+            var result = await _invoiceService.CreateInvoice(projectId, true);
 
-            if (unbilled.Length == 0)
+            if (result.IsError)
             {
-                Message = "No unbilled expenses exist";
+                Message = result.ErrorMessage;
                 return RedirectToAction("Index", new { projectId = projectId });
             }
 
-            var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = projectId, Status = Invoice.Statuses.Created, Total = unbilled.Sum(x => x.Total) };
-
-            newInvoice.Expenses = new System.Collections.Generic.List<Expense>(unbilled);
-
-            _dbContext.Invoices.Add(newInvoice);
-            await _dbContext.SaveChangesAsync();
-
             Message = "Invoice created";
 
-            return RedirectToAction("Details", new { id = newInvoice.Id });
+            return RedirectToAction("Details", new { id = result.Value });
         }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
+using Harvest.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -14,7 +15,7 @@ namespace Harvest.Core.Services
 {
     public interface IInvoiceService
     {
-        Task<bool> CreateInvoice(int id);
+        Task<Result<int>> CreateInvoice(int projectId, bool manualOverride = false);
         Task<int> CreateInvoices();
         Task<List<int>> GetCreatedInvoiceIds();
     }
@@ -29,36 +30,38 @@ namespace Harvest.Core.Services
             _dbContext = dbContext;
             _historyService = historyService;
         }
-        public async Task<bool> CreateInvoice(int id)
+        public async Task<Result<int>> CreateInvoice(int projectId, bool manualOverride = false)
         {
             var now = DateTime.UtcNow;
 
-            //Make sure we are running on a business day
-            var day = now.DayOfWeek;
-            if (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday)
-            {
-                return false;
-            }
-
             //Look for an active project
             var project = await _dbContext.Projects.Include(a => a.AcreageRate)
-                .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == id).SingleOrDefaultAsync();
+                .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Id == projectId).SingleOrDefaultAsync();
             if (project == null)
             {
-                return false;
-            }
-            
-            //Check to see if there is an invoice within current month
-            if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == id && a.CreatedOn.Year == DateTime.UtcNow.Year && a.CreatedOn.Month == DateTime.UtcNow.Month))
-            {
-                //Already invoice within current month
-                return false;
+                return Result.Error("No active project found for given projectId");
             }
 
-            if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
+            if (!manualOverride)
             {
-                //Project hasn't started yet. (Is Start UTC? if not, it should be)
-                return false;
+                //Make sure we are running on a business day
+                var day = now.ToPacificTime().DayOfWeek;
+                if (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday)
+                {
+                    return Result.Error("Invoices can only be created Monday through Friday");
+                }
+
+                //Check to see if there is an invoice within current month
+                if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == DateTime.UtcNow.Year && a.CreatedOn.Month == DateTime.UtcNow.Month))
+                {
+                    return Result.Error("An invoice already exists for current month");
+                }
+
+                if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
+                {
+                    return Result.Error("Project has not yet started");
+                }
+
             }
 
             //TODO: Review this later
@@ -68,19 +71,19 @@ namespace Harvest.Core.Services
                 project.Status = Project.Statuses.Completed;
             }
 
+            //Acreage fees are ignored for manually created invoices
             //TODO: Create the acreage expense with correct amount 
-
             await CreateMonthlyAcreageExpense(project);
 
-            var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == id).ToArrayAsync();
+            var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
 
             //Shouldn't happen once we create the acreage expense 
             if (unbilledExpenses.Length == 0)
             {
-                return false;
+                return Result.Error("No existing unbilled expenses found");
             }
 
-            var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = id, Status = Invoice.Statuses.Created, Total = unbilledExpenses.Sum(x => x.Total) };
+            var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = projectId, Status = Invoice.Statuses.Created, Total = unbilledExpenses.Sum(x => x.Total) };
 
             newInvoice.Expenses = new System.Collections.Generic.List<Expense>(unbilledExpenses);
 
@@ -89,7 +92,7 @@ namespace Harvest.Core.Services
             await _historyService.AddProjectHistory(project, nameof(CreateInvoice), "Invoice created", newInvoice);
 
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
-            return true;
+            return Result.Value(newInvoice.Id);
 
         }
 
@@ -107,17 +110,17 @@ namespace Harvest.Core.Services
 
             var expense = new Expense
             {
-                Type        = project.AcreageRate.Type,
+                Type = project.AcreageRate.Type,
                 Description = project.AcreageRate.Description,
-                Price       = project.AcreageRate.Price / 12, //This can be more than 2 decimals
-                Quantity    = (decimal)project.Acres,
-                Total       = amountToCharge,
-                ProjectId   = project.Id,
-                RateId      = project.AcreageRate.Id,
-                InvoiceId   = null,
-                CreatedOn   = DateTime.UtcNow,
+                Price = project.AcreageRate.Price / 12, //This can be more than 2 decimals
+                Quantity = (decimal)project.Acres,
+                Total = amountToCharge,
+                ProjectId = project.Id,
+                RateId = project.AcreageRate.Id,
+                InvoiceId = null,
+                CreatedOn = DateTime.UtcNow,
                 CreatedById = null,
-                Account     = project.AcreageRate.Account,
+                Account = project.AcreageRate.Account,
             };
 
             await _dbContext.Expenses.AddAsync(expense);
@@ -133,7 +136,7 @@ namespace Harvest.Core.Services
             var counter = 0;
             foreach (var activeProject in activeProjects)
             {
-                if (await CreateInvoice(activeProject.Id))
+                if (!(await CreateInvoice(activeProject.Id)).IsError)
                 {
                     //Log something if invoice created?
                     counter++;

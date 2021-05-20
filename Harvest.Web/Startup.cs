@@ -155,6 +155,7 @@ namespace Harvest.Web
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped(provder => JsonOptions.Standard);
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
+            services.AddScoped<IInvoiceService, InvoiceService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
