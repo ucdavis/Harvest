@@ -98,6 +98,11 @@ namespace Harvest.Core.Services
 
         private async Task CreateMonthlyAcreageExpense(Project project)
         {
+            // Don't want to continue running if there are no acres
+            if (project.Acres == 0 ) {
+                return;
+            }
+
             var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2);
 
             //Check for an unbilled acreage expense
