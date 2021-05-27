@@ -7,27 +7,22 @@ import { Field } from "../types";
 interface Props {
   crops: string[];
   field: Field;
+  updateFieldId: (field?: Field) => void;
   updateField: (field: Field) => void;
 }
 
 export const EditField = (props: Props) => {
-  const [isOpen, setIsOpen] = useState(true);
-
-  // every time the field changes, re-open the modal
-  useEffect(() => {
-    setIsOpen(true);
-  }, [props.field]);
-
+  // Render modal if field is not undefined
   const update = () => {
     if (props.field) {
       //   props.saveFieldChanges({ ...props.field });
-      setIsOpen(false);
+      props.updateFieldId(undefined);
     }
   };
 
   return (
     <div>
-      <Modal isOpen={isOpen}>
+      <Modal isOpen={props.field != undefined}>
         <ModalHeader>Field #{props.field.id}</ModalHeader>
         <ModalBody>
           <form onSubmit={e => e.preventDefault()}>
