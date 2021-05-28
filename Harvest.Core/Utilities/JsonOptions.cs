@@ -14,8 +14,19 @@ namespace Harvest.Core.Utilities
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             AllowTrailingCommas = true,
             PropertyNameCaseInsensitive = true,
-            ReferenceHandler = ReferenceHandler.Preserve
+            //ReferenceHandler = ReferenceHandler.Preserve
         };
+
+        // modifies existing JsonSerializerOptions
+        public static JsonSerializerOptions WithStandard(this JsonSerializerOptions options)
+        {
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+            options.AllowTrailingCommas = true;
+            options.PropertyNameCaseInsensitive = true;
+            //options.ReferenceHandler = ReferenceHandler.Preserve;
+            return options;
+        }
 
         public static JsonSerializerOptions WithGeoJson(this JsonSerializerOptions options)
         {

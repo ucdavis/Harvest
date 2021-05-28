@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ProjectHeader } from "../Requests/ProjectHeader";
-import { InvoiceListContainer } from "./InvoiceListContainer";
+import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
 
 import { Project } from "../types";
 
@@ -34,7 +34,7 @@ export const ProjectDetailContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={project}></ProjectHeader>
+      <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <ul>

@@ -12,13 +12,13 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers
 {
     [Authorize]
-    public class InvoiceController : SuperController
+    public class TempInvoiceController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IInvoiceService _invoiceService;
 
-        public InvoiceController(AppDbContext dbContext, IUserService userService, IInvoiceService invoiceService)
+        public TempInvoiceController(AppDbContext dbContext, IUserService userService, IInvoiceService invoiceService)
         {
             _dbContext = dbContext;
             _userService = userService;
