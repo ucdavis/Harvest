@@ -1,4 +1,5 @@
 export type CropType = "Row" | "Tree"
+export type RateType = "Acreage" | "Equipment" | "Labor" | "Other"
 
 export interface Project {
   id: number;
@@ -25,11 +26,12 @@ export interface Project {
 }
 
 export interface Invoice {
-    id: number;
-    total: number;
-    createdOn: Date;
-    notes: string;
-    status: string;
+  id: number;
+  total: number;
+  createdOn: Date;
+  notes: string;
+  status: string;
+  expenses: Expense[];
 }
 
 export interface User {
@@ -45,7 +47,7 @@ export interface User {
 export interface Rate {
   price: number;
   unit: string;
-  type: string;
+  type: RateType;
   description: string;
   id: number;
 }
@@ -54,7 +56,7 @@ export interface Expense {
   id: number;
   activity: string;
   description: string;
-  type: string;
+  type: RateType;
   quantity: number;
   rate: Rate | null;
   rateId: number;
@@ -159,7 +161,7 @@ export class WorkItemImpl implements WorkItem {
   quantity;
   total = 0;
 
-  constructor(activityId: number, id: number, type: string) {
+  constructor(activityId: number, id: number, type: RateType) {
     this.activityId = activityId;
     this.id = id;
     this.type = type;
@@ -172,7 +174,7 @@ export class WorkItemImpl implements WorkItem {
 export interface WorkItem {
   id: number;
   activityId: number;
-  type: string;
+  type: RateType;
   rateId: number;
   rate: number;
   description: string;
@@ -204,4 +206,9 @@ export interface RequestInput {
   cropType: string;
   requirements?: string;
   principalInvestigator: User;
+}
+
+export interface ProjectWithInvoice {
+  project: Project;
+  invoice: Invoice;
 }

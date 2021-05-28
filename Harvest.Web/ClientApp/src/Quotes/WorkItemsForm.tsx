@@ -10,18 +10,18 @@ import {
   Row,
 } from "reactstrap";
 
-import { Rate, WorkItem } from "../types";
+import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
-  category: string;
+  category: RateType;
   rates: Rate[];
   workItems: WorkItem[];
   updateWorkItems: (workItem: WorkItem) => void;
-  addNewWorkItem: (category: string) => void;
+  addNewWorkItem: (type: RateType) => void;
   deleteWorkItem: (workItem: WorkItem) => void;
 }
 
@@ -51,7 +51,7 @@ export const WorkItemsForm = (props: Props) => {
 
   // TODO: Determine a better way of working out which other options need extra description text
   const requiresCustomDescription = (unit: string) => {
-    return props.category === "other" && unit === "Unit";
+    return props.category === "Other" && unit === "Unit";
   };
 
   return (
@@ -61,7 +61,7 @@ export const WorkItemsForm = (props: Props) => {
           <label>{props.category}</label>
         </Col>
         <Col xs="3">
-          <label>{props.category === "labor" ? "Time" : "Unit"}</label>
+          <label>{props.category === "Labor" ? "Time" : "Unit"}</label>
         </Col>
         <Col xs="2">
           <label>Rate</label>

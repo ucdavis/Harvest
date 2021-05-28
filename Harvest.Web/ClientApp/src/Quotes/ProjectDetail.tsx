@@ -37,9 +37,9 @@ export const ProjectDetail = (props: Props) => {
           name: "Activity",
           total: 0,
           workItems: [
-            new WorkItemImpl(newActivityId, 1, "labor"),
-            new WorkItemImpl(newActivityId, 2, "equipment"),
-            new WorkItemImpl(newActivityId, 3, "other"),
+            new WorkItemImpl(newActivityId, 1, "Labor"),
+            new WorkItemImpl(newActivityId, 2, "Equipment"),
+            new WorkItemImpl(newActivityId, 3, "Other"),
           ],
         },
       ],

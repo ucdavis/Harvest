@@ -1,14 +1,13 @@
-import { WorkItem, RateType } from "../types";
+import { Expense, RateType } from "../types";
 import { ActivityRateTypes } from "../constants";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
-  workItems: WorkItem[];
+  expenses: Expense[];
 }
 
-export const WorkItemDisplay = (props: Props) => {
+export const ExpenseDisplay = (props: Props) => {
   // TODO: should we break out individual display renderer by labor/equip/other?
-  
   return (
     <div>
       {ActivityRateTypes.map((type) => (
@@ -22,14 +21,14 @@ export const WorkItemDisplay = (props: Props) => {
             </tr>
           </thead>
           <tbody>
-            {props.workItems
+            {props.expenses
               .filter((w) => w.type === type)
-              .map((workItem) => (
-                <tr key={`item-${workItem.id}`}>
-                  <td>{workItem.description}</td>
-                  <td>{workItem.quantity}</td>
-                  <td>{workItem.rate}</td>
-                  <td>${formatCurrency(workItem.total)}</td>
+              .map((expense) => (
+                <tr key={`item-${expense.id}`}>
+                  <td>{expense.description}</td>
+                  <td>{expense.quantity}</td>
+                  <td>{expense.rate}</td>
+                  <td>${formatCurrency(expense.total)}</td>
                 </tr>
               ))}
           </tbody>
