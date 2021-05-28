@@ -18,7 +18,6 @@ function App() {
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
-      {/*<Route path="/invoice/:projectId" component={InvoiceListContainer} />*/}
       <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
