@@ -25,7 +25,7 @@ export const EditField = (props: Props) => {
       <Modal isOpen={props.field != undefined}>
         <ModalHeader>Field #{props.field.id}</ModalHeader>
         <ModalBody>
-          <form onSubmit={e => e.preventDefault()}>
+          <form onSubmit={(e) => e.preventDefault()}>
             <div className="form-group">
               <label htmlFor="fieldName">Field Name</label>
               <input
@@ -77,6 +77,9 @@ export const EditField = (props: Props) => {
           </form>
         </ModalBody>
         <ModalFooter>
+          <Button color="danger" onClick={update}>
+            Cancel
+          </Button>
           <Button color="primary" onClick={update}>
             Confirm
           </Button>
