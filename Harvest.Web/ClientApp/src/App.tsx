@@ -8,6 +8,7 @@ import { RequestContainer } from "./Requests/RequestContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
+import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { Map } from "./Maps/Map";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
+      <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
       <Route

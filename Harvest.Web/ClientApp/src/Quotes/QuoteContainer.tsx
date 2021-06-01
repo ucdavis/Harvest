@@ -89,13 +89,13 @@ export const QuoteContainer = () => {
           activitiesTotal += workItem.total || 0;
 
           switch (workItem.type) {
-            case "labor":
+            case "Labor":
               laborTotal += workItem.total || 0;
               break;
-            case "equipment":
+            case "Equipment":
               equipmentTotal += workItem.total || 0;
               break;
-            case "other":
+            case "Other":
               otherTotal += workItem.total || 0;
               break;
           }
@@ -154,7 +154,7 @@ export const QuoteContainer = () => {
     return (
       <div>
         <div className="card-wrapper">
-          <ProjectHeader project={project}></ProjectHeader>
+          <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
 
           <div className="card-green-bg">
             <div className="card-content">
@@ -198,7 +198,7 @@ export const QuoteContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={project}></ProjectHeader>
+      <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <div className="quote-details">

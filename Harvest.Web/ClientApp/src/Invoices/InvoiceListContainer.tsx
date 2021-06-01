@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Invoice } from "../types";
-import { InvoiceTable } from "./InvoiceTable";
+import { InvoiceTable } from "../Invoices/InvoiceTable";
 
 interface Props {
     projectId: any;

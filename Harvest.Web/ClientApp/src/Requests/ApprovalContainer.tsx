@@ -68,7 +68,7 @@ export const ApprovalContainer = () => {
   // we have a project with a quote, time for the approval step
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={projectAndQuote.project}></ProjectHeader>
+      <ProjectHeader project={projectAndQuote.project} title={"Field Request #" + (projectAndQuote.project.id || "")}></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>

@@ -55,15 +55,7 @@ namespace Harvest.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<SerilogControllerActionFilter>();
-            }).AddJsonOptions(options =>
-            {
-                var o = JsonOptions.Standard;
-                options.JsonSerializerOptions.PropertyNamingPolicy = o.PropertyNamingPolicy;
-                options.JsonSerializerOptions.NumberHandling = o.NumberHandling;
-                options.JsonSerializerOptions.AllowTrailingCommas = o.AllowTrailingCommas;
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = o.PropertyNameCaseInsensitive;
-                options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
-            });
+            }).AddJsonOptions(options => options.JsonSerializerOptions.WithStandard().WithGeoJson());
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

@@ -4,7 +4,7 @@ import { Input } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 
-import { Activity, Rate, WorkItem, WorkItemImpl } from "../types";
+import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
@@ -30,13 +30,13 @@ export const ActivityForm = (props: Props) => {
     props.updateActivity({ ...props.activity, workItems: allItems });
   };
 
-  const addNewWorkItem = (category: string) => {
+  const addNewWorkItem = (type: RateType) => {
     const newId = Math.max(...props.activity.workItems.map((w) => w.id), 0) + 1;
     props.updateActivity({
       ...props.activity,
       workItems: [
         ...props.activity.workItems,
-        new WorkItemImpl(props.activity.id, newId, category),
+        new WorkItemImpl(props.activity.id, newId, type),
       ],
     });
   };
@@ -81,27 +81,27 @@ export const ActivityForm = (props: Props) => {
         </div>
 
         <WorkItemsForm
-          category="labor"
+          category="Labor"
           rates={props.rates.filter((r) => r.type === "Labor")}
-          workItems={props.activity.workItems.filter((w) => w.type === "labor")}
+          workItems={props.activity.workItems.filter((w) => w.type === "Labor")}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
           deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
-          category="equipment"
+          category="Equipment"
           rates={props.rates.filter((r) => r.type === "Equipment")}
           workItems={props.activity.workItems.filter(
-            (w) => w.type === "equipment"
+            (w) => w.type === "Equipment"
           )}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
           deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
-          category="other"
+          category="Other"
           rates={props.rates.filter((r) => r.type === "Other")}
-          workItems={props.activity.workItems.filter((w) => w.type === "other")}
+          workItems={props.activity.workItems.filter((w) => w.type === "Other")}
           updateWorkItems={updateWorkItems}
           addNewWorkItem={addNewWorkItem}
           deleteWorkItem={deleteWorkItem}
