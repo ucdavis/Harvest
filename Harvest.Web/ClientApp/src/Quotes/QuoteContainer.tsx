@@ -172,6 +172,9 @@ export const QuoteContainer = () => {
                       You can add in as many fields as you like, or click an
                       existing field for more info and actions
                     </li>
+                    <li>
+                      To edit a field, click on it in the map and choose either edit or remove.
+                    </li>
                     <li>When you are finished, click confirm below</li>
                   </ol>
                   <button
