@@ -5,17 +5,16 @@ import { Invoice } from "../types";
 import { InvoiceTable } from "../Invoices/InvoiceTable";
 
 interface Props {
-    projectId: any;
+  projectId: any;
 }
 
-
 export const InvoiceListContainer = (props: Props) => {
-    const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
-    useEffect(() => {
+  useEffect(() => {
     // get rates so we can load up all expense types and info
-        const cb = async () => {
-            const response = await fetch(`/Project/Invoices/${props.projectId}`);
+    const cb = async () => {
+      const response = await fetch(`/Project/Invoices/${props.projectId}`);
 
       if (response.ok) {
         setInvoices(await response.json());
@@ -23,12 +22,14 @@ export const InvoiceListContainer = (props: Props) => {
     };
 
     cb();
-    }, [props.projectId]);
+  }, [props.projectId]);
 
   return (
-      <div>
-          <h3>Invoices</h3>
+    <div className="card-green-bg">
+      <div className="card-content">
+        <h3>Invoices</h3>
         <InvoiceTable invoices={invoices}></InvoiceTable>
+      </div>
     </div>
   );
 };
