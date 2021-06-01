@@ -11,7 +11,7 @@
 }
 .btn:focus,
 .btn.focus {
-  box-shadow: 0 0 0 0.2rem rgba(38, 96, 65, 0.25);
+  box-shadow: none;
 }
 .btn-link {
   color: $primary-color;
