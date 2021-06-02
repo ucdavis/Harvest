@@ -5,6 +5,9 @@ import { ProjectSelection } from "./ProjectSelection";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button } from "reactstrap";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -60,17 +63,21 @@ export const ExpenseEntryContainer = () => {
     // transform activity workItems to expenses
     // we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
     const expensesBody = activities.flatMap((activity) =>
-      activity.workItems.filter(w=>w.rateId !== 0).flatMap((workItem): Expense => ({
-        id: 0,
-        activity: activity.name,
-        description: workItem.description,
-        price: workItem.rate,
-        type: workItem.type,
-        quantity: workItem.quantity,
-        total: workItem.total,
-        rateId: workItem.rateId,
-        rate: null,
-      }))
+      activity.workItems
+        .filter((w) => w.rateId !== 0)
+        .flatMap(
+          (workItem): Expense => ({
+            id: 0,
+            activity: activity.name,
+            description: workItem.description,
+            price: workItem.rate,
+            type: workItem.type,
+            quantity: workItem.quantity,
+            total: workItem.total,
+            rateId: workItem.rateId,
+            rate: null,
+          })
+        )
     );
 
     console.log("expenses", expensesBody);
@@ -123,7 +130,8 @@ export const ExpenseEntryContainer = () => {
   return (
     <div className="card-wrapper">
       <div className="card-content">
-        <h3>Add Expenses for Project #{projectId}</h3>
+        <h1>Add Expenses for Project #{projectId}</h1>
+        <br />
         <div>
           {activities.map((activity) => (
             <ActivityForm
@@ -135,15 +143,22 @@ export const ExpenseEntryContainer = () => {
             />
           ))}
         </div>
+        <Button className="mb-4" color="link" size="lg" onClick={addActivity}>
+          Add Activity <FontAwesomeIcon icon={faPlus} />
+        </Button>
       </div>
-      <Button className="mb-4" color="primary" size="lg" onClick={addActivity}>
-        Add Activity
-      </Button>
+      <div className="card-content">
+        <div className="col">
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={submit}
+            disabled={disabled}
+          >
+            Submit Expense
+          </button>
+        </div>
+      </div>
 
-      <hr />
-      <button onClick={submit} disabled={disabled}>
-        Submit!
-      </button>
       <div>DEBUG: {JSON.stringify(activities)}</div>
     </div>
   );
