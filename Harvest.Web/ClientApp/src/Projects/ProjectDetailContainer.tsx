@@ -34,24 +34,36 @@ export const ProjectDetailContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+      <ProjectHeader
+        project={project}
+        title={"Field Request #" + (project?.id || "")}
+      ></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
-          <ul>
-            <li>
-              <Link to={`/quote/create/${project.id}`}>Create Quote</Link>
-            </li>
-            <li>
-            <Link to={`/request/approve/${project.id}`}>Approve Quote</Link>
-            </li>
-            <li>
-              {/* TODO: Update approve accounts page to react once we know what it should do */}
-              <a href={`/project/accountApproval/${project.id}`}>Approve Accounts</a>
-            </li>
-          </ul>
+          <Link
+            className="btn btn-primary btn-small mr-4"
+            to={`/quote/create/${project.id}`}
+          >
+            Create Quote
+          </Link>
+
+          <Link
+            className="btn btn-primary btn-small mr-4"
+            to={`/request/approve/${project.id}`}
+          >
+            Approve Quote
+          </Link>
+
+          {/* TODO: Update approve accounts page to react once we know what it should do */}
+          <a
+            className="btn btn-primary btn-small"
+            href={`/project/accountApproval/${project.id}`}
+          >
+            Approve Accounts
+          </a>
         </div>
-          </div>
-          <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
       </div>
+      <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
+    </div>
   );
 };
