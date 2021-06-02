@@ -114,6 +114,7 @@ export class FieldContainer extends React.Component<Props, State> {
               <Popup>
                 <FieldPopup
                   field={field}
+                  updateFieldId={this._updateFieldId}
                   removeField={this._removeField}
                 ></FieldPopup>
               </Popup>
@@ -136,14 +137,25 @@ export class FieldContainer extends React.Component<Props, State> {
           <EditField
             crops={this.props.crops}
             field={field}
+            updateFieldId={this._updateFieldId}
             updateField={this._updateField}
-          ></EditField>
+          />
         );
       }
     }
 
     return null;
   };
+
+  // This is used to trigger the modal to open
+  _updateFieldId = (field?: Field) => {
+    console.log(this.state.editFieldId);
+    if (field) {
+      this.setState({ editFieldId: field.id });
+    } else {
+      this.setState({ editFieldId: undefined });
+    }
+  }
 
   // our render feature group, only used for dynamic drawing
   // once drawing is finished, a field is added and react-leaflet takes over with rendering and control
