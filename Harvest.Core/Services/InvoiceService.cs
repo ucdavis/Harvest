@@ -8,6 +8,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Models.InvoiceModels;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -89,7 +90,7 @@ namespace Harvest.Core.Services
 
             _dbContext.Invoices.Add(newInvoice);
 
-            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), "Invoice created", newInvoice);
+            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), "Invoice created", new InvoiceModel(newInvoice));
 
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
             return Result.Value(newInvoice.Id);
@@ -129,7 +130,7 @@ namespace Harvest.Core.Services
             };
 
             await _dbContext.Expenses.AddAsync(expense);
-            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), "Monthly acreage expense created", expense);
+            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), "Monthly acreage expense created", new ExpenseModel(expense));
             await _dbContext.SaveChangesAsync();
 
         }
