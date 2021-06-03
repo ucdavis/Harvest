@@ -68,7 +68,10 @@ export const ApprovalContainer = () => {
   // we have a project with a quote, time for the approval step
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={projectAndQuote.project} title={"Field Request #" + (projectAndQuote.project.id || "")}></ProjectHeader>
+      <ProjectHeader
+        project={projectAndQuote.project}
+        title={"Field Request #" + (projectAndQuote.project.id || "")}
+      ></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
@@ -77,9 +80,9 @@ export const ApprovalContainer = () => {
               <h2 className="primary-font bold-font">
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
-              <a className="btn btn-link btn-sm" href="#">
+              <button className="btn btn-link btn-sm">
                 Download PDF <FontAwesomeIcon icon={faDownload} />
-              </a>
+              </button>
 
               <AccountsInput
                 accounts={accounts}
@@ -96,14 +99,14 @@ export const ApprovalContainer = () => {
                   by the client. A change order is required if substantial
                   elements of the project are altered. Estimate valid for 30
                   days.
-                  <li>
-                    Payment for initial materials/supplies due prior to work
-                    performed.
-                  </li>
-                  <li>
-                    Payment for work performed due immediately upon completion
-                    of job.
-                  </li>
+                </li>
+                <li>
+                  Payment for initial materials/supplies due prior to work
+                  performed.
+                </li>
+                <li>
+                  Payment for work performed due immediately upon completion of
+                  job.
                 </li>
               </ol>
               <div className="text-right mt-5">

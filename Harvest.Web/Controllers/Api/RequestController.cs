@@ -54,14 +54,18 @@ namespace Harvest.Web.Controllers
 
             // get the currently unapproved quote for this project
             var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == id && q.ApprovedOn == null);
+            
+            var currentUser = await _userService.GetCurrentUser();
 
             // TODO: double check the percentages add up to 100%
             // TODO: add in fiscal officer info??
             foreach (var account in model.Accounts)
             {
                 account.ProjectId = id;
-                account.ApprovedById = null;
-                account.ApprovedOn = null;
+
+                // Accounts will be auto-approved by quote approver
+                account.ApprovedById = currentUser.Id;
+                account.ApprovedOn = DateTime.UtcNow;
             }
 
             var quoteDetail = QuoteDetail.Deserialize(quote.Text);
@@ -70,7 +74,7 @@ namespace Harvest.Web.Controllers
             project.AcreageRateId = quoteDetail.AcreageRateId;
 
             project.Accounts = new List<Account>(model.Accounts);
-            project.Status = Project.Statuses.PendingAccountApproval;
+            project.Status = Project.Statuses.Active;
             project.QuoteId = quote.Id;
             project.QuoteTotal = quote.Total;
 
