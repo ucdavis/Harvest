@@ -26,7 +26,7 @@ export const ProjectHeader = (props: Props) => {
               <p className="lede">Status</p>
               <p className="quote-status">{project.status}</p>
               <p className="lede">Type</p>
-              <p>TODO ROW CROPS</p>
+              <p>{project.cropType}</p>
             </div>
             <div className="col">
               <p className="lede">Timeline</p>
