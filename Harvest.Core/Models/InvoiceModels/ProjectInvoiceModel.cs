@@ -8,7 +8,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Utilities;
 using NetTopologySuite.Geometries;
 
-namespace Harvest.Web.Models
+namespace Harvest.Core.Models.InvoiceModels
 {
     public class ProjectInvoiceModel
     {
@@ -44,7 +44,7 @@ namespace Harvest.Web.Models
         public string Description { get; set; }
         public string Type { get; set; }
         public decimal Quantity { get; set; }
-        public Rate Rate { get; set; }
+        public RateModel Rate { get; set; }
         public int RateId { get; set; }
         public decimal Price { get; set; }
         public decimal Total { get; set; }
@@ -58,10 +58,30 @@ namespace Harvest.Web.Models
             Description = expense.Description;
             Type = expense.Type;
             Quantity = expense.Quantity;
-            Rate = expense.Rate;
+            Rate = expense.Rate == null ? null : new RateModel(expense.Rate);
             RateId = expense.RateId;
             Price = expense.Price;
             Total = expense.Total;
+        }
+    }
+
+    public class RateModel
+    {
+        public int Id { get; set; }
+        public decimal Price { get; set; }
+        public string Unit { get; set; }
+        public string Type { get; set; }
+        public string Description { get; set; }
+
+        public RateModel() { }
+
+        public RateModel(Rate rate)
+        {
+            Id = rate.Id;
+            Price = rate.Price;
+            Unit = rate.Unit;
+            Type = rate.Type;
+            Description = rate.Description;
         }
     }
 }

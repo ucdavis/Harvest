@@ -20,7 +20,7 @@ interface Props {
   rates: Rate[];
   quote: QuoteContent;
   updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
-  setEditFields: React.Dispatch<React.SetStateAction<boolean>>
+  setEditFields: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const ProjectDetail = (props: Props) => {
@@ -113,7 +113,7 @@ export const ProjectDetail = (props: Props) => {
                 onChange={(e) =>
                   props.updateQuote({
                     ...props.quote,
-                    acres: parseInt(e.target.value ?? 0),
+                    acres: parseFloat(e.target.value),
                   })
                 }
               />
@@ -131,7 +131,7 @@ export const ProjectDetail = (props: Props) => {
                   onChange={(e) =>
                     props.updateQuote({
                       ...props.quote,
-                      acreageRate: parseInt(e.target.value ?? 0),
+                      acreageRate: parseFloat(e.target.value ?? 0),
                     })
                   }
                 />
@@ -174,7 +174,12 @@ export const ProjectDetail = (props: Props) => {
             <Label for="projectLocation">Project Location</Label>
           </Col>
           <Col>
-            <button className="btn btn-link" onClick={_ => props.setEditFields(true)}>Edit Fields</button>
+            <button
+              className="btn btn-link"
+              onClick={(_) => props.setEditFields(true)}
+            >
+              Edit Fields
+            </button>
           </Col>
         </Row>
         <Location fields={props.quote.fields}></Location>

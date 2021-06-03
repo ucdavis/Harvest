@@ -10,6 +10,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Models.InvoiceModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
 using Microsoft.EntityFrameworkCore;
@@ -216,7 +217,7 @@ namespace Harvest.Core.Services
 
                 invoice.Status = Invoice.Statuses.Pending;
 
-                await _historyService.AddProjectHistory(invoice.Project, nameof(MoveMoney), "Sloth money movement requested", invoice);
+                await _historyService.AddProjectHistory(invoice.Project, nameof(MoveMoney), "Sloth money movement requested", new InvoiceModel(invoice));
                 await _dbContext.SaveChangesAsync();
 
 
@@ -282,14 +283,14 @@ namespace Harvest.Core.Services
                         invoice.Project.ChargedTotal += invoice.Total;
 
                         invoice.Status = Invoice.Statuses.Completed;
-                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", invoice);
+                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", new InvoiceModel(invoice));
                         await _dbContext.SaveChangesAsync();
                     }
                     if (slothResponse.Status == "Cancelled")
                     {
 
                         Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
-                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice cancelled", invoice);
+                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice cancelled", new InvoiceModel(invoice));
                         rolledBackCount++;
                         //TODO: Write to the notes field? Trigger off an email?
                     }

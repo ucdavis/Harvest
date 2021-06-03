@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Models.InvoiceModels;
 using Harvest.Core.Services;
 using Harvest.Core.Utilities;
 using Harvest.Web.Models;
@@ -32,7 +33,10 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Get(int id)
         {
-            var invoice = await _dbContext.Invoices.Include(i => i.Expenses).AsNoTracking()
+            var invoice = await _dbContext.Invoices
+                .Include(i => i.Expenses)
+                .ThenInclude(e => e.Rate)
+                .AsNoTracking()
                 .SingleOrDefaultAsync(i => i.Id == id);
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)

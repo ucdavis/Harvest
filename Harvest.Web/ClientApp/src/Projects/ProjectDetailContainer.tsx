@@ -53,14 +53,6 @@ export const ProjectDetailContainer = () => {
           >
             Approve Quote
           </Link>
-
-          {/* TODO: Update approve accounts page to react once we know what it should do */}
-          <a
-            className="btn btn-primary btn-small"
-            href={`/project/accountApproval/${project.id}`}
-          >
-            Approve Accounts
-          </a>
         </div>
       </div>
       <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
