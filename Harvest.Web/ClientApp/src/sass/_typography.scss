@@ -21,6 +21,12 @@ h4 {
   font-size: 1.2rem;
   color: $secondary-font;
 }
+h5 {
+  text-transform: uppercase;
+  color: $primary-color;
+  font-size: 1.2rem;
+  font-family: $sans-bold;
+}
 .current-year {
   font-weight: 400;
   font-size: 1.4rem;
@@ -42,4 +48,10 @@ p {
 label {
   font-size: 1.2rem;
   text-transform: capitalize;
+}
+a {
+  color: $primary-color;
+  &:hover {
+    color: darken($primary-color, 4);
+  }
 }

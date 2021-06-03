@@ -11,7 +11,7 @@
 }
 .btn:focus,
 .btn.focus {
-  box-shadow: 0 0 0 0.2rem rgba(38, 96, 65, 0.25);
+  box-shadow: none;
 }
 .btn-link {
   color: $primary-color;
@@ -83,7 +83,7 @@
     background-color: #fff !important;
   }
 }
-
+$nchild-wide: 24%;
 .activity-table {
   th {
     color: $primary-font;
@@ -93,30 +93,30 @@
     border-top: 0;
     &:nth-child(2) {
       text-align: right;
-      width: 12%;
+      width: $nchild-wide;
     }
     &:nth-child(3) {
       text-align: right;
-      width: 12%;
+      width: $nchild-wide;
     }
     &:nth-child(4) {
       text-align: right;
-      width: 12%;
+      width: $nchild-wide;
     }
   }
   td {
     border-top: 0;
     &:nth-child(2) {
       text-align: right;
-      width: 12%;
+      width: $nchild-wide;
     }
     &:nth-child(3) {
       text-align: right;
-      width: 12%;
+      width: $nchild-wide;
     }
     &:nth-child(4) {
       text-align: right;
-      width: 12%;
+      width: $nchild-wide;
     }
   }
 }
