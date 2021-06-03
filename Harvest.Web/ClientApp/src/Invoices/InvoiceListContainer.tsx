@@ -25,7 +25,7 @@ export const InvoiceListContainer = (props: Props) => {
   }, [props.projectId]);
 
   return (
-    <div className="card-green-bg">
+    <div className="">
       <div className="card-content">
         <h3>Invoices</h3>
         <InvoiceTable invoices={invoices}></InvoiceTable>
