@@ -22,6 +22,8 @@ namespace Harvest.Core.Models.FinancialAccountModels
         public string SubAccountName { get; set; } //Different Lookup
         public string SubAccount { get; set; } //Added for harvest
         public string Project { get; set; } //Added for harvest
+        public KfsUser AccountManager { get; set; }
+        public KfsUser FiscalOfficer { get; set; }
 
         public override string ToString()
         {
