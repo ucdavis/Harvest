@@ -28,7 +28,14 @@ namespace Harvest.Core.Models.FinancialAccountModels
             var extraAccountInfo = string.Empty;
             if (!string.IsNullOrWhiteSpace(SubAccount) || !string.IsNullOrWhiteSpace(Project))
             {
-                extraAccountInfo = $"-{SubAccount}-{Project}";
+                if (!string.IsNullOrWhiteSpace(Project))
+                {
+                    extraAccountInfo = $"-{SubAccount}-{Project}";
+                }
+                else
+                {
+                    extraAccountInfo = $"-{SubAccount}";
+                }
             }
             return $"{ChartOfAccountsCode}-{AccountNumber}{extraAccountInfo}";
         }
