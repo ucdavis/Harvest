@@ -3,16 +3,16 @@ import {
   Button,
   Col,
   FormGroup,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
   Row,
 } from "reactstrap";
-import { InputElement, useFormState, FormState, StateErrors } from 'react-use-form-state';
+import { useFormState, InputElement } from 'react-use-form-state';
 
 import { Rate, RateType, WorkItem, WorkItemSchema } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { getInputValidityStyle, getFieldValidator, ValidationErrorMessage } from "../Validation";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
@@ -35,21 +35,7 @@ interface WorkItemProps {
   deleteWorkItem: (workItem: WorkItem) => void;
 }
 
-interface ValidationMessageProps {
-  formState: FormState<any, StateErrors<any, string>>;
-  name: string;
-}
-
-const ValidationErrorMessage = (props: ValidationMessageProps) => {
-  const { formState, name } = props;
-  return formState.touched[name] && formState.validity[name] === false
-    ? (<p className="text-danger">{formState.errors[name]}</p>)
-    : (null);
-}
-
-const InputValidityStyle = (formState: FormState<any, StateErrors<any, string>>, name: string) => {
-  return formState.touched[name] && (formState.validity[name] === false) && "is-invalid";
-}
+const validateField = getFieldValidator(WorkItemSchema);
 
 const WorkItemForm = (props: WorkItemProps) => {
   const { workItem } = props;
@@ -68,16 +54,6 @@ const WorkItemForm = (props: WorkItemProps) => {
       }
     });
   console.debug(JSON.stringify(formState));
-
-  const validateField = (field: keyof WorkItem) =>
-    (value: unknown): string | true => {
-      const parsedResult = WorkItemSchema
-        .pick({ [field]: true })
-        .safeParse({ [field]: value });
-      return !parsedResult.success
-        ? parsedResult.error.errors[0].message
-        : true;
-    }
 
   // TODO: Determine a better way of working out which other options need extra description text
   const requiresCustomDescription = (unit: string | null) => {
@@ -109,7 +85,7 @@ const WorkItemForm = (props: WorkItemProps) => {
       <Col xs="5">
         <FormGroup>
           <select
-            className={`form-control ${InputValidityStyle(formState, "rateId")}`}
+            className={`form-control ${getInputValidityStyle(formState, "rateId")}`}
             {...select({
               name: "rateId",
               onChange: (e) => rateItemChanged(e, workItem),
@@ -125,7 +101,7 @@ const WorkItemForm = (props: WorkItemProps) => {
 
           {requiresCustomDescription(workItem.unit) && (
             <input
-              className={`form-control ${InputValidityStyle(formState, "description")}`}
+              className={`form-control ${getInputValidityStyle(formState, "description")}`}
               {...text({
                 name: "description",
                 validate: validateField("description")
@@ -143,7 +119,7 @@ const WorkItemForm = (props: WorkItemProps) => {
             <InputGroupText>{workItem.unit || ""}</InputGroupText>
           </InputGroupAddon>
           <input
-            className={`form-control ${InputValidityStyle(formState, "quantity")}`}
+            className={`form-control ${getInputValidityStyle(formState, "quantity")}`}
             {...number({
               name: "quantity",
               validate: (value) => validateField("quantity")(parseFloat(value))
@@ -158,7 +134,7 @@ const WorkItemForm = (props: WorkItemProps) => {
             <InputGroupText>$</InputGroupText>
           </InputGroupAddon>
           <input
-            className={`form-control ${InputValidityStyle(formState, "rate")}`}
+            className={`form-control ${getInputValidityStyle(formState, "rate")}`}
             {...number({
               name: "rate",
               validate: (value) => validateField("rate")(parseFloat(value))
