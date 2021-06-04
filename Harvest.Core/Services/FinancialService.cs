@@ -303,6 +303,8 @@ namespace Harvest.Core.Services
             rtValue.KfsAccount.SubFundGroupCode = accountLookup.SubFundGroupCode;
             rtValue.KfsAccount.SubFundGroupTypeCode = accountLookup.SubFundGroupTypeCode;
             rtValue.KfsAccount.SubFundGroupName = accountLookup.SubFundGroupName;
+            rtValue.KfsAccount.AccountManager = accountLookup.AccountManager;
+            rtValue.KfsAccount.FiscalOfficer = accountLookup.FiscalOfficer;
 
             //TODO:this lookup can get the fiscal officer and account manager populate the account manager?
 
