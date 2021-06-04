@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type CropType = "Row" | "Tree"
 export type RateType = "Acreage" | "Equipment" | "Labor" | "Other"
 
@@ -171,17 +173,20 @@ export class WorkItemImpl implements WorkItem {
     this.unit = "";
   }
 }
-export interface WorkItem {
-  id: number;
-  activityId: number;
-  type: RateType;
-  rateId: number;
-  rate: number;
-  description: string;
-  quantity: number;
-  unit: string;
-  total: number;
-}
+
+export const WorkItemSchema = z.object({
+  id: z.number().int().default(0),
+  activityId: z.number().int(),
+  type: z.union([z.literal("Acreage"), z.literal("Equipment"), z.literal("Labor"), z.literal("Other")]),
+  rateId: z.number().int().default(0),
+  rate: z.number().min(0),
+  description: z.string(),
+  quantity: z.number().min(0),
+  unit: z.string().nullable(),
+  total: z.number().min(0)
+});
+
+export interface WorkItem extends z.infer<typeof WorkItemSchema> {};
 
 export interface Activity {
   total: number;
