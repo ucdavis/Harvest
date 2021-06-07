@@ -18,6 +18,7 @@ export const ApprovalContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   useEffect(() => {
     const cb = async () => {
@@ -87,7 +88,8 @@ export const ApprovalContainer = () => {
               <AccountsInput
                 accounts={accounts}
                 setAccounts={setAccounts}
-              ></AccountsInput>
+                setDisabled={setDisabled}
+              />
             </div>
             <div className="col-md-6">
               <p>
@@ -111,7 +113,11 @@ export const ApprovalContainer = () => {
               </ol>
               <div className="text-right mt-5">
                 <button className="btn btn-link mr-2">Reject</button>
-                <button className="btn btn-primary" onClick={approve}>
+                <button
+                  className="btn btn-primary"
+                  disabled={disabled}
+                  onClick={approve}
+                >
                   Approve Quote
                 </button>
               </div>

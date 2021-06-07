@@ -1,6 +1,6 @@
 // typeahead input box that allows entering valid account numbers
 // each one entered is displayed on a new line where percentages can be set
-import React, { createRef, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 
 import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
 import { Col, Input, Row } from "reactstrap";
@@ -10,6 +10,7 @@ import { ProjectAccount } from "../types";
 interface Props {
   accounts: ProjectAccount[];
   setAccounts: (accounts: ProjectAccount[]) => void;
+  setDisabled: (disabled: boolean) => void;
 }
 
 export const AccountsInput = (props: Props) => {
@@ -22,6 +23,16 @@ export const AccountsInput = (props: Props) => {
   const typeaheadRef = createRef<AsyncTypeahead<ProjectAccount>>();
 
   const { accounts, setAccounts } = props;
+
+  useEffect(() => {
+    let total = 0;
+    for (let i = 0; i < accounts.length; i++) {
+      total += accounts[i].percentage;
+    }
+
+    total == 100 ? props.setDisabled(false) : props.setDisabled(true);
+  }, [props.accounts]);
+
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
