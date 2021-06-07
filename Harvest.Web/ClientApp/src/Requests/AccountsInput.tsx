@@ -80,7 +80,11 @@ export const AccountsInput = (props: Props) => {
   ) => {
     const idx = accounts.findIndex((a) => a.number === account.number);
 
-    accounts[idx].percentage = percentage;
+    if (percentage < 0) {
+      accounts[idx].percentage = 0;
+    } else {
+      accounts[idx].percentage = percentage;
+    }
 
     setAccounts([...accounts]);
 
@@ -137,7 +141,7 @@ export const AccountsInput = (props: Props) => {
             <Input
               type="text"
               name="percent"
-              defaultValue={account.percentage}
+              value={account.percentage}
               onChange={(e) =>
                 updateAccountPercentage(
                   account,
