@@ -1,6 +1,6 @@
 ﻿import React from "react";
 import { InputElement, useFormState, FormState, StateErrors } from "react-use-form-state";
-import { z, ZodObject } from "Zod";
+import { z, ZodObject } from "zod";
 
 interface ValidationMessageProps {
   formState: FormState<any, StateErrors<any, string>>;
