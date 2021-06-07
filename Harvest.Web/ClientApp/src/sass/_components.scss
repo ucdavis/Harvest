@@ -26,6 +26,13 @@
 .btn-group-lg > .btn {
   padding: 1rem 1.5rem;
 }
+.btn-light {
+  color: $primary-color;
+  &:hover {
+    background-color: $bg-primary;
+    color: $primary-color;
+  }
+}
 
 .page-item.active .page-link {
   background-color: transparentize($primary-color, 0.3);
@@ -56,7 +63,13 @@
     margin: 0;
   }
 }
-
+.progress {
+  background-color: #f2f2f2;
+  border: 1px solid $borders;
+}
+.progress-bar {
+  background-color: $primary-color;
+}
 // tables
 
 .harvest-table {
@@ -66,9 +79,7 @@
     font-size: 0.9rem;
     text-transform: uppercase;
   }
-  .progress-bar {
-    background-color: $primary-color;
-  }
+
   a {
     color: $primary-color;
     &:hover {
