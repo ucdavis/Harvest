@@ -3,6 +3,8 @@ import React from "react";
 import { Input } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarWeek } from "@fortawesome/free-solid-svg-icons";
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
@@ -56,14 +58,28 @@ export const ActivityForm = (props: Props) => {
     <div className="card-wrapper mb-4 no-green">
       <div className="card-content">
         <div className="row justify-content-between align-items-end">
-          <div className="col-md-8">
-            <label> Activity Name</label>
-            <button
-              className="btn btn-link btn-sm"
-              onClick={() => props.deleteActivity(props.activity)}
-            >
-              Remove activity <FontAwesomeIcon icon={faMinusCircle} />
-            </button>
+          <div className="col-md-12">
+            <div className="row justify-content-between">
+              <div className="col-md-6">
+                <label> Activity Name</label>
+              </div>
+
+              <div className="col-md-6 text-right">
+                <button className="btn btn-link btn-sm">
+                  Duplicate Activity <FontAwesomeIcon icon={faCopy} />
+                </button>
+                <button className="btn btn-link btn-sm">
+                  Adjust Year <FontAwesomeIcon icon={faCalendarWeek} />
+                </button>
+                <button
+                  className="btn btn-link btn-sm"
+                  onClick={() => props.deleteActivity(props.activity)}
+                >
+                  Remove activity <FontAwesomeIcon icon={faMinusCircle} />
+                </button>
+              </div>
+            </div>
+
             <Input
               type="text"
               id="activityName"
