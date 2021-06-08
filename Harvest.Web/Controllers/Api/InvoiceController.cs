@@ -34,6 +34,7 @@ namespace Harvest.Web.Controllers
         public async Task<ActionResult> Get(int id)
         {
             var invoice = await _dbContext.Invoices
+                .Include(a => a.Transfers)
                 .Include(i => i.Expenses)
                 .ThenInclude(e => e.Rate)
                 .AsNoTracking()
