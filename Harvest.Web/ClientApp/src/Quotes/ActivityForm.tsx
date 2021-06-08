@@ -58,6 +58,12 @@ export const ActivityForm = (props: Props) => {
         <div className="row justify-content-between align-items-end">
           <div className="col-md-8">
             <label> Activity Name</label>
+            <button
+              className="btn btn-link btn-sm"
+              onClick={() => props.deleteActivity(props.activity)}
+            >
+              Remove activity <FontAwesomeIcon icon={faMinusCircle} />
+            </button>
             <Input
               type="text"
               id="activityName"
@@ -69,14 +75,6 @@ export const ActivityForm = (props: Props) => {
                 })
               }
             ></Input>
-          </div>
-          <div className="col-md-4">
-            <button
-              className="btn btn-link btn-sm"
-              onClick={() => props.deleteActivity(props.activity)}
-            >
-              Remove activity <FontAwesomeIcon icon={faMinusCircle} />
-            </button>
           </div>
         </div>
 
