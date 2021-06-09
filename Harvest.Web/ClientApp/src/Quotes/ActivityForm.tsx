@@ -66,10 +66,10 @@ export const ActivityForm = (props: Props) => {
 
               <div className="col-md-6 text-right">
                 <button className="btn btn-link btn-sm">
-                  Duplicate Activity <FontAwesomeIcon icon={faCopy} />
+                  Adjust Year <FontAwesomeIcon icon={faCalendarWeek} />
                 </button>
                 <button className="btn btn-link btn-sm">
-                  Adjust Year <FontAwesomeIcon icon={faCalendarWeek} />
+                  Duplicate Activity <FontAwesomeIcon icon={faCopy} />
                 </button>
                 <button
                   className="btn btn-link btn-sm"
