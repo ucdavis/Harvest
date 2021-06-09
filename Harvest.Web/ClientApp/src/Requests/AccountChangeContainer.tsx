@@ -13,6 +13,7 @@ export const AccountChangeContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   useEffect(() => {
     const cb = async () => {
@@ -43,7 +44,7 @@ export const AccountChangeContainer = () => {
   return (
     <div className="card-wrapper">
       <ProjectHeader
-        project={project}
+        project={project} 
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
       <div className="card-green-bg">
@@ -54,8 +55,9 @@ export const AccountChangeContainer = () => {
               <AccountsInput
                 accounts={accounts}
                 setAccounts={setAccounts}
-              ></AccountsInput>
-              <button className="btn btn-primary" onClick={() => {}}>
+                setDisabled={setDisabled}
+              />
+              <button className="btn btn-primary" onClick={() => {}} disabled={disabled}>
                 Change Accounts
               </button>
             </div>
