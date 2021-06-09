@@ -135,30 +135,30 @@ export const RequestContainer = () => {
           <div className="custom-control custom-radio">
             <input
               type="radio"
-              id="customRadio1"
-              name="customRadio"
+              id="rowCropInput"
+              name="rowCropInput"
               className="custom-control-input"
               style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
               value="Row"
               checked={project.cropType === "Row"}
               onChange={handleCropTypeChange}
             />
-            <label className="custom-control-label" htmlFor="customRadio1">
+            <label className="custom-control-label" htmlFor="rowCropInput">
               Row Crops
             </label>
           </div>
           <div className="custom-control custom-radio">
             <input
               type="radio"
-              id="customRadio2"
-              name="customRadio"
+              id="treeCropInput"
+              name="treeCropInput"
               className="custom-control-input"
               style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
               value="Tree"
               checked={project.cropType === "Tree"}
               onChange={handleCropTypeChange}
             />
-            <label className="custom-control-label" htmlFor="customRadio2">
+            <label className="custom-control-label" htmlFor="treeCropInput">
               Tree Crops
             </label>
           </div>
