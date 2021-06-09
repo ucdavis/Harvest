@@ -143,7 +143,9 @@ export const RequestContainer = () => {
               checked={project.cropType === "Row"}
               onChange={handleCropTypeChange}
             />
-            <label className="custom-control-label">Row Crops</label>
+            <label className="custom-control-label" htmlFor="customRadio1">
+              Row Crops
+            </label>
           </div>
           <div className="custom-control custom-radio">
             <input
@@ -156,7 +158,9 @@ export const RequestContainer = () => {
               checked={project.cropType === "Tree"}
               onChange={handleCropTypeChange}
             />
-            <label className="custom-control-label">Tree Crops</label>
+            <label className="custom-control-label" htmlFor="customRadio2">
+              Tree Crops
+            </label>
           </div>
         </FormGroup>
 
