@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 
 import { Invoice } from "../types";
 import { ExpenseDisplay } from "../Expenses/ExpenseDisplay";
@@ -13,12 +14,13 @@ interface Props {
 export const InvoiceDisplay = (props: Props) => {
   const { invoice } = props;
   const acreageExpenses = invoice.expenses.filter((expense) => expense.type === "Acreage");
+  const accounts = invoice.transfers.filter((transfer) => transfer.type === "Debit");
   const activities = groupBy(invoice.expenses.filter((expense) => expense.type !== "Acreage"), (expense) => expense.activity || "Activity");
 
   return (
     <div>
-      <h1>Invoice</h1>
-      {acreageExpenses.map((expense) => (
+        <h1>Invoice</h1>
+        {acreageExpenses.map((expense) => (
         <p key={"expense_" + expense.id}>
           <b>
             {expense.description}: {expense.quantity} @{" "}
@@ -27,8 +29,7 @@ export const InvoiceDisplay = (props: Props) => {
           </b>
         </p>))}
 
-
-      {activities.map((activityExpenses, i) => {
+        {activities.map((activityExpenses, i) => {
         const activity = activityExpenses[0].activity || "Activity";
         const activityTotal = activityExpenses.reduce((a, b) => a + b.total, 0);
 
@@ -48,8 +49,26 @@ export const InvoiceDisplay = (props: Props) => {
           </div>
         );
       })}
-      <InvoiceTotals invoice={props.invoice}></InvoiceTotals>
-      DEBUG: {JSON.stringify(invoice)}
+
+        <Card className="card-project-totals mt-4">
+            <CardHeader>Account(s)</CardHeader>
+            <CardBody>
+                <div id="accounts123">
+                    {accounts.map((transfers) => (
+                      <Row key={"transfer_" + transfers.id}>
+                        <Col xs="10" sm="10">
+                            <div>{ transfers.account }</div>
+                        </Col>
+                        <Col xs="2" sm="2">
+                            ${formatCurrency(transfers.total)}
+                        </Col>
+                    </Row>
+                    ))}
+                </div>
+            </CardBody>
+        </Card>
+        <InvoiceTotals invoice={props.invoice}></InvoiceTotals>
+        DEBUG: {JSON.stringify(invoice)}
     </div>
   );
 };
