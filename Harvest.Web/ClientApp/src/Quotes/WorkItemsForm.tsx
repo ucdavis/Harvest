@@ -15,6 +15,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   category: RateType;
@@ -72,7 +73,7 @@ export const WorkItemsForm = (props: Props) => {
       </Row>
       {props.workItems.map((workItem) => (
         <Row
-          className="activity-line-item"
+          className="activity-line-item align-items-center"
           key={`workItem-${workItem.id}-activity-${workItem.activityId}`}
         >
           <Col xs="5">
@@ -149,7 +150,7 @@ export const WorkItemsForm = (props: Props) => {
 
           <Col xs="1">
             <button
-              className="btn btn-link"
+              className="btn btn-link mt-0"
               onClick={() => props.deleteWorkItem(workItem)}
             >
               <FontAwesomeIcon icon={faTrashAlt} />
@@ -162,6 +163,7 @@ export const WorkItemsForm = (props: Props) => {
         color="link"
         onClick={() => props.addNewWorkItem(props.category)}
       >
+        <FontAwesomeIcon className="mr-2" icon={faPlus} />
         Add {props.category}
       </Button>
     </div>
