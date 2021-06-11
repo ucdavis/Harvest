@@ -23,15 +23,13 @@ export function ValidationErrorMessage<T>(props: ValidationMessageProps<T>) {
   const { formik, name } = props;
   const meta = formik.getFieldMeta(name);
 
-  // meta.touched not considered because it seems to be always false
-  return meta.error !== undefined && meta.error !== ""
+  return meta.touched && meta.error !== undefined && meta.error !== ""
     ? (<p className="text-danger">{meta.error}</p>)
     : (null);
 }
 
 export function getInputValidityStyle<T>(formik: UseFormikType<T>, name: string) {
   const meta = formik.getFieldMeta(name);
-  // meta.touched not considered because it seems to be always false
-  return meta.error !== undefined && meta.error !== "" && "is-invalid";
+  return meta.touched && meta.error !== undefined && meta.error !== "" && "is-invalid";
 }
 

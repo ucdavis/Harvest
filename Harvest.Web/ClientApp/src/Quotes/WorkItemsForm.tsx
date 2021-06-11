@@ -81,8 +81,10 @@ const WorkItemForm = (props: WorkItemProps) => {
             className={`form-control ${getInputValidityStyle(formik, "rateId")}`}
             id="rateId"
             name="rateId"
+            value={formik.values.rateId}
             onChange={(e) => rateItemChanged(e)}
-            value={formik.values.rateId}>
+            onBlur={formik.handleBlur}
+          >
             <option value="0">-- Select {props.category} --</option>
             {props.rates.map((r) => (
               <option key={`rate-${r.type}-${r.id}`} value={r.id}>
@@ -98,6 +100,7 @@ const WorkItemForm = (props: WorkItemProps) => {
               name="description"
               value={formik.values.description}
               onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
             />
           )}
         </FormGroup>
@@ -116,6 +119,7 @@ const WorkItemForm = (props: WorkItemProps) => {
             name="quantity"
             value={formik.values.quantity}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           />
         </InputGroup>
         <ValidationErrorMessage formik={formik} name="quantity" />
@@ -132,6 +136,7 @@ const WorkItemForm = (props: WorkItemProps) => {
             name="rate"
             value={formik.values.rate}
             onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           />
         </InputGroup>
         <ValidationErrorMessage formik={formik} name="rate" />
