@@ -1,32 +1,37 @@
 ﻿import React from "react";
-import { InputElement, useFormState, FormState, StateErrors } from "react-use-form-state";
-import { z, ZodObject } from "zod";
+import { useFormik, FormikConfig, FormikValues } from "formik";
 
-interface ValidationMessageProps {
-  formState: FormState<any, StateErrors<any, string>>;
+//hack to get return type of useFormic()
+class UseFormikWrapper<T> {
+  // wrapped has no explicit return type so we can infer it
+  wrapped(e: FormikConfig<T>) {
+    // renaming prevents react from recognizing this as a hook to avoid runtime error
+    const refUseFormik = useFormik;
+    return refUseFormik<T>(e);
+  }
+}
+export type UseFormikType<T> = ReturnType<UseFormikWrapper<T>['wrapped']>;
+
+
+interface ValidationMessageProps<T> {
+  formik: UseFormikType<T>;
   name: string;
 }
 
-export const ValidationErrorMessage = (props: ValidationMessageProps) => {
-  const { formState, name } = props;
-  return formState.touched[name] && formState.validity[name] === false
-    ? (<p className="text-danger">{formState.errors[name]}</p>)
+
+export function ValidationErrorMessage<T>(props: ValidationMessageProps<T>) {
+  const { formik, name } = props;
+  const meta = formik.getFieldMeta(name);
+
+  // meta.touched not considered because it seems to be always false
+  return meta.error !== undefined && meta.error !== ""
+    ? (<p className="text-danger">{meta.error}</p>)
     : (null);
 }
 
-export const getInputValidityStyle = (formState: FormState<any, StateErrors<any, string>>, name: string) => {
-  return formState.touched[name] && (formState.validity[name] === false) && "is-invalid";
+export function getInputValidityStyle<T>(formik: UseFormikType<T>, name: string) {
+  const meta = formik.getFieldMeta(name);
+  // meta.touched not considered because it seems to be always false
+  return meta.error !== undefined && meta.error !== "" && "is-invalid";
 }
 
-export function getFieldValidator<T extends ZodObject<any>>(schema: T) {
-  return (field: keyof any) => {
-    return (value: unknown): string | true => {
-      const parsedResult = schema
-        .pick({ [field]: true })
-        .safeParse({ [field]: value });
-      return !parsedResult.success
-        ? parsedResult.error.errors[0].message
-        : true;
-    }
-  }
-}
