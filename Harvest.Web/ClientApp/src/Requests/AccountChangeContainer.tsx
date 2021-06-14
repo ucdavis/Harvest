@@ -34,7 +34,7 @@ export const AccountChangeContainer = () => {
   }
 
   const changeAccounts = async () => {
-    const response = await fetch(`/Request/ApproveChange/${projectId}`, {
+    const response = await fetch(`/Request/ApproveAsync/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
