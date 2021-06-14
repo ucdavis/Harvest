@@ -34,11 +34,6 @@ export const AccountChangeContainer = () => {
   }
 
   const changeAccounts = async () => {
-    // TODO: take accounts and validate
-    // if accounts look good, post them to new .net endpoint in Api/RequestController.cs
-    // that endpoint will look something like the accounts portion of ApproveAsync method
-    // on success, redirect back to project detail page
-    console.log(projectId, accounts);
     const response = await fetch(`/Request/ApproveChange/${projectId}`, {
       method: "POST",
       headers: {
@@ -50,7 +45,8 @@ export const AccountChangeContainer = () => {
 
     // console.log(response)
     if (response.ok) {
-      console.log("ok nice");
+      const data = await response.json();
+      window.location.pathname = `/Project/Details/${data.id}`;
     }
   };
 
