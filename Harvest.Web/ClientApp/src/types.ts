@@ -32,6 +32,7 @@ export interface Invoice {
   notes: string;
   status: string;
   expenses: Expense[];
+  transfers: Transfer[];
 }
 
 export interface User {
@@ -62,6 +63,13 @@ export interface Expense {
   rateId: number;
   price: number;
   total: number;
+}
+
+export interface Transfer {
+    id: number;
+    type: string;
+    account: string;
+    total: number;
 }
 
 // TODO: should this be a different name or is it ok?  Do we even need an interface?

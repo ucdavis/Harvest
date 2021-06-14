@@ -22,10 +22,9 @@
   }
 }
 .card-project-totals {
-  border: 1px solid $primary-color;
   .card-header {
     font-weight: bold;
-    border-bottom: 1px solid $primary-color;
+    border-bottom: 1px solid $borders;
     font-size: 1.1rem;
     background-color: #fff;
   }
@@ -34,10 +33,10 @@
   }
 }
 .total-row {
-  background-color: transparentize($primary-color, 0.75);
+  // background-color: transparentize($primary-color, 0.75);
   padding: 12px 0 8px 0;
-  border-top: 1px solid $primary-color;
-  margin: 4px -13px 0 -13px;
+  border-top: 3px solid $borders;
+  margin: 12px -13px 0 -13px;
   h6,
   span {
     font-size: 1.1rem;

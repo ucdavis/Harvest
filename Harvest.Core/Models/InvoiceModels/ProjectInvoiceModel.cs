@@ -24,6 +24,7 @@ namespace Harvest.Core.Models.InvoiceModels
         public string Notes { get; set; }
         public string Status { get; set; }
         public List<ExpenseModel> Expenses { get; set; }
+        public List<TransferModel> Transfers { get; set; }
 
         public InvoiceModel() { }
 
@@ -34,6 +35,23 @@ namespace Harvest.Core.Models.InvoiceModels
             CreatedOn = invoice.CreatedOn;
             Notes = invoice.Notes;
             Expenses = (invoice.Expenses?.Select(e => new ExpenseModel(e)) ?? Enumerable.Empty<ExpenseModel>()).ToList();
+            Transfers = (invoice.Transfers?.Select(a => new TransferModel(a)) ?? Enumerable.Empty<TransferModel>()).ToList();
+        }
+    }
+
+    public class TransferModel
+    {
+        public int Id { get; set; }
+        public string Type { get; set; }
+        public string Account { get; set; }
+        public decimal Total { get; set; }
+
+        public TransferModel(Transfer transfer)
+        {
+            Id = transfer.Id;
+            Type = transfer.Type;
+            Account = transfer.Account;
+            Total = transfer.Total;
         }
     }
 

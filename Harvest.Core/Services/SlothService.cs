@@ -205,7 +205,7 @@ namespace Harvest.Core.Services
                         extraAccountInfo = $"-{transferViewModel.SubAccount}";
                     }
                     var transfer = new Transfer();
-                    transfer.Account = $"{transferViewModel.Chart}-{transferViewModel.Account}{{extraAccountInfo}}";
+                    transfer.Account = $"{transferViewModel.Chart}-{transferViewModel.Account}{extraAccountInfo}";
                     transfer.Total = transferViewModel.Amount;
                     transfer.Type = transferViewModel.Direction;
 
