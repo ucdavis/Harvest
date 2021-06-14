@@ -38,13 +38,27 @@ export const AccountChangeContainer = () => {
     // if accounts look good, post them to new .net endpoint in Api/RequestController.cs
     // that endpoint will look something like the accounts portion of ApproveAsync method
     // on success, redirect back to project detail page
+    console.log(projectId, accounts);
+    const response = await fetch(`/Request/ApproveChange/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Accounts: accounts }),
+    });
+
+    // console.log(response)
+    if (response.ok) {
+      console.log("ok nice");
+    }
   };
 
   // we have a project, now time to change account
   return (
     <div className="card-wrapper">
       <ProjectHeader
-        project={project} 
+        project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
       <div className="card-green-bg">
@@ -57,7 +71,11 @@ export const AccountChangeContainer = () => {
                 setAccounts={setAccounts}
                 setDisabled={setDisabled}
               />
-              <button className="btn btn-primary" onClick={() => {}} disabled={disabled}>
+              <button
+                className="btn btn-primary"
+                onClick={() => changeAccounts()}
+                disabled={disabled}
+              >
                 Change Accounts
               </button>
             </div>
