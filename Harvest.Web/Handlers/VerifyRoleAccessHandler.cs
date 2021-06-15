@@ -44,11 +44,20 @@ namespace Harvest.Web.Handlers
             {
                 try
                 {
-                    //Assumes id will always be project id if PI string is used
-                    var projectId = Int32.Parse( _httpContext.HttpContext?.Request.RouteValues["id"]?.ToString());
+                    int projectId = 0;
+                    //Try to get projectId Parameter:
+                    var projectString = _httpContext.HttpContext?.Request.RouteValues["id"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(projectString))
+                    {
+                        projectId = Int32.Parse(projectString);
+                    }
+                    else
+                    {
+                        //Try to get id parameter instead. Assume it is the project Id
+                        projectId = Int32.Parse(_httpContext.HttpContext?.Request.RouteValues["id"]?.ToString());
+                    }
 
-                    if (await _dbContext.Projects.AnyAsync(a =>
-                        a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
+                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
                     {
                         context.Succeed(requirement);
                         return;
