@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -95,6 +97,7 @@ namespace Harvest.Web
                 options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Worker)));
+                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.AddRequirements(new VerifyRoleAccess(Role.Codes.PI)));
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();

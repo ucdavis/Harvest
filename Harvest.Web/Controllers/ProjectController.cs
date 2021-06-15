@@ -44,7 +44,7 @@ namespace Harvest.Web.Controllers
         {
             return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == id).ToArrayAsync());
         }
-
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Details(int id)
         {
             // TODO: move routes so react handles this natively and place API stuff in own controller

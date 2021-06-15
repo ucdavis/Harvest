@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -30,12 +31,35 @@ namespace Harvest.Web.Handlers
             {
                 return;
             }
-            
+
+
             if (await _dbContext.Permissions.AnyAsync(p => p.User.Iam == userIamId && (requirement.RoleStrings.Contains(p.Role.Name)
                 || p.Role.Name == Role.Codes.System))) // system admin should have access to all the things
             {
                 context.Succeed(requirement);
+                return;
             }
+
+            if (requirement.RoleStrings.Contains(Role.Codes.PI))
+            {
+                try
+                {
+                    //Assumes id will always be project id if PI string is used
+                    var projectId = Int32.Parse( _httpContext.HttpContext?.Request.RouteValues["id"]?.ToString());
+
+                    if (await _dbContext.Projects.AnyAsync(a =>
+                        a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
+                    {
+                        context.Succeed(requirement);
+                        return;
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+
         }
     }
 }

@@ -8,5 +8,6 @@ namespace Harvest.Core.Models
         public const string FieldManagerAccess = "FieldManagerAccess";
         public const string SupervisorAccess = "SupervisorAccess";
         public const string WorkerAccess = "WorkerAccess";
+        public const string PrincipalInvestigator = "PrincipalInvestigator";
     }
 }
