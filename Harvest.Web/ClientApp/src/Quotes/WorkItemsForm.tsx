@@ -8,11 +8,12 @@ import {
   InputGroupText,
   Row,
 } from "reactstrap";
-import { useFormik, FormikConfig } from "formik";
+import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
 
 import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { getInputValidityStyle, ValidationErrorMessage, UseFormikType } from "../Validation";
+import { getInputValidityStyle, ValidationErrorMessage } from "../Validation";
 import { workItemSchema } from "../schemas";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -39,34 +40,44 @@ interface WorkItemProps {
 const WorkItemForm = (props: WorkItemProps) => {
   const { workItem } = props;
 
-  const formik = useFormik<WorkItem>({
-    initialValues: workItem,
-    validationSchema: workItemSchema
-  } as FormikConfig<WorkItem>);
+  const { register, handleSubmit, formState, setValue, watch } = useForm<WorkItem>({
+    defaultValues: workItem,
+    resolver: yupResolver(workItemSchema),
+    mode: "onBlur"
+  });
+
+  // registering rateId prior to render in order to get access to onChange event handler
+  const registeredRateId = register("rateId");
+
+  // get current values of given fields
+  const watchRateId = watch("rateId");
+  const watchUnit = watch("unit");
+  const watchRate = watch("rate");
+  const watchQuantity = watch("quantity");
 
 
   // TODO: Determine a better way of working out which other options need extra description text
-  const requiresCustomDescription = (unit: string | null) => {
+  const requiresCustomDescription = (unit: string) => {
     return props.category === "Other" && unit === "Unit";
   };
 
   const rateItemChanged = (
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    //let formik do it's validation and casting magic
-    formik.handleChange(e);
+    //let react-hook-form do it's validation and casting magic
+    registeredRateId.onChange(e);
 
-    const meta = formik.getFieldMeta("rateId");
-    if (meta.touched && meta.error !== undefined && meta.error !== "") {
-      const rate = props.rates.find((r) => r.id === formik.values.rateId);
+    
+    if (!formState.errors.rateId) {
+      const rate = props.rates.find((r) => r.id === watchRateId);
 
       // rate can be undefinied if they select the default option
       if (!!rate) {
         // new rate selected, update the work item with defaults
-        formik.setFieldValue("rate", rate.price);
-        formik.setFieldValue("description", requiresCustomDescription(rate.unit) ? "" : rate.description);
-        formik.setFieldValue("unit", rate.unit);
-        formik.setFieldValue("total", 0);
+        setValue("rate", rate.price);
+        setValue("description", requiresCustomDescription(rate.unit) ? "" : rate.description);
+        setValue("unit", rate.unit);
+        setValue("total", 0);
       }
     }
   };
@@ -74,16 +85,14 @@ const WorkItemForm = (props: WorkItemProps) => {
   return (
     <Row
       className="activity-line-item"
-      key={`workItem-${formik.values.id}-activity-${formik.values.activityId}`}>
+      key={`workItem-${workItem.id}-activity-${workItem.activityId}`}>
       <Col xs="5">
         <FormGroup>
           <select
-            className={`form-control ${getInputValidityStyle(formik, "rateId")}`}
+            className={`form-control ${getInputValidityStyle(formState.errors.rateId)}`}
             id="rateId"
-            name="rateId"
-            value={formik.values.rateId}
+            {...registeredRateId}
             onChange={(e) => rateItemChanged(e)}
-            onBlur={formik.handleBlur}
           >
             <option value="0">-- Select {props.category} --</option>
             {props.rates.map((r) => (
@@ -93,36 +102,30 @@ const WorkItemForm = (props: WorkItemProps) => {
             ))}
           </select>
 
-          {requiresCustomDescription(formik.values.unit) && (
+          {requiresCustomDescription(watchUnit) && (
             <input
-              className={`form-control ${getInputValidityStyle(formik, "description")}`}
+              className={`form-control ${getInputValidityStyle(formState.errors.description)}`}
               id="description"
-              name="description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              {...register("description")}
             />
           )}
         </FormGroup>
-        <ValidationErrorMessage formik={formik} name="rateId" />
-        <ValidationErrorMessage formik={formik} name="description" />
+        <ValidationErrorMessage error={formState.errors.rateId} />
+        <ValidationErrorMessage error={formState.errors.description} />
       </Col>
 
       <Col xs="3">
         <InputGroup>
           <InputGroupAddon addonType="prepend">
-            <InputGroupText>{formik.values.unit || ""}</InputGroupText>
+            <InputGroupText>{watchUnit}</InputGroupText>
           </InputGroupAddon>
           <input
-            className={`form-control ${getInputValidityStyle(formik, "quantity")}`}
+            className={`form-control ${getInputValidityStyle(formState.errors.quantity)}`}
             id="quantity"
-            name="quantity"
-            value={formik.values.quantity}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            {...register("quantity")}
           />
         </InputGroup>
-        <ValidationErrorMessage formik={formik} name="quantity" />
+        <ValidationErrorMessage error={formState.errors.quantity} />
       </Col>
 
       <Col xs="2">
@@ -131,18 +134,15 @@ const WorkItemForm = (props: WorkItemProps) => {
             <InputGroupText>$</InputGroupText>
           </InputGroupAddon>
           <input
-            className={`form-control ${getInputValidityStyle(formik, "rate")}`}
+            className={`form-control ${getInputValidityStyle(formState.errors.rate)}`}
             id="rate"
-            name="rate"
-            value={formik.values.rate}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            {...register("rate")}
           />
         </InputGroup>
-        <ValidationErrorMessage formik={formik} name="rate" />
+        <ValidationErrorMessage error={formState.errors.rate} />
       </Col>
 
-      <Col xs="1">${formatCurrency(formik.values.rate * formik.values.quantity)}</Col>
+      <Col xs="1">${formatCurrency(watchRate * watchQuantity)}</Col>
 
       <Col xs="1">
         <button

@@ -1,35 +1,20 @@
 ﻿import React from "react";
-import { useFormik, FormikConfig, FormikValues } from "formik";
-
-//hack to get return type of useFormic()
-class UseFormikWrapper<T> {
-  // wrapped has no explicit return type so we can infer it
-  wrapped(e: FormikConfig<T>) {
-    // renaming prevents react from recognizing this as a hook to avoid runtime error
-    const refUseFormik = useFormik;
-    return refUseFormik<T>(e);
-  }
-}
-export type UseFormikType<T> = ReturnType<UseFormikWrapper<T>['wrapped']>;
-
+import { FieldError } from "react-hook-form"
 
 interface ValidationMessageProps<T> {
-  formik: UseFormikType<T>;
-  name: string;
+  error: FieldError | undefined;
 }
 
 
 export function ValidationErrorMessage<T>(props: ValidationMessageProps<T>) {
-  const { formik, name } = props;
-  const meta = formik.getFieldMeta(name);
+  const { error } = props;
 
-  return meta.touched && meta.error !== undefined && meta.error !== ""
-    ? (<p className="text-danger">{meta.error}</p>)
+  return error
+    ? (<p className="text-danger">{error.message}</p>)
     : (null);
 }
 
-export function getInputValidityStyle<T>(formik: UseFormikType<T>, name: string) {
-  const meta = formik.getFieldMeta(name);
-  return meta.touched && meta.error !== undefined && meta.error !== "" && "is-invalid";
+export function getInputValidityStyle<T>(error: FieldError | undefined) {
+  return error && "is-invalid";
 }
 
