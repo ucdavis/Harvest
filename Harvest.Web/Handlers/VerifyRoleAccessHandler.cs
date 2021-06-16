@@ -46,7 +46,7 @@ namespace Harvest.Web.Handlers
                 {
                     int projectId = 0;
                     //Try to get projectId Parameter:
-                    var projectString = _httpContext.HttpContext?.Request.RouteValues["id"]?.ToString();
+                    var projectString = _httpContext.HttpContext?.Request.RouteValues["projectId"]?.ToString();
                     if (!string.IsNullOrWhiteSpace(projectString))
                     {
                         projectId = Int32.Parse(projectString);
