@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import {
+  PDFDownloadLink,
+  Page,
+  Text,
+  View,
+  Document,
+  StyleSheet,
+} from "@react-pdf/renderer";
+import {
+  Table,
+  TableHeader,
+  TableCell,
+  TableBody,
+  DataTableCell,
+} from "@david.kucsai/react-pdf-table";
 
+import { ActivityRateTypes } from "../constants";
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ProjectHeader } from "./ProjectHeader";
@@ -66,6 +82,41 @@ export const ApprovalContainer = () => {
     return <div>No project or open quote found</div>;
   }
 
+  const styles = StyleSheet.create({
+    page: {
+      flexDirection: "row",
+      backgroundColor: "#E4E4E4",
+    },
+    section: {
+      margin: 10,
+      padding: 10,
+      flexGrow: 1,
+    },
+  });
+
+  const MyDocument = () => (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <Text>Quote</Text>
+          <Text>
+            {" "}
+            {projectAndQuote.quote?.acreageRateDescription}:{" "}
+            {projectAndQuote.quote?.acres} @{" "}
+            {projectAndQuote.quote != undefined
+              ? formatCurrency(projectAndQuote.quote.acreageRate)
+              : 0}{" "}
+            = $
+            {projectAndQuote.quote != undefined
+              ? formatCurrency(projectAndQuote.quote.acreageTotal)
+              : 0}
+          </Text>
+        </View>
+    
+      </Page>
+    </Document>
+  );
+
   // we have a project with a quote, time for the approval step
   return (
     <div className="card-wrapper">
@@ -81,10 +132,14 @@ export const ApprovalContainer = () => {
               <h2 className="primary-font bold-font">
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
-              <button className="btn btn-link btn-sm">
-                Download PDF <FontAwesomeIcon icon={faDownload} />
-              </button>
-
+              <PDFDownloadLink
+                document={<MyDocument />}
+                fileName="somename.pdf"
+              >
+                <button className="btn btn-link btn-sm">
+                  Download PDF <FontAwesomeIcon icon={faDownload} />
+                </button>
+              </PDFDownloadLink>
               <AccountsInput
                 accounts={accounts}
                 setAccounts={setAccounts}
