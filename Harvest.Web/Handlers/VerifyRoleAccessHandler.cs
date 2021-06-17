@@ -44,24 +44,19 @@ namespace Harvest.Web.Handlers
             {
                 try
                 {
-                    int projectId = 0;
+
                     //Try to get projectId Parameter:
                     var projectString = _httpContext.HttpContext?.Request.RouteValues["projectId"]?.ToString();
                     if (!string.IsNullOrWhiteSpace(projectString))
                     {
-                        projectId = Int32.Parse(projectString);
-                    }
-                    else
-                    {
-                        //Try to get id parameter instead. Assume it is the project Id
-                        projectId = Int32.Parse(_httpContext.HttpContext?.Request.RouteValues["id"]?.ToString());
+                        var projectId = Int32.Parse(projectString);
+                        if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
+                        {
+                            context.Succeed(requirement);
+                            return;
+                        }
                     }
 
-                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
-                    {
-                        context.Succeed(requirement);
-                        return;
-                    }
                 }
                 catch
                 {

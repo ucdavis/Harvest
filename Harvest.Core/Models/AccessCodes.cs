@@ -9,8 +9,8 @@ namespace Harvest.Core.Models
         public const string SupervisorAccess = "SupervisorAccess";
         public const string WorkerAccess = "WorkerAccess";
         /// <summary>
-        /// When using this Authentication, the project id must be in either the projectId or id parameters. It will look for the projectId first.
+        /// When using this Authentication, the projectId must be in the parameters.
         /// </summary>
-        public const string PrincipalInvestigatorProjectMustBeIdOrProjectId = "PrincipalInvestigator";
+        public const string PrincipalInvestigator = "PrincipalInvestigator";
     }
 }

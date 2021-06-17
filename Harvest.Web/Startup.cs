@@ -97,7 +97,7 @@ namespace Harvest.Web
                 options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.PrincipalInvestigatorProjectMustBeIdOrProjectId, policy => policy.AddRequirements(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.PI)));
+                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.AddRequirements(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.PI)));
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();
