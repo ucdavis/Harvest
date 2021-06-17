@@ -29,6 +29,7 @@ namespace Harvest.Core.Domain
         public string Requirements { get; set; }
         public DateTime DueDate { get; set; }
 
+        public string WorkNotes { get; set; } //For the person doing the Task
         public string Status { get; set; } = "Created";
         public bool Completed { get; set; } = false;
         
