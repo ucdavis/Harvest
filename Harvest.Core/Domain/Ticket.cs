@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Core.Domain
 {
-    public class ProjectTask
+    public class Ticket
     {
         [Key]
         public int Id { get; set; }

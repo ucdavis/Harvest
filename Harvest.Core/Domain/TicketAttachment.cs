@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Core.Domain
 {
-    public class TaskAttachment
+    public class TicketAttachment
     {
         [Key]
         public int Id { get; set; }
@@ -16,7 +16,7 @@ namespace Harvest.Core.Domain
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
 
-        public int TaskId { get; set; }
-        public ProjectTask Task { get; set; }
+        public int TicketId { get; set; }
+        public Ticket Ticket { get; set; }
     }
 }
