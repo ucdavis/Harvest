@@ -4,6 +4,7 @@ import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
+import { FileUpload } from "./FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
@@ -47,7 +48,9 @@ export const RequestContainer = () => {
       }
     };
 
-    cb();
+    if (projectId !== undefined) {
+      cb();
+    }
   }, [projectId]);
 
   const create = async () => {
@@ -181,6 +184,11 @@ export const RequestContainer = () => {
               setProject({ ...project, principalInvestigator: u })
             }
           ></SearchPerson>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>Want to attach any files?</Label>
+          <FileUpload></FileUpload>
         </FormGroup>
 
         <FormGroup>
