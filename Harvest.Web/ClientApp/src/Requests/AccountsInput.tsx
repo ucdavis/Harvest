@@ -137,9 +137,13 @@ export const AccountsInput = (props: Props) => {
       )}
 
       {accounts.map((account) => (
-        <Row className="approval-row" key={account.number}>
-          <Col md={4}>{account.number}</Col>
+        <Row className="approval-row align-items-center" key={account.number}>
           <Col md={4}>
+            <b>{account.number}</b>
+            <br />
+            More info here
+          </Col>
+          <Col md={3}>
             {" "}
             <Input
               type="text"
@@ -154,7 +158,9 @@ export const AccountsInput = (props: Props) => {
             />
           </Col>
           <Col md={2}>
-            <FontAwesomeIcon icon={faMinusCircle} />
+            <a href="#" className="btn btn-link btn-fa">
+              <FontAwesomeIcon icon={faMinusCircle} />
+            </a>
           </Col>
         </Row>
       ))}

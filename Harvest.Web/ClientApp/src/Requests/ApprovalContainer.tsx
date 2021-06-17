@@ -78,20 +78,6 @@ export const ApprovalContainer = () => {
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
           <div className="row">
             <div className="col-md-6">
-              <h2 className="primary-font bold-font">
-                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
-              </h2>
-              <button className="btn btn-link btn-sm">
-                Download PDF <FontAwesomeIcon icon={faDownload} />
-              </button>
-
-              <AccountsInput
-                accounts={accounts}
-                setAccounts={setAccounts}
-                setDisabled={setDisabled}
-              />
-            </div>
-            <div className="col-md-6">
               <p>
                 <b>Terms and Conditions</b>
               </p>
@@ -111,8 +97,19 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="text-right mt-5">
-                <button className="btn btn-link mr-2">Reject</button>
+              <h2 className="primary-font bold-font">
+                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
+              </h2>
+              <button className="btn btn-link btn-sm btn-fa mb-2">
+                Download PDF <FontAwesomeIcon icon={faDownload} />
+              </button>
+
+              <AccountsInput
+                accounts={accounts}
+                setAccounts={setAccounts}
+                setDisabled={setDisabled}
+              />
+              <div className="mt-5">
                 <button
                   className="btn btn-primary"
                   disabled={disabled}
@@ -120,6 +117,7 @@ export const ApprovalContainer = () => {
                 >
                   Approve Quote
                 </button>
+                <button className="btn btn-link mr-2">Reject</button>
               </div>
             </div>
           </div>
