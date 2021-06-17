@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Core.Domain
 {
-    public class Task
+    public class ProjectTask
     {
         [Key]
         public int Id { get; set; }
@@ -25,6 +25,9 @@ namespace Harvest.Core.Domain
         public int UpdatedById { get; set; }
         public DateTime UpdatedOn { get; set; }
 
+        [StringLength(50)]
+        [Display(Name = "Task Name")]
+        public string Name { get; set; }
         [Required]
         public string Requirements { get; set; }
         public DateTime DueDate { get; set; }
