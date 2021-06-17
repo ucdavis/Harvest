@@ -33,6 +33,7 @@ export const AccountChangeContainer = () => {
     return <div>Loading ...</div>;
   }
 
+  //TODO: require PI or supervisor access after updating auth policies
   const changeAccounts = async () => {
     const response = await fetch(`/Request/Approve/${projectId}`, {
       method: "POST",
