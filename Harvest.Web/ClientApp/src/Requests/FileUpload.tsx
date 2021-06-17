@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 import { BlobServiceClient } from "@azure/storage-blob";
 
@@ -9,6 +10,7 @@ const UploadFile = async (
 ) => {
   const blobServiceClient = new BlobServiceClient(sasUrl);
 
+  // don't need to pass a container since it's in the SAS url
   const containerClient = blobServiceClient.getContainerClient("");
   const blockClient = containerClient.getBlockBlobClient(fileName);
 
@@ -37,38 +39,34 @@ export const FileUpload = () => {
   }, []);
 
   const filesChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // shouldn't be possible, but we can't upload any files if we don't have the SAS info yet
-    if (sasUrl === undefined) return;
-
     const addedFiles = event.target.files;
 
-    if (addedFiles == null) {
-      return;
-    }
+    // shouldn't be possible, but we can't upload any files if we don't have the SAS info yet
+    if (sasUrl === undefined || addedFiles === null) return;
 
     const newFiles: File[] = [];
 
     for (let i = 0; i < addedFiles.length; i++) {
       const addedFile = addedFiles[i];
 
+      const fileId = uuidv4();
       // TODO: make file name unique w/ GUID or similar
-      const name = addedFile.name;
-
       newFiles.push({
-        name: name,
+        id: fileId,
+        name: addedFile.name,
         size: addedFile.size,
         type: addedFile.type,
         uploaded: false,
       });
 
-      console.log('uploading with ', sasUrl)
+      console.log("uploading with ", sasUrl);
 
-      UploadFile(sasUrl, name, addedFile.arrayBuffer()).then((_) => {
+      UploadFile(sasUrl, fileId, addedFile.arrayBuffer()).then((_) => {
         // TODO, check for an error
 
         // file is done uploading, so update uploaded details
         setFiles((f) => {
-          const fileIndex = f.findIndex((file) => file.name === name);
+          const fileIndex = f.findIndex((file) => file.id === fileId);
           f[fileIndex].uploaded = true;
 
           return [...f];
@@ -107,6 +105,7 @@ export const FileUpload = () => {
 };
 
 interface File {
+  id: string;
   name: string;
   size: number;
   type: string;
