@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import { Project, ProjectAccount } from "../types";
 import { AccountsInput } from "./AccountsInput";
@@ -14,6 +14,7 @@ export const AccountChangeContainer = () => {
   const [project, setProject] = useState<Project | undefined>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
+  const history = useHistory();
 
   useEffect(() => {
     const cb = async () => {
@@ -46,7 +47,7 @@ export const AccountChangeContainer = () => {
 
     if (response.ok) {
       const data = await response.json();
-      window.location.pathname = `/Project/Details/${data.id}`;
+      history.push(`/Project/Details/${data.id}`);
     } else {
       alert("Something went wrong, please try again");
     }
