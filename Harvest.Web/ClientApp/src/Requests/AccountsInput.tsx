@@ -7,6 +7,9 @@ import { Col, Input, Row } from "reactstrap";
 
 import { ProjectAccount } from "../types";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+
 interface Props {
   accounts: ProjectAccount[];
   setAccounts: (accounts: ProjectAccount[]) => void;
@@ -127,16 +130,16 @@ export const AccountsInput = (props: Props) => {
         options={searchResultAccounts}
       />
       {accounts.length > 0 && (
-        <Row md={6}>
-          <Col>Account To Charge</Col>
-          <Col>Percent %</Col>
+        <Row className="approval-row approval-row-title">
+          <Col md={4}>Account To Charge</Col>
+          <Col md={4}>Percent %</Col>
         </Row>
       )}
 
       {accounts.map((account) => (
-        <Row key={account.number} md={6}>
-          <Col>{account.number}</Col>
-          <Col>
+        <Row className="approval-row" key={account.number}>
+          <Col md={4}>{account.number}</Col>
+          <Col md={4}>
             {" "}
             <Input
               type="text"
@@ -149,6 +152,9 @@ export const AccountsInput = (props: Props) => {
                 )
               }
             />
+          </Col>
+          <Col md={2}>
+            <FontAwesomeIcon icon={faMinusCircle} />
           </Col>
         </Row>
       ))}
