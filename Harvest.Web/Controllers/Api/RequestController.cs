@@ -53,7 +53,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> ApproveChange(int id, [FromBody] RequestApprovalModel model)
+        public async Task<ActionResult> Approve(int id, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
 

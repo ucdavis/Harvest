@@ -34,7 +34,7 @@ export const AccountChangeContainer = () => {
   }
 
   const changeAccounts = async () => {
-    const response = await fetch(`/Request/ApproveChange/${projectId}`, {
+    const response = await fetch(`/Request/Approve/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -46,6 +46,8 @@ export const AccountChangeContainer = () => {
     if (response.ok) {
       const data = await response.json();
       window.location.pathname = `/Project/Details/${data.id}`;
+    } else {
+      alert("Something went wrong, please try again");
     }
   };
 
