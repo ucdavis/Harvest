@@ -20,15 +20,16 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpGet]
-        public Uri GetUploadUrl()
+        public string GetUploadDetails()
         {
-            return fileService.GetUploadUrl(storageSettings.ContainerName);
+            return fileService.GetUploadUrl(storageSettings.ContainerName).AbsoluteUri;
         }
 
         [HttpGet]
-        public Uri GetReadUrl() {
+        public string GetReadDetails()
+        {
             // TODO: need to know what blob they want to read
-            return fileService.GetDownloadUrl(storageSettings.ContainerName, "image.png");
+            return fileService.GetDownloadUrl(storageSettings.ContainerName, "image.png").AbsoluteUri;
         }
     }
 }
