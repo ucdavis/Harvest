@@ -17,7 +17,8 @@ namespace Harvest.Core.Domain
         public DateTime CreatedOn { get; set; }
 
         [Required]
-        public Guid Identifier { get; set; }
+        [StringLength(128)]
+        public string Identifier { get; set; }
 
         public int TicketId { get; set; }
         public Ticket Ticket { get; set; }
@@ -28,6 +29,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<TicketAttachment>().HasIndex(a => a.CreatedOn);
             modelBuilder.Entity<TicketAttachment>().Property(a => a.FileName).HasMaxLength(250);
             modelBuilder.Entity<TicketAttachment>().Property(a => a.ContentType).HasMaxLength(250);
+            modelBuilder.Entity<TicketAttachment>().Property(a => a.Identifier).HasMaxLength(128);
         }
     }
 }
