@@ -4,9 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 import { BlobServiceClient } from "@azure/storage-blob";
 
 interface Props {
-  files: File[];
-  setFiles: (files: File[]) => void;
-  updateFile: (file: File) => void;
+  files: BlobFile[];
+  setFiles: (files: BlobFile[]) => void;
+  updateFile: (file: BlobFile) => void;
 }
 
 const UploadFile = async (
@@ -49,7 +49,7 @@ export const FileUpload = (props: Props) => {
     // shouldn't be possible, but we can't upload any files if we don't have the SAS info yet
     if (sasUrl === undefined || addedFiles === null) return;
 
-    const newFiles: File[] = [];
+    const newFiles: BlobFile[] = [];
 
     for (let i = 0; i < addedFiles.length; i++) {
       const addedFile = addedFiles[i];
@@ -104,7 +104,7 @@ export const FileUpload = (props: Props) => {
   );
 };
 
-interface File {
+interface BlobFile {
   id: string;
   name: string;
   size: number;
