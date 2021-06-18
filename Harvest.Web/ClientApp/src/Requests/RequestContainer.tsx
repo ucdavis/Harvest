@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
@@ -14,6 +14,7 @@ interface RouteParams {
 }
 
 export const RequestContainer = () => {
+  const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({
     id: 0,
@@ -73,7 +74,7 @@ export const RequestContainer = () => {
 
     if (response.ok) {
       const data = await response.json();
-      window.location.pathname = `/Project/Details/${data.id}`;
+      history.push(`/Project/Details/${data.id}`);
     } else {
       alert("Something went wrong, please try again");
     }
