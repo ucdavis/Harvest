@@ -576,7 +576,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<int>("UpdatedById")
                         .HasColumnType("int");
@@ -603,6 +604,10 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<string>("ContentType")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
@@ -611,7 +616,13 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.Property<string>("FileName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<int>("TicketId")
                         .HasColumnType("int");
