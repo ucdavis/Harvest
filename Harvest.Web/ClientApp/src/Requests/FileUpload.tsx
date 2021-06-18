@@ -3,6 +3,12 @@ import { v4 as uuidv4 } from "uuid";
 
 import { BlobServiceClient } from "@azure/storage-blob";
 
+interface Props {
+  files: File[];
+  setFiles: (files: File[]) => void;
+  updateFile: (file: File) => void;
+}
+
 const UploadFile = async (
   sasUrl: string,
   fileName: string,
@@ -20,9 +26,8 @@ const UploadFile = async (
   return uploadBlobResponse;
 };
 
-export const FileUpload = () => {
+export const FileUpload = (props: Props) => {
   // TODO: pass uploaded files up to parent.  perhaps allow add/remove
-  const [files, setFiles] = useState<File[]>([]);
   const [sasUrl, setSasUrl] = useState<string>();
 
   useEffect(() => {
@@ -50,31 +55,26 @@ export const FileUpload = () => {
       const addedFile = addedFiles[i];
 
       const fileId = uuidv4();
-      // TODO: make file name unique w/ GUID or similar
-      newFiles.push({
+
+      const newFile = {
         id: fileId,
         name: addedFile.name,
         size: addedFile.size,
         type: addedFile.type,
         uploaded: false,
-      });
+      };
 
-      console.log("uploading with ", sasUrl);
+      newFiles.push(newFile);
 
       UploadFile(sasUrl, fileId, addedFile.arrayBuffer()).then((_) => {
         // TODO, check for an error
 
         // file is done uploading, so update uploaded details
-        setFiles((f) => {
-          const fileIndex = f.findIndex((file) => file.id === fileId);
-          f[fileIndex].uploaded = true;
-
-          return [...f];
-        });
+        props.updateFile({ ...newFile, uploaded: true });
       });
     }
 
-    setFiles((f) => [...f, ...newFiles]);
+    props.setFiles([...props.files, ...newFiles]);
   };
 
   if (sasUrl === undefined) {
@@ -89,10 +89,10 @@ export const FileUpload = () => {
         className="form-control-file"
         onChange={filesChanged}
       />
-      {files.length > 0 && (
+      {props.files.length > 0 && (
         <small id="emailHelp" className="form-text text-muted">
           <ul>
-            {files.map((file) => (
+            {props.files.map((file) => (
               <li key={file.name}>
                 {file.name} {!file.uploaded && "[spinner]"}
               </li>

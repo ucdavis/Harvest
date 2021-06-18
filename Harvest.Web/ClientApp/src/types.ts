@@ -23,6 +23,15 @@ export interface Project {
   isActive: boolean;
   accounts: null;
   quotes: null;
+  files: File[];
+}
+
+export interface File {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploaded: boolean;
 }
 
 export interface Invoice {
