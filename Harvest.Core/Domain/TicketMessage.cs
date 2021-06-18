@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Harvest.Core.Domain
 {
@@ -18,5 +15,11 @@ namespace Harvest.Core.Domain
 
         public int TicketId { get; set; }
         public Ticket Ticket { get; set; }
+
+        internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TicketMessage>().HasIndex(a => a.TicketId);
+            modelBuilder.Entity<TicketMessage>().HasIndex(a => a.CreatedOn);
+        }
     }
 }

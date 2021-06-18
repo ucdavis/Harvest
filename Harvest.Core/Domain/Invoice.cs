@@ -32,6 +32,8 @@ namespace Harvest.Core.Domain
         [StringLength(20)] //Probably only 10, but this gives growth if it changes
         public string KfsTrackingNumber { get; set; }
 
+        public List<Ticket> Tickets { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Invoice>().HasIndex(a => a.ProjectId);
@@ -47,6 +49,12 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Transfer>()
                 .HasOne(a => a.Invoice)
                 .WithMany(p => p.Transfers)
+                .HasForeignKey(a => a.InvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne(a => a.Invoice)
+                .WithMany(p => p.Tickets)
                 .HasForeignKey(a => a.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
