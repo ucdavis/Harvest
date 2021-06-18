@@ -32,6 +32,7 @@ namespace Harvest.Core.Domain
         public DateTime DueDate { get; set; }
 
         public string WorkNotes { get; set; } //For the person doing the Task
+        [StringLength(25)]
         public string Status { get; set; } = "Created";
         public bool Completed { get; set; } = false;
         [JsonIgnore]
@@ -49,6 +50,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Ticket>().HasIndex(a => a.Completed);
 
             modelBuilder.Entity<Ticket>().Property(a => a.Completed).HasDefaultValue(false);
+            modelBuilder.Entity<Ticket>().Property(a => a.Status).HasMaxLength(25);
+            modelBuilder.Entity<Ticket>().Property(a => a.Name).HasMaxLength(50);
 
             modelBuilder.Entity<TicketMessage>()
                 .HasOne(a => a.Ticket)

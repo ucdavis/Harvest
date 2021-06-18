@@ -9,9 +9,15 @@ namespace Harvest.Core.Domain
         [Key]
         public int Id { get; set; }
         [Required]
+        [StringLength(250)]
         public string FileName { get; set; }
+        [StringLength(250)]
+        public string ContentType { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
+
+        [Required]
+        public Guid Identifier { get; set; }
 
         public int TicketId { get; set; }
         public Ticket Ticket { get; set; }
@@ -20,6 +26,8 @@ namespace Harvest.Core.Domain
         {
             modelBuilder.Entity<TicketAttachment>().HasIndex(a => a.TicketId);
             modelBuilder.Entity<TicketAttachment>().HasIndex(a => a.CreatedOn);
+            modelBuilder.Entity<TicketAttachment>().Property(a => a.FileName).HasMaxLength(250);
+            modelBuilder.Entity<TicketAttachment>().Property(a => a.ContentType).HasMaxLength(250);
         }
     }
 }
