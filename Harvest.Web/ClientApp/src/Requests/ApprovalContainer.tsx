@@ -48,7 +48,7 @@ export const ApprovalContainer = () => {
     });
 
     if (response.ok) {
-      history.push(`/Project/Details/${projectId}`);
+      history.replace(`/Project/Details/${projectId}`);
     } else {
       alert("Something went wrong, please try again");
     }
