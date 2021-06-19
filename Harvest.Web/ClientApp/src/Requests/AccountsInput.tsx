@@ -100,7 +100,6 @@ export const AccountsInput = (props: Props) => {
 
   return (
     <div>
-      {error && <span className="text-danger">{error}</span>}
       <AsyncTypeahead
         id="searchAccounts" // for accessibility
         ref={typeaheadRef}
@@ -165,6 +164,7 @@ export const AccountsInput = (props: Props) => {
         </Row>
       ))}
       <div>DEBUG: {JSON.stringify(accounts)}</div>
+      {error && <span className="text-danger">{error}</span>}
     </div>
   );
 };

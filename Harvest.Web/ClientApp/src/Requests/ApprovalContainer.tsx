@@ -78,9 +78,9 @@ export const ApprovalContainer = () => {
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
           <div className="row">
             <div className="col-md-6">
-              <p>
+              <h4>
                 <b>Terms and Conditions</b>
-              </p>
+              </h4>
               <ol>
                 <li>
                   This estimate is approximate based on the information provided
@@ -110,6 +110,10 @@ export const ApprovalContainer = () => {
                 setDisabled={setDisabled}
               />
               <div className="mt-5">
+                <p className="discreet">
+                  Please check with the above account managers before pressing
+                  approve
+                </p>
                 <button
                   className="btn btn-primary"
                   disabled={disabled}

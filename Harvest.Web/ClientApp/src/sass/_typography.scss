@@ -44,6 +44,10 @@ p {
     font-size: 1.1rem;
     font-family: $sans-bold;
   }
+  .discreet {
+    font-style: italic;
+    color: $secondary-font;
+  }
 }
 label {
   font-size: 1.2rem;
