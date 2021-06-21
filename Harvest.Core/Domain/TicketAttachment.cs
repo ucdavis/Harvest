@@ -13,6 +13,7 @@ namespace Harvest.Core.Domain
         public string FileName { get; set; }
         [StringLength(250)]
         public string ContentType { get; set; }
+        public int FileSize { get; set; }
         public int CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
 
