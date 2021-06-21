@@ -3,15 +3,17 @@ using System;
 using Harvest.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 namespace Harvest.Core.Migrations.Sqlite
 {
     [DbContext(typeof(AppDbContextSqlite))]
-    partial class AppDbContextSqliteModelSnapshot : ModelSnapshot
+    [Migration("20210618172049_UpdateTicketFields1")]
+    partial class UpdateTicketFields1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -533,9 +535,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("Completed")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CreatedById")
                         .HasColumnType("INTEGER");
@@ -543,7 +543,7 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("DueDate")
+                    b.Property<DateTime>("DueDate")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("InvoiceId")
@@ -564,10 +564,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasMaxLength(25)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("UpdatedById")
+                    b.Property<int>("UpdatedById")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("UpdatedOn")
+                    b.Property<DateTime>("UpdatedOn")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("WorkNotes")
@@ -575,23 +575,11 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Completed");
-
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("CreatedOn");
-
-                    b.HasIndex("DueDate");
-
                     b.HasIndex("InvoiceId");
-
-                    b.HasIndex("Name");
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("UpdatedById");
-
-                    b.ToTable("Tickets");
+                    b.ToTable("Ticket");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.TicketAttachment", b =>
@@ -604,7 +592,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasMaxLength(250)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CreatedById")
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedOn")
@@ -614,9 +602,6 @@ namespace Harvest.Core.Migrations.Sqlite
                         .IsRequired()
                         .HasMaxLength(250)
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("FileSize")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Identifier")
                         .IsRequired()
@@ -628,13 +613,9 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("CreatedOn");
-
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketAttachments");
+                    b.ToTable("TicketAttachment");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.TicketMessage", b =>
@@ -643,7 +624,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CreatedById")
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedOn")
@@ -658,13 +639,9 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
-
-                    b.HasIndex("CreatedOn");
-
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketMessages");
+                    b.ToTable("TicketMessage");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
@@ -956,12 +933,6 @@ namespace Harvest.Core.Migrations.Sqlite
 
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
                 {
-                    b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
                         .WithMany("Tickets")
                         .HasForeignKey("InvoiceId")
@@ -973,53 +944,29 @@ namespace Harvest.Core.Migrations.Sqlite
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Harvest.Core.Domain.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
-
-                    b.Navigation("CreatedBy");
-
                     b.Navigation("Invoice");
 
                     b.Navigation("Project");
-
-                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.TicketAttachment", b =>
                 {
-                    b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
-                        .WithMany("TicketAttachments")
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Harvest.Core.Domain.Ticket", "Ticket")
                         .WithMany("Attachments")
                         .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.TicketMessage", b =>
                 {
-                    b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
-                        .WithMany("TicketMessages")
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Harvest.Core.Domain.Ticket", "Ticket")
                         .WithMany("Messages")
                         .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("CreatedBy");
 
                     b.Navigation("Ticket");
                 });
@@ -1086,10 +1033,6 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Permissions");
 
                     b.Navigation("PrincipalInvestigatorProjects");
-
-                    b.Navigation("TicketAttachments");
-
-                    b.Navigation("TicketMessages");
 
                     b.Navigation("UpdatedRates");
                 });
