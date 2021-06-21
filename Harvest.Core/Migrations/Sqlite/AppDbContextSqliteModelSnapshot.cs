@@ -360,6 +360,49 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Projects");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.ProjectAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ContentType")
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("FileSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Identifier")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("ProjectAttachments");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.ProjectHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -884,6 +927,25 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("PrincipalInvestigator");
 
                     b.Navigation("Quote");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.ProjectAttachment", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.ProjectHistory", b =>
