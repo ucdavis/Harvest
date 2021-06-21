@@ -550,7 +550,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .UseIdentityColumn();
 
                     b.Property<bool>("Completed")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
@@ -590,11 +592,19 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Completed");
+
+                    b.HasIndex("CreatedOn");
+
+                    b.HasIndex("DueDate");
+
                     b.HasIndex("InvoiceId");
+
+                    b.HasIndex("Name");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Ticket");
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.TicketAttachment", b =>
@@ -619,6 +629,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<int>("FileSize")
+                        .HasColumnType("int");
+
                     b.Property<string>("Identifier")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -629,9 +642,11 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedOn");
+
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketAttachment");
+                    b.ToTable("TicketAttachments");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.TicketMessage", b =>
@@ -656,9 +671,11 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedOn");
+
                     b.HasIndex("TicketId");
 
-                    b.ToTable("TicketMessage");
+                    b.ToTable("TicketMessages");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Transfer", b =>
@@ -973,7 +990,7 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasOne("Harvest.Core.Domain.Ticket", "Ticket")
                         .WithMany("Attachments")
                         .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Ticket");
@@ -984,7 +1001,7 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasOne("Harvest.Core.Domain.Ticket", "Ticket")
                         .WithMany("Messages")
                         .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Ticket");
