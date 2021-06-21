@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { BlobServiceClient } from "@azure/storage-blob";
+import { BlobFile } from "../types";
 
 interface Props {
   files: BlobFile[];
@@ -56,11 +57,11 @@ export const FileUpload = (props: Props) => {
 
       const fileId = uuidv4();
 
-      const newFile = {
-        id: fileId,
-        name: addedFile.name,
-        size: addedFile.size,
-        type: addedFile.type,
+      const newFile: BlobFile = {
+        identifier: fileId,
+        fileName: addedFile.name,
+        fileSize: addedFile.size,
+        contentType: addedFile.type,
         uploaded: false,
       };
 
@@ -93,8 +94,8 @@ export const FileUpload = (props: Props) => {
         <small id="emailHelp" className="form-text text-muted">
           <ul>
             {props.files.map((file) => (
-              <li key={file.name}>
-                {file.name} {!file.uploaded && "[spinner]"}
+              <li key={file.fileName}>
+                {file.fileName} {!file.uploaded && "[spinner]"}
               </li>
             ))}
           </ul>
@@ -103,11 +104,3 @@ export const FileUpload = (props: Props) => {
     </div>
   );
 };
-
-interface BlobFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  uploaded: boolean;
-}

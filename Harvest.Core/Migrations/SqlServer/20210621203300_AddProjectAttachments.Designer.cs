@@ -4,15 +4,17 @@ using Harvest.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 namespace Harvest.Core.Migrations.SqlServer
 {
     [DbContext(typeof(AppDbContextSqlServer))]
-    partial class AppDbContextSqlServerModelSnapshot : ModelSnapshot
+    [Migration("20210621203300_AddProjectAttachments")]
+    partial class AddProjectAttachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -960,9 +962,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
-                        .WithMany("Attachments")
+                        .WithMany()
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
@@ -1136,8 +1138,6 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
                     b.Navigation("Accounts");
-
-                    b.Navigation("Attachments");
 
                     b.Navigation("Fields");
 

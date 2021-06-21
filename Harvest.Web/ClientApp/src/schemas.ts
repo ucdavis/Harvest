@@ -16,10 +16,10 @@ export const investigatorSchema: SchemaOf<User> = yup
   });
 
 export const fileSchema: SchemaOf<BlobFile> = yup.object().shape({
-  id: yup.string().required(),
-  name: yup.string().required(),
-  size: yup.number().required(),
-  type: yup.string().required(),
+  identifier: yup.string().required(),
+  fileName: yup.string().required(),
+  fileSize: yup.number().required(),
+  contentType: yup.string().required(),
   uploaded: yup.boolean().required().isTrue() // files are only valid if they are done uploading
 });
 

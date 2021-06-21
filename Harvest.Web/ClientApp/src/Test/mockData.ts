@@ -39,7 +39,7 @@ export const fakeProject: ProjectWithQuote = {
     },
     accounts: null,
     quotes: null,
-    files: []
+    attachments: []
   },
   quote: null,
 };
