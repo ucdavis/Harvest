@@ -9,6 +9,7 @@ import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
+import { TicketContainer } from "./Tickets/TicketContainer";
 import { Map } from "./Maps/Map";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
       <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
+      <Route path="/ticket/create/:projectId?" component={TicketContainer} />
       <Route
         path="/project/details/:projectId"
         component={ProjectDetailContainer}
