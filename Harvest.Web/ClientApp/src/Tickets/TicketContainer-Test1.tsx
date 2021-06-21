@@ -59,12 +59,10 @@ export const TicketContainer = () => {
   };
 
 
-  if (projectId !== undefined && project.id === 0) {
-    // if we have a project id but it hasn't loaded yet, wait
-    return <div>Loading...</div>;
+  if (projectId === undefined || project.id === 0) {
+      // if we have a project id but it hasn't loaded yet, wait
+      return <div>ERROR!!! Need to be associated with a project</div>;
   }
-
-
 
   return (
     <div className="card-wrapper card-medium">
