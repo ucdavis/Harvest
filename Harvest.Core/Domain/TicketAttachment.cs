@@ -14,7 +14,8 @@ namespace Harvest.Core.Domain
         [StringLength(250)]
         public string ContentType { get; set; }
         public int FileSize { get; set; }
-        public int CreatedBy { get; set; }
+        public int CreatedById { get; set; }
+        public User CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
 
         [Required]
@@ -28,6 +29,7 @@ namespace Harvest.Core.Domain
         {
             modelBuilder.Entity<TicketAttachment>().HasIndex(a => a.TicketId);
             modelBuilder.Entity<TicketAttachment>().HasIndex(a => a.CreatedOn);
+            modelBuilder.Entity<TicketAttachment>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<TicketAttachment>().Property(a => a.FileName).HasMaxLength(250);
             modelBuilder.Entity<TicketAttachment>().Property(a => a.ContentType).HasMaxLength(250);
             modelBuilder.Entity<TicketAttachment>().Property(a => a.Identifier).HasMaxLength(128);

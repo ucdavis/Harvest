@@ -10,7 +10,8 @@ namespace Harvest.Core.Domain
         public int Id { get; set; }
         [Required]
         public string Message { get; set; }
-        public int CreatedBy { get; set; }
+        public int CreatedById { get; set; }
+        public User CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
 
         public int TicketId { get; set; }
@@ -20,6 +21,7 @@ namespace Harvest.Core.Domain
         {
             modelBuilder.Entity<TicketMessage>().HasIndex(a => a.TicketId);
             modelBuilder.Entity<TicketMessage>().HasIndex(a => a.CreatedOn);
+            modelBuilder.Entity<TicketMessage>().HasIndex(a => a.CreatedById);
         }
     }
 }

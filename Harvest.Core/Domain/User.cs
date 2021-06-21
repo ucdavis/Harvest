@@ -48,6 +48,15 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Project> PrincipalInvestigatorProjects { get; set; }
 
+        [JsonIgnore]
+        public List<Ticket> CreatedTickets { get; set; }
+        [JsonIgnore]
+        public List<Ticket> UpdatedTickets { get; set; }
+        [JsonIgnore]
+        public List<TicketAttachment> TicketAttachments { get; set; }
+        [JsonIgnore]
+        public List<TicketMessage> TicketMessages { get; set; }
+
         [Display(Name = "Name")]
         public string Name => FirstName + " " + LastName;
 
@@ -88,7 +97,27 @@ namespace Harvest.Core.Domain
                 .WithMany(u => u.UpdatedRates)
                 .HasForeignKey(p => p.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Ticket>()
+                .HasOne(a => a.CreatedBy)
+                .WithMany(a => a.CreatedTickets)
+                .HasForeignKey(a => a.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Ticket>()
+                .HasOne(a => a.UpdatedBy)
+                .WithMany(a => a.UpdatedTickets)
+                .HasForeignKey(a => a.UpdatedById)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<TicketAttachment>()
+                .HasOne(a => a.CreatedBy)
+                .WithMany(a => a.TicketAttachments)
+                .HasForeignKey(a => a.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<TicketMessage>()
+                .HasOne(a => a.CreatedBy)
+                .WithMany(a => a.TicketMessages)
+                .HasForeignKey(a => a.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
