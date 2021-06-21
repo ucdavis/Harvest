@@ -938,9 +938,9 @@ namespace Harvest.Core.Migrations.Sqlite
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
-                        .WithMany()
+                        .WithMany("Attachments")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
@@ -1114,6 +1114,8 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Project", b =>
                 {
                     b.Navigation("Accounts");
+
+                    b.Navigation("Attachments");
 
                     b.Navigation("Fields");
 
