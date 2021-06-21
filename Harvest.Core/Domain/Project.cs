@@ -13,6 +13,7 @@ namespace Harvest.Core.Domain
             Fields = new List<Field>();
             Accounts = new List<Account>();
             Quotes = new List<Quote>();
+            Attachments = new List<ProjectAttachment>();
         }
         
         [Key]
@@ -96,7 +97,6 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Ticket> Tickets { get; set; }
 
-        [JsonIgnore]
         public List<ProjectAttachment> Attachments { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)

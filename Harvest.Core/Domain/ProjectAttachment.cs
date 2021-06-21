@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -5,6 +6,8 @@ namespace Harvest.Core.Domain
     public class ProjectAttachment : AttachmentBase
     {
         public int ProjectId { get; set; }
+
+        [JsonIgnore]
         public Project Project { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
