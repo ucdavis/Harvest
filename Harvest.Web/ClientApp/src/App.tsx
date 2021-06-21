@@ -5,6 +5,7 @@ import { Route } from "react-router-dom";
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
+import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
@@ -19,6 +20,7 @@ function App() {
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
+      <Route path="/request/changeAccount/:projectId" component={AccountChangeContainer} />
       <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />

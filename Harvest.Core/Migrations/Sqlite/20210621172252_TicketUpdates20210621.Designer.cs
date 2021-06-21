@@ -3,15 +3,17 @@ using System;
 using Harvest.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
 namespace Harvest.Core.Migrations.Sqlite
 {
     [DbContext(typeof(AppDbContextSqlite))]
-    partial class AppDbContextSqliteModelSnapshot : ModelSnapshot
+    [Migration("20210621172252_TicketUpdates20210621")]
+    partial class TicketUpdates20210621
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -957,9 +959,9 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
-                        .WithMany()
+                        .WithMany("CreatedTickets")
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
@@ -974,8 +976,9 @@ namespace Harvest.Core.Migrations.Sqlite
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.User", "UpdatedBy")
-                        .WithMany()
-                        .HasForeignKey("UpdatedById");
+                        .WithMany("UpdatedTickets")
+                        .HasForeignKey("UpdatedById")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 
@@ -1083,6 +1086,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Navigation("CreatedRates");
 
+                    b.Navigation("CreatedTickets");
+
                     b.Navigation("Permissions");
 
                     b.Navigation("PrincipalInvestigatorProjects");
@@ -1092,6 +1097,8 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("TicketMessages");
 
                     b.Navigation("UpdatedRates");
+
+                    b.Navigation("UpdatedTickets");
                 });
 #pragma warning restore 612, 618
         }

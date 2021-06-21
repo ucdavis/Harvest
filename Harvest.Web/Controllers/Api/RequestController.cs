@@ -47,8 +47,13 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        [HttpGet]
+        public ActionResult ChangeAccount(int id) {
+            return View("React");
+        }
+
         [HttpPost]
-        public async Task<ActionResult> ApproveAsync(int id, [FromBody] RequestApprovalModel model)
+        public async Task<ActionResult> Approve(int id, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
 

@@ -19,17 +19,19 @@ namespace Harvest.Core.Domain
 
         [Required]
         public int CreatedById { get; set; }
+        public User CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
 
-        public int UpdatedById { get; set; }
-        public DateTime UpdatedOn { get; set; }
+        public int? UpdatedById { get; set; }
+        public User UpdatedBy { get; set; }
+        public DateTime? UpdatedOn { get; set; }
 
         [StringLength(50)]
         [Display(Name = "Task Name")]
         public string Name { get; set; }
         [Required]
         public string Requirements { get; set; }
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
 
         public string WorkNotes { get; set; } //For the person doing the Task
         [StringLength(25)]

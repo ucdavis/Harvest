@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import { RequestInput, User } from "./types";
+import { BlobFile, RequestInput, User } from "./types";
 
 export const investigatorSchema: SchemaOf<User> = yup
   .object()
@@ -15,6 +15,14 @@ export const investigatorSchema: SchemaOf<User> = yup
     nameAndEmail: yup.string(),
   });
 
+export const fileSchema: SchemaOf<BlobFile> = yup.object().shape({
+  id: yup.string().required(),
+  name: yup.string().required(),
+  size: yup.number().required(),
+  type: yup.string().required(),
+  uploaded: yup.boolean().required().isTrue() // files are only valid if they are done uploading
+});
+
 export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   id: yup.number().required(),
   start: yup.string().required(),
@@ -23,4 +31,5 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   cropType: yup.string().required(),
   requirements: yup.string(),
   principalInvestigator: investigatorSchema,
+  files: yup.array().of(fileSchema)
 });
