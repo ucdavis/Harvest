@@ -23,14 +23,14 @@ export interface Project {
   isActive: boolean;
   accounts: null;
   quotes: null;
-  files: BlobFile[];
+  attachments: BlobFile[];
 }
 
 export interface BlobFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
+  identifier: string;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
   uploaded: boolean;
 }
 

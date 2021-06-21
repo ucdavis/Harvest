@@ -190,14 +190,14 @@ export const RequestContainer = () => {
         <FormGroup>
           <Label>Want to attach any files?</Label>
           <FileUpload
-            files={project.files || []}
-            setFiles={(f) => setProject({ ...project, files: [...f] })}
+            files={project.attachments || []}
+            setFiles={(f) => setProject({ ...project, attachments: [...f] })}
             updateFile={(f) =>
               setProject((proj) => {
                 // update just one specific file from project p
-                proj.files[proj.files.findIndex(file=>file.id === f.id)] = {...f};
+                proj.attachments[proj.attachments.findIndex(file=>file.identifier === f.identifier)] = {...f};
                 
-                return { ...proj, files: [...proj.files] };
+                return { ...proj, attachments: [...proj.attachments] };
               })
             }
           ></FileUpload>
