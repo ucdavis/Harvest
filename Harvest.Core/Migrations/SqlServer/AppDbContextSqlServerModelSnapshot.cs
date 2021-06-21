@@ -978,9 +978,9 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
-                        .WithMany("CreatedTickets")
+                        .WithMany()
                         .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Invoice", "Invoice")
@@ -995,9 +995,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.User", "UpdatedBy")
-                        .WithMany("UpdatedTickets")
-                        .HasForeignKey("UpdatedById")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .WithMany()
+                        .HasForeignKey("UpdatedById");
 
                     b.Navigation("CreatedBy");
 
@@ -1105,8 +1104,6 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.Navigation("CreatedRates");
 
-                    b.Navigation("CreatedTickets");
-
                     b.Navigation("Permissions");
 
                     b.Navigation("PrincipalInvestigatorProjects");
@@ -1116,8 +1113,6 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Navigation("TicketMessages");
 
                     b.Navigation("UpdatedRates");
-
-                    b.Navigation("UpdatedTickets");
                 });
 #pragma warning restore 612, 618
         }
