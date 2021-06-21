@@ -96,6 +96,9 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Ticket> Tickets { get; set; }
 
+        [JsonIgnore]
+        public List<ProjectAttachment> Attachments { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Project>().HasIndex(a => a.Name);
@@ -109,6 +112,12 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Account>()
                 .HasOne(a => a.Project)
                 .WithMany(p => p.Accounts)
+                .HasForeignKey(a => a.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProjectAttachment>()
+                .HasOne(a => a.Project)
+                .WithMany(a => a.Attachments)
                 .HasForeignKey(a => a.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
