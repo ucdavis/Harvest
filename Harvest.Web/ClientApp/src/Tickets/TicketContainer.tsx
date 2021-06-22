@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { Project, CreateTicket } from '../types';
-import { ProjectHeader } from '../Requests/ProjectHeader';
-import DatePicker from 'react-date-picker';
-import { Button, FormGroup, Input, Label } from 'reactstrap';
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import { Project, CreateTicket } from "../types";
+import { ProjectHeader } from "../Requests/ProjectHeader";
+import DatePicker from "react-date-picker";
+import { Button, FormGroup, Input, Label } from "reactstrap";
 
 interface RouteParams {
   projectId?: string;
@@ -13,8 +13,8 @@ export const TicketContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [createTicket, setCreateTicket] = useState<CreateTicket>({
-    requirements: '',
-    name: ''
+    requirements: "",
+    name: "",
   } as CreateTicket);
   const [disabled, setDisabled] = useState<boolean>(true);
   const history = useHistory();
@@ -41,71 +41,71 @@ export const TicketContainer = () => {
     // create a new project
 
     const response = await fetch(`/Ticket/Create?projectId=${projectId}`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(createTicket)
+      body: JSON.stringify(createTicket),
     });
 
     if (response.ok) {
       const data = await response.json();
       window.location.pathname = `/Project/Details/${data.id}`;
     } else {
-      alert('Something went wrong, please try again');
+      alert("Something went wrong, please try again");
     }
   };
 
   // we have a project, now time to change account
   return (
-    <div className='card-wrapper'>
+    <div className="card-wrapper">
       <ProjectHeader
         project={project}
-        title={'Field Request #' + (project.id || '')}
+        title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-      <div className='card-content'>
-        <div className='card-head'>
+      <div className="card-content">
+        <div className="card-head">
           <h2>Create new ticket for your project</h2>
         </div>
         <FormGroup>
           <Label>Subject</Label>
           <Input
-            type='text'
-            name='name'
-            id='name'
+            type="text"
+            name="name"
+            id="name"
             value={createTicket.name}
-            onChange={e =>
+            onChange={(e) =>
               setCreateTicket({ ...createTicket, name: e.target.value })
             }
-            placeholder='Enter a short description for this request'
+            placeholder="Enter a short description for this request"
           />
         </FormGroup>
 
         <FormGroup>
           <Label>What are the details of your ticket request?</Label>
           <Input
-            type='textarea'
-            name='text'
-            id='requirements'
+            type="textarea"
+            name="text"
+            id="requirements"
             value={createTicket.requirements}
-            onChange={e =>
+            onChange={(e) =>
               setCreateTicket({ ...createTicket, requirements: e.target.value })
             }
-            placeholder='Enter a full description of your requirements'
+            placeholder="Enter a full description of your requirements"
           />
         </FormGroup>
-        <div className='row'>
-          <div className='col-md-6'>
-            <div className='form-group'>
+        <div className="row">
+          <div className="col-md-6">
+            <div className="form-group">
               <Label>Due Date?</Label>
-              <div className='input-group' style={{ zIndex: 9000 }}>
+              <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
-                  format='MM/dd/yyyy'
+                  format="MM/dd/yyyy"
                   required={true}
                   clearIcon={null}
                   value={createTicket.dueDate}
-                  onChange={date =>
+                  onChange={(date) =>
                     setCreateTicket({ ...createTicket, dueDate: date as Date })
                   }
                 />
@@ -113,8 +113,8 @@ export const TicketContainer = () => {
             </div>
           </div>
         </div>
-        <div className='row justify-content-center'>
-          <Button className='btn-lg' color='primary' onClick={create}>
+        <div className="row justify-content-center">
+          <Button className="btn-lg" color="primary" onClick={create}>
             Create New Ticket
           </Button>
         </div>
