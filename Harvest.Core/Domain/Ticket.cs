@@ -27,7 +27,7 @@ namespace Harvest.Core.Domain
         public DateTime? UpdatedOn { get; set; }
 
         [StringLength(50)]
-        [Display(Name = "Task Name")]
+        [Display(Name = "Subject")]
         public string Name { get; set; }
         [Required]
         public string Requirements { get; set; }

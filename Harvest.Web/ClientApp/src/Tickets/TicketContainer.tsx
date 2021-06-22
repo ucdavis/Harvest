@@ -13,7 +13,8 @@ export const TicketContainer = () => {
     const { projectId } = useParams<RouteParams>();
     const [project, setProject] = useState<Project | undefined>();
     const [createTicket, setCreateTicket] = useState<CreateTicket>({
-        requirements: ""
+        requirements: "",
+        name: ""
 } as CreateTicket);
     const [disabled, setDisabled] = useState<boolean>(true);
     const history = useHistory();
@@ -40,7 +41,7 @@ export const TicketContainer = () => {
         // create a new project
 
 
-        const response = await fetch(`/Ticket/Create`, {
+        const response = await fetch(`/Ticket/Create?projectId=${projectId}`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -68,7 +69,7 @@ export const TicketContainer = () => {
             <div className="card-content">
                 <div className="card-head">
                     <h2>
-                        Create New Ticket for your project
+                        Create new ticket for your project
                     </h2>
                 </div>
                 <FormGroup>
