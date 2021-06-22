@@ -30,13 +30,13 @@ namespace Harvest.Web.Controllers
         public async Task<ActionResult> Get(string account)
         {
             var validationModel = await _financialService.IsValid(account);
-
             if (validationModel.IsValid)
             {
                 // want to grab the account info and also fiscal officer
                 return Ok(new Account
                 {
                     Name = validationModel.KfsAccount.AccountName,
+                    AccountManager = validationModel.KfsAccount.AccountManager?.Name,
                     Number = validationModel.KfsAccount.ToString()
                 });
             }

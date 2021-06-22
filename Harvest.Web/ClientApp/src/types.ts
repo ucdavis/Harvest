@@ -212,6 +212,7 @@ export interface ProjectAccount {
   projectId: number;
   number: string;
   name: string;
+  accountManager: string;
   percentage: number;
 }
 

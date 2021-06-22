@@ -140,7 +140,7 @@ export const AccountsInput = (props: Props) => {
           <Col md={6}>
             <b>{account.number}</b>
             <br />
-            Accn Manager: <a href="#">Adam Getchell</a>
+            Account Manager: {account.accountManager}
           </Col>
           <Col md={3}>
             {" "}
@@ -157,9 +157,9 @@ export const AccountsInput = (props: Props) => {
             />
           </Col>
           <Col md={2}>
-            <a href="#" className="btn btn-link btn-fa">
-              <FontAwesomeIcon icon={faMinusCircle} />
-            </a>
+            <button className="btn btn-link btn-fa">
+              <FontAwesomeIcon icon={faMinusCircle} /> (TODO)
+            </button>
           </Col>
         </Row>
       ))}
@@ -173,7 +173,7 @@ export const AccountsInput = (props: Props) => {
       <div>DEBUG: {JSON.stringify(accounts)}</div>
       {error && <span className="text-danger">{error}</span>}
       <p className="discreet mt-5">
-        Please check with your account manager before approving
+        Please check with your account manager for each account above before approving
       </p>
     </div>
   );
