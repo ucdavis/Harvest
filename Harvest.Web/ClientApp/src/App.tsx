@@ -24,7 +24,7 @@ function App() {
       <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
       <Route path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
-      <Route path="/ticket/create/:projectId?" component={TicketContainer} />
+      <Route path="/ticket/create/:projectId" component={TicketContainer} />
       <Route
         path="/project/details/:projectId"
         component={ProjectDetailContainer}

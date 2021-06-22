@@ -215,6 +215,13 @@ export interface ProjectAccount {
   percentage: number;
 }
 
+export interface CreateTicket {
+    projectId: number;
+    name: string;
+    requirements: string;
+    dueDate: Date;
+}
+
 export interface RequestInput {
   id: number;
   start: string;
