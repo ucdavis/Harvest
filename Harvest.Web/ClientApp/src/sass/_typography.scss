@@ -44,7 +44,7 @@ p {
     font-size: 1.1rem;
     font-family: $sans-bold;
   }
-  .discreet {
+  &.discreet {
     font-style: italic;
     color: $secondary-font;
   }
