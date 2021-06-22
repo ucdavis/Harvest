@@ -1,24 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import {
-  PDFDownloadLink,
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
-} from "@react-pdf/renderer";
-import {
-  Table,
-  TableHeader,
-  TableCell,
-  TableBody,
-  DataTableCell,
-} from "@david.kucsai/react-pdf-table";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
-import { ActivityRateTypes } from "../constants";
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
+import { ApprovalPDF } from "./ApprovalPDF";
 import { ProjectHeader } from "./ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -83,93 +69,6 @@ export const ApprovalContainer = () => {
     return <div>No project or open quote found</div>;
   }
 
-  const quote = projectAndQuote.quote;
-  const styles = StyleSheet.create({
-    page: {
-      flexDirection: "row",
-      backgroundColor: "#E4E4E4",
-    },
-    section: {
-      margin: 10,
-      padding: 10,
-      flexGrow: 1,
-    },
-  });
-
-  const MyDocument = () => (
-    <Document>
-      <Page size="A4">
-        <View>
-          <Text>Quote</Text>
-          <Text>
-            {" "}
-            {quote.acreageRateDescription}: {quote.acres} @{" "}
-            {formatCurrency(quote.acreageRate)} = $
-            {formatCurrency(quote.acreageTotal)}
-          </Text>
-        </View>
-        <View>
-          {quote.activities.map((activity) => (
-            <View key={`${activity.name}-view`}>
-              <Text>
-                {activity.name} • Activity Total: $
-                {formatCurrency(activity.total)}
-              </Text>
-              {ActivityRateTypes.map((type) => (
-                <Table
-                  key={`${type}-table`}
-                  data={activity.workItems.filter((w) => w.type === type)}
-                >
-                  <TableHeader>
-                    <TableCell>{type}</TableCell>
-                    <TableCell>Quantity</TableCell>
-                    <TableCell>Rate</TableCell>
-                    <TableCell>Total</TableCell>
-                  </TableHeader>
-                  <TableBody>
-                    <DataTableCell
-                      getContent={(workItem) => workItem.description}
-                    />
-                    <DataTableCell
-                      getContent={(workItem) => workItem.quantity}
-                    />
-                    <DataTableCell getContent={(workItem) => workItem.rate} />
-                    <DataTableCell
-                      getContent={(workItem) => formatCurrency(workItem.total)}
-                    />
-                  </TableBody>
-                </Table>
-              ))}
-            </View>
-          ))}
-        </View>
-        <View>
-          <Text>Project Totals</Text>
-          <View>
-            <Text>Acreage Fees</Text>
-            <Text>${formatCurrency(quote.acreageTotal)}</Text>
-          </View>
-          <View>
-            <Text>Labor</Text>
-            <Text>${formatCurrency(quote.laborTotal)}</Text>
-          </View>
-          <View>
-            <Text>Equipment</Text>
-            <Text>${formatCurrency(quote.equipmentTotal)}</Text>
-          </View>
-          <View>
-            <Text>Materials / Other</Text>
-            <Text>${formatCurrency(quote.otherTotal)}</Text>
-          </View>
-          <View>
-            <Text>Total Cost</Text>
-            <Text>${formatCurrency(quote.grandTotal)}</Text>
-          </View>
-        </View>
-      </Page>
-    </Document>
-  );
-
   // we have a project with a quote, time for the approval step
   return (
     <div className="card-wrapper">
@@ -186,7 +85,7 @@ export const ApprovalContainer = () => {
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
               <PDFDownloadLink
-                document={<MyDocument />}
+                document={<ApprovalPDF quote={projectAndQuote.quote} />}
                 fileName="somename.pdf"
               >
                 <button className="btn btn-link btn-sm">
