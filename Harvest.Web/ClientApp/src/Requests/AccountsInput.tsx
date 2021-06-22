@@ -148,6 +148,8 @@ export const AccountsInput = (props: Props) => {
           <Col md={6}>
             <b>{account.number}</b>
             <br />
+            <small>{account.name}</small>
+            <br/>
             Account Manager:{" "}
             <a href={`mailto:${account.accountManagerEmail}`}>
               {account.accountManagerName}
