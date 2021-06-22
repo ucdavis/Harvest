@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import {
   PDFDownloadLink,
+  PDFViewer,
   Page,
   Text,
   View,
@@ -83,6 +84,7 @@ export const ApprovalContainer = () => {
     return <div>No project or open quote found</div>;
   }
 
+  const quote = projectAndQuote.quote;
   const styles = StyleSheet.create({
     page: {
       flexDirection: "row",
@@ -95,25 +97,63 @@ export const ApprovalContainer = () => {
     },
   });
 
+  // quote.activities.map((activity) => {
+  //   ActivityRateTypes.map((type) => {
+  //     activity.workItems
+  //       .filter((w) => w.type === type)
+  //       .map((workItem) => {
+  //         console.log(workItem);
+  //       });
+  //   });
+  // });
+
   const MyDocument = () => (
     <Document>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.section}>
+      <Page size="A4">
+        <View>
           <Text>Quote</Text>
           <Text>
             {" "}
-            {projectAndQuote.quote?.acreageRateDescription}:{" "}
-            {projectAndQuote.quote?.acres} @{" "}
-            {projectAndQuote.quote != undefined
-              ? formatCurrency(projectAndQuote.quote.acreageRate)
-              : 0}{" "}
-            = $
-            {projectAndQuote.quote != undefined
-              ? formatCurrency(projectAndQuote.quote.acreageTotal)
-              : 0}
+            {quote.acreageRateDescription}: {quote.acres} @{" "}
+            {formatCurrency(quote.acreageRate)} = $
+            {formatCurrency(quote.acreageTotal)}
           </Text>
         </View>
-    
+        <View>
+          {quote.activities.map((activity) => (
+            <View key={`${activity.name}-view`}>
+              <Text>
+                {activity.name} • Activity Total: $
+                {formatCurrency(activity.total)}
+              </Text>
+              {ActivityRateTypes.map((type) => (
+                <Table
+                  key={`${type}-table`}
+                  data={activity.workItems.filter((w) => w.type === type)}
+                >
+                  <TableHeader>
+                    <TableCell>{type}</TableCell>
+                    <TableCell>Quantity</TableCell>
+                    <TableCell>Rate</TableCell>
+                    <TableCell>Total</TableCell>
+                  </TableHeader>
+                  <TableBody>
+                    <DataTableCell
+                      getContent={(workItem) => workItem.description}
+                    />
+                    <DataTableCell
+                      getContent={(workItem) => workItem.quantity}
+                    />
+                    <DataTableCell getContent={(workItem) => workItem.rate} />
+                    <DataTableCell
+                      getContent={(workItem) => formatCurrency(workItem.total)}
+                    />
+                  </TableBody>
+                </Table>
+              ))}
+            </View>
+          ))}
+        </View>
       </Page>
     </Document>
   );
@@ -127,7 +167,7 @@ export const ApprovalContainer = () => {
       ></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
-          <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
+          <QuoteDisplay quote={projectAndQuote.quote} />
           <div className="row">
             <div className="col-md-6">
               <h2 className="primary-font bold-font">
