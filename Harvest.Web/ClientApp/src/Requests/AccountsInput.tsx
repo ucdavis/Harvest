@@ -77,6 +77,12 @@ export const AccountsInput = (props: Props) => {
     }
   };
 
+  const removeAccount = (account: ProjectAccount) => {
+    const otherAccounts = props.accounts.filter(a=>a.number !== account.number);
+
+    props.setAccounts(otherAccounts);
+  }
+
   const updateAccountPercentage = (
     account: ProjectAccount,
     percentage: number
@@ -157,8 +163,8 @@ export const AccountsInput = (props: Props) => {
             />
           </Col>
           <Col md={2}>
-            <button className="btn btn-link btn-fa">
-              <FontAwesomeIcon icon={faMinusCircle} /> (TODO)
+            <button className="btn btn-link btn-fa" onClick={() => removeAccount(account)}>
+              <FontAwesomeIcon icon={faMinusCircle} />
             </button>
           </Col>
         </Row>
