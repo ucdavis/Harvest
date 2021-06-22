@@ -33,8 +33,8 @@ export const AccountsInput = (props: Props) => {
       total += accounts[i].percentage;
     }
 
-    total == 100 ? props.setDisabled(false) : props.setDisabled(true);
-  }, [props.accounts]);
+    total === 100 ? props.setDisabled(false) : props.setDisabled(true);
+  }, [accounts, props]);
 
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
@@ -163,11 +163,13 @@ export const AccountsInput = (props: Props) => {
           </Col>
         </Row>
       ))}
-      <Row>
-        <Col className="col-md-4 offset-md-6">
-          <b>Totat Percent: 100%</b>
-        </Col>
-      </Row>
+      {accounts.length > 0 && (
+        <Row>
+          <Col className="col-md-4 offset-md-6">
+            <b>Totat Percent: {accounts.reduce((prev, curr) => prev + curr.percentage, 0)}%</b>
+          </Col>
+        </Row>
+      )}
       <div>DEBUG: {JSON.stringify(accounts)}</div>
       {error && <span className="text-danger">{error}</span>}
       <p className="discreet mt-5">
