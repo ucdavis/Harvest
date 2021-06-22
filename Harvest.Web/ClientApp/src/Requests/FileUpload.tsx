@@ -12,17 +12,22 @@ interface Props {
 
 const UploadFile = async (
   sasUrl: string,
-  fileName: string,
+  file: BlobFile,
   dataPromise: Promise<ArrayBuffer>
 ) => {
   const blobServiceClient = new BlobServiceClient(sasUrl);
 
   // don't need to pass a container since it's in the SAS url
   const containerClient = blobServiceClient.getContainerClient("");
-  const blockClient = containerClient.getBlockBlobClient(fileName);
+  const blockClient = containerClient.getBlockBlobClient(file.identifier);
 
   const data = await dataPromise;
-  const uploadBlobResponse = await blockClient.uploadData(data);
+  const uploadBlobResponse = await blockClient.uploadData(data, {
+    blobHTTPHeaders: {
+      blobContentType: file.contentType,
+      blobContentDisposition: `filename=${file.fileName}`,
+    },
+  });
 
   return uploadBlobResponse;
 };
@@ -67,7 +72,7 @@ export const FileUpload = (props: Props) => {
 
       newFiles.push(newFile);
 
-      UploadFile(sasUrl, fileId, addedFile.arrayBuffer()).then((_) => {
+      UploadFile(sasUrl, newFile, addedFile.arrayBuffer()).then((_) => {
         // TODO, check for an error
 
         // file is done uploading, so update uploaded details
