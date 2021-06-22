@@ -2,6 +2,8 @@ import React from "react";
 
 import { Route } from "react-router-dom";
 
+import AppContext from './Shared/AppContext';
+
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
@@ -11,10 +13,14 @@ import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { Map } from "./Maps/Map";
+import { AppContextShape } from "./types";
+
+// Global variable containing top-level app settings and info
+declare var Harvest: AppContextShape;
 
 function App() {
   return (
-    <>
+    <AppContext.Provider value={Harvest}>
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create/:projectId?" component={RequestContainer} />
@@ -32,7 +38,7 @@ function App() {
         component={ExpenseEntryContainer}
       />
       <Route path="/home/map" component={Map} />
-    </>
+    </AppContext.Provider>
   );
 }
 

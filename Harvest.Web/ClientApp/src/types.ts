@@ -1,5 +1,5 @@
-export type CropType = "Row" | "Tree"
-export type RateType = "Acreage" | "Equipment" | "Labor" | "Other"
+export type CropType = "Row" | "Tree";
+export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
 
 export interface Project {
   id: number;
@@ -75,10 +75,10 @@ export interface Expense {
 }
 
 export interface Transfer {
-    id: number;
-    type: string;
-    account: string;
-    total: number;
+  id: number;
+  type: string;
+  account: string;
+  total: number;
 }
 
 // TODO: should this be a different name or is it ok?  Do we even need an interface?
@@ -174,7 +174,7 @@ export class WorkItemImpl implements WorkItem {
   type;
   rate;
   rateId = 0;
-  unit = 'hr';
+  unit = "hr";
   quantity;
   total = 0;
 
@@ -229,4 +229,10 @@ export interface RequestInput {
 export interface ProjectWithInvoice {
   project: Project;
   invoice: Invoice;
+}
+
+export interface AppContextShape {
+  user: {
+    roles: string[];
+  };
 }

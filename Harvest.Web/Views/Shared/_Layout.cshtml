@@ -114,8 +114,8 @@
 
 
     <script>
-        var Harvest = {};
-        Harvest.roles = @Html.Raw(await Context.GetUserRoles());
+        var Harvest = { user: {} };
+        Harvest.user.roles = @Html.Raw(await Context.GetUserRoles());
     </script>
 
     <environment include="Development">
