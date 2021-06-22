@@ -34,7 +34,7 @@ export const TicketContainer = () => {
   }, [projectId]);
 
   if (project === undefined) {
-    return <div>Project Not Found!</div>;
+    return <div>Loading...</div>;
   }
   const create = async () => {
     // TODO: validation, loading spinner
