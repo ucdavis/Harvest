@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import {
   PDFDownloadLink,
-  PDFViewer,
   Page,
   Text,
   View,
@@ -97,16 +96,6 @@ export const ApprovalContainer = () => {
     },
   });
 
-  // quote.activities.map((activity) => {
-  //   ActivityRateTypes.map((type) => {
-  //     activity.workItems
-  //       .filter((w) => w.type === type)
-  //       .map((workItem) => {
-  //         console.log(workItem);
-  //       });
-  //   });
-  // });
-
   const MyDocument = () => (
     <Document>
       <Page size="A4">
@@ -153,6 +142,29 @@ export const ApprovalContainer = () => {
               ))}
             </View>
           ))}
+        </View>
+        <View>
+          <Text>Project Totals</Text>
+          <View>
+            <Text>Acreage Fees</Text>
+            <Text>${formatCurrency(quote.acreageTotal)}</Text>
+          </View>
+          <View>
+            <Text>Labor</Text>
+            <Text>${formatCurrency(quote.laborTotal)}</Text>
+          </View>
+          <View>
+            <Text>Equipment</Text>
+            <Text>${formatCurrency(quote.equipmentTotal)}</Text>
+          </View>
+          <View>
+            <Text>Materials / Other</Text>
+            <Text>${formatCurrency(quote.otherTotal)}</Text>
+          </View>
+          <View>
+            <Text>Total Cost</Text>
+            <Text>${formatCurrency(quote.grandTotal)}</Text>
+          </View>
         </View>
       </Page>
     </Document>
