@@ -23,6 +23,15 @@ export interface Project {
   isActive: boolean;
   accounts: null;
   quotes: null;
+  attachments: BlobFile[];
+}
+
+export interface BlobFile {
+  identifier: string;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+  uploaded: boolean;
 }
 
 export interface Invoice {
@@ -214,6 +223,7 @@ export interface RequestInput {
   cropType: string;
   requirements?: string;
   principalInvestigator: User;
+  files: BlobFile[];
 }
 
 export interface ProjectWithInvoice {

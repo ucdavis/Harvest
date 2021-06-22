@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
@@ -15,6 +15,7 @@ interface RouteParams {
 }
 
 export const ApprovalContainer = () => {
+  const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
@@ -47,7 +48,7 @@ export const ApprovalContainer = () => {
     });
 
     if (response.ok) {
-      window.location.pathname = `/Project/Details/${projectId}`;
+      history.replace(`/Project/Details/${projectId}`);
     } else {
       alert("Something went wrong, please try again");
     }

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import {
   Project,
@@ -20,6 +20,7 @@ interface RouteParams {
 }
 
 export const QuoteContainer = () => {
+  const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
 
@@ -139,7 +140,7 @@ export const QuoteContainer = () => {
     });
 
     if (saveResponse.ok) {
-      window.location.pathname = `/Project/Details/${projectId}`;
+      history.push(`/Project/Details/${projectId}`);
     } else {
       alert("Something went wrong, please try again");
     }

@@ -56,6 +56,13 @@ export const ProjectDetailContainer = () => {
               >
                 Approve Quote
               </Link>
+
+              <Link
+                className="btn btn-primary btn-small mr-4"
+                to={`/request/changeAccount/${project.id}`}
+              >
+                Change Accounts
+              </Link>
             </div>
             <div className="col text-right">
               <a href="#" className="btn btn-light">
