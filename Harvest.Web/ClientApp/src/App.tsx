@@ -2,7 +2,9 @@ import React from "react";
 
 import { Route } from "react-router-dom";
 
-import AppContext from './Shared/AppContext';
+import AppContext from "./Shared/AppContext";
+import { AppContextShape } from "./types";
+import { ConditionalRoute } from './ConditionalRoute'
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
@@ -13,7 +15,7 @@ import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { Map } from "./Maps/Map";
-import { AppContextShape } from "./types";
+
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -25,9 +27,15 @@ function App() {
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
-      <Route path="/request/changeAccount/:projectId" component={AccountChangeContainer} />
-      <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
-      <Route path="/quote/create/:projectId" component={QuoteContainer} />
+      <Route
+        path="/request/changeAccount/:projectId"
+        component={AccountChangeContainer}
+      />
+      <Route
+        path="/invoice/details/:invoiceId"
+        component={InvoiceDetailContainer}
+      />
+      <ConditionalRoute roles={['FieldManager', 'Supervisor']} path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
       <Route
         path="/project/details/:projectId"

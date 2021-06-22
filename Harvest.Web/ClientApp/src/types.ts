@@ -1,5 +1,11 @@
 export type CropType = "Row" | "Tree";
 export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
+export type RoleName =
+  | "Admin"
+  | "FieldManager"
+  | "Supervisor"
+  | "System"
+  | "Worker";
 
 export interface Project {
   id: number;
@@ -233,6 +239,6 @@ export interface ProjectWithInvoice {
 
 export interface AppContextShape {
   user: {
-    roles: string[];
+    roles: RoleName[];
   };
 }
