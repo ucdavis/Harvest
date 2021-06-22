@@ -130,14 +130,14 @@ export const AccountsInput = (props: Props) => {
       />
       {accounts.length > 0 && (
         <Row className="approval-row approval-row-title">
-          <Col md={5}>Account To Charge</Col>
+          <Col md={6}>Account To Charge</Col>
           <Col md={4}>Percent %</Col>
         </Row>
       )}
 
       {accounts.map((account) => (
         <Row className="approval-row align-items-center" key={account.number}>
-          <Col md={5}>
+          <Col md={6}>
             <b>{account.number}</b>
             <br />
             Accn Manager: <a href="#">Adam Getchell</a>
@@ -163,9 +163,14 @@ export const AccountsInput = (props: Props) => {
           </Col>
         </Row>
       ))}
+      <Row>
+        <Col className="col-md-4 offset-md-6">
+          <b>Totat Percent: 100%</b>
+        </Col>
+      </Row>
       <div>DEBUG: {JSON.stringify(accounts)}</div>
       {error && <span className="text-danger">{error}</span>}
-      <p className="discreet">
+      <p className="discreet mt-5">
         Please check with your account manager before approving
       </p>
     </div>
