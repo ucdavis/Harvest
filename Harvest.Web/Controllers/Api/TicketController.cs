@@ -52,6 +52,11 @@ namespace Harvest.Web.Controllers.Api
             ticketToCreate.DueDate = ticket.DueDate;
             ticketToCreate.CreatedById = currentUser.Id;
 
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Something is wrong");
+            }
+
             await _dbContext.Tickets.AddAsync(ticketToCreate);
             await _dbContext.SaveChangesAsync();
 
