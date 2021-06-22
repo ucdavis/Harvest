@@ -17,6 +17,12 @@ namespace Harvest.Web.Models
     // JSON quote detail stored in Quote.Text
     public class QuoteDetail
     {
+        public QuoteDetail()
+        {
+            Fields = new QuoteField[0];
+            Activities = new Activity[0];
+        }
+
         public static QuoteDetail Deserialize(string text)
         {
             return JsonSerializer.Deserialize<QuoteDetail>(text, JsonOptions.Standard.WithGeoJson());
