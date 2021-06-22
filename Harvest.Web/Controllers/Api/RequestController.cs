@@ -26,12 +26,6 @@ namespace Harvest.Web.Controllers
             this._userService = userService;
         }
 
-        // Get info on the project as well as current proposed quote
-        [HttpGet]
-        public async Task<ActionResult> Get(int id)
-        {
-            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).AsNoTracking().SingleOrDefaultAsync(x => x.Id == id));
-        }
 
         // create a new request via react
         [HttpGet]

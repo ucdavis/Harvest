@@ -36,7 +36,7 @@ export const RequestContainer = () => {
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
-      const response = await fetch(`/Request/Get/${projectId}`);
+      const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
