@@ -22,7 +22,10 @@ namespace Harvest.Core.Domain
         public string Name { get; set; }
 
         [NotMapped]
-        public string AccountManager { get; set; }
+        public string AccountManagerName { get; set; }
+
+        [NotMapped]
+        public string AccountManagerEmail { get; set; }
 
         public decimal Percentage { get; set; }
 

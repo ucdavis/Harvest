@@ -78,10 +78,12 @@ export const AccountsInput = (props: Props) => {
   };
 
   const removeAccount = (account: ProjectAccount) => {
-    const otherAccounts = props.accounts.filter(a=>a.number !== account.number);
+    const otherAccounts = props.accounts.filter(
+      (a) => a.number !== account.number
+    );
 
     props.setAccounts(otherAccounts);
-  }
+  };
 
   const updateAccountPercentage = (
     account: ProjectAccount,
@@ -146,7 +148,10 @@ export const AccountsInput = (props: Props) => {
           <Col md={6}>
             <b>{account.number}</b>
             <br />
-            Account Manager: {account.accountManager}
+            Account Manager:{" "}
+            <a href={`mailto:${account.accountManagerEmail}`}>
+              {account.accountManagerName}
+            </a>
           </Col>
           <Col md={3}>
             {" "}
@@ -163,7 +168,10 @@ export const AccountsInput = (props: Props) => {
             />
           </Col>
           <Col md={2}>
-            <button className="btn btn-link btn-fa" onClick={() => removeAccount(account)}>
+            <button
+              className="btn btn-link btn-fa"
+              onClick={() => removeAccount(account)}
+            >
               <FontAwesomeIcon icon={faMinusCircle} />
             </button>
           </Col>
@@ -172,14 +180,18 @@ export const AccountsInput = (props: Props) => {
       {accounts.length > 0 && (
         <Row>
           <Col className="col-md-4 offset-md-6">
-            <b>Totat Percent: {accounts.reduce((prev, curr) => prev + curr.percentage, 0)}%</b>
+            <b>
+              Totat Percent:{" "}
+              {accounts.reduce((prev, curr) => prev + curr.percentage, 0)}%
+            </b>
           </Col>
         </Row>
       )}
       <div>DEBUG: {JSON.stringify(accounts)}</div>
       {error && <span className="text-danger">{error}</span>}
       <p className="discreet mt-5">
-        Please check with your account manager for each account above before approving
+        Please check with your account manager for each account above before
+        approving
       </p>
     </div>
   );

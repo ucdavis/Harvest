@@ -36,7 +36,8 @@ namespace Harvest.Web.Controllers
                 return Ok(new Account
                 {
                     Name = validationModel.KfsAccount.AccountName,
-                    AccountManager = validationModel.KfsAccount.AccountManager?.Name,
+                    AccountManagerName = validationModel.KfsAccount.AccountManager?.Name,
+                    AccountManagerEmail = validationModel.KfsAccount.AccountManager?.EmailAddress,
                     Number = validationModel.KfsAccount.ToString()
                 });
             }

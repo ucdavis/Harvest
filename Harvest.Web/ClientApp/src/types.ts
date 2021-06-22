@@ -212,7 +212,8 @@ export interface ProjectAccount {
   projectId: number;
   number: string;
   name: string;
-  accountManager: string;
+  accountManagerName: string;
+  accountManagerEmail: string;
   percentage: number;
 }
 
