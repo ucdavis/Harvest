@@ -148,9 +148,6 @@ export const ApprovalContainer = () => {
           </div>
         </div>
       </div>
-      <PDFViewer>
-        <ApprovalPDF quote={projectAndQuote.quote} />
-      </PDFViewer>
     </div>
   );
 };
