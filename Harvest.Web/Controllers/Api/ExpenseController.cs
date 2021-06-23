@@ -29,6 +29,10 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        public ActionResult Unbilled(int id) {
+            return View("React");
+        }
+
         [HttpPost]
         [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -51,6 +55,12 @@ namespace Harvest.Web.Controllers
             await _dbContext.SaveChangesAsync();
 
             return Ok(expenses);
+        }
+
+        // Get all unbilled expenses for the given project
+        [HttpGet]
+        public async Task<ActionResult> GetUnbilled(int id) {
+            return Ok(await _dbContext.Expenses.Where(e=>e.InvoiceId == null && e.ProjectId == id).ToArrayAsync());
         }
     }
 }

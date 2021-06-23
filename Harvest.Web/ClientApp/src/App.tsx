@@ -14,6 +14,7 @@ import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
+import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { Map } from "./Maps/Map";
 
 
@@ -45,6 +46,7 @@ function App() {
         path="/expense/entry/:projectId?"
         component={ExpenseEntryContainer}
       />
+      <Route path="/expense/unbilled/:projectId" component={UnbilledExpensesContainer} />
       <Route path="/home/map" component={Map} />
     </AppContext.Provider>
   );
