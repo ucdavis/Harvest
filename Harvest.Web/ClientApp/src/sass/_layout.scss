@@ -40,6 +40,9 @@ body {
 .card-green-bg {
   background: transparentize($primary-color, 0.9);
   border-top: 1px solid $borders;
+  &.green-bg-border {
+    border-bottom: 1px solid $borders;
+  }
 }
 .container {
   padding: 0;

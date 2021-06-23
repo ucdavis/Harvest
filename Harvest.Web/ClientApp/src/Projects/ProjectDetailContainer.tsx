@@ -4,6 +4,9 @@ import { ProjectHeader } from "../Requests/ProjectHeader";
 import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
 import { Progress } from "reactstrap";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
+
 import { Project } from "../types";
 
 interface RouteParams {
@@ -72,7 +75,7 @@ export const ProjectDetailContainer = () => {
           </div>
         </div>
       </div>
-      <div className="card-green-bg">
+      <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col">
@@ -91,7 +94,35 @@ export const ProjectDetailContainer = () => {
               />
             </div>
           </div>
-          <div className="card-wrapper no-green mt-5">
+        </div>
+      </div>
+      <div>
+        <div className="row justify-content-around">
+          <div className="col-md-5">
+            <div className="card-wrapper no-green mt-4">
+              <div className="card-content">
+                <h2>Project Attachements</h2>
+                !! Add upload file input here !!
+                <ul className="no-list-style attached-files-list">
+                  <li>
+                    <a href="#">
+                      <FontAwesomeIcon icon={faDownload} />
+                      Filename 1.pdf
+                    </a>{" "}
+                    uploaded 9.23.2021
+                  </li>
+                  <li>
+                    <a href="#">
+                      <FontAwesomeIcon icon={faDownload} />
+                      Filename 1.pdf
+                    </a>{" "}
+                    uploaded 9.23.2021
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-6">
             <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
           </div>
         </div>
