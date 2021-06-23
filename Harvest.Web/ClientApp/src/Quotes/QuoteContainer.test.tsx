@@ -4,11 +4,12 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
 import { QuoteContainer } from "./QuoteContainer";
-import { fakeProject, sampleRates } from "../Test/mockData";
+import { fakeAppContext, fakeProject, sampleRates } from "../Test/mockData";
 
 let container: Element;
 
 beforeEach(() => {
+  (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);

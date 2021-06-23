@@ -146,6 +146,19 @@ namespace Harvest.Web.Controllers
                 piName = project.PrincipalInvestigator.Name;
             }
 
+            // If there are attachments, fill out details and add to project
+            foreach (var attachment in project.Attachments)
+            {
+                newProject.Attachments.Add(new ProjectAttachment {
+                    Identifier = attachment.Identifier,
+                    FileName = attachment.FileName,
+                    FileSize = attachment.FileSize,
+                    ContentType = attachment.ContentType,
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedById = currentUser.Id
+                });
+            }
+
             // TODO: when is name determined? Currently by quote creator but can it be changed?
             newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
 

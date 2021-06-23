@@ -33,6 +33,7 @@ namespace Harvest.Core.Domain
             public const string FieldManager = "FieldManager";
             public const string Supervisor = "Supervisor";
             public const string Worker = "Worker";
+            public const string PI = "PI";
         }
     }
 }

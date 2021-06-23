@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -95,6 +96,7 @@ namespace Harvest.Web
                 options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
                 options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Worker)));
+                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.AddRequirements(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.PI)));
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();

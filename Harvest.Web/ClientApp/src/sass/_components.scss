@@ -8,7 +8,7 @@
   }
 }
 .btn-sm {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 .box-shadow {
   box-shadow: $box-shadow;
@@ -25,6 +25,9 @@
   &:hover {
     color: darken($primary-color, 3);
   }
+}
+.btn-fa {
+  padding: 0;
 }
 .btn-lg,
 .btn-group-lg > .btn {
@@ -134,4 +137,8 @@ $nchild-wide: 24%;
       width: $nchild-wide;
     }
   }
+}
+.btn-link:focus,
+.btn-link.focus {
+  text-decoration: none;
 }

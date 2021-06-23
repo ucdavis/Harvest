@@ -1,4 +1,10 @@
-import { ProjectWithQuote, Rate } from "../types";
+import { AppContextShape, ProjectWithQuote, Rate } from "../types";
+
+export const fakeAppContext: AppContextShape = {
+  user: {
+    roles: ["Admin"],
+  },
+};
 
 export const fakeProject: ProjectWithQuote = {
   project: {
@@ -39,6 +45,7 @@ export const fakeProject: ProjectWithQuote = {
     },
     accounts: null,
     quotes: null,
+    attachments: [],
   },
   quote: null,
 };

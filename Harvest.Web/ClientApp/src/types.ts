@@ -1,5 +1,11 @@
-export type CropType = "Row" | "Tree"
-export type RateType = "Acreage" | "Equipment" | "Labor" | "Other"
+export type CropType = "Row" | "Tree";
+export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
+export type RoleName =
+  | "Admin"
+  | "FieldManager"
+  | "Supervisor"
+  | "System"
+  | "Worker";
 
 export interface Project {
   id: number;
@@ -23,6 +29,15 @@ export interface Project {
   isActive: boolean;
   accounts: null;
   quotes: null;
+  attachments: BlobFile[];
+}
+
+export interface BlobFile {
+  identifier: string;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+  uploaded: boolean;
 }
 
 export interface Invoice {
@@ -66,10 +81,10 @@ export interface Expense {
 }
 
 export interface Transfer {
-    id: number;
-    type: string;
-    account: string;
-    total: number;
+  id: number;
+  type: string;
+  account: string;
+  total: number;
 }
 
 // TODO: should this be a different name or is it ok?  Do we even need an interface?
@@ -165,7 +180,7 @@ export class WorkItemImpl implements WorkItem {
   type;
   rate;
   rateId = 0;
-  unit = 'hr';
+  unit = "hr";
   quantity;
   total = 0;
 
@@ -203,6 +218,8 @@ export interface ProjectAccount {
   projectId: number;
   number: string;
   name: string;
+  accountManagerName: string;
+  accountManagerEmail: string;
   percentage: number;
 }
 
@@ -214,9 +231,16 @@ export interface RequestInput {
   cropType: string;
   requirements?: string;
   principalInvestigator: User;
+  files: BlobFile[];
 }
 
 export interface ProjectWithInvoice {
   project: Project;
   invoice: Invoice;
+}
+
+export interface AppContextShape {
+  user: {
+    roles: RoleName[];
+  };
 }

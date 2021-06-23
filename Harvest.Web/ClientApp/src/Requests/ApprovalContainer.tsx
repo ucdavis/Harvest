@@ -99,9 +99,9 @@ export const ApprovalContainer = () => {
               />
             </div>
             <div className="col-md-6">
-              <p>
+              <h4>
                 <b>Terms and Conditions</b>
-              </p>
+              </h4>
               <ol>
                 <li>
                   This estimate is approximate based on the information provided
@@ -118,8 +118,23 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="text-right mt-5">
-                <button className="btn btn-link mr-2">Reject</button>
+              <h2 className="primary-font bold-font">
+                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
+              </h2>
+              <button className="btn btn-link btn-sm btn-fa mb-2">
+                Download PDF <FontAwesomeIcon icon={faDownload} />
+              </button>
+
+              <AccountsInput
+                accounts={accounts}
+                setAccounts={setAccounts}
+                setDisabled={setDisabled}
+              />
+              <div className="mt-5">
+                <p className="discreet">
+                  Please check with the above account managers before pressing
+                  approve
+                </p>
                 <button
                   className="btn btn-primary"
                   disabled={disabled}
@@ -127,6 +142,7 @@ export const ApprovalContainer = () => {
                 >
                   Approve Quote
                 </button>
+                <button className="btn btn-link mr-2">Reject</button>
               </div>
             </div>
           </div>

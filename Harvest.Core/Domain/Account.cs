@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,12 @@ namespace Harvest.Core.Domain
 
         [StringLength(200)]
         public string Name { get; set; }
+
+        [NotMapped]
+        public string AccountManagerName { get; set; }
+
+        [NotMapped]
+        public string AccountManagerEmail { get; set; }
 
         public decimal Percentage { get; set; }
 
