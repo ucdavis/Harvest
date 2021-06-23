@@ -98,7 +98,7 @@ export const ProjectDetailContainer = () => {
       </div>
       <div>
         <div className="row justify-content-around">
-          <div className="col-md-6">
+          <div className="col-md-5">
             <div className="card-wrapper no-green mt-4">
               <div className="card-content">
                 <h2>Project Attachements</h2>
@@ -122,7 +122,7 @@ export const ProjectDetailContainer = () => {
               </div>
             </div>
           </div>
-          <div className="col-md-5">
+          <div className="col-md-6">
             <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
           </div>
         </div>
