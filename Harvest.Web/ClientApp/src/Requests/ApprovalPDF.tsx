@@ -91,6 +91,7 @@ export const ApprovalPDF = (props: Props) => (
           {formatCurrency(props.quote.acreageTotal)}
         </Text>
       </View>
+      {/* This section displays all the the acitivities associated with the quote */}
       <View>
         {props.quote.activities.map((activity) => (
           <View key={`${activity.name}-view`} style={styles.activity}>
@@ -99,6 +100,9 @@ export const ApprovalPDF = (props: Props) => (
               {formatCurrency(activity.total)}
             </Text>
             {ActivityRateTypes.map((type) => (
+              // Used react-pdf-table to display a table in the pdf
+              // Used the data attribute to display data in the DataTableCell instead
+              // of manually rendering it with map
               <Table
                 key={`${type}-table`}
                 data={activity.workItems.filter((w) => w.type === type)}
@@ -132,6 +136,7 @@ export const ApprovalPDF = (props: Props) => (
           </View>
         ))}
       </View>
+      {/* This section displays the project total */}
       <View style={styles.projectTotal}>
         <Text style={styles.projectTotalTitle}>Project Totals</Text>
         <View style={styles.row}>
