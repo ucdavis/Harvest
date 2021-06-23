@@ -1,5 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { useFormik, FormikConfig, FormikHelpers, FieldArray, FieldArrayRenderProps, FormikProvider } from "formik";
+import { getInputValidityStyle, ValidationErrorMessage, FormikState } from "../Validation";
+import { quoteContentSchema } from "../schemas";
 
 import {
   Project,
@@ -7,6 +10,7 @@ import {
   QuoteContent,
   QuoteContentImpl,
   Rate,
+  WorkItemImpl
 } from "../types";
 
 import { FieldContainer } from "../Fields/FieldContainer";
@@ -19,16 +23,100 @@ interface RouteParams {
   projectId?: string;
 }
 
+export const updateQuoteTotals = (q: QuoteContent) => {
+  //TODO: Eliminate some of the mutation going on here
+  let acreageTotal = q.acreageRate * q.acres;
+  let activitiesTotal = 0;
+  let laborTotal = 0;
+  let equipmentTotal = 0;
+  let otherTotal = 0;
+
+  for (let i = 0; i < q.activities.length; i++) {
+    const activity = q.activities[i];
+    activity.total = 0;
+
+    for (let j = 0; j < activity.workItems.length; j++) {
+      const workItem = activity.workItems[j];
+
+      workItem.total = workItem.rate * workItem.quantity;
+
+      activitiesTotal += workItem.total || 0;
+      activity.total += workItem.total || 0;
+
+      switch (workItem.type) {
+        case "Labor":
+          laborTotal += workItem.total || 0;
+          break;
+        case "Equipment":
+          equipmentTotal += workItem.total || 0;
+          break;
+        case "Other":
+          otherTotal += workItem.total || 0;
+          break;
+      }
+    }
+  }
+
+  return {
+    ...q,
+    acreageTotal,
+    activitiesTotal,
+    laborTotal,
+    equipmentTotal,
+    otherTotal,
+    grandTotal: activitiesTotal + acreageTotal,
+  } as QuoteContent;
+};
+
+
 export const QuoteContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
 
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
-  const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
   const [rates, setRates] = useState<Rate[]>([]);
 
   const [editFields, setEditFields] = useState(false);
+
+  const activitiesRef = useRef<FieldArrayRenderProps>(null);
+
+
+  const handleSubmit = async (q: QuoteContent, actions: FormikHelpers<QuoteContent>) => {
+    // remove unused workitems and empty activities and apply to state only after successfully saving
+    const quote = updateQuoteTotals(q);
+    quote.activities.forEach(
+      (a) =>
+      (a.workItems = a.workItems.filter(
+        (w) => w.quantity !== 0 || w.total !== 0
+      ))
+    );
+    quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
+
+    // TODO: add progress and hide info while saving
+    const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(quote),
+    });
+
+    actions.setSubmitting(false);
+
+    if (saveResponse.ok) {
+      window.location.pathname = `/Project/Details/${projectId}`;
+    } else {
+      alert("Something went wrong, please try again");
+    }
+  }
+
+  const formik = useFormik<QuoteContent>({
+    initialValues: new QuoteContentImpl(),
+    validationSchema: quoteContentSchema,
+    onSubmit: handleSubmit
+  } as FormikConfig<QuoteContent>);
 
   useEffect(() => {
     const cb = async () => {
@@ -43,9 +131,9 @@ export const QuoteContainer = () => {
 
         if (projectWithQuote.quote) {
           // TODO: remove once we standardize on new quote format
-          setQuote({
+          formik.setValues({
             ...projectWithQuote.quote,
-            fields: projectWithQuote.quote.fields ?? [],
+            fields: projectWithQuote.quote.fields || [],
           });
 
           if (
@@ -60,7 +148,7 @@ export const QuoteContainer = () => {
           quoteToUse.acreageRate =
             rateJson.find((r) => r.type === "Acreage")?.price || 120;
 
-          setQuote(quoteToUse);
+          formik.setValues(quoteToUse);
           setEditFields(true); // we have no existing quote, start with editing fields
         }
       } else {
@@ -72,78 +160,23 @@ export const QuoteContainer = () => {
     cb();
   }, [projectId]);
 
-  useEffect(() => {
-    setQuote((q) => {
-      let acreageTotal = q.acreageRate * q.acres;
-      let activitiesTotal = 0;
-      let laborTotal = 0;
-      let equipmentTotal = 0;
-      let otherTotal = 0;
-
-      for (let i = 0; i < q.activities.length; i++) {
-        const activity = q.activities[i];
-
-        for (let j = 0; j < activity.workItems.length; j++) {
-          const workItem = activity.workItems[j];
-
-          activitiesTotal += workItem.total || 0;
-
-          switch (workItem.type) {
-            case "Labor":
-              laborTotal += workItem.total || 0;
-              break;
-            case "Equipment":
-              equipmentTotal += workItem.total || 0;
-              break;
-            case "Other":
-              otherTotal += workItem.total || 0;
-              break;
-          }
-        }
-      }
-
-      return {
-        ...q,
-        acreageTotal,
-        activitiesTotal,
-        laborTotal,
-        equipmentTotal,
-        otherTotal,
-        grandTotal: activitiesTotal + acreageTotal,
-      };
-    });
-  }, [quote.activities, quote.acreageRate, quote.acres]);
-
   const cropArray = useMemo(() => (project ? project.crop.split(",") : []), [
     project,
   ]);
 
-  const save = async () => {
-    // remove unused workitems and empty activities and apply to state only after successfully saving
-    quote.activities.forEach(
-      (a) =>
-        (a.workItems = a.workItems.filter(
-          (w) => w.quantity !== 0 || w.total !== 0
-        ))
-    );
-    quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
-
-    // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(quote),
+  const addActivity = () => {
+    const newActivityId = Math.max(...formik.values.activities.map((a) => a.id), 0) + 1;
+    activitiesRef.current?.push({
+      id: newActivityId,
+      name: "Activity",
+      total: 0,
+      workItems: [
+        new WorkItemImpl(newActivityId, 1, "Labor"),
+        new WorkItemImpl(newActivityId, 2, "Equipment"),
+        new WorkItemImpl(newActivityId, 3, "Other"),
+      ],
     });
-
-    if (saveResponse.ok) {
-      window.location.pathname = `/Project/Details/${projectId}`;
-    } else {
-      alert("Something went wrong, please try again");
-    }
-  };
+  }
 
   if (!project) {
     return <div>Loading</div>;
@@ -152,83 +185,97 @@ export const QuoteContainer = () => {
   // TODO: we might want to move this all into a separate component
   if (editFields) {
     return (
-      <div>
-        <div className="card-wrapper">
-          <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+      <FormikProvider value={formik}>
+        <div>
+          <div className="card-wrapper">
+            <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
 
-          <div className="card-green-bg">
-            <div className="card-content">
-              <div className="row">
-                <div className="col-md-6">
-                  <h3>Choose a location</h3>
+            <div className="card-green-bg">
+              <div className="card-content">
+                <div className="row">
+                  <div className="col-md-6">
+                    <h3>Choose a location</h3>
                   Instructions:
                   <ol>
-                    <li>
-                      Draw your field boundaries using the rectangle or polygon
-                      tool in the upper-right
+                      <li>
+                        Draw your field boundaries using the rectangle or polygon
+                        tool in the upper-right
                     </li>
-                    <li>Fill in the field details and click "Confirm"</li>
-                    <li>
-                      You can add in as many fields as you like, or click an
-                      existing field for more info and actions
+                      <li>Fill in the field details and click "Confirm"</li>
+                      <li>
+                        You can add in as many fields as you like, or click an
+                        existing field for more info and actions
                     </li>
-                    <li>
-                      To edit a field, click on it in the map and choose either edit or remove.
+                      <li>
+                        To edit a field, click on it in the map and choose either edit or remove.
                     </li>
-                    <li>When you are finished, click confirm below</li>
-                  </ol>
-                  <button
-                    className="btn btn-primary"
-                    onClick={(_) => setEditFields(false)}
-                  >
-                    Confirm Field Locations
+                      <li>When you are finished, click confirm below</li>
+                    </ol>
+                    <button
+                      className="btn btn-primary"
+                      onClick={(_) => setEditFields(false)}>
+                      Confirm Field Locations
                   </button>
+                  </div>
                 </div>
               </div>
             </div>
+            <FieldArray name="fields">
+              {(arrayHelpers) => (
+                <FieldContainer
+                  crops={cropArray}
+                  fields={formik.values.fields}
+                  updateField={(field) => arrayHelpers.replace(formik.values.fields.findIndex(f => f.id === field.id), { ...field })}
+                  addField={(field) => arrayHelpers.push({ ...field })}
+                  removeField={(field) => arrayHelpers.remove(formik.values.fields.findIndex(f => f.id === field.id))}
+                ></FieldContainer>
+              )}
+            </FieldArray>
           </div>
-
-          <FieldContainer
-            crops={cropArray}
-            fields={quote.fields}
-            updateFields={(fields) => setQuote({ ...quote, fields })}
-          ></FieldContainer>
+          <div>Debug: {JSON.stringify(formik.values)}</div>
         </div>
-        <div>Debug: {JSON.stringify(quote)}</div>
-      </div>
+      </FormikProvider>
     );
   }
 
   return (
-    <div className="card-wrapper">
-      <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
-      <div className="card-green-bg">
-        <div className="card-content">
-          <div className="quote-details">
-            <h2>Quote Details</h2>
-            <hr />
-            <ProjectDetail
-              rates={rates}
-              quote={quote}
-              updateQuote={setQuote}
-              setEditFields={setEditFields}
-            />
-            <ActivitiesContainer
-              quote={quote}
-              rates={rates}
-              updateQuote={setQuote}
-            />
-          </div>
-          <QuoteTotals quote={quote}></QuoteTotals>
+    <FormikProvider value={formik}>
+      <div className="card-wrapper">
+        <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+        <div className="card-green-bg">
+          <div className="card-content">
+            <div className="quote-details">
+              <h2>Quote Details</h2>
+              <hr />
+              <ProjectDetail
+                rates={rates}
+                formik={formik}
+                setEditFields={setEditFields}
+                addActivity={addActivity}
+              />
+              <ActivitiesContainer
+                ref={activitiesRef}
+                formik={formik}
+                rates={rates}
+              />
+            </div>
+            <QuoteTotals quote={formik.values}></QuoteTotals>
 
-          <button className="btn btn-primary mt-4" onClick={save}>
-            Save Quote
+            <button className="btn btn-primary mt-4" onClick={() => {
+              if (Object.keys(formik.errors).length > 0) {
+                alert(JSON.stringify(formik.errors, null, "  "));
+              } else {
+                formik.submitForm();
+              }
+            }}>
+              Save Quote
           </button>
+          </div>
         </div>
-      </div>
 
-      <div>Debug: {JSON.stringify(quote)}</div>
-      <div>Debug Rates: {JSON.stringify(rates)}</div>
-    </div>
+        <div>Debug: {JSON.stringify(formik.values)}</div>
+        <div>Debug Rates: {JSON.stringify(rates)}</div>
+      </div>
+    </FormikProvider>
   );
 };

@@ -110,6 +110,8 @@ export interface Field {
   geometry: GeoJSON.Polygon;
 }
 
+export type FieldWithoutGeometry = Omit<Field, "geometry">;
+
 export interface Quote {
   id: number;
   projectId: number;
@@ -180,7 +182,7 @@ export interface WorkItem {
   rate: number;
   description: string;
   quantity: number;
-  unit: string;
+  unit: string | null;
   total: number;
 }
 

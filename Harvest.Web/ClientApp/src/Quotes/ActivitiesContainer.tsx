@@ -1,46 +1,43 @@
 import React from "react";
 
 import { Activity, QuoteContent, Rate } from "../types";
+import { FormikState } from "../Validation";
+import { FieldArray, FieldArrayRenderProps } from "formik";
 
 import { ActivityForm } from "./ActivityForm";
 
 interface Props {
   rates: Rate[];
-  quote: QuoteContent;
-  updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
+  formik: FormikState<QuoteContent>;
 }
 
-export const ActivitiesContainer = (props: Props) => {
-  const updateActivity = (activity: Activity) => {
-    // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
-    const allActivities = props.quote.activities;
-    const activityIndex = allActivities.findIndex((a) => a.id === activity.id);
-    allActivities[activityIndex] = {
-      ...activity,
-      total: activity.workItems.reduce(
-        (prev, curr) => prev + curr.total || 0,
-        0
-      ),
-    };
+export const ActivitiesContainer = React.forwardRef<FieldArrayRenderProps, Props>((props, ref) => {
+  const { formik } = props;
+  const { values } = formik;
+  const { activities } = values;
 
-    props.updateQuote({ ...props.quote, activities: [...allActivities] });
-  };
-  const deleteActivity = (activity: Activity) => {
-    const allActivities = props.quote.activities.filter((a) => a.id !== activity.id);
-    props.updateQuote({ ...props.quote, activities: [...allActivities] });
-  }
+  // ugly hack to be able to add an activity from outside ActivitiesContainer
+  let arrayHelpersRef: FieldArrayRenderProps;
+  React.useImperativeHandle(ref, () => arrayHelpersRef);
 
   return (
-    <div>
-      {props.quote.activities.map((activity) => (
-        <ActivityForm
-          key={`activity-${activity.id}`}
-          activity={activity}
-          updateActivity={(activity: Activity) => updateActivity(activity)}
-          deleteActivity={(activity: Activity) => deleteActivity(activity)}
-          rates={props.rates}
-        />
-      ))}
-    </div>
+    <FieldArray name="activities">
+      {(arrayHelpers) => {
+        arrayHelpersRef = arrayHelpers;
+        return (
+          <div>
+            {activities.map((activity, i) => (
+              <ActivityForm
+                key={`activity-${activity.id}`}
+                activity={activity}
+                deleteActivity={() => arrayHelpers.remove(i)}
+                rates={props.rates}
+                formik={formik}
+                path={`activities.${i}`} />
+            ))}
+          </div>
+        );
+      }}
+    </FieldArray>
   );
-};
+});

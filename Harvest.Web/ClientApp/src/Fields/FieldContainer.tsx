@@ -20,7 +20,9 @@ import { Field } from "../types";
 interface Props {
   crops: string[];
   fields: Field[];
-  updateFields: (fields: Field[]) => void;
+  addField: (field: Field) => void;
+  removeField: (field: Field) => void;
+  updateField: (field: Field) => void;
 }
 
 interface State {
@@ -51,29 +53,13 @@ export class FieldContainer extends React.Component<Props, State> {
       geometry: layer.toGeoJSON().geometry,
     };
 
-    this.props.updateFields([...this.props.fields, newField]);
+    this.props.addField(newField);
 
     // immediately set the new field for editing
     this.setState({ editFieldId: newId });
 
     // immediately remove added layer because we are going to let react handle rendering layers
     this._editableFG?.removeLayer(layer);
-  };
-
-  _updateField = (field: Field) => {
-    // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
-    const allItems = this.props.fields;
-    const itemIndex = allItems.findIndex((a) => a.id === field.id);
-    allItems[itemIndex] = {
-      ...field,
-    };
-
-    this.props.updateFields([...allItems]);
-  };
-
-  _removeField = (field: Field) => {
-    const itemsToKeep = this.props.fields.filter((w) => w.id !== field.id);
-    this.props.updateFields(itemsToKeep);
   };
 
   render() {
@@ -115,7 +101,7 @@ export class FieldContainer extends React.Component<Props, State> {
                 <FieldPopup
                   field={field}
                   updateFieldId={this._updateFieldId}
-                  removeField={this._removeField}
+                  removeField={this.props.removeField}
                 ></FieldPopup>
               </Popup>
             </GeoJSON>
@@ -138,7 +124,7 @@ export class FieldContainer extends React.Component<Props, State> {
             crops={this.props.crops}
             field={field}
             updateFieldId={this._updateFieldId}
-            updateField={this._updateField}
+            updateField={this.props.updateField}
           />
         );
       }

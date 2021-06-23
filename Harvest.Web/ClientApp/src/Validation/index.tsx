@@ -10,11 +10,11 @@ class UseFormikWrapper<T> {
     return refUseFormik<T>(e);
   }
 }
-export type UseFormikType<T> = ReturnType<UseFormikWrapper<T>['wrapped']>;
+export type FormikState<T> = ReturnType<UseFormikWrapper<T>['wrapped']>;
 
 
 interface ValidationMessageProps<T> {
-  formik: UseFormikType<T>;
+  formik: FormikState<T>;
   name: string;
 }
 
@@ -28,7 +28,7 @@ export function ValidationErrorMessage<T>(props: ValidationMessageProps<T>) {
     : (null);
 }
 
-export function getInputValidityStyle<T>(formik: UseFormikType<T>, name: string) {
+export function getInputValidityStyle<T>(formik: FormikState<T>, name: string) {
   const meta = formik.getFieldMeta(name);
   return meta.touched && meta.error !== undefined && meta.error !== "" && "is-invalid";
 }

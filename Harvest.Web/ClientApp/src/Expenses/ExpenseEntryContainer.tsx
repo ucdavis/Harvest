@@ -133,15 +133,16 @@ export const ExpenseEntryContainer = () => {
         <h1>Add Expenses for Project #{projectId}</h1>
         <br />
         <div>
-          {activities.map((activity) => (
-            <ActivityForm
-              key={`activity-${activity.id}`}
-              activity={activity}
-              updateActivity={(activity: Activity) => updateActivity(activity)}
-              deleteActivity={(activity: Activity) => deleteActivity(activity)}
-              rates={rates}
-            />
-          ))}
+          {/*temporarily disabling until we can formikify all the things*/}
+          {/*{activities.map((activity) => (*/}
+          {/*  <ActivityForm*/}
+          {/*    key={`activity-${activity.id}`}*/}
+          {/*    activity={activity}*/}
+          {/*    updateActivity={(activity: Activity) => updateActivity(activity)}*/}
+          {/*    deleteActivity={(activity: Activity) => deleteActivity(activity)}*/}
+          {/*    rates={rates}*/}
+          {/*  />*/}
+          {/*))}*/}
         </div>
         <Button className="mb-4" color="link" size="lg" onClick={addActivity}>
           Add Activity <FontAwesomeIcon icon={faPlus} />

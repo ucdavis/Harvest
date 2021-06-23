@@ -1,6 +1,7 @@
 import React from "react";
 
 import { QuoteContent, Rate, WorkItemImpl } from "../types";
+import { FormikState, ValidationErrorMessage } from "../Validation";
 
 import {
   Button,
@@ -11,6 +12,7 @@ import {
   InputGroupText,
   Label,
   Row,
+  FormGroup
 } from "reactstrap";
 
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -18,140 +20,125 @@ import { Location } from "../Fields/Location";
 
 interface Props {
   rates: Rate[];
-  quote: QuoteContent;
-  updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
+  formik: FormikState<QuoteContent>;
   setEditFields: React.Dispatch<React.SetStateAction<boolean>>;
+  addActivity: () => void;
 }
 
 export const ProjectDetail = (props: Props) => {
-  // TODO: should we do the work here or pass up to parent?
-  const addActivity = () => {
-    const newActivityId =
-      Math.max(...props.quote.activities.map((a) => a.id), 0) + 1;
-    props.updateQuote({
-      ...props.quote,
-      activities: [
-        ...props.quote.activities,
-        {
-          id: newActivityId,
-          name: "Activity",
-          total: 0,
-          workItems: [
-            new WorkItemImpl(newActivityId, 1, "Labor"),
-            new WorkItemImpl(newActivityId, 2, "Equipment"),
-            new WorkItemImpl(newActivityId, 3, "Other"),
-          ],
-        },
-      ],
-    });
-  };
+  const { formik } = props;
+  
+  React.useEffect(() => {
+    const rate = props.rates.find((r) => r.id === formik.values.acreageRateId);
 
-  const setAcreageRate = (rate: Rate | undefined) => {
-    if (rate) {
-      props.updateQuote({
-        ...props.quote,
-        acreageRate: rate.price,
-        acreageRateId: rate.id,
-        acreageRateDescription: rate.description,
-      });
+    // rate can be undefinied if they select the default option
+    if (!!rate) {
+      formik.setFieldValue("acreageRate", rate.price);
+      formik.setFieldValue("acreageRateId", rate.id);
+      formik.setFieldValue("acreageRateDescription", rate.description);
     } else {
-      props.updateQuote({
-        ...props.quote,
-        acreageRate: 0,
-        acreageRateId: 0,
-        acreageRateDescription: "",
-      });
+      formik.setFieldValue("acreageRate", 0);
+      formik.setFieldValue("acreageRateId", 0);
+      formik.setFieldValue("acreageRateDescription", "");
     }
-  };
+  }, [formik.values.acreageRateId]);
+
   return (
     <Row className="align-items-baseline">
       {/* Left Details */}
       <Col md="6">
-        <Label for="projectName">Project Name</Label>
-        <Input
-          type="text"
-          id="projectName"
-          value={props.quote.projectName}
-          onChange={(e) =>
-            props.updateQuote({ ...props.quote, projectName: e.target.value })
-          }
-        />
+        <FormGroup>
+          <Label for="projectName">Project Name</Label>
+          <Input
+            type="text"
+            id="projectName"
+            name="projectName"
+            value={formik.values.projectName}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+        </FormGroup>
+        <ValidationErrorMessage formik={formik} name="projectName" />
         <br />
         <Row className="align-items-baseline">
           <Col>
-            <Label>Acreage Rate</Label>
-            <Input
-              type="select"
-              name="acreageRate"
-              value={props.quote.acreageRateId}
-              onChange={(e) =>
-                setAcreageRate(
-                  props.rates.find((r) => r.id === parseInt(e.target.value))
-                )
-              }
-            >
-              <option value="0">-- Select Acreage Rate --</option>
-              {props.rates
-                .filter((r) => r.type === "Acreage")
-                .map((r) => (
-                  <option key={`rate-${r.type}-${r.id}`} value={r.id}>
-                    {r.description}
-                  </option>
-                ))}
-            </Input>
+            <FormGroup>
+              <Label>Acreage Rate</Label>
+              <Input
+                type="select"
+                id="acreageRate"
+                name="acreageRate"
+                value={formik.values.acreageRateId}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+              >
+                <option value="0">-- Select Acreage Rate --</option>
+                {props.rates
+                  .filter((r) => r.type === "Acreage")
+                  .map((r) => (
+                    <option key={`rate-${r.type}-${r.id}`} value={r.id}>
+                      {r.description}
+                    </option>
+                  ))}
+              </Input>
+            </FormGroup>
+            <ValidationErrorMessage formik={formik} name="acreageRateId" />
           </Col>
         </Row>
         <br />
-        {props.quote.acreageRateId > 0 && (
+        {formik.values.acreageRateId > 0 && (
           <Row className="align-items-baseline">
             <Col md="4">
-              <Label for="acres">Number of Acres</Label>
-              <Input
-                type="number"
-                id="acres"
-                value={props.quote.acres}
-                onChange={(e) =>
-                  props.updateQuote({
-                    ...props.quote,
-                    acres: parseFloat(e.target.value),
-                  })
-                }
-              />
-            </Col>
-            <Col md="4">
-              <Label for="rate">Rate</Label>
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>$</InputGroupText>
-                </InputGroupAddon>
+              <FormGroup>
+                <Label for="acres">Number of Acres</Label>
                 <Input
                   type="number"
-                  id="rate"
-                  value={props.quote.acreageRate}
-                  onChange={(e) =>
-                    props.updateQuote({
-                      ...props.quote,
-                      acreageRate: parseFloat(e.target.value ?? 0),
-                    })
-                  }
+                  id="acres"
+                  name="acres"
+                  value={formik.values.acres}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
                 />
-              </InputGroup>
+              </FormGroup>
+              <ValidationErrorMessage formik={formik} name="acres" />
             </Col>
             <Col md="4">
-              <Label>Total Acreage Fee</Label>
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>$</InputGroupText>
-                </InputGroupAddon>
-                <Input
-                  type="text"
-                  id="rate"
-                  readOnly
-                  value={formatCurrency(
-                    props.quote.acres * props.quote.acreageRate
-                  )}
-                />
-              </InputGroup>
+              <FormGroup>
+                <Label for="rate">Rate</Label>
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>$</InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    type="number"
+                    id="rate"
+                    name="rate"
+                    value={formik.values.acreageRate}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                </InputGroup>
+              </FormGroup>
+              <ValidationErrorMessage formik={formik} name="acreageRate" />
+
+            </Col>
+            <Col md="4">
+              <FormGroup>
+                <Label>Total Acreage Fee</Label>
+                <InputGroup>
+                  <InputGroupAddon addonType="prepend">
+                    <InputGroupText>$</InputGroupText>
+                  </InputGroupAddon>
+                  <Input
+                    type="text"
+                    id="rate"
+                    readOnly
+                    value={formatCurrency(
+                      formik.values.acres * formik.values.acreageRate
+                    )}
+                  />
+                </InputGroup>
+              </FormGroup>
             </Col>
           </Row>
         )}
@@ -161,7 +148,7 @@ export const ProjectDetail = (props: Props) => {
           className="mb-4"
           color="primary"
           size="lg"
-          onClick={addActivity}
+          onClick={props.addActivity}
         >
           Add Activity
         </Button>
@@ -182,7 +169,7 @@ export const ProjectDetail = (props: Props) => {
             </button>
           </Col>
         </Row>
-        <Location fields={props.quote.fields}></Location>
+        <Location fields={formik.values.fields}></Location>
         <br />
         <div id="map" />
       </Col>
