@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
@@ -132,6 +132,9 @@ export const ApprovalContainer = () => {
           </div>
         </div>
       </div>
+      <PDFViewer>
+        <ApprovalPDF quote={projectAndQuote.quote} />
+      </PDFViewer>
     </div>
   );
 };
