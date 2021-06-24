@@ -17,6 +17,7 @@ import { workItemSchema } from "../schemas";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   category: RateType;
@@ -58,27 +59,6 @@ const WorkItemForm = (props: WorkItemProps) => {
         formik.setFieldValue(`${path}.total`, 0);
       }
     }  }, [props.workItem.rateId]);
-
-  //const rateItemChanged = (
-  //  e: React.ChangeEvent<HTMLSelectElement>,
-  //) => {
-  //  //let formik do it's validation and casting magic
-  //  formik.handleChange(e);
-
-  //  const meta = formik.getFieldMeta("rateId");
-  //  if (meta.touched && meta.error !== undefined && meta.error !== "") {
-  //    const rate = props.rates.find((r) => r.id === formik.values.rateId);
-
-  //    // rate can be undefinied if they select the default option
-  //    if (!!rate) {
-  //      // new rate selected, update the work item with defaults
-  //      formik.setFieldValue("rate", rate.price);
-  //      formik.setFieldValue("description", requiresCustomDescription(rate.unit) ? "" : rate.description);
-  //      formik.setFieldValue("unit", rate.unit);
-  //      formik.setFieldValue("total", 0);
-  //    }
-  //  }
-  //};
 
   return (
     <Row
@@ -201,6 +181,7 @@ export const WorkItemsForm = (props: Props) => {
               color="link"
               onClick={() => arrayHelpers.push(props.getNewWorkItem(props.category))}
             >
+              <FontAwesomeIcon className="mr-2" icon={faPlus} />
               Add {props.category}
             </Button>
           </div>

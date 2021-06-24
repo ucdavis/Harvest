@@ -2,24 +2,40 @@ import React from "react";
 
 import { Route } from "react-router-dom";
 
+import AppContext from "./Shared/AppContext";
+import { AppContextShape } from "./types";
+import { ConditionalRoute } from './ConditionalRoute'
+
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
+import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { Map } from "./Maps/Map";
 
+
+// Global variable containing top-level app settings and info
+declare var Harvest: AppContextShape;
+
 function App() {
   return (
-    <>
+    <AppContext.Provider value={Harvest}>
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
       <Route path="/request/create/:projectId?" component={RequestContainer} />
       <Route path="/request/approve/:projectId" component={ApprovalContainer} />
-      <Route path="/invoice/details/:invoiceId" component={InvoiceDetailContainer} />
-      <Route path="/quote/create/:projectId" component={QuoteContainer} />
+      <Route
+        path="/request/changeAccount/:projectId"
+        component={AccountChangeContainer}
+      />
+      <Route
+        path="/invoice/details/:invoiceId"
+        component={InvoiceDetailContainer}
+      />
+      <ConditionalRoute roles={['FieldManager', 'Supervisor']} path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
       <Route
         path="/project/details/:projectId"
@@ -30,7 +46,7 @@ function App() {
         component={ExpenseEntryContainer}
       />
       <Route path="/home/map" component={Map} />
-    </>
+    </AppContext.Provider>
   );
 }
 

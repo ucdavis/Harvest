@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { useFormik, FormikConfig, FormikHelpers, FieldArray, FieldArrayRenderProps, FormikProvider } from "formik";
 import { getInputValidityStyle, ValidationErrorMessage, FormikState } from "../Validation";
 import { quoteContentSchema } from "../schemas";
@@ -70,6 +70,7 @@ export const updateQuoteTotals = (q: QuoteContent) => {
 
 
 export const QuoteContainer = () => {
+  const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
 
@@ -106,7 +107,7 @@ export const QuoteContainer = () => {
     actions.setSubmitting(false);
 
     if (saveResponse.ok) {
-      window.location.pathname = `/Project/Details/${projectId}`;
+      history.push(`/Project/Details/${projectId}`);
     } else {
       alert("Something went wrong, please try again");
     }

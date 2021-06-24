@@ -47,8 +47,13 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        [HttpGet]
+        public ActionResult ChangeAccount(int id) {
+            return View("React");
+        }
+
         [HttpPost]
-        public async Task<ActionResult> ApproveAsync(int id, [FromBody] RequestApprovalModel model)
+        public async Task<ActionResult> Approve(int id, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
 
@@ -139,6 +144,19 @@ namespace Harvest.Web.Controllers
                 // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
                 newProject.PrincipalInvestigator = project.PrincipalInvestigator;
                 piName = project.PrincipalInvestigator.Name;
+            }
+
+            // If there are attachments, fill out details and add to project
+            foreach (var attachment in project.Attachments)
+            {
+                newProject.Attachments.Add(new ProjectAttachment {
+                    Identifier = attachment.Identifier,
+                    FileName = attachment.FileName,
+                    FileSize = attachment.FileSize,
+                    ContentType = attachment.ContentType,
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedById = currentUser.Id
+                });
             }
 
             // TODO: when is name determined? Currently by quote creator but can it be changed?

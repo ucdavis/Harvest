@@ -92,7 +92,7 @@ export const ExpenseEntryContainer = () => {
     });
 
     if (response.ok) {
-      window.location.pathname = "/project";
+      history.push("/project");
     } else {
       alert("Something went wrong, please try again");
     }

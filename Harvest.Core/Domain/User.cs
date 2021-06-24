@@ -48,6 +48,11 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Project> PrincipalInvestigatorProjects { get; set; }
 
+        [JsonIgnore]
+        public List<TicketAttachment> TicketAttachments { get; set; }
+        [JsonIgnore]
+        public List<TicketMessage> TicketMessages { get; set; }
+
         [Display(Name = "Name")]
         public string Name => FirstName + " " + LastName;
 
@@ -89,6 +94,16 @@ namespace Harvest.Core.Domain
                 .HasForeignKey(p => p.UpdatedById)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<TicketAttachment>()
+                .HasOne(a => a.CreatedBy)
+                .WithMany(a => a.TicketAttachments)
+                .HasForeignKey(a => a.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<TicketMessage>()
+                .HasOne(a => a.CreatedBy)
+                .WithMany(a => a.TicketMessages)
+                .HasForeignKey(a => a.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

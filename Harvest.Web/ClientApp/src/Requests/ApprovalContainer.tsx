@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
@@ -15,9 +15,11 @@ interface RouteParams {
 }
 
 export const ApprovalContainer = () => {
+  const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   useEffect(() => {
     const cb = async () => {
@@ -46,7 +48,7 @@ export const ApprovalContainer = () => {
     });
 
     if (response.ok) {
-      window.location.pathname = `/Project/Details/${projectId}`;
+      history.replace(`/Project/Details/${projectId}`);
     } else {
       alert("Something went wrong, please try again");
     }
@@ -77,22 +79,9 @@ export const ApprovalContainer = () => {
           <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
           <div className="row">
             <div className="col-md-6">
-              <h2 className="primary-font bold-font">
-                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
-              </h2>
-              <button className="btn btn-link btn-sm">
-                Download PDF <FontAwesomeIcon icon={faDownload} />
-              </button>
-
-              <AccountsInput
-                accounts={accounts}
-                setAccounts={setAccounts}
-              ></AccountsInput>
-            </div>
-            <div className="col-md-6">
-              <p>
+              <h4>
                 <b>Terms and Conditions</b>
-              </p>
+              </h4>
               <ol>
                 <li>
                   This estimate is approximate based on the information provided
@@ -109,11 +98,31 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="text-right mt-5">
-                <button className="btn btn-link mr-2">Reject</button>
-                <button className="btn btn-primary" onClick={approve}>
+              <h2 className="primary-font bold-font">
+                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
+              </h2>
+              <button className="btn btn-link btn-sm btn-fa mb-2">
+                Download PDF <FontAwesomeIcon icon={faDownload} />
+              </button>
+
+              <AccountsInput
+                accounts={accounts}
+                setAccounts={setAccounts}
+                setDisabled={setDisabled}
+              />
+              <div className="mt-5">
+                <p className="discreet">
+                  Please check with the above account managers before pressing
+                  approve
+                </p>
+                <button
+                  className="btn btn-primary"
+                  disabled={disabled}
+                  onClick={approve}
+                >
                   Approve Quote
                 </button>
+                <button className="btn btn-link mr-2">Reject</button>
               </div>
             </div>
           </div>

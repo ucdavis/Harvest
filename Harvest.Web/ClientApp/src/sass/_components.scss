@@ -1,13 +1,17 @@
 .btn {
   font-family: $sans-bold;
   font-size: 1.2rem;
+  padding: 8px 26px;
   text-decoration: none;
   &:hover {
     text-decoration: none;
   }
 }
 .btn-sm {
-  font-size: 0.9rem;
+  font-size: 1rem;
+}
+.box-shadow {
+  box-shadow: $box-shadow;
 }
 .btn:focus,
 .btn.focus {
@@ -22,9 +26,19 @@
     color: darken($primary-color, 3);
   }
 }
+.btn-fa {
+  padding: 0;
+}
 .btn-lg,
 .btn-group-lg > .btn {
   padding: 1rem 1.5rem;
+}
+.btn-light {
+  color: $primary-color;
+  &:hover {
+    background-color: $bg-primary;
+    color: $primary-color;
+  }
 }
 
 .page-item.active .page-link {
@@ -56,7 +70,13 @@
     margin: 0;
   }
 }
-
+.progress {
+  background-color: #f2f2f2;
+  border: 1px solid $borders;
+}
+.progress-bar {
+  background-color: $primary-color;
+}
 // tables
 
 .harvest-table {
@@ -66,9 +86,7 @@
     font-size: 0.9rem;
     text-transform: uppercase;
   }
-  .progress-bar {
-    background-color: $primary-color;
-  }
+
   a {
     color: $primary-color;
     &:hover {
@@ -119,4 +137,8 @@ $nchild-wide: 24%;
       width: $nchild-wide;
     }
   }
+}
+.btn-link:focus,
+.btn-link.focus {
+  text-decoration: none;
 }

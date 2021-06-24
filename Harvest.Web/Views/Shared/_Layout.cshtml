@@ -77,7 +77,7 @@
                     </li>
                 </ul>
                 <div class="mt-2 mt-md-0">
-                    Welcome @User.Identity.Name
+                    Welcome @User.GetNameClaim()
                 </div>
             </div>
         </nav>
@@ -111,6 +111,12 @@
         <p>Copyright &copy; <span id="copywrite-year"></span> The Regents of the University of California, Davis campus.
             All rights reserved.</p>
     </footer>
+
+
+    <script>
+        var Harvest = { user: {} };
+        Harvest.user.roles = @Html.Raw(await Context.GetUserRoles());
+    </script>
 
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>

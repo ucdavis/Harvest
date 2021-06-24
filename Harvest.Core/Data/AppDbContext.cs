@@ -37,6 +37,7 @@ namespace Harvest.Core.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Permission> Permissions { get; set; }
+        public DbSet<ProjectAttachment> ProjectAttachments { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<ProjectHistory> ProjectHistory { get; set; }
         public DbSet<Quote> Quotes { get; set; }
@@ -44,6 +45,9 @@ namespace Harvest.Core.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Transfer> Transfers { get; set; }
         public DbSet<Rate> Rates { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
+        public DbSet<TicketMessage> TicketMessages { get; set; }
+        public DbSet<TicketAttachment> TicketAttachments { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -56,12 +60,16 @@ namespace Harvest.Core.Data
             Notification.OnModelCreating(modelBuilder);
             Permission.OnModelCreating(modelBuilder);
             Project.OnModelCreating(modelBuilder);
+            ProjectAttachment.OnModelCreating(modelBuilder);
             Domain.ProjectHistory.OnModelCreating(modelBuilder);
             Quote.OnModelCreating(modelBuilder);
             Role.OnModelCreating(modelBuilder);
             User.OnModelCreating(modelBuilder);
             Transfer.OnModelCreating(modelBuilder);
             Rate.OnModelCreating(modelBuilder);
+            Ticket.OnModelCreating(modelBuilder);
+            TicketMessage.OnModelCreating(modelBuilder);
+            TicketAttachment.OnModelCreating(modelBuilder);
         }
     }
 }

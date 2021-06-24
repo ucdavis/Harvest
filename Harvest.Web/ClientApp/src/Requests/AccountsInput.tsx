@@ -1,15 +1,19 @@
 // typeahead input box that allows entering valid account numbers
 // each one entered is displayed on a new line where percentages can be set
-import React, { createRef, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 
 import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
 import { Col, Input, Row } from "reactstrap";
 
 import { ProjectAccount } from "../types";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+
 interface Props {
   accounts: ProjectAccount[];
   setAccounts: (accounts: ProjectAccount[]) => void;
+  setDisabled: (disabled: boolean) => void;
 }
 
 export const AccountsInput = (props: Props) => {
@@ -22,6 +26,16 @@ export const AccountsInput = (props: Props) => {
   const typeaheadRef = createRef<AsyncTypeahead<ProjectAccount>>();
 
   const { accounts, setAccounts } = props;
+
+  useEffect(() => {
+    let total = 0;
+    for (let i = 0; i < accounts.length; i++) {
+      total += accounts[i].percentage;
+    }
+
+    total === 100 ? props.setDisabled(false) : props.setDisabled(true);
+  }, [accounts, props]);
+
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
@@ -63,13 +77,25 @@ export const AccountsInput = (props: Props) => {
     }
   };
 
+  const removeAccount = (account: ProjectAccount) => {
+    const otherAccounts = props.accounts.filter(
+      (a) => a.number !== account.number
+    );
+
+    props.setAccounts(otherAccounts);
+  };
+
   const updateAccountPercentage = (
     account: ProjectAccount,
     percentage: number
   ) => {
     const idx = accounts.findIndex((a) => a.number === account.number);
 
-    accounts[idx].percentage = percentage;
+    if (percentage < 0) {
+      accounts[idx].percentage = 0;
+    } else {
+      accounts[idx].percentage = percentage;
+    }
 
     setAccounts([...accounts]);
 
@@ -82,7 +108,6 @@ export const AccountsInput = (props: Props) => {
 
   return (
     <div>
-      {error && <span className="text-danger">{error}</span>}
       <AsyncTypeahead
         id="searchAccounts" // for accessibility
         ref={typeaheadRef}
@@ -112,21 +137,30 @@ export const AccountsInput = (props: Props) => {
         options={searchResultAccounts}
       />
       {accounts.length > 0 && (
-        <Row md={6}>
-          <Col>Account To Charge</Col>
-          <Col>Percent %</Col>
+        <Row className="approval-row approval-row-title">
+          <Col md={6}>Account To Charge</Col>
+          <Col md={4}>Percent %</Col>
         </Row>
       )}
 
       {accounts.map((account) => (
-        <Row key={account.number} md={6}>
-          <Col>{account.number}</Col>
-          <Col>
+        <Row className="approval-row align-items-center" key={account.number}>
+          <Col md={6}>
+            <b>{account.number}</b>
+            <br />
+            <small>{account.name}</small>
+            <br/>
+            Account Manager:{" "}
+            <a href={`mailto:${account.accountManagerEmail}`}>
+              {account.accountManagerName}
+            </a>
+          </Col>
+          <Col md={3}>
             {" "}
             <Input
               type="text"
               name="percent"
-              defaultValue={account.percentage}
+              value={account.percentage}
               onChange={(e) =>
                 updateAccountPercentage(
                   account,
@@ -135,9 +169,32 @@ export const AccountsInput = (props: Props) => {
               }
             />
           </Col>
+          <Col md={2}>
+            <button
+              className="btn btn-link btn-fa"
+              onClick={() => removeAccount(account)}
+            >
+              <FontAwesomeIcon icon={faMinusCircle} />
+            </button>
+          </Col>
         </Row>
       ))}
+      {accounts.length > 0 && (
+        <Row>
+          <Col className="col-md-4 offset-md-6">
+            <b>
+              Totat Percent:{" "}
+              {accounts.reduce((prev, curr) => prev + curr.percentage, 0)}%
+            </b>
+          </Col>
+        </Row>
+      )}
       <div>DEBUG: {JSON.stringify(accounts)}</div>
+      {error && <span className="text-danger">{error}</span>}
+      <p className="discreet mt-5">
+        Please check with your account manager for each account above before
+        approving
+      </p>
     </div>
   );
 };

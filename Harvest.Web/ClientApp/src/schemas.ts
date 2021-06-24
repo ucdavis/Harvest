@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import { RequestInput, User, WorkItem, QuoteContent, Field, FieldWithoutGeometry, Activity } from "./types";
+import { BlobFile, RequestInput, User, WorkItem, QuoteContent, Field, FieldWithoutGeometry, Activity } from "./types";
 
 export const investigatorSchema: SchemaOf<User> = yup
   .object()
@@ -15,6 +15,14 @@ export const investigatorSchema: SchemaOf<User> = yup
     nameAndEmail: yup.string(),
   });
 
+export const fileSchema: SchemaOf<BlobFile> = yup.object().shape({
+  identifier: yup.string().required(),
+  fileName: yup.string().required(),
+  fileSize: yup.number().required(),
+  contentType: yup.string().required(),
+  uploaded: yup.boolean().required().isTrue() // files are only valid if they are done uploading
+});
+
 export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   id: yup.number().required(),
   start: yup.string().required(),
@@ -23,6 +31,7 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   cropType: yup.string().required(),
   requirements: yup.string(),
   principalInvestigator: investigatorSchema,
+  files: yup.array().of(fileSchema)
 });
 
 export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
@@ -33,7 +42,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   rate: yup.number().required().positive(),
   description: yup.string().defined(),
   quantity: yup.number().required().positive(),
-  unit: yup.string().nullable(),
+  unit: yup.string().required().nullable(),
   total: yup.number().required().positive()
 });
 
