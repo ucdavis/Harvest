@@ -37,6 +37,17 @@ export const ExpenseTable = (props: Props) => {
         Header: "Total",
         accessor: (row) => row.total,
       },
+      {
+        Header: "Entered by",
+        accessor: (row) => row.createdBy?.name,
+      },
+      {
+        Header: "Entered on",
+        accessor: (row) =>
+          row.createdOn === undefined
+            ? "N/A"
+            : new Date(row.createdOn).toLocaleDateString(),
+      },
     ],
     []
   );
