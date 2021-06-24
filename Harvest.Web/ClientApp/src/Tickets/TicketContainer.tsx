@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Project, CreateTicket } from "../types";
+import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Requests/ProjectHeader";
 import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -12,10 +12,10 @@ interface RouteParams {
 export const TicketContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
-  const [createTicket, setCreateTicket] = useState<CreateTicket>({
+  const [ticket, setTicket] = useState<Ticket>({
     requirements: "",
     name: "",
-  } as CreateTicket);
+  } as Ticket);
   const [disabled, setDisabled] = useState<boolean>(true);
   const history = useHistory();
 
@@ -26,7 +26,7 @@ export const TicketContainer = () => {
       if (response.ok) {
         const proj: Project = await response.json();
         setProject(proj);
-        setCreateTicket({ ...createTicket, projectId: proj.id });
+        setTicket({ ...ticket, projectId: proj.id });
       }
     };
 
@@ -46,7 +46,7 @@ export const TicketContainer = () => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(createTicket),
+      body: JSON.stringify(ticket),
     });
 
     if (response.ok) {
@@ -74,9 +74,9 @@ export const TicketContainer = () => {
             type="text"
             name="name"
             id="name"
-            value={createTicket.name}
+            value={ticket.name}
             onChange={(e) =>
-              setCreateTicket({ ...createTicket, name: e.target.value })
+              setTicket({ ...ticket, name: e.target.value })
             }
             placeholder="Enter a short description for this request"
           />
@@ -88,9 +88,9 @@ export const TicketContainer = () => {
             type="textarea"
             name="text"
             id="requirements"
-            value={createTicket.requirements}
+            value={ticket.requirements}
             onChange={(e) =>
-              setCreateTicket({ ...createTicket, requirements: e.target.value })
+              setTicket({ ...ticket, requirements: e.target.value })
             }
             placeholder="Enter a full description of your requirements"
           />
@@ -104,9 +104,9 @@ export const TicketContainer = () => {
                   format="MM/dd/yyyy"
                   required={true}
                   clearIcon={null}
-                  value={createTicket.dueDate}
+                  value={ticket.dueDate}
                   onChange={(date) =>
-                    setCreateTicket({ ...createTicket, dueDate: date as Date })
+                    setTicket({ ...ticket, dueDate: date as Date })
                   }
                 />
               </div>
@@ -118,7 +118,7 @@ export const TicketContainer = () => {
             Create New Ticket
           </Button>
         </div>
-        <div>DEBUG: {JSON.stringify(createTicket)}</div>
+        <div>DEBUG: {JSON.stringify(ticket)}</div>
       </div>
     </div>
   );
