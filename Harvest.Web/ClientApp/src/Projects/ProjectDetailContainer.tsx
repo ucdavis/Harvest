@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 import { Project } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
   projectId?: string;
@@ -88,15 +89,15 @@ export const ProjectDetailContainer = () => {
               <h1>Project Progress</h1>
               <div className="row justify-content-between">
                 <div className="col">
-                  <p className="mb-1">$4,550 Billed</p>
+                  <p className="mb-1">${formatCurrency(project.chargedTotal)} Billed</p>
                 </div>
                 <div className="col text-right">
-                  <p className="mb-1">$220,000 Remaining</p>
+                  <p className="mb-1">${formatCurrency(project.quoteTotal - project.chargedTotal)} Remaining</p>
                 </div>
               </div>
               <Progress
                 style={{ width: "100%", height: "20px" }}
-                value={Math.random() * 100}
+                value={(project.chargedTotal / project.quoteTotal) * 100}
               />
             </div>
           </div>
