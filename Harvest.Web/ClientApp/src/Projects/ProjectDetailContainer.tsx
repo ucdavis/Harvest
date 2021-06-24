@@ -68,9 +68,9 @@ export const ProjectDetailContainer = () => {
               </Link>
             </div>
             <div className="col text-right">
-              <a href="#" className="btn btn-light">
+              <Link to={`/expense/unbilled/${projectId}`} className="btn btn-light">
                 View Unbilled Expenses - $124,555.54
-              </a>
+              </Link>
             </div>
           </div>
         </div>
