@@ -3,6 +3,7 @@ import { Column, TableState } from "react-table";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Expense } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   expenses: Expense[];
@@ -31,11 +32,11 @@ export const ExpenseTable = (props: Props) => {
       },
       {
         Header: "Rate",
-        accessor: (row) => row.price,
+        accessor: (row) => "$" + formatCurrency(row.price),
       },
       {
         Header: "Total",
-        accessor: (row) => row.total,
+        accessor: (row) => "$" + formatCurrency(row.total),
       },
       {
         Header: "Entered by",
