@@ -8,6 +8,7 @@ import { ConditionalRoute } from './ConditionalRoute'
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
+import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
@@ -45,6 +46,7 @@ function App() {
         path="/expense/entry/:projectId?"
         component={ExpenseEntryContainer}
       />
+       <Route path="/expense/unbilled/:projectId" component={UnbilledExpensesContainer} />
       <Route path="/home/map" component={Map} />
     </AppContext.Provider>
   );
