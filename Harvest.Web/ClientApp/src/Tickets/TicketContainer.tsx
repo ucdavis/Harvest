@@ -11,7 +11,7 @@ interface RouteParams {
 
 export const TicketContainer = () => {
   const { projectId } = useParams<RouteParams>();
-  const [project, setProject] = useState<Project | undefined>();
+  const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<Ticket>({
     requirements: "",
     name: "",
