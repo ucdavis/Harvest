@@ -16,7 +16,6 @@ export const TicketContainer = () => {
     requirements: "",
     name: "",
   } as Ticket);
-  const [disabled, setDisabled] = useState<boolean>(true);
   const history = useHistory();
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export const TicketContainer = () => {
       if (response.ok) {
         const proj: Project = await response.json();
         setProject(proj);
-        setTicket({ ...ticket, projectId: proj.id });
+        setTicket(t => ({ ...t, projectId: proj.id }));
       }
     };
 
