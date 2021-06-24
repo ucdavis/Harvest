@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
+import { ApprovalPDF } from "./ApprovalPDF";
 import { ProjectHeader } from "./ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -76,8 +78,26 @@ export const ApprovalContainer = () => {
       ></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
-          <QuoteDisplay quote={projectAndQuote.quote}></QuoteDisplay>
+          <QuoteDisplay quote={projectAndQuote.quote} />
           <div className="row">
+            <div className="col-md-6">
+              <h2 className="primary-font bold-font">
+                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
+              </h2>
+              <PDFDownloadLink
+                document={<ApprovalPDF quote={projectAndQuote.quote} />}
+                fileName="somename.pdf"
+              >
+                <button className="btn btn-link btn-sm">
+                  Download PDF <FontAwesomeIcon icon={faDownload} />
+                </button>
+              </PDFDownloadLink>
+              <AccountsInput
+                accounts={accounts}
+                setAccounts={setAccounts}
+                setDisabled={setDisabled}
+              />
+            </div>
             <div className="col-md-6">
               <h4>
                 <b>Terms and Conditions</b>
