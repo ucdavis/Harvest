@@ -50,10 +50,10 @@ export const TicketContainer = () => {
     });
 
     if (response.ok) {
-      const data = await response.json();
-      window.location.pathname = `/Project/Details/${data.id}`;
+        const data = await response.json();
+        history.push(`/Project/Details/${data.id}`);
     } else {
-      alert("Something went wrong, please try again");
+        alert("Something went wrong, please try again");
     }
   };
 
