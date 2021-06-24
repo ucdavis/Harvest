@@ -65,5 +65,12 @@ namespace Harvest.Web.Controllers
         {
             return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == id).ToArrayAsync());
         }
+
+        // Get just the total of unbilled expenses for the current project
+        [HttpGet]
+        public async Task<ActionResult> GetUnbilledTotal(int id)
+        {
+            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == id).SumAsync(e=>e.Total));
+        }
     }
 }
