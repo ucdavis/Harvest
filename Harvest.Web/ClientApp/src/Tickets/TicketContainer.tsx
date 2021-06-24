@@ -37,8 +37,7 @@ export const TicketContainer = () => {
     return <div>Loading...</div>;
   }
   const create = async () => {
-    // TODO: validation, loading spinner
-    // create a new project
+    // TODO: validation
 
     const response = await fetch(`/Ticket/Create?projectId=${projectId}`, {
       method: "POST",
@@ -57,7 +56,7 @@ export const TicketContainer = () => {
     }
   };
 
-  // we have a project, now time to change account
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
