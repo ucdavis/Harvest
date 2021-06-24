@@ -115,7 +115,6 @@ export interface QuoteContent {
   acreageRateId: number;
   acreageRateDescription: string;
   activities: Activity[];
-  total: number;
   acreageTotal: number;
   activitiesTotal: number;
   laborTotal: number;
@@ -205,7 +204,7 @@ export interface WorkItem {
   rate: number;
   description: string;
   quantity: number;
-  unit: string | null;
+  unit: string;
   total: number;
 }
 

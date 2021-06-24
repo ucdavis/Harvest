@@ -42,7 +42,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   rate: yup.number().required().positive(),
   description: yup.string().defined(),
   quantity: yup.number().required().positive(),
-  unit: yup.string().required().nullable(),
+  unit: yup.string().defined(),
   total: yup.number().required().positive()
 });
 
@@ -50,7 +50,7 @@ export const fieldSchema/*: SchemaOf<FieldWithoutGeometry>*/ = yup.object().shap
   id: yup.number().required(),
   name: yup.string().required(),
   crop: yup.string().required(),
-  details: yup.string().required(),
+  details: yup.string(),
   //geometry: ? //not sure of a clean way to validate GeoJSON.Polygon
 });
 
@@ -68,7 +68,6 @@ export const quoteContentSchema/*: SchemaOf<QuoteContent>*/ = yup.object().shape
   acreageRateId: yup.number().required(),
   acreageRateDescription: yup.string().required(),
   activities: yup.array().of(activitySchema).required(),
-  total: yup.number().required(),
   acreageTotal: yup.number().required(),
   activitiesTotal: yup.number().required(),
   laborTotal: yup.number().required(),
