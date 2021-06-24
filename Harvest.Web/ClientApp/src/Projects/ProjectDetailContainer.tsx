@@ -64,8 +64,14 @@ export const ProjectDetailContainer = () => {
                 className="btn btn-primary btn-small mr-4"
                 to={`/request/changeAccount/${project.id}`}
               >
-                Change Accounts
+                              Change Accounts
               </Link>
+                <Link
+                    className="btn btn-primary btn-small mr-4"
+                    to={`/ticket/create/${project.id}`}
+                >
+                    Create Ticket
+                </Link>
             </div>
             <div className="col text-right">
               <a href="#" className="btn btn-light">
