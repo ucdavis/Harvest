@@ -9,6 +9,11 @@ import {
 import { ColumnFilterHeaders, DefaultColumnFilter } from "./Filtering";
 import { PaginationItem, PaginationLink } from "reactstrap";
 import { ReactTableUtil } from "./TableUtil";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faLongArrowAltUp,
+  faLongArrowAltDown,
+} from "@fortawesome/free-solid-svg-icons";
 
 export const ReactTable = ({
   columns,
@@ -80,9 +85,9 @@ export const ReactTable = ({
                   <span>
                     {column.isSorted ? (
                       column.isSortedDesc ? (
-                        <i className="fas fa-long-arrow-alt-down" />
+                        <FontAwesomeIcon icon={faLongArrowAltDown} />
                       ) : (
-                        <i className="fas fa-long-arrow-alt-up" />
+                        <FontAwesomeIcon icon={faLongArrowAltUp} />
                       )
                     ) : (
                       ""
