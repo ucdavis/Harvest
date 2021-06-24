@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { ProjectAccount, ProjectWithInvoice } from "../types";
-import { AccountsInput } from "../Requests/AccountsInput";
+import { ProjectWithInvoice } from "../types";
 import { ProjectHeader } from "../Requests/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
-import { formatCurrency } from "../Util/NumberFormatting";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 interface RouteParams {
   invoiceId?: string;
@@ -16,8 +11,10 @@ interface RouteParams {
 
 export const InvoiceDetailContainer = () => {
   const { invoiceId } = useParams<RouteParams>();
-  const [projectAndInvoice, setProjectAndInvoice] = useState<ProjectWithInvoice>();
-  const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
+  const [
+    projectAndInvoice,
+    setProjectAndInvoice,
+  ] = useState<ProjectWithInvoice>();
 
   useEffect(() => {
     const cb = async () => {
@@ -47,7 +44,15 @@ export const InvoiceDetailContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={projectAndInvoice.project} title={"Invoice #" + invoiceId + " - Project #" + projectAndInvoice.project.id}></ProjectHeader>
+      <ProjectHeader
+        project={projectAndInvoice.project}
+        title={
+          "Invoice #" +
+          invoiceId +
+          " - Project #" +
+          projectAndInvoice.project.id
+        }
+      ></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <InvoiceDisplay invoice={projectAndInvoice.invoice}></InvoiceDisplay>
