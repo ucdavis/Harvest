@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
 
@@ -22,7 +22,7 @@ export const EditField = (props: Props) => {
 
   return (
     <div>
-      <Modal isOpen={props.field != undefined}>
+      <Modal isOpen={props.field !== undefined}>
         <ModalHeader>Field #{props.field.id}</ModalHeader>
         <ModalBody>
           <form onSubmit={(e) => e.preventDefault()}>
