@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Button,
   Col,
@@ -45,7 +45,7 @@ const WorkItemForm = (props: WorkItemProps) => {
     return props.category === "Other" && unit === "Unit";
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const meta = formik.getFieldMeta(`${path}.rateId`);
     if (meta.touched && meta.error !== undefined && meta.error !== "") {
       const rate = props.rates.find((r) => r.id === formik.values.rateId);
@@ -56,9 +56,17 @@ const WorkItemForm = (props: WorkItemProps) => {
         formik.setFieldValue(`${path}.rate`, rate.price);
         formik.setFieldValue(`${path}.description`, requiresCustomDescription(rate.unit) ? "" : rate.description);
         formik.setFieldValue(`${path}.unit`, rate.unit);
-        formik.setFieldValue(`${path}.total`, 0);
+      } else {
+        formik.setFieldValue(`${path}.rate`, 0);
+        formik.setFieldValue(`${path}.description`, "");
+        formik.setFieldValue(`${path}.unit`, "");
       }
-    }  }, [props.workItem.rateId]);
+    }
+  }, [props.workItem.rateId]);
+
+  useEffect(() => {
+    formik.setFieldValue(`${path}.total`, props.workItem.rate * props.workItem.quantity);
+  }, [props.workItem.rate, props.workItem.quantity]);
 
   return (
     <Row
@@ -104,6 +112,7 @@ const WorkItemForm = (props: WorkItemProps) => {
           </InputGroupAddon>
           <input
             className={`form-control ${getInputValidityStyle(formik, `${path}.quantity`)}`}
+            type="number"
             id={`${path}.quantity`}
             name={`${path}.quantity`}
             value={props.workItem.quantity}
@@ -121,6 +130,7 @@ const WorkItemForm = (props: WorkItemProps) => {
           </InputGroupAddon>
           <input
             className={`form-control ${getInputValidityStyle(formik, `${path}.rate`)}`}
+            type="number"
             id={`${path}.rate`}
             name={`${path}.rate`}
             value={props.workItem.rate}

@@ -23,52 +23,6 @@ interface RouteParams {
   projectId?: string;
 }
 
-export const updateQuoteTotals = (q: QuoteContent) => {
-  //TODO: Eliminate some of the mutation going on here
-  let acreageTotal = q.acreageRate * q.acres;
-  let activitiesTotal = 0;
-  let laborTotal = 0;
-  let equipmentTotal = 0;
-  let otherTotal = 0;
-
-  for (let i = 0; i < q.activities.length; i++) {
-    const activity = q.activities[i];
-    activity.total = 0;
-
-    for (let j = 0; j < activity.workItems.length; j++) {
-      const workItem = activity.workItems[j];
-
-      workItem.total = workItem.rate * workItem.quantity;
-
-      activitiesTotal += workItem.total || 0;
-      activity.total += workItem.total || 0;
-
-      switch (workItem.type) {
-        case "Labor":
-          laborTotal += workItem.total || 0;
-          break;
-        case "Equipment":
-          equipmentTotal += workItem.total || 0;
-          break;
-        case "Other":
-          otherTotal += workItem.total || 0;
-          break;
-      }
-    }
-  }
-
-  return {
-    ...q,
-    acreageTotal,
-    activitiesTotal,
-    laborTotal,
-    equipmentTotal,
-    otherTotal,
-    grandTotal: activitiesTotal + acreageTotal,
-  } as QuoteContent;
-};
-
-
 export const QuoteContainer = () => {
   const history = useHistory();
   const { projectId } = useParams<RouteParams>();
@@ -83,16 +37,10 @@ export const QuoteContainer = () => {
   const activitiesRef = useRef<FieldArrayRenderProps>(null);
 
 
-  const handleSubmit = async (q: QuoteContent, actions: FormikHelpers<QuoteContent>) => {
+  const handleSubmit = async (quote: QuoteContent, actions: FormikHelpers<QuoteContent>) => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
-    const quote = updateQuoteTotals(q);
-    quote.activities.forEach(
-      (a) =>
-      (a.workItems = a.workItems.filter(
-        (w) => w.quantity !== 0 || w.total !== 0
-      ))
-    );
-    quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
+    quote.activities.forEach((a) => (a.workItems = a.workItems.filter((w) => w.total !== 0)));
+    quote.activities = quote.activities.filter((a) => a.total !== 0);
 
     // TODO: add progress and hide info while saving
     const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
@@ -189,7 +137,7 @@ export const QuoteContainer = () => {
       <FormikProvider value={formik}>
         <div>
           <div className="card-wrapper">
-            <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+            <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")} />
 
             <div className="card-green-bg">
               <div className="card-content">
@@ -242,7 +190,7 @@ export const QuoteContainer = () => {
   return (
     <FormikProvider value={formik}>
       <div className="card-wrapper">
-        <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+        <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}/>
         <div className="card-green-bg">
           <div className="card-content">
             <div className="quote-details">

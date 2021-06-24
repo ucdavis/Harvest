@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
@@ -25,6 +25,12 @@ export const ActivityForm = (props: Props) => {
     const newId = Math.max(...props.activity.workItems.map((w) => w.id), 0) + 1;
     return new WorkItemImpl(props.activity.id, newId, category);
   };
+
+  const workItemsTotal = props.activity.workItems.reduce((acc, workItem) => (acc + workItem.total), 0);
+  
+  useEffect(() => {
+    props.formik.setFieldValue(`${props.path}.total`, workItemsTotal);
+  }, [workItemsTotal]);
 
   return (
     <div className="card-wrapper mb-4 no-green">

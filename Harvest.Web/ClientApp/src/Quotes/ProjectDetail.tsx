@@ -1,12 +1,11 @@
 import React from "react";
 
 import { QuoteContent, Rate, WorkItemImpl } from "../types";
-import { FormikState, ValidationErrorMessage } from "../Validation";
+import { FormikState, ValidationErrorMessage, getInputValidityStyle } from "../Validation";
 
 import {
   Button,
   Col,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -49,8 +48,8 @@ export const ProjectDetail = (props: Props) => {
       <Col md="6">
         <FormGroup>
           <Label for="projectName">Project Name</Label>
-          <Input
-            type="text"
+          <input
+            className={`form-control ${getInputValidityStyle(formik, "projectName")}`}
             id="projectName"
             name="projectName"
             value={formik.values.projectName}
@@ -64,8 +63,8 @@ export const ProjectDetail = (props: Props) => {
           <Col>
             <FormGroup>
               <Label>Acreage Rate</Label>
-              <Input
-                type="select"
+              <select
+                className={`form-control ${getInputValidityStyle(formik, "acreageRate")}`}
                 id="acreageRate"
                 name="acreageRate"
                 value={formik.values.acreageRateId}
@@ -80,7 +79,7 @@ export const ProjectDetail = (props: Props) => {
                       {r.description}
                     </option>
                   ))}
-              </Input>
+              </select>
             </FormGroup>
             <ValidationErrorMessage formik={formik} name="acreageRateId" />
           </Col>
@@ -91,7 +90,8 @@ export const ProjectDetail = (props: Props) => {
             <Col md="4">
               <FormGroup>
                 <Label for="acres">Number of Acres</Label>
-                <Input
+                <input
+                  className={`form-control ${getInputValidityStyle(formik, "acres")}`}
                   type="number"
                   id="acres"
                   name="acres"
@@ -109,7 +109,8 @@ export const ProjectDetail = (props: Props) => {
                   <InputGroupAddon addonType="prepend">
                     <InputGroupText>$</InputGroupText>
                   </InputGroupAddon>
-                  <Input
+                  <input
+                    className={`form-control ${getInputValidityStyle(formik, "acreageRate")}`}
                     type="number"
                     id="rate"
                     name="rate"
@@ -129,7 +130,8 @@ export const ProjectDetail = (props: Props) => {
                   <InputGroupAddon addonType="prepend">
                     <InputGroupText>$</InputGroupText>
                   </InputGroupAddon>
-                  <Input
+                  <input
+                    className="form-control"
                     type="text"
                     id="rate"
                     readOnly
