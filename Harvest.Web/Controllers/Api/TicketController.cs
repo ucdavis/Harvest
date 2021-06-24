@@ -24,7 +24,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
 
-        // create a new request via react
+        // create a new ticket via react
         [HttpGet]
         public ActionResult Create()
         {
@@ -35,10 +35,6 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Ticket ticket)
         {
-            if (projectId != ticket.ProjectId)
-            {
-                return BadRequest("Wrong Project Id");
-            }
 
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
             var currentUser = await _userService.GetCurrentUser();
