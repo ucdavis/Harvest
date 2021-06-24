@@ -1,4 +1,4 @@
-import { Expense, RateType } from "../types";
+import { Expense } from "../types";
 import { ActivityRateTypes } from "../constants";
 import { formatCurrency } from "../Util/NumberFormatting";
 
