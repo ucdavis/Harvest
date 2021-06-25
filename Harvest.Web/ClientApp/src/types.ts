@@ -230,6 +230,7 @@ export interface Ticket {
     name: string;
     requirements: string;
     dueDate?: Date;
+    attachments: BlobFile[];
 }
 
 export interface RequestInput {

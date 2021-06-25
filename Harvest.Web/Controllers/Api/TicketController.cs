@@ -39,7 +39,7 @@ namespace Harvest.Web.Controllers.Api
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
             var currentUser = await _userService.GetCurrentUser();
 
-            //TODO: Any authentication? Add in attachments?
+            //TODO: Any authentication? 
 
             var ticketToCreate = new Ticket();
             ticketToCreate.ProjectId = projectId;
@@ -47,6 +47,20 @@ namespace Harvest.Web.Controllers.Api
             ticketToCreate.Requirements = ticket.Requirements;
             ticketToCreate.DueDate = ticket.DueDate;
             ticketToCreate.CreatedById = currentUser.Id;
+
+            // If there are attachments, fill out details and add to project
+            foreach (var attachment in ticket.Attachments)
+            {
+                ticketToCreate.Attachments.Add(new TicketAttachment()
+                {
+                    Identifier = attachment.Identifier,
+                    FileName = attachment.FileName,
+                    FileSize = attachment.FileSize,
+                    ContentType = attachment.ContentType,
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedById = currentUser.Id
+                });
+            }
 
             if (!ModelState.IsValid)
             {

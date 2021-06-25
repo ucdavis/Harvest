@@ -4,6 +4,7 @@ import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Requests/ProjectHeader";
 import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
+import { FileUpload } from "../Requests/FileUpload";
 
 interface RouteParams {
   projectId?: string;
@@ -111,6 +112,21 @@ export const TicketContainer = () => {
             </div>
           </div>
         </div>
+          <FormGroup>
+              <Label>Want to attach any files?</Label>
+              <FileUpload
+                  files={ticket.attachments || []}
+                  setFiles={(f) => setTicket((tick) => ({ ...tick, attachments: [...f] }))}
+                  updateFile={(f) =>
+                          setTicket((tick) => {
+                              // update just one specific file from ticket p
+                              tick.attachments[tick.attachments.findIndex(file => file.identifier === f.identifier)] = { ...f };
+
+                              return { ...tick, attachments: [...tick.attachments] };
+                          })
+                      }
+              ></FileUpload>
+          </FormGroup>
         <div className="row justify-content-center">
           <Button className="btn-lg" color="primary" onClick={create}>
             Create New Ticket
