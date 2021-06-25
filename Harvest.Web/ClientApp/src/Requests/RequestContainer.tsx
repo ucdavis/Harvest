@@ -4,7 +4,7 @@ import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
-import { FileUpload } from "./FileUpload";
+import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";

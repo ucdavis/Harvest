@@ -5,7 +5,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ApprovalPDF } from "./ApprovalPDF";
-import { ProjectHeader } from "./ProjectHeader";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
 
