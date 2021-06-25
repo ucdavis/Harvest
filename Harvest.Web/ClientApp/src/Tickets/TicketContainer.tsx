@@ -116,7 +116,7 @@ export const TicketContainer = () => {
               <Label>Want to attach any files?</Label>
               <FileUpload
                   files={ticket.attachments || []}
-                  setFiles={(f) => setTicket({ ...ticket, attachments: [...f] })}
+                  setFiles={(f) => setTicket((tick) => ({ ...tick, attachments: [...f] }))}
                   updateFile={(f) =>
                           setTicket((tick) => {
                               // update just one specific file from ticket p
