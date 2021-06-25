@@ -62,8 +62,22 @@ export const RequestContainer = () => {
     if (requestErrors) {
       if (requestErrors.length > 0) {
         setInputErrors(requestErrors);
+
+        if (new Date(project.start) > new Date(project.end)) {
+          setInputErrors((oldErrors) => [
+            ...oldErrors,
+            "Start date must be before end date",
+          ]);
+        }
         return;
+      } else {
+        setInputErrors([]);
       }
+    }
+
+    if (new Date(project.start) > new Date(project.end)) {
+      setInputErrors(["Start date must be before end date"]);
+      return;
     }
 
     const response = await fetch(`/Request/Create`, {
@@ -195,8 +209,12 @@ export const RequestContainer = () => {
             updateFile={(f) =>
               setProject((proj) => {
                 // update just one specific file from project p
-                proj.attachments[proj.attachments.findIndex(file=>file.identifier === f.identifier)] = {...f};
-                
+                proj.attachments[
+                  proj.attachments.findIndex(
+                    (file) => file.identifier === f.identifier
+                  )
+                ] = { ...f };
+
                 return { ...proj, attachments: [...proj.attachments] };
               })
             }
