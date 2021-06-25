@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -91,6 +92,24 @@ namespace Harvest.Web.Controllers
             Message = "Accounts Approved. Project is now active";
 
             return RedirectToAction("Details", new { id });
+        }
+
+        public async Task<IActionResult> RefreshTotal(int projectId)
+        {
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            var invoiceTotal = await _dbContext.Invoices.Where(a =>
+                    a.ProjectId == projectId &&
+                    (a.Status == Invoice.Statuses.Pending || a.Status == Invoice.Statuses.Completed)).Select(a => a.Total).SumAsync();
+            var originalTotal = project.ChargedTotal;
+            if (project.ChargedTotal != invoiceTotal)
+            {
+                project.ChargedTotal = invoiceTotal;
+                await _dbContext.SaveChangesAsync();
+                return Content($"Project total updated from {originalTotal} to {project.ChargedTotal}");
+            }
+
+            return Content("Project already up to date.");
+
         }
     }
 }
