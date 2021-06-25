@@ -217,6 +217,9 @@ namespace Harvest.Core.Services
 
                 invoice.Status = Invoice.Statuses.Pending;
 
+                //Update running total
+                invoice.Project.ChargedTotal += invoice.Total;
+
                 await _historyService.AddProjectHistory(invoice.Project, nameof(MoveMoney), "Sloth money movement requested", new InvoiceModel(invoice));
                 await _dbContext.SaveChangesAsync();
 
@@ -279,8 +282,6 @@ namespace Harvest.Core.Services
                     if (slothResponse.Status == "Completed")
                     {
                         updatedCount++;
-                        //Update Project Running total
-                        invoice.Project.ChargedTotal += invoice.Total;
 
                         invoice.Status = Invoice.Statuses.Completed;
                         await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", new InvoiceModel(invoice));
