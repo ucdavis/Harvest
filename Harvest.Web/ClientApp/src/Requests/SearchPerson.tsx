@@ -38,13 +38,16 @@ export const SearchPerson = (props: Props) => {
     }
   };
 
+  console.log(props.user ? [props.user] : []);
+
   return (
     <AsyncTypeahead
       id="searchPeople" // for accessibility
       isLoading={isSearchLoading}
       minLength={3}
       clearButton
-      defaultSelected={props.user ? [props.user] : []}
+      // defaultSelected={props.user ? [props.user] : []}
+      // selected={props.user ? [props.user] : []}
       placeholder="Search for person by email or kerberos"
       labelKey={(option: User) => `${option.name} (${option.email})`}
       filterBy={() => true} // don't filter on top of our search

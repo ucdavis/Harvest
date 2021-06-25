@@ -8,7 +8,7 @@ import { FileUpload } from "./FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import { Project, CropType } from "../types";
+import { Project, CropType, User } from "../types";
 
 interface RouteParams {
   projectId?: string;
@@ -53,6 +53,19 @@ export const RequestContainer = () => {
       cb();
     }
   }, [projectId]);
+
+  // useEffect(() => {
+  //   const defaultPI = async () => {
+  //     const response = await fetch("/people/default");
+
+  //     if (response.ok) {
+  //       const user: User = await response.json();
+  //       setProject({ ...project, principalInvestigator: user });
+  //     }
+  //   };
+
+  //   defaultPI();
+  // }, []);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -174,7 +187,7 @@ export const RequestContainer = () => {
             crops={project.crop}
             setCrops={(c) => setProject({ ...project, crop: c })}
             cropType={project.cropType}
-          ></Crops>
+          />
         </FormGroup>
 
         <FormGroup>
@@ -184,7 +197,7 @@ export const RequestContainer = () => {
             setUser={(u) =>
               setProject({ ...project, principalInvestigator: u })
             }
-          ></SearchPerson>
+          />
         </FormGroup>
 
         <FormGroup>
@@ -195,12 +208,16 @@ export const RequestContainer = () => {
             updateFile={(f) =>
               setProject((proj) => {
                 // update just one specific file from project p
-                proj.attachments[proj.attachments.findIndex(file=>file.identifier === f.identifier)] = {...f};
-                
+                proj.attachments[
+                  proj.attachments.findIndex(
+                    (file) => file.identifier === f.identifier
+                  )
+                ] = { ...f };
+
                 return { ...proj, attachments: [...proj.attachments] };
               })
             }
-          ></FileUpload>
+          />
         </FormGroup>
 
         <FormGroup>
