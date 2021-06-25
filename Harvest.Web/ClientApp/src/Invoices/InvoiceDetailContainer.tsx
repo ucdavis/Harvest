@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { ProjectWithInvoice } from "../types";
-import { ProjectHeader } from "../Requests/ProjectHeader";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
 
 interface RouteParams {

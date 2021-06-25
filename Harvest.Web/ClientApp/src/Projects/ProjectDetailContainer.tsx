@@ -5,7 +5,7 @@ import { Progress } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
-import { ProjectHeader } from "../Requests/ProjectHeader";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { Project } from "../types";
