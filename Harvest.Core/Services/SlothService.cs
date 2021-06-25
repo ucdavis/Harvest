@@ -282,7 +282,6 @@ namespace Harvest.Core.Services
                     if (slothResponse.Status == "Completed")
                     {
                         updatedCount++;
-                        //Update Project Running total
 
                         invoice.Status = Invoice.Statuses.Completed;
                         await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", new InvoiceModel(invoice));
