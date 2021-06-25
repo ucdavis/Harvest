@@ -59,16 +59,18 @@ export const RequestContainer = () => {
     // create a new project
     const requestErrors = await checkRequestValidity(project);
 
-    if (new Date(project.start) > new Date(project.end)) {
-      setInputErrors([...inputErrors, "Start date must be before end date"]);
-      return;
-    }
-
     if (requestErrors) {
       if (requestErrors.length > 0) {
         setInputErrors(requestErrors);
         return;
+      } else {
+        setInputErrors([]);
       }
+    }
+
+    if (new Date(project.start) > new Date(project.end)) {
+      setInputErrors(["Start date must be before end date"]);
+      return;
     }
 
     const response = await fetch(`/Request/Create`, {
