@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ProjectHeader } from "../Requests/ProjectHeader";
-import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
 import { Progress } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
+import { ProjectHeader } from "../Requests/ProjectHeader";
+import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
+import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
@@ -75,9 +76,9 @@ export const ProjectDetailContainer = () => {
                 </Link>
             </div>
             <div className="col text-right">
-              <a href="#" className="btn btn-light">
-                View Unbilled Expenses - $124,555.54
-              </a>
+              <ProjectUnbilledButton
+                projectId={project.id}
+              ></ProjectUnbilledButton>
             </div>
           </div>
         </div>

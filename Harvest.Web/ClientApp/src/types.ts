@@ -78,6 +78,8 @@ export interface Expense {
   rateId: number;
   price: number;
   total: number;
+  createdOn?: Date;
+  createdBy?: User;
 }
 
 export interface Transfer {
