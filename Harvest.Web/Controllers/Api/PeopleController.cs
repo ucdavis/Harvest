@@ -1,7 +1,9 @@
+using System;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Services;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +15,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
+        private readonly IUserService _userService;
 
-        public PeopleController(AppDbContext dbContext, IIdentityService identityService)
+        public PeopleController(AppDbContext dbContext, IIdentityService identityService, IUserService userService)
         {
             this._dbContext = dbContext;
             this._identityService = identityService;
+            this._userService = userService;
         }
 
         // Search people based on kerb or email
@@ -36,6 +40,15 @@ namespace Harvest.Web.Controllers
             }
 
             return Ok(user);
+        }
+
+        [HttpGet("/people/default")]
+        public async Task<ActionResult> DefaultPI()
+        {
+            var user = await _userService.GetCurrentUser();
+            var currentUser = await _identityService.GetByEmail(user.Email);
+
+            return Ok(currentUser);
         }
 
         // create a new request via react
