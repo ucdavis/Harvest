@@ -8,6 +8,12 @@ namespace Harvest.Core.Domain
 {
     public class Ticket
     {
+        public Ticket()
+        {
+            Attachments = new List<TicketAttachment>();
+            Messages = new List<TicketMessage>();
+        }
+
         [Key]
         public int Id { get; set; }
 
