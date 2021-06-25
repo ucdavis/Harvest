@@ -62,6 +62,13 @@ export const RequestContainer = () => {
     if (requestErrors) {
       if (requestErrors.length > 0) {
         setInputErrors(requestErrors);
+
+        if (new Date(project.start) > new Date(project.end)) {
+          setInputErrors((oldErrors) => [
+            ...oldErrors,
+            "Start date must be before end date",
+          ]);
+        }
         return;
       } else {
         setInputErrors([]);
