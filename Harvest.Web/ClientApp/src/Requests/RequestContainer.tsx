@@ -59,6 +59,11 @@ export const RequestContainer = () => {
     // create a new project
     const requestErrors = await checkRequestValidity(project);
 
+    if (new Date(project.start) > new Date(project.end)) {
+      setInputErrors([...inputErrors, "Start date must be before end date"]);
+      return;
+    }
+
     if (requestErrors) {
       if (requestErrors.length > 0) {
         setInputErrors(requestErrors);
@@ -195,8 +200,12 @@ export const RequestContainer = () => {
             updateFile={(f) =>
               setProject((proj) => {
                 // update just one specific file from project p
-                proj.attachments[proj.attachments.findIndex(file=>file.identifier === f.identifier)] = {...f};
-                
+                proj.attachments[
+                  proj.attachments.findIndex(
+                    (file) => file.identifier === f.identifier
+                  )
+                ] = { ...f };
+
                 return { ...proj, attachments: [...proj.attachments] };
               })
             }
