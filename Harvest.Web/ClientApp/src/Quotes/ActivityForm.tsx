@@ -7,29 +7,28 @@ import { faCalendarWeek } from "@fortawesome/free-solid-svg-icons";
 import { FieldArray } from "formik";
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl, QuoteContent } from "../types";
-import { getInputValidityStyle, ValidationErrorMessage, FormikState } from "../Validation";
+import { getInputValidityStyle, ValidationErrorMessage, FormikBag } from "../Validation";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
 interface Props {
-  activity: Activity;
   deleteActivity: () => void;
   rates: Rate[];
-  formik: FormikState<QuoteContent>;
-  path: string;
+  formik: FormikBag<QuoteContent, Activity>;
 }
 
 export const ActivityForm = (props: Props) => {
+  const { formik } = props;
 
   const getNewWorkItem = (category: RateType) => {
-    const newId = Math.max(...props.activity.workItems.map((w) => w.id), 0) + 1;
-    return new WorkItemImpl(props.activity.id, newId, category);
+    const newId = Math.max(...formik.values.workItems.map((w) => w.id), 0) + 1;
+    return new WorkItemImpl(formik.values.id, newId, category);
   };
 
-  const workItemsTotal = props.activity.workItems.reduce((acc, workItem) => (acc + workItem.total), 0);
+  const workItemsTotal = formik.values.workItems.reduce((acc, workItem) => (acc + workItem.total), 0);
   
   useEffect(() => {
-    props.formik.setFieldValue(`${props.path}.total`, workItemsTotal);
+    formik.setFieldValue("total", workItemsTotal);
   }, [workItemsTotal]);
 
   return (
@@ -86,15 +85,15 @@ export const ActivityForm = (props: Props) => {
 
             <div>
               <input
-                className={`form-control ${getInputValidityStyle(props.formik, `${props.path}.name`)}`}
-                id={`${props.path}.name`}
-                name={`${props.path}.name`}
-                value={props.activity.name}
-                onChange={props.formik.handleChange}
-                onBlur={props.formik.handleBlur}
+                className={`form-control ${getInputValidityStyle(formik, "name")}`}
+                id={formik.fullPath("name")}
+                name={formik.fullPath("name")}
+                value={formik.values.name}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
               />
             </div>
-            <ValidationErrorMessage formik={props.formik} name={`${props.path}.name`} />
+            <ValidationErrorMessage formik={formik} name={formik.fullPath("name")} />
 
           </div>
         </div>
@@ -102,25 +101,19 @@ export const ActivityForm = (props: Props) => {
         <WorkItemsForm
           category="Labor"
           rates={props.rates}
-          workItems={props.activity.workItems}
-          formik={props.formik}
-          path={props.path}
+          formik={formik.getNestedBag((activity) => activity.workItems)}
           getNewWorkItem={getNewWorkItem}
         />
         <WorkItemsForm
           category="Equipment"
           rates={props.rates}
-          workItems={props.activity.workItems}
-          formik={props.formik}
-          path={props.path}
+          formik={formik.getNestedBag((activity) => activity.workItems)}
           getNewWorkItem={getNewWorkItem}
         />
         <WorkItemsForm
           category="Other"
           rates={props.rates}
-          workItems={props.activity.workItems}
-          formik={props.formik}
-          path={props.path}
+          formik={formik.getNestedBag((activity) => activity.workItems)}
           getNewWorkItem={getNewWorkItem}
         />
       </div>

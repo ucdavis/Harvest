@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 
 import { Activity, QuoteContent, Rate } from "../types";
-import { FormikState } from "../Validation";
+import { FormikBag } from "../Validation";
 import { FieldArray, FieldArrayRenderProps } from "formik";
 
 import { ActivityForm } from "./ActivityForm";
 
 interface Props {
   rates: Rate[];
-  formik: FormikState<QuoteContent>;
+  formik: FormikBag<QuoteContent, QuoteContent>;
 }
 
 export const ActivitiesContainer = React.forwardRef<FieldArrayRenderProps, Props>((props, ref) => {
@@ -62,11 +62,10 @@ export const ActivitiesContainer = React.forwardRef<FieldArrayRenderProps, Props
             {activities.map((activity, i) => (
               <ActivityForm
                 key={`activity-${activity.id}`}
-                activity={activity}
                 deleteActivity={() => arrayHelpers.remove(i)}
                 rates={props.rates}
-                formik={formik}
-                path={`activities.${i}`} />
+                formik={formik.getNestedBag((values) => values.activities[i])}
+              />
             ))}
           </div>
         );

@@ -1,7 +1,7 @@
 import React from "react";
 
 import { QuoteContent, Rate, WorkItemImpl } from "../types";
-import { FormikState, ValidationErrorMessage, getInputValidityStyle } from "../Validation";
+import { FormikBag, ValidationErrorMessage, getInputValidityStyle } from "../Validation";
 
 import {
   Button,
@@ -19,7 +19,7 @@ import { Location } from "../Fields/Location";
 
 interface Props {
   rates: Rate[];
-  formik: FormikState<QuoteContent>;
+  formik: FormikBag<QuoteContent>;
   setEditFields: React.Dispatch<React.SetStateAction<boolean>>;
   addActivity: () => void;
 }

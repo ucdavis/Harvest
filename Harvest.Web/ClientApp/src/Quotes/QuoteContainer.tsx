@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { useFormik, FormikConfig, FormikHelpers, FieldArray, FieldArrayRenderProps, FormikProvider } from "formik";
-import { getInputValidityStyle, ValidationErrorMessage, FormikState } from "../Validation";
+import { FormikConfig, FormikHelpers, FieldArray, FieldArrayRenderProps, FormikProvider } from "formik";
+import { useWrappedFormik } from "../Validation";
 import { quoteContentSchema } from "../schemas";
 
 import {
@@ -61,7 +61,7 @@ export const QuoteContainer = () => {
     }
   }
 
-  const formik = useFormik<QuoteContent>({
+  const formik = useWrappedFormik<QuoteContent>({
     initialValues: new QuoteContentImpl(),
     validationSchema: quoteContentSchema,
     onSubmit: handleSubmit
@@ -134,7 +134,7 @@ export const QuoteContainer = () => {
   // TODO: we might want to move this all into a separate component
   if (editFields) {
     return (
-      <FormikProvider value={formik}>
+      <FormikProvider value={formik.root}>
         <div>
           <div className="card-wrapper">
             <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")} />
@@ -188,7 +188,7 @@ export const QuoteContainer = () => {
   }
 
   return (
-    <FormikProvider value={formik}>
+    <FormikProvider value={formik.root}>
       <div className="card-wrapper">
         <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}/>
         <div className="card-green-bg">
