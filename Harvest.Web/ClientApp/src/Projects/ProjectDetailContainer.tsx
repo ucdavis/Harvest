@@ -127,7 +127,7 @@ export const ProjectDetailContainer = () => {
           </div>
           <div className="col-md-6">
             <RecentInvoicesContainer compact={true} projectId={projectId}></RecentInvoicesContainer>
-              <TicketListContainer projectId={projectId}></TicketListContainer>
+            <TicketListContainer compact={true} projectId={projectId}></TicketListContainer>
            </div>
 
         </div>

@@ -62,7 +62,7 @@ export const AllTickets = () => {
         >
           Create Ticket
         </Link>
-        <TicketTable tickets={tickets}></TicketTable>
+        <TicketTable compact={false} tickets={tickets}></TicketTable>
       </div>
     </div>
   );

@@ -6,7 +6,8 @@ import { Ticket } from "../types";
 import { Link } from "react-router-dom";
 
 interface Props {
-  tickets: Ticket[];
+    tickets: Ticket[];
+    compact?: boolean;
 }
 
 export const TicketTable = (props: Props) => {
@@ -63,6 +64,7 @@ export const TicketTable = (props: Props) => {
       columns={columns}
       data={ticketData}
       initialState={initialState}
+      hideFilters={props.compact || false}
     />
   );
 };

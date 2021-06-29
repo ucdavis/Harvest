@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 
 interface Props {
-  projectId: any;
+    projectId: any;
+    compact: boolean;
 }
 
 
@@ -40,7 +41,7 @@ export const TicketListContainer = (props: Props) => {
           >
               View All
           </Link>
-        <TicketTable tickets={tickets}></TicketTable>
+        <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
       </div>
     </div>
   );
