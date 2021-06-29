@@ -25,7 +25,6 @@ export const InvoiceListContainer = () => {
     if (projectId) {
       cb();
     }
-    cb();
   }, [projectId]);
 
   if (invoices.length === 0) {
