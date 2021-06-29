@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams, Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
-import { Button } from "reactstrap";
 import { TicketTable } from "./TicketTable";
 
 interface RouteParams {
@@ -14,7 +13,6 @@ export const AllTickets = () => {
   const [project, setProject] = useState<Project>();
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
-  const history = useHistory();
 
   useEffect(() => {
     const cb = async () => {
