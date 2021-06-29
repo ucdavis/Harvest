@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 import { ProjectHeader } from "../Shared/ProjectHeader";
-import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
+import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { TicketListContainer } from "../Tickets/TicketListContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { Project } from "../types";
@@ -126,7 +126,7 @@ export const ProjectDetailContainer = () => {
             </div>
           </div>
           <div className="col-md-6">
-              <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
+            <RecentInvoicesContainer compact={true} projectId={projectId}></RecentInvoicesContainer>
               <TicketListContainer projectId={projectId}></TicketListContainer>
            </div>
 

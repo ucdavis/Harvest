@@ -6,6 +6,7 @@ import { Invoice } from "../types";
 
 interface Props {
   invoices: Invoice[];
+  compact?: boolean;
 }
 
 export const InvoiceTable = (props: Props) => {
@@ -53,6 +54,7 @@ export const InvoiceTable = (props: Props) => {
       columns={columns}
       data={invoiceData}
       initialState={initialState}
+      hideFilters={props.compact || false}
     />
   );
 };
