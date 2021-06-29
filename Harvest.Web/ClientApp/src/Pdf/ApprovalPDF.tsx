@@ -8,6 +8,7 @@ import {
   DataTableCell,
 } from "@david.kucsai/react-pdf-table";
 
+import { TablePDF } from "./TablePDF";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { QuoteContent } from "../types";
 import { ActivityRateTypes } from "../constants";
@@ -32,14 +33,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  activity: {
-    paddingBottom: 10,
-  },
-  activityCost: {
-    fontSize: 13,
-    fontWeight: "bold",
-    paddingBottom: 10,
-  },
   projectTotal: {
     padding: 5,
     borderTop: 1,
@@ -63,13 +56,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#266041",
   },
-  tableHeader: {
-    fontWeight: "bold",
-    padding: 3,
-  },
-  tableCell: {
-    padding: 3,
-  },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -91,51 +77,7 @@ export const ApprovalPDF = (props: Props) => (
           {formatCurrency(props.quote.acreageTotal)}
         </Text>
       </View>
-      {/* This section displays all the the acitivities associated with the quote */}
-      <View>
-        {props.quote.activities.map((activity) => (
-          <View key={`${activity.name}-view`} style={styles.activity}>
-            <Text style={styles.activityCost}>
-              {activity.name} • Activity Total: $
-              {formatCurrency(activity.total)}
-            </Text>
-            {ActivityRateTypes.map((type) => (
-              // Used react-pdf-table to display a table in the pdf
-              // Used the data attribute to display data in the DataTableCell instead
-              // of manually rendering it with map
-              <Table
-                key={`${type}-table`}
-                data={activity.workItems.filter((w) => w.type === type)}
-              >
-                <TableHeader>
-                  <TableCell style={styles.tableHeader}>{type}</TableCell>
-                  <TableCell style={styles.tableHeader}>Quantity</TableCell>
-                  <TableCell style={styles.tableHeader}>Rate</TableCell>
-                  <TableCell style={styles.tableHeader}>Total</TableCell>
-                </TableHeader>
-                <TableBody>
-                  <DataTableCell
-                    style={styles.tableCell}
-                    getContent={(workItem) => workItem.description}
-                  />
-                  <DataTableCell
-                    style={styles.tableCell}
-                    getContent={(workItem) => workItem.quantity}
-                  />
-                  <DataTableCell
-                    style={styles.tableCell}
-                    getContent={(workItem) => workItem.rate}
-                  />
-                  <DataTableCell
-                    style={styles.tableCell}
-                    getContent={(workItem) => formatCurrency(workItem.total)}
-                  />
-                </TableBody>
-              </Table>
-            ))}
-          </View>
-        ))}
-      </View>
+      <TablePDF quote={props.quote} />
       {/* This section displays the project total */}
       <View style={styles.projectTotal}>
         <Text style={styles.projectTotalTitle}>Project Totals</Text>

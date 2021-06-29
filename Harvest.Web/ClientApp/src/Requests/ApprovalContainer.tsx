@@ -4,7 +4,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
-import { ApprovalPDF } from "./ApprovalPDF";
+import { ApprovalPDF } from "../Pdf/ApprovalPDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -86,7 +86,7 @@ export const ApprovalContainer = () => {
               </h2>
               <PDFDownloadLink
                 document={<ApprovalPDF quote={projectAndQuote.quote} />}
-                fileName="somename.pdf"
+                fileName="Quote.pdf"
               >
                 <button className="btn btn-link btn-sm">
                   Download PDF <FontAwesomeIcon icon={faDownload} />
