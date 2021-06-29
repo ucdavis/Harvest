@@ -85,7 +85,7 @@ export const ApprovalContainer = () => {
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
               <PDFDownloadLink
-                document={<ApprovalPDF quote={projectAndQuote.quote} />}
+                document={<QuotePDF quote={projectAndQuote.quote} />}
                 fileName="Quote.pdf"
               >
                 <button className="btn btn-link btn-sm">
