@@ -14,8 +14,7 @@ export const TicketListContainer = (props: Props) => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
   useEffect(() => {
-    // get rates so we can load up all expense types and info
-    const cb = async () => {
+      const cb = async () => {
         const response = await fetch(`/Ticket/List?projectId=${props.projectId}`);
 
       if (response.ok) {
@@ -38,7 +37,7 @@ export const TicketListContainer = (props: Props) => {
           </Link>
           <Link
               className="btn btn-primary btn-small mr-4"
-              to={`/ticket/todo/${props.projectId}`}
+              to={`/ticket/allTickets/${props.projectId}`}
           >
               View All Tickets
           </Link>

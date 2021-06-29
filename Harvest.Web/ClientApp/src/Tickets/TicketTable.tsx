@@ -29,12 +29,22 @@ export const TicketTable = (props: Props) => {
       {
         Header: "Status",
         accessor: (row) => row.status,
-      },
+          },
+        {
+            Header: "Created",
+            accessor: (row) =>
+                row.createdOn ? new Date(row.createdOn).toLocaleDateString() : "",
+        },
       {
         Header: "Updated",
         accessor: (row) =>
           row.updatedOn ? new Date(row.updatedOn).toLocaleDateString() : "",
-      },
+          },
+        {
+            Header: "Due",
+            accessor: (row) =>
+                row.dueDate ? new Date(row.dueDate).toLocaleDateString() : "",
+        },
       {
         Header: "Subject",
         accessor: (row) => row.name,

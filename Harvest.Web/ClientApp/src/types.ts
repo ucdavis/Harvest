@@ -234,6 +234,7 @@ export interface Ticket {
     updatedOn?: Date;
     attachments: BlobFile[];
     status: string;
+    createdOn?: Date;
 }
 
 export interface RequestInput {
