@@ -25,14 +25,20 @@ namespace Harvest.Web.Controllers
             this._userService = userService;
         }
 
-        public ActionResult Entry() {
+        public ActionResult Entry()
+        {
+            return View("React");
+        }
+
+        public ActionResult Unbilled(int id)
+        {
             return View("React");
         }
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult> Create(int id, [FromBody]Expense[] expenses)
+        public async Task<ActionResult> Create(int id, [FromBody] Expense[] expenses)
         {
             // TODO: validation!
             var user = await _userService.GetCurrentUser();
@@ -51,6 +57,20 @@ namespace Harvest.Web.Controllers
             await _dbContext.SaveChangesAsync();
 
             return Ok(expenses);
+        }
+
+        // Get all unbilled expenses for the given project
+        [HttpGet]
+        public async Task<ActionResult> GetUnbilled(int id)
+        {
+            return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == id).ToArrayAsync());
+        }
+
+        // Get just the total of unbilled expenses for the current project
+        [HttpGet]
+        public async Task<ActionResult> GetUnbilledTotal(int id)
+        {
+            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == id).SumAsync(e=>e.Total));
         }
     }
 }

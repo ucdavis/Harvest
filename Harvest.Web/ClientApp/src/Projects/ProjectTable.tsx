@@ -2,9 +2,11 @@ import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Cell, Column, TableState } from "react-table";
 import { Progress } from "reactstrap";
+
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Project } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   projects: Project[];
@@ -31,10 +33,16 @@ export const ProjectTable = (props: Props) => {
         accessor: (row) => row.principalInvestigator.name,
       },
       {
-        Cell: (data: Cell<Project>) => (
-          <Progress style={{ width: "10em" }} value={Math.random() * 100} />
-        ),
+        Cell: (data: Cell<Project>) => {
+          const percent =
+            data.row.original.chargedTotal / data.row.original.quoteTotal;
+          return <Progress style={{ width: "10em" }} value={percent * 100} />;
+        },
         Header: "Progress",
+      },
+      {
+        Header: "Remaining",
+        accessor: (row) => '$' + formatCurrency(row.quoteTotal - row.chargedTotal)
       },
       {
         Header: "Crop Type",

@@ -8,6 +8,12 @@ namespace Harvest.Core.Domain
 {
     public class Ticket
     {
+        public Ticket()
+        {
+            Attachments = new List<TicketAttachment>();
+            Messages = new List<TicketMessage>();
+        }
+
         [Key]
         public int Id { get; set; }
 
@@ -27,7 +33,7 @@ namespace Harvest.Core.Domain
         public DateTime? UpdatedOn { get; set; }
 
         [StringLength(50)]
-        [Display(Name = "Task Name")]
+        [Display(Name = "Subject")]
         public string Name { get; set; }
         [Required]
         public string Requirements { get; set; }

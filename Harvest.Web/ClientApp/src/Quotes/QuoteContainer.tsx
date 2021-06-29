@@ -15,7 +15,7 @@ import {
 
 import { FieldContainer } from "../Fields/FieldContainer";
 import { ProjectDetail } from "./ProjectDetail";
-import { ProjectHeader } from "../Requests/ProjectHeader";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 

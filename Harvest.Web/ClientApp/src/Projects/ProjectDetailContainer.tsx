@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ProjectHeader } from "../Requests/ProjectHeader";
-import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
 import { Progress } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
+import { ProjectHeader } from "../Shared/ProjectHeader";
+import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
+import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { Project } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
   projectId?: string;
@@ -64,13 +66,19 @@ export const ProjectDetailContainer = () => {
                 className="btn btn-primary btn-small mr-4"
                 to={`/request/changeAccount/${project.id}`}
               >
-                Change Accounts
+                              Change Accounts
               </Link>
+                <Link
+                    className="btn btn-primary btn-small mr-4"
+                    to={`/ticket/create/${project.id}`}
+                >
+                    Create Ticket
+                </Link>
             </div>
             <div className="col text-right">
-              <a href="#" className="btn btn-light">
-                View Unbilled Expenses - $124,555.54
-              </a>
+              <ProjectUnbilledButton
+                projectId={project.id}
+              ></ProjectUnbilledButton>
             </div>
           </div>
         </div>
@@ -82,15 +90,15 @@ export const ProjectDetailContainer = () => {
               <h1>Project Progress</h1>
               <div className="row justify-content-between">
                 <div className="col">
-                  <p className="mb-1">$4,550 Billed</p>
+                  <p className="mb-1">${formatCurrency(project.chargedTotal)} Billed</p>
                 </div>
                 <div className="col text-right">
-                  <p className="mb-1">$220,000 Remaining</p>
+                  <p className="mb-1">${formatCurrency(project.quoteTotal - project.chargedTotal)} Remaining</p>
                 </div>
               </div>
               <Progress
                 style={{ width: "100%", height: "20px" }}
-                value={Math.random() * 100}
+                value={(project.chargedTotal / project.quoteTotal) * 100}
               />
             </div>
           </div>

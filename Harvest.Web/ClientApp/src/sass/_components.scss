@@ -85,6 +85,10 @@
     color: $secondary-font;
     font-size: 0.9rem;
     text-transform: uppercase;
+    svg {
+      width: 12px !important;
+      color: $primary-color;
+    }
   }
 
   a {

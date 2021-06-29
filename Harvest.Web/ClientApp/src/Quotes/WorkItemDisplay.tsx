@@ -1,4 +1,4 @@
-import { WorkItem, RateType } from "../types";
+import { WorkItem } from "../types";
 import { ActivityRateTypes } from "../constants";
 import { formatCurrency } from "../Util/NumberFormatting";
 

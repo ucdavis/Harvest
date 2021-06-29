@@ -78,6 +78,8 @@ export interface Expense {
   rateId: number;
   price: number;
   total: number;
+  createdOn?: Date;
+  createdBy?: User;
 }
 
 export interface Transfer {
@@ -223,6 +225,14 @@ export interface ProjectAccount {
   accountManagerName: string;
   accountManagerEmail: string;
   percentage: number;
+}
+
+export interface Ticket {
+    projectId: number;
+    name: string;
+    requirements: string;
+    dueDate?: Date;
+    attachments: BlobFile[];
 }
 
 export interface RequestInput {

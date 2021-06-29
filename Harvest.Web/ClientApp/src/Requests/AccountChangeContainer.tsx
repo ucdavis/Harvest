@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router-dom";
 
 import { Project, ProjectAccount } from "../types";
 import { AccountsInput } from "./AccountsInput";
-import { ProjectHeader } from "./ProjectHeader";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 
 interface RouteParams {
   projectId?: string;

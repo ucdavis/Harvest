@@ -4,7 +4,7 @@ import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
-import { FileUpload } from "./FileUpload";
+import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
@@ -36,7 +36,7 @@ export const RequestContainer = () => {
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
-      const response = await fetch(`/Request/Get/${projectId}`);
+      const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -62,8 +62,22 @@ export const RequestContainer = () => {
     if (requestErrors) {
       if (requestErrors.length > 0) {
         setInputErrors(requestErrors);
+
+        if (new Date(project.start) > new Date(project.end)) {
+          setInputErrors((oldErrors) => [
+            ...oldErrors,
+            "Start date must be before end date",
+          ]);
+        }
         return;
+      } else {
+        setInputErrors([]);
       }
+    }
+
+    if (new Date(project.start) > new Date(project.end)) {
+      setInputErrors(["Start date must be before end date"]);
+      return;
     }
 
     const response = await fetch(`/Request/Create`, {
@@ -195,8 +209,12 @@ export const RequestContainer = () => {
             updateFile={(f) =>
               setProject((proj) => {
                 // update just one specific file from project p
-                proj.attachments[proj.attachments.findIndex(file=>file.identifier === f.identifier)] = {...f};
-                
+                proj.attachments[
+                  proj.attachments.findIndex(
+                    (file) => file.identifier === f.identifier
+                  )
+                ] = { ...f };
+
                 return { ...proj, attachments: [...proj.attachments] };
               })
             }
