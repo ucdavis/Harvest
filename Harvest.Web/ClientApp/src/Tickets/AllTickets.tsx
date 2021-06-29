@@ -45,7 +45,7 @@ export const AllTickets = () => {
 
 
 
-  if (project === undefined) {
+    if (project === undefined || tickets === undefined) {
     return <div>Loading...</div>;
   }
 
