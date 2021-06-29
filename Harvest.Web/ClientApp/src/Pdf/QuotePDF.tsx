@@ -1,16 +1,25 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
-import { TablePDF } from "./TablePDF";
-import { TotalPDF } from "./TotalPDF";
-import { formatCurrency } from "../Util/NumberFormatting";
+import { TablePDF } from "./TableSection";
+import { TotalPDF } from "./TotalSection";
+
 import { QuoteContent } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   quote: QuoteContent;
 }
 
 const styles = StyleSheet.create({
+  activity: {
+    paddingBottom: 10,
+  },
+  activityCost: {
+    fontSize: 13,
+    fontWeight: "bold",
+    paddingBottom: 10,
+  },
   page: {
     fontSize: 12,
     padding: 25,
@@ -46,7 +55,17 @@ export const QuotePDF = (props: Props) => (
           {formatCurrency(props.quote.acreageTotal)}
         </Text>
       </View>
-      <TablePDF quote={props.quote} />
+
+      {/* Displays activity tables */}
+      {props.quote.activities.map((activity) => (
+        <View key={`${activity.name}-view`} style={styles.activity}>
+          <Text style={styles.activityCost}>
+            {activity.name} • Activity Total: ${formatCurrency(activity.total)}
+          </Text>
+          <TablePDF activity={activity} />
+        </View>
+      ))}
+
       <TotalPDF quote={props.quote} />
       <Text style={styles.quoteTotal}>
         Quote Total: ${formatCurrency(props.quote.grandTotal)}
