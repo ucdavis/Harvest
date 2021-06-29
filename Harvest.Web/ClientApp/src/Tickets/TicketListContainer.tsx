@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 
 import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
@@ -31,7 +31,19 @@ export const TicketListContainer = (props: Props) => {
   return (
     <div className="">
       <div className="card-content">
-        <h3>Tickets</h3>
+              <h3>Last 5 Updated Tickets</h3>
+          <Link
+              className="btn btn-primary btn-small mr-4"
+              to={`/ticket/create/${projectId}`}
+          >
+                  Create Ticket
+          </Link>
+          <Link
+              className="btn btn-primary btn-small mr-4"
+              to={`/ticket/todo/${projectId}`}
+          >
+              View All Tickets
+          </Link>
         <TicketTable tickets={tickets}></TicketTable>
       </div>
     </div>

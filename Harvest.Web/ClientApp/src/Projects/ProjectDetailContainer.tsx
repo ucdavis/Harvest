@@ -69,12 +69,6 @@ export const ProjectDetailContainer = () => {
               >
                               Change Accounts
               </Link>
-                <Link
-                    className="btn btn-primary btn-small mr-4"
-                    to={`/ticket/create/${project.id}`}
-                >
-                    Create Ticket
-                </Link>
             </div>
             <div className="col text-right">
               <ProjectUnbilledButton
@@ -132,11 +126,10 @@ export const ProjectDetailContainer = () => {
             </div>
           </div>
           <div className="col-md-6">
-            <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
-                  </div>
-            <div className="col-md-6">
-                <TicketListContainer projectId={projectId}></TicketListContainer>
-            </div>
+              <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
+              <TicketListContainer projectId={projectId}></TicketListContainer>
+           </div>
+
         </div>
       </div>
     </div>
