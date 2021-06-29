@@ -15,6 +15,7 @@ import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
+import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
 import { TicketContainer } from "./Tickets/TicketContainer";
 import { Map } from "./Maps/Map";
 
@@ -32,6 +33,10 @@ function App() {
       <Route
         path="/request/changeAccount/:projectId"
         component={AccountChangeContainer}
+      />
+      <Route
+        path="/project/invoices/:projectId"
+        component={InvoiceListContainer}
       />
       <Route
         path="/invoice/details/:invoiceId"

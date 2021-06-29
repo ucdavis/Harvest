@@ -20,6 +20,7 @@ export const ReactTable = ({
   data,
   initialState,
   filterTypes,
+  hideFilters = false,
 }: any) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -97,7 +98,9 @@ export const ReactTable = ({
               ))}
             </tr>
           ))}
-          <ColumnFilterHeaders headerGroups={headerGroups} />
+          {hideFilters === false && (
+            <ColumnFilterHeaders headerGroups={headerGroups} />
+          )}
         </thead>
         <tbody {...getTableBodyProps()}>
           {page.map((row) => {
