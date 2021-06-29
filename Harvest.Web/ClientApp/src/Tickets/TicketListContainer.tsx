@@ -36,10 +36,9 @@ export const TicketListContainer = (props: Props) => {
                   Create Ticket
           </Link>
           <Link
-              className="btn btn-primary btn-small mr-4"
               to={`/ticket/allTickets/${props.projectId}`}
           >
-              View All Tickets
+              View All
           </Link>
         <TicketTable tickets={tickets}></TicketTable>
       </div>
