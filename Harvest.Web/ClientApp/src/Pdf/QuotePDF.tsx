@@ -62,7 +62,7 @@ export const QuotePDF = (props: Props) => (
           <Text style={styles.activityCost}>
             {activity.name} • Activity Total: ${formatCurrency(activity.total)}
           </Text>
-          <TablePDF activity={activity} />
+          <TablePDF tableItem={activity} />
         </View>
       ))}
 

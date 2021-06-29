@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet } from "@react-pdf/renderer";
+import { View, StyleSheet } from "@react-pdf/renderer";
 import {
   Table,
   TableHeader,
@@ -13,7 +13,7 @@ import { Activity, Invoice } from "../types";
 import { ActivityRateTypes } from "../constants";
 
 interface Props {
-  activity: Activity | Invoice;
+  tableItem: Activity | Invoice;
 }
 
 const styles = StyleSheet.create({
@@ -40,10 +40,10 @@ export const TablePDF = (props: Props) => (
     {ActivityRateTypes.map((type) => {
       let data = [];
 
-      if ("workItems" in props.activity) {
-        data = props.activity.workItems.filter((w) => w.type === type);
+      if ("workItems" in props.tableItem) {
+        data = props.tableItem.workItems.filter((w) => w.type === type);
       } else {
-        data = props.activity.expenses.filter((w) => w.type === type);
+        data = props.tableItem.expenses.filter((w) => w.type === type);
       }
 
       // Used react-pdf-table to display a table in the pdf
@@ -69,7 +69,7 @@ export const TablePDF = (props: Props) => (
             <DataTableCell
               style={styles.tableCell}
               getContent={(workItem) => {
-                if ("workItems" in props.activity) {
+                if ("workItems" in props.tableItem) {
                   return workItem.rate;
                 } else {
                   return (
