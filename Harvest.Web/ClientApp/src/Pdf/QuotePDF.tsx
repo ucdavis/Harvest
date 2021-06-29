@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const ApprovalPDF = (props: Props) => (
+export const QuotePDF = (props: Props) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View>
