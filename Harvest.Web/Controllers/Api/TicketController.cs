@@ -38,6 +38,11 @@ namespace Harvest.Web.Controllers.Api
             return Ok(await ticketsQuery.ToArrayAsync());
         }
 
+        [HttpGet]
+        public ActionResult AllTickets(int id)
+        {
+            return View("React");
+        }
 
         // create a new ticket via react
         [HttpGet]
@@ -62,6 +67,7 @@ namespace Harvest.Web.Controllers.Api
             ticketToCreate.Requirements = ticket.Requirements;
             ticketToCreate.DueDate = ticket.DueDate;
             ticketToCreate.CreatedById = currentUser.Id;
+            ticketToCreate.CreatedOn = DateTime.UtcNow;
 
             // If there are attachments, fill out details and add to project
             foreach (var attachment in ticket.Attachments)
