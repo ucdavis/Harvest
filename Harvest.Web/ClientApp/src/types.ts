@@ -226,11 +226,14 @@ export interface ProjectAccount {
 }
 
 export interface Ticket {
+    id: number;
     projectId: number;
     name: string;
     requirements: string;
     dueDate?: Date;
+    updatedOn?: Date;
     attachments: BlobFile[];
+    status: string;
 }
 
 export interface RequestInput {

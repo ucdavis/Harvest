@@ -23,6 +23,21 @@ namespace Harvest.Web.Controllers.Api
             this._userService = userService;
         }
 
+        // create a new ticket via react
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        public async Task<ActionResult> ListTickets(int projectId, bool topOnly = true)
+        {
+            var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
+            if (topOnly)
+            {
+                //I actually don't like this take 5, too easy to loose that there maybe uncompleted tickets not showing here. but worry about it later.
+                //Maybe return a model that has counts and other info
+                ticketsQuery = (IOrderedQueryable<Ticket>) ticketsQuery.Take(5);
+            }
+            return Ok(await ticketsQuery.ToArrayAsync());
+        }
+
 
         // create a new ticket via react
         [HttpGet]

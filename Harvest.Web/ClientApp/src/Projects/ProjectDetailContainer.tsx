@@ -7,6 +7,7 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceListContainer } from "../Invoices/InvoiceListContainer";
+import { TicketListContainer } from "../Tickets/TicketListContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -132,7 +133,10 @@ export const ProjectDetailContainer = () => {
           </div>
           <div className="col-md-6">
             <InvoiceListContainer projectId={projectId}></InvoiceListContainer>
-          </div>
+                  </div>
+            <div className="col-md-6">
+                <TicketListContainer projectId={projectId}></TicketListContainer>
+            </div>
         </div>
       </div>
     </div>
