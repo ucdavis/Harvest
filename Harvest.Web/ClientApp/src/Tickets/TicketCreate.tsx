@@ -10,7 +10,7 @@ interface RouteParams {
   projectId?: string;
 }
 
-export const TicketContainer = () => {
+export const TicketCreate = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<Ticket>({
