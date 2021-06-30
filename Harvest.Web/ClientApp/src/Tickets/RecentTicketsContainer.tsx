@@ -10,13 +10,13 @@ interface Props {
 }
 
 
-export const TicketListContainer = (props: Props) => {
+export const RecentTicketsContainer = (props: Props) => {
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
   useEffect(() => {
       const cb = async () => {
-        const response = await fetch(`/Ticket/List?projectId=${props.projectId}`);
+        const response = await fetch(`/Ticket/GetList?projectId=${props.projectId}`);
 
       if (response.ok) {
         setTickets(await response.json());
@@ -37,7 +37,7 @@ export const TicketListContainer = (props: Props) => {
                   Create Ticket
           </Link>
           <Link
-              to={`/ticket/allTickets/${props.projectId}`}
+              to={`/ticket/List/${props.projectId}`}
           >
               View All
           </Link>

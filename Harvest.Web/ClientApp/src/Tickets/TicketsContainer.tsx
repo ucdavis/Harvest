@@ -8,7 +8,7 @@ interface RouteParams {
   projectId?: string;
 }
 
-export const AllTickets = () => {
+export const TicketsContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -30,7 +30,7 @@ export const AllTickets = () => {
   useEffect(() => {
       const cb = async () => {
       const response = await fetch(
-        `/Ticket/List?projectId=${projectId}&topOnly=false`
+        `/Ticket/GetList?projectId=${projectId}&topOnly=false`
       );
 
       if (response.ok) {

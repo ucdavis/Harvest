@@ -23,10 +23,10 @@ namespace Harvest.Web.Controllers.Api
             this._userService = userService;
         }
 
-        // create a new ticket via react
+
         [HttpGet]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public async Task<ActionResult> List(int projectId, bool topOnly = true)
+        public async Task<ActionResult> GetList(int projectId, bool topOnly = true)
         {
             var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
             if (topOnly)
@@ -39,7 +39,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        public ActionResult AllTickets(int id)
+        public ActionResult List(int id)
         {
             return View("React");
         }
