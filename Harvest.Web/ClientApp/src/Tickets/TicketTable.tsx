@@ -33,8 +33,7 @@ export const TicketTable = (props: Props) => {
       },
       {
         Header: "Created",
-        accessor: (row) =>
-          row.createdOn ? new Date(row.createdOn).toLocaleDateString() : "",
+        accessor: (row) => new Date(row.createdOn).toLocaleDateString(),
       },
       {
         Header: "Updated",
