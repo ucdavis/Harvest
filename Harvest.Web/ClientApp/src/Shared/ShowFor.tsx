@@ -18,7 +18,7 @@ export const ShowFor = (props: Props) => {
     userRoles.includes("System") ||
     anyMatchingRoles
   ) {
-    return { children };
+      return(<>{ children }</>);
   }
 
   return null;
