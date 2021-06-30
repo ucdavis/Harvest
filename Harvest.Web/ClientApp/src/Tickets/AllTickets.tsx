@@ -28,8 +28,7 @@ export const AllTickets = () => {
   }, [projectId]);
 
   useEffect(() => {
-    // get rates so we can load up all expense types and info
-    const cb = async () => {
+      const cb = async () => {
       const response = await fetch(
         `/Ticket/List?projectId=${projectId}&topOnly=false`
       );
