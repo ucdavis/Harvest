@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useContext } from "react";
+
+import AppContext from "./AppContext";
+import { RoleName } from "../types";
 
 interface Props {
-  show: boolean;
   children: any;
+  roles: RoleName[];
 }
 
 export const ShowFor = (props: Props) => {
-  const { show, children } = props;
+  const { children, roles } = props;
+  const userRoles = useContext(AppContext).user.roles;
+  const anyMatchingRoles = userRoles.some((role) => roles.includes(role));
 
-  if (show === false) {
-      return null;
+  if (
+    userRoles.includes("Admin") ||
+    userRoles.includes("System") ||
+    anyMatchingRoles
+  ) {
+    return { children };
   }
-  return <div>{children}</div>;
+
+  return null;
 };
