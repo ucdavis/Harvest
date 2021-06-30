@@ -1,8 +1,8 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
-import { TablePDF } from "./TableSection";
-import { TotalPDF } from "./TotalSection";
+import { TableSection } from "./TableSection";
+import { TotalSection } from "./TotalSection";
 
 import { QuoteContent } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -62,11 +62,17 @@ export const QuotePDF = (props: Props) => (
           <Text style={styles.activityCost}>
             {activity.name} • Activity Total: ${formatCurrency(activity.total)}
           </Text>
-          <TablePDF tableItem={activity} />
+          <TableSection tableItem={activity} />
         </View>
       ))}
 
-      <TotalPDF quote={props.quote} />
+      <TotalSection
+        acreageTotal={props.quote.acreageTotal}
+        laborTotal={props.quote.laborTotal}
+        equipmentTotal={props.quote.laborTotal}
+        otherTotal={props.quote.otherTotal}
+        grandTotal={props.quote.grandTotal}
+      />
       <Text style={styles.quoteTotal}>
         Quote Total: ${formatCurrency(props.quote.grandTotal)}
       </Text>

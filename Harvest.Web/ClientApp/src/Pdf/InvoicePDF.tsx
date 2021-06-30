@@ -1,8 +1,8 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 
-import { TablePDF } from "./TableSection";
-import { TotalPDF } from "./TotalSection";
+import { TableSection } from "./TableSection";
+import { TotalSection } from "./TotalSection";
 
 import { Invoice } from "../types";
 import { groupBy } from "../Util/ArrayHelpers";
@@ -46,6 +46,20 @@ const styles = StyleSheet.create({
 
 export const InvoicePDF = (props: Props) => {
   const { invoice } = props;
+  const acreageTotal = invoice.expenses
+    .filter((expense) => expense.type === "Acreage")
+    .reduce((a, b) => a + b.total, 0);
+  const laborTotal = invoice.expenses
+    .filter((expense) => expense.type === "Labor")
+    .reduce((a, b) => a + b.total, 0);
+  const equipmentTotal = invoice.expenses
+    .filter((expense) => expense.type === "Equipment")
+    .reduce((a, b) => a + b.total, 0);
+  const otherTotal = invoice.expenses
+    .filter((expense) => expense.type === "Other")
+    .reduce((a, b) => a + b.total, 0);
+  const grandTotal = acreageTotal + laborTotal + equipmentTotal + otherTotal;
+
   const acreageExpenses = invoice.expenses.filter(
     (expense) => expense.type === "Acreage"
   );
@@ -84,10 +98,18 @@ export const InvoicePDF = (props: Props) => {
               <Text style={styles.activityCost}>
                 {activity} • Activity Total: ${formatCurrency(activityTotal)}
               </Text>
-              <TablePDF tableItem={props.invoice} />
+              <TableSection tableItem={props.invoice} />
             </View>
           );
         })}
+
+        <TotalSection
+          acreageTotal={acreageTotal}
+          laborTotal={laborTotal}
+          equipmentTotal={laborTotal}
+          otherTotal={otherTotal}
+          grandTotal={grandTotal}
+        />
       </Page>
     </Document>
   );

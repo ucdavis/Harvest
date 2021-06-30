@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const TablePDF = (props: Props) => (
+export const TableSection = (props: Props) => (
   // This section displays all the the acitivities associated with the quote
   <View>
     {ActivityRateTypes.map((type) => {

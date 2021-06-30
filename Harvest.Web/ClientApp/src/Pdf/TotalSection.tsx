@@ -2,10 +2,13 @@ import React from "react";
 import { Text, View, StyleSheet } from "@react-pdf/renderer";
 
 import { formatCurrency } from "../Util/NumberFormatting";
-import { QuoteContent } from "../types";
 
 interface Props {
-  quote: QuoteContent;
+  acreageTotal: number;
+  laborTotal: number;
+  equipmentTotal: number;
+  otherTotal: number;
+  grandTotal: number;
 }
 
 const styles = StyleSheet.create({
@@ -35,34 +38,34 @@ const styles = StyleSheet.create({
   },
 });
 
-export const TotalPDF = (props: Props) => (
+export const TotalSection = (props: Props) => (
   // This section displays the project total
   <View style={styles.projectTotal}>
     <Text style={styles.projectTotalTitle}>Project Totals</Text>
     <View style={styles.row}>
       <Text style={styles.col}>Acreage Fees</Text>
       <Text style={styles.col}>
-        ${formatCurrency(props.quote.acreageTotal)}
+        ${formatCurrency(props.acreageTotal)}
       </Text>
     </View>
     <View style={styles.row}>
       <Text style={styles.col}>Labor</Text>
-      <Text style={styles.col}>${formatCurrency(props.quote.laborTotal)}</Text>
+      <Text style={styles.col}>${formatCurrency(props.laborTotal)}</Text>
     </View>
     <View style={styles.row}>
       <Text style={styles.col}>Equipment</Text>
       <Text style={styles.col}>
-        ${formatCurrency(props.quote.equipmentTotal)}
+        ${formatCurrency(props.equipmentTotal)}
       </Text>
     </View>
     <View style={styles.row}>
       <Text style={styles.col}>Materials / Other</Text>
-      <Text style={styles.col}>${formatCurrency(props.quote.otherTotal)}</Text>
+      <Text style={styles.col}>${formatCurrency(props.otherTotal)}</Text>
     </View>
     <View style={styles.row}>
       <Text style={styles.totalCost}>Total Cost</Text>
       <Text style={styles.totalCost}>
-        ${formatCurrency(props.quote.grandTotal)}
+        ${formatCurrency(props.grandTotal)}
       </Text>
     </View>
   </View>
