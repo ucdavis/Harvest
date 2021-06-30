@@ -41,7 +41,7 @@ export const TicketsContainer = () => {
     cb();
   });
 
-  if (project === undefined || tickets === undefined) {
+  if (project === undefined) {
     return <div>Loading...</div>;
   }
 
