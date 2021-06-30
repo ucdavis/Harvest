@@ -12,11 +12,12 @@ interface Props {
 
 export const RecentTicketsContainer = (props: Props) => {
 
-  const [tickets, setTickets] = useState<Ticket[]>([]);
+    const [tickets, setTickets] = useState<Ticket[]>([]);
+    const maxRows = 5;
 
   useEffect(() => {
       const cb = async () => {
-        const response = await fetch(`/Ticket/GetList?projectId=${props.projectId}`);
+        const response = await fetch(`/Ticket/GetList?projectId=${props.projectId}&maxRows=${maxRows}`);
 
       if (response.ok) {
         setTickets(await response.json());
@@ -29,7 +30,7 @@ export const RecentTicketsContainer = (props: Props) => {
   return (
     <div className="">
       <div className="card-content">
-              <h3>Last 5 Updated Tickets</h3>
+              <h3>Last {maxRows} Updated Tickets</h3>
           <Link
               className="btn btn-primary btn-small mr-4"
               to={`/ticket/create/${props.projectId}`}

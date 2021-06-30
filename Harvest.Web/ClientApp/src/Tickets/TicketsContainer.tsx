@@ -30,7 +30,7 @@ export const TicketsContainer = () => {
   useEffect(() => {
       const cb = async () => {
       const response = await fetch(
-        `/Ticket/GetList?projectId=${projectId}&topOnly=false`
+        `/Ticket/GetList?projectId=${projectId}`
       );
 
       if (response.ok) {

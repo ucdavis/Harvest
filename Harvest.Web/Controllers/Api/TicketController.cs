@@ -26,14 +26,14 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public async Task<ActionResult> GetList(int projectId, bool topOnly = true)
+        public async Task<ActionResult> GetList(int projectId, int? maxRows)
         {
             var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
-            if (topOnly)
+            if (maxRows.HasValue)
             {
                 //I actually don't like this take 5, too easy to loose that there maybe uncompleted tickets not showing here. but worry about it later.
                 //Maybe return a model that has counts and other info.
-                ticketsQuery = (IOrderedQueryable<Ticket>) ticketsQuery.Take(5);
+                ticketsQuery = (IOrderedQueryable<Ticket>) ticketsQuery.Take(maxRows.Value);
             }
             return Ok(await ticketsQuery.ToArrayAsync());
         }
