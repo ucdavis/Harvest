@@ -36,12 +36,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
   },
-  inoviceTotal: {
-    paddingTop: 7,
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#266041",
-  },
 });
 
 export const InvoicePDF = (props: Props) => {
@@ -103,6 +97,8 @@ export const InvoicePDF = (props: Props) => {
           );
         })}
 
+        {/* TODO: Need to add accounts section when accounts are displayed */}
+        
         <TotalSection
           acreageTotal={acreageTotal}
           laborTotal={laborTotal}
