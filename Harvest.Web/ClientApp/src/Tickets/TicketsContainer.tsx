@@ -39,7 +39,7 @@ export const TicketsContainer = () => {
     };
 
     cb();
-  });
+  }, [projectId]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
