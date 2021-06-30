@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
 {
+    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
     public class TicketController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -25,7 +26,6 @@ namespace Harvest.Web.Controllers.Api
 
 
         [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
         {
             var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
@@ -92,6 +92,11 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);
+        }
+
+        public async Task<ActionResult> Details(int projectId, int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }
