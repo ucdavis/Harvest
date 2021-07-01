@@ -236,6 +236,30 @@ export interface Ticket {
     status: string;
     createdOn: Date;
 }
+export interface TicketDetails {
+    id: number;
+    projectId: number;
+    name: string;
+    requirements: string;
+    dueDate?: Date;
+    updatedOn?: Date;
+/*    attachments?: TicketAttachment[];*/
+    status: string;
+    createdOn: Date;
+    createdBy: User;
+}
+export interface TicketAttachment {
+    id: number;
+    fileName: string;
+    createdOn: Date;
+    createdBy: User;
+}
+export interface TicketMessage {
+    id: number;
+    message: string;
+    createdBy: User;
+    createdOn: Date;
+}
 
 export interface RequestInput {
   id: number;

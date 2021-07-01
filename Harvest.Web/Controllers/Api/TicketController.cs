@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Migrations.SqlServer;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -98,16 +99,38 @@ namespace Harvest.Web.Controllers.Api
         {
             return View("React");
         }
-
+        [HttpGet]
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
         public async Task<ActionResult> Get(int projectId, int ticketId)
         {
             var ticket = await _dbContext.Tickets
                 .Include(a => a.CreatedBy)
                 .Include(a => a.UpdatedBy)
-                .Include(a => a.Attachments)
-                .Include(a => a.Messages).ThenInclude(a => a.CreatedBy)
+                //.Include(a => a.Attachments)
+                .Include(a => a.Messages)
+                .ThenInclude(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
             return Ok(ticket);
+        }
+
+        [HttpGet]
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public async Task<ActionResult> GetAttachments(int projectId, int ticketId)
+        {
+            var ticketAttachments = await _dbContext.TicketAttachments
+                .Include(a => a.CreatedBy)
+                .Where(a => a.TicketId == ticketId).ToArrayAsync();
+            return Ok(ticketAttachments);
+        }
+
+        [HttpGet]
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public async Task<ActionResult> GetMessages(int projectId, int ticketId)
+        {
+            var ticketMessages = await _dbContext.TicketMessages
+                .Include(a => a.CreatedBy)
+                .Where(a => a.TicketId == ticketId).ToArrayAsync();
+            return Ok(ticketMessages);
         }
     }
 }

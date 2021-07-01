@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Project, Ticket } from "../types";
+import { Project, Ticket, TicketAttachment, TicketMessage, TicketDetails} from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
-import { TicketTable } from "./TicketTable";
 
 interface RouteParams {
-  projectId?: string;
+    projectId: string;
+    ticketId: string;
 }
 
 export const TicketDetailContainer = () => {
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, ticketId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
-
-
+  const [ticket, setTicket] = useState<TicketDetails>();
+    const [attachment, setAttachment] = useState<TicketAttachment>();
+    const [message, setMessage] = useState<TicketMessage>();
 
   useEffect(() => {
     const cb = async () => {
@@ -27,9 +28,49 @@ export const TicketDetailContainer = () => {
     cb();
   }, [projectId]);
 
+  useEffect(() => {
+      const cb = async () => {
+          const response = await fetch(`/Ticket/Get/${projectId}/${ticketId}`);
+
+          if (response.ok) {
+              const tick: TicketDetails = await response.json();
+              setTicket(tick);
+          }
+      };
+
+      cb();
+  }, [ticketId, projectId]);
+
+  //useEffect(() => {
+  //    const cb = async () => {
+  //        const response = await fetch(`/Ticket/GetAttachments/${projectId}/${ticketId}`);
+
+  //        if (response.ok) {
+  //            const attachments: TicketAttachment = await response.json();
+  //            setAttachment(attachments);
+  //        }
+  //    };
+
+  //    cb();
+  //}, [ticketId, projectId]);
+
+  //useEffect(() => {
+  //    const cb = async () => {
+  //        const response = await fetch(`/Ticket/GetMessages/${projectId}/${ticketId}`);
+
+  //        if (response.ok) {
+  //            const mess: TicketMessage = await response.json();
+  //            setMessage(mess);
+  //        }
+  //    };
+
+  //    cb();
+  //}, [ticketId, projectId]);
+
+  
 
 
-  if (project === undefined) {
+  if (project === undefined || ticket === undefined) {
     return <div>Loading...</div>;
   }
 
@@ -43,8 +84,9 @@ export const TicketDetailContainer = () => {
         <div className="card-head">
           <h2>List of all tickets for your project</h2>
         </div>
-
-
+              
+              <p>{ticket.name}</p>
+              
       </div>
     </div>
   );
