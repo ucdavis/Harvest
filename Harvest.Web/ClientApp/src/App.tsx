@@ -18,6 +18,7 @@ import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
+import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { Map } from "./Maps/Map";
 
 
@@ -47,6 +48,7 @@ function App() {
       <Route exact path="/project" component={ProjectListContainer} />
       <Route path="/ticket/create/:projectId" component={TicketCreate} />
       <Route path="/ticket/list/:projectId" component={TicketsContainer} />
+      <Route path="/ticket/details/:projectId/:id" component={TicketDetailContainer} />
       <Route
         path="/project/details/:projectId"
         component={ProjectDetailContainer}

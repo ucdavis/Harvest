@@ -93,10 +93,10 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(project);
         }
-
+        [Route("[controller]/[action]/{projectId}/{id}")]
         public async Task<ActionResult> Details(int projectId, int id)
         {
-            throw new NotImplementedException();
+            return View("React");
         }
     }
 }
