@@ -93,10 +93,21 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(project);
         }
-        [Route("[controller]/[action]/{projectId}/{id}")]
-        public async Task<ActionResult> Details(int projectId, int id)
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public ActionResult Details(int projectId, int ticketId)
         {
             return View("React");
+        }
+
+        public async Task<ActionResult> Get(int projectId, int ticketId)
+        {
+            var ticket = await _dbContext.Tickets
+                .Include(a => a.CreatedBy)
+                .Include(a => a.UpdatedBy)
+                .Include(a => a.Attachments)
+                .Include(a => a.Messages).ThenInclude(a => a.CreatedBy)
+                .SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+            return Ok(ticket);
         }
     }
 }
