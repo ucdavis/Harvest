@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 
 import AppContext from "./AppContext";
 import { RoleName } from "../types";
@@ -11,14 +11,18 @@ interface Props {
 export const ShowFor = (props: Props) => {
   const { children, roles } = props;
   const userRoles = useContext(AppContext).user.roles;
-  const anyMatchingRoles = userRoles.some((role) => roles.includes(role));
+
+  const anyMatchingRoles: boolean = useMemo(
+    () => userRoles.some((role) => roles.includes(role)),
+    [userRoles.some((role) => roles.includes(role))]
+  );
 
   if (
     userRoles.includes("Admin") ||
     userRoles.includes("System") ||
     anyMatchingRoles
   ) {
-      return(<>{ children }</>);
+    return <>{children}</>;
   }
 
   return null;
