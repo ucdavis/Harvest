@@ -9,7 +9,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
-import { Project } from "../types";
+import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
@@ -38,6 +38,17 @@ export const ProjectDetailContainer = () => {
   if (project === undefined) {
     return <div>Loading...</div>;
   }
+
+  const updateFiles = async (attachments: BlobFile[]) => {
+    await fetch(`/Request/Files/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Attachments: attachments }),
+    });
+  };
 
   return (
     <div className="card-wrapper">
@@ -116,10 +127,11 @@ export const ProjectDetailContainer = () => {
                 <h2>Project Attachements</h2>
                 <FileUpload
                   files={project.attachments || []}
-                  setFiles={(f) =>
-                    setProject({ ...project, attachments: [...f] })
-                  }
-                  updateFile={(f) =>
+                  setFiles={(f) => {
+                    setProject({ ...project, attachments: [...f] });
+                    updateFiles(f);
+                  }}
+                  updateFile={(f) => {
                     setProject((proj) => {
                       if (proj) {
                         // update just one specific file from project p
@@ -131,8 +143,8 @@ export const ProjectDetailContainer = () => {
 
                         return { ...proj, attachments: [...proj.attachments] };
                       }
-                    })
-                  }
+                    });
+                  }}
                 />
                 <ul className="no-list-style attached-files-list">
                   {project.attachments.map((attachment) => (
@@ -149,10 +161,7 @@ export const ProjectDetailContainer = () => {
             </div>
           </div>
           <div className="col-md-6">
-            <RecentInvoicesContainer
-              compact={true}
-              projectId={projectId}
-            />
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
           </div>
         </div>
       </div>
