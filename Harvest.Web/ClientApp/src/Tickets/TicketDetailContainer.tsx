@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Project, Ticket, TicketAttachment, TicketMessage, TicketDetails} from "../types";
+import { Project, TicketAttachment, TicketMessage, TicketDetails} from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 
 interface RouteParams {
@@ -60,7 +60,8 @@ export const TicketDetailContainer = () => {
               
               <p>{ticket.name}</p>
               <p>{ticket.attachments[0].fileName}</p>
-          <p>{ticket.messages[0].message}</p>
+              <p>{ticket.messages[0].message}</p>
+          <p>{ticket.messages[0].createdBy.name}</p>
       </div>
     </div>
   );

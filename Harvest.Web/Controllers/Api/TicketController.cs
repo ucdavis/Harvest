@@ -103,57 +103,18 @@ namespace Harvest.Web.Controllers.Api
         [Route("[controller]/[action]/{projectId}/{ticketId}")]
         public async Task<ActionResult> Get(int projectId, int ticketId)
         {
-            //var ticket = await _dbContext.Tickets
-            //    .Include(a => a.CreatedBy)
-            //    .Include(a => a.UpdatedBy)
-            //    //.Include(a => a.Attachments)
-            //    .Include(a => a.Messages)
-            //    .ThenInclude(a => a.CreatedBy)
-            //    .SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
-            try
-            {
-                var ticket = await _dbContext.Tickets
-                    .Include(a => a.CreatedBy)
-                    .Include(a => a.UpdatedBy)
-                    .Include(a => a.Attachments)
-                    .Include(a => a.Messages)
-                    .ThenInclude(a => a.CreatedBy)
-                    .Where(a => a.Id == ticketId && a.ProjectId == projectId)
-                    .Select(a => new 
-                        Ticket
-                        {
-                            Name = a.Name, CreatedBy = a.CreatedBy,CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy, UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages = a.Messages, Attachments = a.Attachments
-                        })
-                    .SingleAsync();
-                return Ok(ticket);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-            
+            var ticket = await _dbContext.Tickets
+                .Where(a => a.Id == ticketId && a.ProjectId == projectId)
+                .Select(a => new
+                    Ticket
+                    {
+                        Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
+                        UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages = a.Messages,
+                        Attachments = a.Attachments
+                    })
+                .SingleAsync();
+            return Ok(ticket);
         }
 
-        [HttpGet]
-        [Route("[controller]/[action]/{projectId}/{ticketId}")]
-        public async Task<ActionResult> GetAttachments(int projectId, int ticketId)
-        {
-            var ticketAttachments = await _dbContext.TicketAttachments
-                .Include(a => a.CreatedBy)
-                .Where(a => a.TicketId == ticketId).ToArrayAsync();
-            return Ok(ticketAttachments);
-        }
-
-        [HttpGet]
-        [Route("[controller]/[action]/{projectId}/{ticketId}")]
-        public async Task<ActionResult> GetMessages(int projectId, int ticketId)
-        {
-            var ticketMessages = await _dbContext.TicketMessages
-                .Include(a => a.CreatedBy)
-                .Where(a => a.TicketId == ticketId).ToArrayAsync();
-            return Ok(ticketMessages);
-        }
     }
 }
