@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useCallback } from "react";
+import { useFormContext, useWatch } from "react-hook-form";
 
-import { QuoteContent, Rate, WorkItemImpl } from "../types";
-import { FormikBag, ValidationErrorMessage, getInputValidityStyle } from "../Validation";
+import { QuoteContent, Rate, Field } from "../types";
+import { ValidationErrorMessage, useFormHelpers } from "../Validation";
 
 import {
   Button,
@@ -19,28 +20,34 @@ import { Location } from "../Fields/Location";
 
 interface Props {
   rates: Rate[];
-  formik: FormikBag<QuoteContent>;
   setEditFields: React.Dispatch<React.SetStateAction<boolean>>;
   addActivity: () => void;
 }
 
 export const ProjectDetail = (props: Props) => {
-  const { formik } = props;
-  
+
+  const { setValue, control, formState: { errors }, register } = useFormContext<QuoteContent>();
+  const { getInputValidityStyle } = useFormHelpers("");
+
+  const [acres, acreageRate, acreageRateId, fields] = useWatch({
+    control,
+    name: ["acres", "acreageRate", "acreageRateId", "fields"]
+  }) as [number, number, number, Field[]];
+
   React.useEffect(() => {
-    const rate = props.rates.find((r) => r.id === formik.values.acreageRateId);
+    const rate = props.rates.find((r) => r.id === acreageRateId);
 
     // rate can be undefinied if they select the default option
     if (!!rate) {
-      formik.setFieldValue("acreageRate", rate.price);
-      formik.setFieldValue("acreageRateId", rate.id);
-      formik.setFieldValue("acreageRateDescription", rate.description);
-    } else {
-      formik.setFieldValue("acreageRate", 0);
-      formik.setFieldValue("acreageRateId", 0);
-      formik.setFieldValue("acreageRateDescription", "");
+      setValue("acreageRate", rate.price);
+      //setValue("acreageRateId", rate.id);
+      setValue("acreageRateDescription", rate.description);
+    //} else {
+    //  setValue("acreageRate", 0);
+    //  //setValue("acreageRateId", 0);
+    //  setValue("acreageRateDescription", "");
     }
-  }, [formik.values.acreageRateId]);
+  }, [acreageRateId]);
 
   return (
     <Row className="align-items-baseline">
@@ -49,27 +56,19 @@ export const ProjectDetail = (props: Props) => {
         <FormGroup>
           <Label for="projectName">Project Name</Label>
           <input
-            className={`form-control ${getInputValidityStyle(formik, "projectName")}`}
-            id="projectName"
-            name="projectName"
-            value={formik.values.projectName}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            className={`form-control ${getInputValidityStyle("projectName")}`}
+            {...register("projectName")}
           />
         </FormGroup>
-        <ValidationErrorMessage formik={formik} name="projectName" />
+        <ValidationErrorMessage name="projectName" />
         <br />
         <Row className="align-items-baseline">
           <Col>
             <FormGroup>
               <Label>Acreage Rate</Label>
               <select
-                className={`form-control ${getInputValidityStyle(formik, "acreageRate")}`}
-                id="acreageRate"
-                name="acreageRate"
-                value={formik.values.acreageRateId}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+                className={`form-control ${getInputValidityStyle("acreageRateId")}`}
+                {...register("acreageRateId")}
               >
                 <option value="0">-- Select Acreage Rate --</option>
                 {props.rates
@@ -81,26 +80,22 @@ export const ProjectDetail = (props: Props) => {
                   ))}
               </select>
             </FormGroup>
-            <ValidationErrorMessage formik={formik} name="acreageRateId" />
+            <ValidationErrorMessage name="acreageRateId" />
           </Col>
         </Row>
         <br />
-        {formik.values.acreageRateId > 0 && (
+        {acreageRateId > 0 && (
           <Row className="align-items-baseline">
             <Col md="4">
               <FormGroup>
                 <Label for="acres">Number of Acres</Label>
                 <input
-                  className={`form-control ${getInputValidityStyle(formik, "acres")}`}
+                  className={`form-control ${getInputValidityStyle("acres")}`}
                   type="number"
-                  id="acres"
-                  name="acres"
-                  value={formik.values.acres}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
+                  {...register("acres", { valueAsNumber: true })}
                 />
               </FormGroup>
-              <ValidationErrorMessage formik={formik} name="acres" />
+              <ValidationErrorMessage name="acres" />
             </Col>
             <Col md="4">
               <FormGroup>
@@ -110,17 +105,13 @@ export const ProjectDetail = (props: Props) => {
                     <InputGroupText>$</InputGroupText>
                   </InputGroupAddon>
                   <input
-                    className={`form-control ${getInputValidityStyle(formik, "acreageRate")}`}
+                    className={`form-control ${getInputValidityStyle("acreageRate")}`}
                     type="number"
-                    id="rate"
-                    name="rate"
-                    value={formik.values.acreageRate}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
+                    {...register("acreageRate", { valueAsNumber: true })}
                   />
                 </InputGroup>
               </FormGroup>
-              <ValidationErrorMessage formik={formik} name="acreageRate" />
+              <ValidationErrorMessage name="acreageRate" />
 
             </Col>
             <Col md="4">
@@ -136,7 +127,7 @@ export const ProjectDetail = (props: Props) => {
                     id="rate"
                     readOnly
                     value={formatCurrency(
-                      formik.values.acres * formik.values.acreageRate
+                      acres * acreageRate
                     )}
                   />
                 </InputGroup>
@@ -171,7 +162,7 @@ export const ProjectDetail = (props: Props) => {
             </button>
           </Col>
         </Row>
-        <Location fields={formik.values.fields}></Location>
+        <Location fields={fields as Field[] || []}></Location>
         <br />
         <div id="map" />
       </Col>

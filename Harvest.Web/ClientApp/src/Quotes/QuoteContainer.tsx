@@ -1,17 +1,11 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { FormikConfig, FormikHelpers, FieldArray, FieldArrayRenderProps, FormikProvider } from "formik";
-import { useWrappedFormik } from "../Validation";
+import { useForm, FormProvider, useWatch, useFieldArray, UseFieldArrayReturn } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useFormHelpers } from "../Validation";
 import { quoteContentSchema } from "../schemas";
 
-import {
-  Project,
-  ProjectWithQuote,
-  QuoteContent,
-  QuoteContentImpl,
-  Rate,
-  WorkItemImpl
-} from "../types";
+import { Project, ProjectWithQuote, QuoteContent, QuoteContentImpl, Rate, WorkItemImpl, Activity, Field } from "../types";
 
 import { FieldContainer } from "../Fields/FieldContainer";
 import { ProjectDetail } from "./ProjectDetail";
@@ -34,10 +28,24 @@ export const QuoteContainer = () => {
 
   const [editFields, setEditFields] = useState(false);
 
-  const activitiesRef = useRef<FieldArrayRenderProps>(null);
+  const formMethods = useForm<QuoteContent>({
+    defaultValues: new QuoteContentImpl(),
+    resolver: yupResolver(quoteContentSchema),
+    mode: "onBlur"
+  });
 
+  const { control, handleSubmit: submit, formState: { errors }, getValues, reset, setValue } = formMethods;
 
-  const handleSubmit = async (quote: QuoteContent, actions: FormikHelpers<QuoteContent>) => {
+  const activitiessHelper = useFieldArray({ control, name: "activities", keyName: "fieldId" });
+
+  const [fields, acreageTotal, laborTotal, equipmentTotal, otherTotal, grandTotal] = useWatch<QuoteContent>({
+    control: control,
+    name: ["fields", "acreageTotal", "laborTotal", "equipmentTotal", "otherTotal", "grandTotal"]
+  }) as [Field[], number, number, number, number, number];
+
+  const fieldsHelper = useFieldArray<QuoteContent>({ control: control, name: "fields" });
+
+  const handleSubmit = async (quote: QuoteContent) => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach((a) => (a.workItems = a.workItems.filter((w) => w.total !== 0)));
     quote.activities = quote.activities.filter((a) => a.total !== 0);
@@ -52,20 +60,12 @@ export const QuoteContainer = () => {
       body: JSON.stringify(quote),
     });
 
-    actions.setSubmitting(false);
-
     if (saveResponse.ok) {
       history.push(`/Project/Details/${projectId}`);
     } else {
       alert("Something went wrong, please try again");
     }
   }
-
-  const formik = useWrappedFormik<QuoteContent>({
-    initialValues: new QuoteContentImpl(),
-    validationSchema: quoteContentSchema,
-    onSubmit: handleSubmit
-  } as FormikConfig<QuoteContent>);
 
   useEffect(() => {
     const cb = async () => {
@@ -80,7 +80,7 @@ export const QuoteContainer = () => {
 
         if (projectWithQuote.quote) {
           // TODO: remove once we standardize on new quote format
-          formik.setValues({
+          reset({
             ...projectWithQuote.quote,
             fields: projectWithQuote.quote.fields || [],
           });
@@ -97,7 +97,10 @@ export const QuoteContainer = () => {
           quoteToUse.acreageRate =
             rateJson.find((r) => r.type === "Acreage")?.price || 120;
 
-          formik.setValues(quoteToUse);
+          reset({
+            ...quoteToUse,
+            fields: quoteToUse.fields || [],
+          });
           setEditFields(true); // we have no existing quote, start with editing fields
         }
       } else {
@@ -113,9 +116,11 @@ export const QuoteContainer = () => {
     project,
   ]);
 
+
   const addActivity = () => {
-    const newActivityId = Math.max(...formik.values.activities.map((a) => a.id), 0) + 1;
-    activitiesRef.current?.push({
+    const activities = getValues("activities");
+    const newActivityId = Math.max(...activities.map((a) => a.id), 0) + 1;
+    activitiessHelper.append({
       id: newActivityId,
       name: "Activity",
       total: 0,
@@ -134,7 +139,7 @@ export const QuoteContainer = () => {
   // TODO: we might want to move this all into a separate component
   if (editFields) {
     return (
-      <FormikProvider value={formik.root}>
+      <FormProvider {...formMethods}>
         <div>
           <div className="card-wrapper">
             <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")} />
@@ -169,28 +174,24 @@ export const QuoteContainer = () => {
                 </div>
               </div>
             </div>
-            <FieldArray name="fields">
-              {(arrayHelpers) => (
-                <FieldContainer
-                  crops={cropArray}
-                  fields={formik.values.fields}
-                  updateField={(field) => arrayHelpers.replace(formik.values.fields.findIndex(f => f.id === field.id), { ...field })}
-                  addField={(field) => arrayHelpers.push({ ...field })}
-                  removeField={(field) => arrayHelpers.remove(formik.values.fields.findIndex(f => f.id === field.id))}
-                ></FieldContainer>
-              )}
-            </FieldArray>
+            <FieldContainer
+              crops={cropArray}
+              fields={fields}
+              updateField={(field) => setValue(`fields.${fields.findIndex(f => f.id === field.id)}` as "fields.0", { ...field })}
+              addField={(field) => fieldsHelper.append({ ...field })}
+              removeField={(field) => fieldsHelper.remove(fields.findIndex(f => f.id === field.id))}
+            ></FieldContainer>
           </div>
-          <div>Debug: {JSON.stringify(formik.values)}</div>
+          <div>Debug: {JSON.stringify(getValues())}</div>
         </div>
-      </FormikProvider>
+      </FormProvider>
     );
   }
 
   return (
-    <FormikProvider value={formik.root}>
+    <FormProvider {...formMethods}>
       <div className="card-wrapper">
-        <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}/>
+        <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")} />
         <div className="card-green-bg">
           <div className="card-content">
             <div className="quote-details">
@@ -198,23 +199,21 @@ export const QuoteContainer = () => {
               <hr />
               <ProjectDetail
                 rates={rates}
-                formik={formik}
                 setEditFields={setEditFields}
                 addActivity={addActivity}
               />
               <ActivitiesContainer
-                ref={activitiesRef}
-                formik={formik}
                 rates={rates}
+                activitiesHelper={activitiessHelper}
               />
             </div>
-            <QuoteTotals quote={formik.values}></QuoteTotals>
+            <QuoteTotals {...{ acreageTotal, laborTotal, equipmentTotal, otherTotal, grandTotal }}></QuoteTotals>
 
             <button className="btn btn-primary mt-4" onClick={() => {
-              if (Object.keys(formik.errors).length > 0) {
-                alert(JSON.stringify(formik.errors, null, "  "));
+              if (Object.keys(errors).length > 0) {
+                alert(JSON.stringify(errors, null, "  "));
               } else {
-                formik.submitForm();
+                submit(handleSubmit)();
               }
             }}>
               Save Quote
@@ -222,9 +221,9 @@ export const QuoteContainer = () => {
           </div>
         </div>
 
-        <div>Debug: {JSON.stringify(formik.values)}</div>
+        <div>Debug: {JSON.stringify(getValues())}</div>
         <div>Debug Rates: {JSON.stringify(rates)}</div>
       </div>
-    </FormikProvider>
+    </FormProvider>
   );
 };

@@ -4,8 +4,7 @@ import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
 import { QuoteContent } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
-interface Props {
-  quote: QuoteContent;
+interface Props extends Pick<QuoteContent, "acreageTotal" | "laborTotal" | "equipmentTotal" | "otherTotal" | "grandTotal"> {
 }
 
 export const QuoteTotals = (props: Props) => {
@@ -19,7 +18,7 @@ export const QuoteTotals = (props: Props) => {
               <div>Acreage Fees</div>
             </Col>
             <Col xs="2" sm="2">
-              ${formatCurrency(props.quote.acreageTotal)}
+              ${formatCurrency(props.acreageTotal)}
             </Col>
           </Row>
           <Row>
@@ -27,7 +26,7 @@ export const QuoteTotals = (props: Props) => {
               <div>Labor</div>
             </Col>
             <Col xs="2" sm="2">
-              ${formatCurrency(props.quote.laborTotal)}
+              ${formatCurrency(props.laborTotal)}
             </Col>
           </Row>
           <Row>
@@ -35,7 +34,7 @@ export const QuoteTotals = (props: Props) => {
               <div>Equipment</div>
             </Col>
             <Col xs="2" sm="2">
-              ${formatCurrency(props.quote.equipmentTotal)}
+              ${formatCurrency(props.equipmentTotal)}
             </Col>
           </Row>
           <Row>
@@ -43,7 +42,7 @@ export const QuoteTotals = (props: Props) => {
               <div>Materials / Other</div>
             </Col>
             <Col xs="2" sm="2">
-              ${formatCurrency(props.quote.otherTotal)}
+              ${formatCurrency(props.otherTotal)}
             </Col>
           </Row>
           <Row className="total-row">
@@ -51,7 +50,7 @@ export const QuoteTotals = (props: Props) => {
               <h6>Total Cost</h6>
             </Col>
             <Col xs="2" sm="2">
-              <span>${formatCurrency(props.quote.grandTotal)}</span>
+              <span>${formatCurrency(props.grandTotal)}</span>
             </Col>
           </Row>
         </div>

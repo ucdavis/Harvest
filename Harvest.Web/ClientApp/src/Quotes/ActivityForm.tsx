@@ -1,35 +1,53 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { faCalendarWeek } from "@fortawesome/free-solid-svg-icons";
-import { FieldArray } from "formik";
+import { UseFieldArrayReturn, useFormContext, useWatch, useFieldArray } from "react-hook-form";
+
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl, QuoteContent } from "../types";
-import { getInputValidityStyle, ValidationErrorMessage, FormikBag } from "../Validation";
+import { useFormHelpers, ValidationErrorMessage } from "../Validation";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
 interface Props {
   deleteActivity: () => void;
   rates: Rate[];
-  formik: FormikBag<QuoteContent, Activity>;
+  path: string;
+  defaultValue: Activity;
 }
 
 export const ActivityForm = (props: Props) => {
-  const { formik } = props;
+
+  const { getValues, setValue, register, formState: {errors}, control } = useFormContext();
+
+  const { getPath, getInputValidityStyle } = useFormHelpers(props.path);
 
   const getNewWorkItem = (category: RateType) => {
-    const newId = Math.max(...formik.values.workItems.map((w) => w.id), 0) + 1;
-    return new WorkItemImpl(formik.values.id, newId, category);
+    const newId = Math.max(...(getValues(getPath("workItems") as "activities.0.workitems")).map((w: WorkItem) => w.id), 0) + 1;
+    return new WorkItemImpl(getValues(getPath("id") as "activities.0.id"), newId, category);
   };
 
-  const workItemsTotal = formik.values.workItems.reduce((acc, workItem) => (acc + workItem.total), 0);
+  const [workItems, total] = useWatch({
+    control,
+    name: [getPath("workItems") as "", getPath("total") as ""],
+    defaultValue: [[], 0]
+  }) as [WorkItem[], number];
+
+  //const workItemsHelper = useFieldArray({ control, name: props.path as "", keyName: "fieldId" });
+
+  const workItemsTotal = (workItems || []).reduce((acc, workItem) => (acc + workItem.total), 0);
   
   useEffect(() => {
-    formik.setFieldValue("total", workItemsTotal);
+    setValue(getPath("total") as "activities.0.total", workItemsTotal);
   }, [workItemsTotal]);
+
+  useEffect(() => {
+
+    },
+    [total]);
 
   return (
     <div className="card-wrapper mb-4 no-green">
@@ -85,15 +103,12 @@ export const ActivityForm = (props: Props) => {
 
             <div>
               <input
-                className={`form-control ${getInputValidityStyle(formik, "name")}`}
-                id={formik.fullPath("name")}
-                name={formik.fullPath("name")}
-                value={formik.values.name}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+                className={`form-control ${getInputValidityStyle("name")}`}
+                {...register(getPath("name") as "name")}
+                defaultValue={props.defaultValue.name}
               />
             </div>
-            <ValidationErrorMessage formik={formik} name={formik.fullPath("name")} />
+            <ValidationErrorMessage name={getPath("name")} />
 
           </div>
         </div>
@@ -101,20 +116,23 @@ export const ActivityForm = (props: Props) => {
         <WorkItemsForm
           category="Labor"
           rates={props.rates}
-          formik={formik.getNestedBag((activity) => activity.workItems)}
           getNewWorkItem={getNewWorkItem}
+          path={getPath("workItems")}
+          //workItemsHelper={workItemsHelper}
         />
         <WorkItemsForm
           category="Equipment"
           rates={props.rates}
-          formik={formik.getNestedBag((activity) => activity.workItems)}
           getNewWorkItem={getNewWorkItem}
+          path={getPath("workItems")}
+         // workItemsHelper={workItemsHelper}
         />
         <WorkItemsForm
           category="Other"
           rates={props.rates}
-          formik={formik.getNestedBag((activity) => activity.workItems)}
           getNewWorkItem={getNewWorkItem}
+          path={getPath("workItems")}
+          //workItemsHelper={workItemsHelper}
         />
       </div>
     </div>

@@ -1,18 +1,12 @@
-import React, { useEffect } from "react";
-import {
-  Button,
-  Col,
-  FormGroup,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Row,
-} from "reactstrap";
-import { FieldArray } from "formik";
+import React, { useEffect, useCallback } from "react";
+import { Button, Col, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Row, } from "reactstrap";
+import { useFormContext, useFieldArray, useWatch, useFormState, UseFieldArrayReturn } from "react-hook-form";
+import get from "lodash/get";
+
 
 import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { getInputValidityStyle, ValidationErrorMessage, FormikBag } from "../Validation";
+import { ValidationErrorMessage, useFormHelpers } from "../Validation";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
@@ -22,18 +16,30 @@ interface Props {
   category: RateType;
   rates: Rate[];
   getNewWorkItem: (category: RateType) => WorkItem;
-  formik: FormikBag<any, WorkItem[]>;
+  path: string;
+  //workItemsHelper: UseFieldArrayReturn<Record<string, any>, "", "fieldId">;
 }
 
 interface WorkItemProps {
   category: RateType;
   rates: Rate[];
-  formik: FormikBag<any, WorkItem>;
+  path: string;
   deleteWorkItem: () => void;
+  defaultValue: WorkItem;
 }
 
 const WorkItemForm = (props: WorkItemProps) => {
-  const { formik } = props;
+
+  const { setValue, control, register } = useFormContext();
+
+  const { getPath, getInputValidityStyle } = useFormHelpers(props.path);
+
+  const [rateId, rate, quantity, unit] = useWatch({
+    control,
+    name: [getPath("rateId") as "", getPath("rate") as "", getPath("quantity") as "", getPath("unit") as ""]
+  }) as [number, number, number, string];
+
+  const { dirtyFields, touchedFields } = useFormState({ control });
 
   // TODO: Determine a better way of working out which other options need extra description text
   const requiresCustomDescription = (unit: string | null) => {
@@ -41,41 +47,37 @@ const WorkItemForm = (props: WorkItemProps) => {
   };
 
   useEffect(() => {
-    const meta = formik.getFieldMeta("rateId");
-    if (meta.touched && meta.error !== undefined && meta.error !== "") {
-      const rate = props.rates.find((r) => r.id === formik.values.rateId);
+    if (get(dirtyFields, getPath("rateId")) !== undefined || get(touchedFields, getPath("rateId")) !== undefined) {
+      const rate = props.rates.find((r) => r.id === rateId);
 
       // rate can be undefinied if they select the default option
       if (!!rate) {
         // new rate selected, update the work item with defaults
-        formik.setFieldValue("rate", rate.price);
-        formik.setFieldValue("description", requiresCustomDescription(rate.unit) ? "" : rate.description);
-        formik.setFieldValue("unit", rate.unit);
+        setValue(getPath("rate") as "", rate.price);
+        setValue(getPath("description") as "", requiresCustomDescription(rate.unit) ? "" : rate.description);
+        setValue(getPath("unit") as "", rate.unit);
       } else {
-        formik.setFieldValue("rate", 0);
-        formik.setFieldValue("description", "");
-        formik.setFieldValue("unit", "");
+        setValue(getPath("rate") as "", 0);
+        setValue(getPath("description") as "", "");
+        setValue(getPath("unit") as "", "");
       }
     }
-  }, [formik.values.rateId]);
+  }, [rateId]);
 
   useEffect(() => {
-    formik.setFieldValue("total", formik.values.rate * formik.values.quantity);
-  }, [formik.values.rate, formik.values.quantity]);
+    setValue(getPath("total") as "", rate * quantity);
+  }, [rate, quantity]);
 
   return (
     <Row
       className="activity-line-item"
-      key={formik.fullPath("id")}>
+      key={getPath("id")}>
       <Col xs="5">
         <FormGroup>
           <select
-            className={`form-control ${getInputValidityStyle(formik, "rateId")}`}
-            id={formik.fullPath("rateId")}
-            name={formik.fullPath("rateId")}
-            value={formik.values.rateId}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            className={`form-control ${getInputValidityStyle(getPath("rateId"))}`}
+            {...register(getPath("rateId") as "")}
+            defaultValue={props.defaultValue.rateId}
           >
             <option value="0">-- Select {props.category} --</option>
             {props.rates.filter((r) => r.type === props.category).map((r) => (
@@ -85,37 +87,31 @@ const WorkItemForm = (props: WorkItemProps) => {
             ))}
           </select>
 
-          {requiresCustomDescription(formik.values.unit) && (
+          {requiresCustomDescription(unit) && (
             <input
-              className={`form-control ${getInputValidityStyle(formik, "description")}`}
-              id={formik.fullPath("description")}
-              name={formik.fullPath("description")}
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
+              className={`form-control ${getInputValidityStyle("description")}`}
+              {...register(getPath("description") as "")}
+              defaultValue={props.defaultValue.description}
             />
           )}
         </FormGroup>
-        <ValidationErrorMessage formik={formik} name="rateId" />
-        <ValidationErrorMessage formik={formik} name="description" />
+        <ValidationErrorMessage name={getPath("rateId")} />
+        <ValidationErrorMessage name={getPath("description")} />
       </Col>
 
       <Col xs="3">
         <InputGroup>
           <InputGroupAddon addonType="prepend">
-            <InputGroupText>{formik.values.unit || ""}</InputGroupText>
+            <InputGroupText>{unit || ""}</InputGroupText>
           </InputGroupAddon>
           <input
-            className={`form-control ${getInputValidityStyle(formik, "quantity")}`}
+            className={`form-control ${getInputValidityStyle("quantity")}`}
             type="number"
-            id={formik.fullPath("quantity")}
-            name={formik.fullPath("quantity")}
-            value={formik.values.quantity}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            {...register(getPath("quantity") as "", { valueAsNumber: true })}
+            defaultValue={props.defaultValue.quantity}
           />
         </InputGroup>
-        <ValidationErrorMessage formik={formik} name="quantity" />
+        <ValidationErrorMessage name={getPath("quantity")} />
       </Col>
 
       <Col xs="2">
@@ -124,19 +120,16 @@ const WorkItemForm = (props: WorkItemProps) => {
             <InputGroupText>$</InputGroupText>
           </InputGroupAddon>
           <input
-            className={`form-control ${getInputValidityStyle(formik,"rate")}`}
+            className={`form-control ${getInputValidityStyle("rate")}`}
             type="number"
-            id={formik.fullPath("rate")}
-            name={formik.fullPath("rate")}
-            value={formik.values.rate}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
+            {...register(getPath("rate") as "", { valueAsNumber: true })}
+            defaultValue={props.defaultValue.rate}
           />
         </InputGroup>
-        <ValidationErrorMessage formik={formik} name="rate" />
+        <ValidationErrorMessage name={getPath("rate")} />
       </Col>
 
-      <Col xs="1">${formatCurrency(formik.values.rate * formik.values.quantity)}</Col>
+      <Col xs="1">${formatCurrency(rate * quantity)}</Col>
 
       <Col xs="1">
         <button
@@ -150,6 +143,13 @@ const WorkItemForm = (props: WorkItemProps) => {
 }
 
 export const WorkItemsForm = (props: Props) => {
+
+  const { control, getValues } = useFormContext();
+
+  const { getPath } = useFormHelpers(props.path);
+
+  const workItemsHelper = useFieldArray<Record<string, any>, "", "fieldId">({ control, name: props.path as "", keyName: "fieldId" });
+
 
   return (
     <div className="activity-line">
@@ -167,32 +167,26 @@ export const WorkItemsForm = (props: Props) => {
           <label>Total</label>
         </Col>
       </Row>
-      <FieldArray name={props.formik.path}>
-        {(arrayHelpers) => (
-          <div>
-            { props.formik.values
-              .map((w, i) => ({ workItem: w, i }))
-              .filter((item) => item.workItem.type === props.category)
-              .map((item) => (
-                <WorkItemForm
-                  key={`workitem-${item.i}-${item.workItem.id}`}
-                  category={props.category}
-                  rates={props.rates}
-                  formik={props.formik.getNestedBag((workItems) => workItems[item.i])}
-                  deleteWorkItem={() => arrayHelpers.remove(item.i)}
-                />))}
-            <Button
-              className="btn-sm"
-              color="link"
-              onClick={() => arrayHelpers.insert(props.formik.values.length, props.getNewWorkItem(props.category))}
-            >
-              <FontAwesomeIcon className="mr-2" icon={faPlus} />
-              Add {props.category}
-            </Button>
-          </div>
-        )}
-      </FieldArray>
-      <div>Debug: {JSON.stringify(props.formik.values)}</div>
+      {workItemsHelper.fields.map((field, i) => ({ field, i, path: getPath(i.toString()) }))
+        .filter(item => (item.field as unknown as WorkItem).type === props.category)
+        .map((item) => (<div key={item.field.fieldId}>
+          <WorkItemForm
+            category={props.category}
+            rates={props.rates}
+            deleteWorkItem={() => workItemsHelper.remove(item.i)}
+            path={item.path}
+            defaultValue={item.field as unknown as WorkItem}
+          />
+          <Button
+            className="btn-sm"
+            color="link"
+            onClick={() => workItemsHelper.append(props.getNewWorkItem(props.category))}
+          >
+            <FontAwesomeIcon className="mr-2" icon={faPlus} />
+          Add {props.category}
+          </Button>
+        </div>))}
+      {/*<div>Debug: {JSON.stringify(props.values)}</div>*/}
     </div >
   );
 };
