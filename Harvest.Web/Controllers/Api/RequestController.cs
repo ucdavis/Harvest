@@ -107,8 +107,6 @@ namespace Harvest.Web.Controllers
         {
             var currentUser = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id);
-            Console.WriteLine("\n \n \n \n \n \n ");
-            Console.WriteLine(model.Attachments);
 
             var newProject = new ProjectAttachment
             {
