@@ -41,33 +41,6 @@ export const TicketDetailContainer = () => {
       cb();
   }, [ticketId, projectId]);
 
-  //useEffect(() => {
-  //    const cb = async () => {
-  //        const response = await fetch(`/Ticket/GetAttachments/${projectId}/${ticketId}`);
-
-  //        if (response.ok) {
-  //            const attachments: TicketAttachment = await response.json();
-  //            setAttachment(attachments);
-  //        }
-  //    };
-
-  //    cb();
-  //}, [ticketId, projectId]);
-
-  //useEffect(() => {
-  //    const cb = async () => {
-  //        const response = await fetch(`/Ticket/GetMessages/${projectId}/${ticketId}`);
-
-  //        if (response.ok) {
-  //            const mess: TicketMessage = await response.json();
-  //            setMessage(mess);
-  //        }
-  //    };
-
-  //    cb();
-  //}, [ticketId, projectId]);
-
-  
 
 
   if (project === undefined || ticket === undefined) {
@@ -86,7 +59,8 @@ export const TicketDetailContainer = () => {
         </div>
               
               <p>{ticket.name}</p>
-              
+              <p>{ticket.attachments[0].fileName}</p>
+          <p>{ticket.messages[0].message}</p>
       </div>
     </div>
   );

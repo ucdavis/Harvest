@@ -243,7 +243,8 @@ export interface TicketDetails {
     requirements: string;
     dueDate?: Date;
     updatedOn?: Date;
-/*    attachments?: TicketAttachment[];*/
+    attachments: TicketAttachment[];
+    messages: TicketMessage[];
     status: string;
     createdOn: Date;
     createdBy: User;
