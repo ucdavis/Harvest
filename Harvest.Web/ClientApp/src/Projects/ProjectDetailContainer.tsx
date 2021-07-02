@@ -147,8 +147,8 @@ export const ProjectDetailContainer = () => {
                   }}
                 />
                 <ul className="no-list-style attached-files-list">
-                  {project.attachments.map((attachment) => (
-                    <li key={attachment.identifier}>
+                  {project.attachments.map((attachment, i) => (
+                    <li key={`attachment-${i}`}>
                       {/* TODO: Add a way to download files from Azure */}
                       <a href="#">
                         <FontAwesomeIcon icon={faDownload} />
