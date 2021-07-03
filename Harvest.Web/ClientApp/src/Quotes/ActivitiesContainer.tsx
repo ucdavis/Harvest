@@ -18,29 +18,30 @@ export const ActivitiesContainer = (props: Props) => {
     name: ["acreageTotal", "acreageRate", "acres", "activities"]
   }) as [number, number, number, Activity[]];
 
-  const activitiesTotal = activities.reduce((acc, activity) => (acc + activity.total), 0);
-
-  useEffect(() => {
+  // can't use a watched workItems collection because it won't reflect the most recent update to a given workItem
+  const handleActivityTotalChanged = () => {
+    const activities = getValues("activities") || [];
+    const activitiesTotal = activities.reduce((acc, workItem) => (acc + workItem.total), 0);
     setValue("activitiesTotal", activitiesTotal);
     setValue("laborTotal", activities
       .reduce<number>((accActivity, curActivity) => accActivity + (curActivity.workItems || []).filter(w => w.type === "Labor")
-          .reduce((accWorkItem, curWorkItem) => (accWorkItem + curWorkItem.total), 0), 0));
+        .reduce((accWorkItem, curWorkItem) => (accWorkItem + curWorkItem.total), 0), 0));
     setValue("equipmentTotal", activities
       .reduce<number>((accActivity, curActivity) => accActivity + (curActivity.workItems || []).filter(w => w.type === "Equipment")
-          .reduce((accWorkItem, curWorkItem) => (accWorkItem + curWorkItem.total), 0), 0));
+        .reduce((accWorkItem, curWorkItem) => (accWorkItem + curWorkItem.total), 0), 0));
     setValue("otherTotal", getValues("activities")
       .reduce<number>((accActivity, curActivity) => accActivity + (curActivity.workItems || []).filter(w => w.type === "Other")
-          .reduce((accWorkItem, curWorkItem) => (accWorkItem + curWorkItem.total), 0), 0));
-
-  }, [activitiesTotal, acreageTotal]);
-
+        .reduce((accWorkItem, curWorkItem) => (accWorkItem + curWorkItem.total), 0), 0));
+    setValue("grandTotal", activitiesTotal + acreageTotal);
+  }
+  
   useEffect(() => {
     setValue("acreageTotal", acreageRate * acres);
   }, [acreageRate, acres]);
 
-  useEffect(() => {
-    setValue("grandTotal", activitiesTotal + acreageTotal);
-  }, [activitiesTotal, acreageTotal]);
+  //useEffect(() => {
+  //  setValue("grandTotal", activitiesTotal + acreageTotal);
+  //}, [activitiesTotal, acreageTotal]);
 
   return (
     <div>
@@ -51,6 +52,7 @@ export const ActivitiesContainer = (props: Props) => {
           rates={props.rates}
           path={`activities.${i}`}
           defaultValue={field}
+          onTotalChanged={handleActivityTotalChanged}
         />
       ))}
     </div>

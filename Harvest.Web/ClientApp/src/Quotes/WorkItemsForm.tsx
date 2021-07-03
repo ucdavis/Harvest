@@ -17,7 +17,8 @@ interface Props {
   rates: Rate[];
   getNewWorkItem: (category: RateType) => WorkItem;
   path: string;
-  //workItemsHelper: UseFieldArrayReturn<Record<string, any>, "", "fieldId">;
+  workItemsHelper: UseFieldArrayReturn<Record<string, any>, "", "fieldId">;
+  onTotalChanged: () => void;
 }
 
 interface WorkItemProps {
@@ -26,6 +27,7 @@ interface WorkItemProps {
   path: string;
   deleteWorkItem: () => void;
   defaultValue: WorkItem;
+  onTotalChanged: () => void;
 }
 
 const WorkItemForm = (props: WorkItemProps) => {
@@ -34,10 +36,10 @@ const WorkItemForm = (props: WorkItemProps) => {
 
   const { getPath, getInputValidityStyle } = useFormHelpers(props.path);
 
-  const [rateId, rate, quantity, unit] = useWatch({
+  const [rateId, rate, quantity, unit, total] = useWatch({
     control,
-    name: [getPath("rateId") as "", getPath("rate") as "", getPath("quantity") as "", getPath("unit") as ""]
-  }) as [number, number, number, string];
+    name: [getPath("rateId") as "", getPath("rate") as "", getPath("quantity") as "", getPath("unit") as "", getPath("total") as ""]
+  }) as [number, number, number, string, number];
 
   const { dirtyFields, touchedFields } = useFormState({ control });
 
@@ -67,6 +69,11 @@ const WorkItemForm = (props: WorkItemProps) => {
   useEffect(() => {
     setValue(getPath("total") as "", rate * quantity);
   }, [rate, quantity]);
+
+  useEffect(() => {
+      props.onTotalChanged();
+    },
+    [total]);
 
   return (
     <Row
@@ -148,9 +155,6 @@ export const WorkItemsForm = (props: Props) => {
 
   const { getPath } = useFormHelpers(props.path);
 
-  const workItemsHelper = useFieldArray<Record<string, any>, "", "fieldId">({ control, name: props.path as "", keyName: "fieldId" });
-
-
   return (
     <div className="activity-line">
       <Row>
@@ -167,20 +171,21 @@ export const WorkItemsForm = (props: Props) => {
           <label>Total</label>
         </Col>
       </Row>
-      {workItemsHelper.fields.map((field, i) => ({ field, i, path: getPath(i.toString()) }))
+      {props.workItemsHelper.fields.map((field, i) => ({ field, i, path: getPath(i.toString()) }))
         .filter(item => (item.field as unknown as WorkItem).type === props.category)
         .map((item) => (<div key={item.field.fieldId}>
           <WorkItemForm
             category={props.category}
             rates={props.rates}
-            deleteWorkItem={() => workItemsHelper.remove(item.i)}
+            deleteWorkItem={() => props.workItemsHelper.remove(item.i)}
             path={item.path}
             defaultValue={item.field as unknown as WorkItem}
+            onTotalChanged={props.onTotalChanged}
           />
           <Button
             className="btn-sm"
             color="link"
-            onClick={() => workItemsHelper.append(props.getNewWorkItem(props.category))}
+            onClick={() => props.workItemsHelper.append(props.getNewWorkItem(props.category))}
           >
             <FontAwesomeIcon className="mr-2" icon={faPlus} />
           Add {props.category}
