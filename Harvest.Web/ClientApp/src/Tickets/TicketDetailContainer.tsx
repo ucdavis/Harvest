@@ -9,6 +9,8 @@ import {
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketAttachments } from "./TicketAttachments";
 import { TicketMessages } from "./TicketMessages";
+import { ShowFor } from "../Shared/ShowFor";
+
 
 interface RouteParams {
   projectId: string;
@@ -73,7 +75,12 @@ export const TicketDetailContainer = () => {
         <p className="lede">Due Date</p>
         <p>
           {ticket.dueDate ? new Date(ticket.dueDate).toDateString() : "N/A"}
-        </p>
+              </p>
+              <ShowFor roles={['FieldManager', 'Supervisor']}>
+                  <h2>Work Notes</h2>
+                  {/*TODO: Make this an input so it can be edited*/}
+                  <p>{ticket.workNotes}</p>
+              </ShowFor>
         <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
         <TicketMessages messages={ticket.messages}></TicketMessages>
       </div>

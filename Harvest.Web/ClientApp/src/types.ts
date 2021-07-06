@@ -249,6 +249,7 @@ export interface TicketDetails {
     status: string;
     createdOn: Date;
     createdBy: User;
+    workNotes: string;
 }
 export interface TicketAttachment {
     id: number;
