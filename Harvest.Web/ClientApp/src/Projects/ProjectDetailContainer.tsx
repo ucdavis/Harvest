@@ -66,14 +66,14 @@ export const ProjectDetailContainer = () => {
                 className="btn btn-primary btn-small mr-4"
                 to={`/request/changeAccount/${project.id}`}
               >
-                              Change Accounts
+                Change Accounts
               </Link>
-                <Link
-                    className="btn btn-primary btn-small mr-4"
-                    to={`/ticket/create/${project.id}`}
-                >
-                    Create Ticket
-                </Link>
+              <Link
+                className="btn btn-primary btn-small mr-4"
+                to={`/ticket/create/${project.id}`}
+              >
+                Create Ticket
+              </Link>
             </div>
             <div className="col text-right">
               <ProjectUnbilledButton
@@ -90,10 +90,15 @@ export const ProjectDetailContainer = () => {
               <h1>Project Progress</h1>
               <div className="row justify-content-between">
                 <div className="col">
-                  <p className="mb-1">${formatCurrency(project.chargedTotal)} Billed</p>
+                  <p className="mb-1">
+                    ${formatCurrency(project.chargedTotal)} Billed
+                  </p>
                 </div>
                 <div className="col text-right">
-                  <p className="mb-1">${formatCurrency(project.quoteTotal - project.chargedTotal)} Remaining</p>
+                  <p className="mb-1">
+                    ${formatCurrency(project.quoteTotal - project.chargedTotal)}{" "}
+                    Remaining
+                  </p>
                 </div>
               </div>
               <Progress
@@ -107,7 +112,7 @@ export const ProjectDetailContainer = () => {
       <div>
         <div className="row justify-content-around">
           <div className="col-md-5">
-            <div className="card-wrapper no-green mt-4">
+            <div className="card-wrapper no-green mt-4 mb-4">
               <div className="card-content">
                 <h2>Project Attachements</h2>
                 !! Add upload file input here !!
@@ -131,7 +136,10 @@ export const ProjectDetailContainer = () => {
             </div>
           </div>
           <div className="col-md-6">
-            <RecentInvoicesContainer compact={true} projectId={projectId}></RecentInvoicesContainer>
+            <RecentInvoicesContainer
+              compact={true}
+              projectId={projectId}
+            ></RecentInvoicesContainer>
           </div>
         </div>
       </div>

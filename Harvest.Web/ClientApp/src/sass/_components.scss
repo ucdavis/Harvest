@@ -146,3 +146,9 @@ $nchild-wide: 24%;
 .btn-link.focus {
   text-decoration: none;
 }
+.page-link:hover {
+  color: $primary-color;
+}
+.page-item button {
+  height: 54px;
+}
