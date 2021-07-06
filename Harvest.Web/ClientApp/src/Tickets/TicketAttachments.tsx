@@ -11,11 +11,17 @@ export const TicketAttachments = (props: Props) => {
   ]);
 
   if (ticketAttachments === undefined || ticketAttachments.length === 0) {
-    return <div>No Attachments</div>;
+    return (
+      <div>
+        <h2>Ticket Attachments</h2>
+        <p>No Attachments</p>
+      </div>
+    );
   }
 
   return (
     <div>
+      <h2>Ticket Attachments</h2>
       <p>{ticketAttachments[0].fileName}</p>
     </div>
   );
