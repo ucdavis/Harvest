@@ -7,6 +7,7 @@ import {
   TicketDetails,
 } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import { TicketAttachments } from "./TicketAttachments";
 
 interface RouteParams {
   projectId: string;
@@ -72,7 +73,7 @@ export const TicketDetailContainer = () => {
         <p>
           {ticket.dueDate ? new Date(ticket.dueDate).toDateString() : "N/A"}
         </p>
-
+              <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
         {/*<p>{ticket.attachments[0].fileName}</p>*/}
         {/*<p>{ticket.messages[0].message}</p>*/}
         {/*<p>{ticket.messages[0].createdBy.name}</p>*/}
