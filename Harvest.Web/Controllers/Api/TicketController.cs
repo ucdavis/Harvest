@@ -109,6 +109,7 @@ namespace Harvest.Web.Controllers.Api
                     Ticket
                     {
                         Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
+                        Requirements = a.Requirements,
                         UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages = a.Messages,
                         Attachments = a.Attachments
                     })
