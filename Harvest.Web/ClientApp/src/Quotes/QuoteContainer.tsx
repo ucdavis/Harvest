@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { useForm, FormProvider, useWatch, useFieldArray, UseFieldArrayReturn } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useFormHelpers } from "../Validation";
 import { quoteContentSchema } from "../schemas";
 
 import { Project, ProjectWithQuote, QuoteContent, QuoteContentImpl, Rate, WorkItemImpl, Activity, Field } from "../types";

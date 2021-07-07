@@ -8,7 +8,7 @@ import { UseFieldArrayReturn, useFormContext, useWatch, useFieldArray } from "re
 
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl, QuoteContent } from "../types";
-import { useFormHelpers, ValidationErrorMessage } from "../Validation";
+import { useFormHelpers, ValidationErrorMessage, usePropValuesFromArray, useMinRenders } from "../Validation";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
@@ -17,40 +17,50 @@ interface Props {
   rates: Rate[];
   path: string;
   defaultValue: Activity;
-  onTotalChanged: () => void;
+  //onTotalChanged: () => void;
 }
 
 export const ActivityForm = (props: Props) => {
 
-  const { getValues, setValue, register, formState: {errors}, control } = useFormContext();
+  const { getValues, setValue, register, control } = useFormContext();
 
   const { getPath, getInputValidityStyle } = useFormHelpers(props.path);
 
   const getNewWorkItem = (category: RateType) => {
-    const newId = Math.max(...(getValues(getPath("workItems") as "activities.0.workitems")).map((w: WorkItem) => w.id), 0) + 1;
+    const path = getPath("workItems");
+    const workItems = getValues(path as "activities.0.workitems");
+    const newId = Math.max(...(workItems).map((w: WorkItem) => w.id), 0) + 1;
     return new WorkItemImpl(getValues(getPath("id") as "activities.0.id"), newId, category);
   };
 
-  const [workItems, total] = useWatch({
-    control,
-    name: [getPath("workItems") as "", getPath("total") as ""],
-    defaultValue: [[], 0]
-  }) as [WorkItem[], number];
+  const laborTotal = usePropValuesFromArray(getPath("workItems"), "total", (item: WorkItem) => item.type === "Labor")
+    .reduce((acc, total) => acc + total || 0, 0);
+  useEffect(() => {
+    setValue(getPath("laborTotal") as "activities.0.total", laborTotal);
+  }, [laborTotal]);
+
+  const equipmentTotal = usePropValuesFromArray(getPath("workItems"), "total", (item: WorkItem) => item.type === "Equipment")
+    .reduce((acc, total) => acc + total || 0, 0);
+  useEffect(() => {
+    setValue(getPath("equipmentTotal") as "activities.0.total", equipmentTotal);
+  }, [equipmentTotal]);
+
+  const otherTotal = usePropValuesFromArray(getPath("workItems"), "total", (item: WorkItem) => item.type === "Other")
+    .reduce((acc, total) => acc + total || 0, 0);
+  useEffect(() => {
+    setValue(getPath("otherTotal") as "activities.0.total", otherTotal);
+  }, [otherTotal]);
+
+  useEffect(() => {
+    setValue(getPath("total") as "activities.0.total", laborTotal + equipmentTotal + otherTotal);
+  }, [laborTotal, equipmentTotal, otherTotal]);
 
   const workItemsHelper = useFieldArray({ control, name: getPath("workItems") as "", keyName: "fieldId" });
 
-
-  // can't use a watched workItems collection because it won't reflect the most recent update to a given workItem
-  const handleWorkItemTotalChanged = () => {
-    const workItems = getValues(getPath("workItems") as "") as WorkItem[];
-    const workItemsTotal = (workItems || []).reduce((acc, workItem) => (acc + workItem.total), 0);
-    setValue(getPath("total") as "activities.0.total", workItemsTotal);
-  }
-  
-  useEffect(() => {
-    props.onTotalChanged();
-    },
-    [total]);
+  //register("total");
+  //register("laborTotal");
+  //register("equipmentTotal");
+  //register("otherTotal");
 
   return (
     <div className="card-wrapper mb-4 no-green">
@@ -122,7 +132,6 @@ export const ActivityForm = (props: Props) => {
           getNewWorkItem={getNewWorkItem}
           path={getPath("workItems")}
           workItemsHelper={workItemsHelper}
-          onTotalChanged={handleWorkItemTotalChanged}
         />
         <WorkItemsForm
           category="Equipment"
@@ -130,7 +139,6 @@ export const ActivityForm = (props: Props) => {
           getNewWorkItem={getNewWorkItem}
           path={getPath("workItems")}
           workItemsHelper={workItemsHelper}
-          onTotalChanged={handleWorkItemTotalChanged}
         />
         <WorkItemsForm
           category="Other"
@@ -138,7 +146,6 @@ export const ActivityForm = (props: Props) => {
           getNewWorkItem={getNewWorkItem}
           path={getPath("workItems")}
           workItemsHelper={workItemsHelper}
-          onTotalChanged={handleWorkItemTotalChanged}
         />
       </div>
     </div>

@@ -18,7 +18,6 @@ interface Props {
   getNewWorkItem: (category: RateType) => WorkItem;
   path: string;
   workItemsHelper: UseFieldArrayReturn<Record<string, any>, "", "fieldId">;
-  onTotalChanged: () => void;
 }
 
 interface WorkItemProps {
@@ -27,7 +26,6 @@ interface WorkItemProps {
   path: string;
   deleteWorkItem: () => void;
   defaultValue: WorkItem;
-  onTotalChanged: () => void;
 }
 
 const WorkItemForm = (props: WorkItemProps) => {
@@ -70,10 +68,13 @@ const WorkItemForm = (props: WorkItemProps) => {
     setValue(getPath("total") as "", rate * quantity);
   }, [rate, quantity]);
 
-  useEffect(() => {
-      props.onTotalChanged();
-    },
-    [total]);
+
+  register(getPath("id") as "");
+  register(getPath("description") as "");
+  register(getPath("activityId") as "");
+  register(getPath("type") as "");
+  register(getPath("rate") as "");
+  register(getPath("unit") as "");
 
   return (
     <Row
@@ -83,7 +84,7 @@ const WorkItemForm = (props: WorkItemProps) => {
         <FormGroup>
           <select
             className={`form-control ${getInputValidityStyle(getPath("rateId"))}`}
-            {...register(getPath("rateId") as "")}
+            {...register(getPath("rateId") as "", { valueAsNumber: true })}
             defaultValue={props.defaultValue.rateId}
           >
             <option value="0">-- Select {props.category} --</option>
@@ -180,18 +181,16 @@ export const WorkItemsForm = (props: Props) => {
             deleteWorkItem={() => props.workItemsHelper.remove(item.i)}
             path={item.path}
             defaultValue={item.field as unknown as WorkItem}
-            onTotalChanged={props.onTotalChanged}
           />
-          <Button
-            className="btn-sm"
-            color="link"
-            onClick={() => props.workItemsHelper.append(props.getNewWorkItem(props.category))}
-          >
-            <FontAwesomeIcon className="mr-2" icon={faPlus} />
-          Add {props.category}
-          </Button>
         </div>))}
-      {/*<div>Debug: {JSON.stringify(props.values)}</div>*/}
+      <Button
+        className="btn-sm"
+        color="link"
+        onClick={() => props.workItemsHelper.append(props.getNewWorkItem(props.category))}
+      >
+        <FontAwesomeIcon className="mr-2" icon={faPlus} />
+        Add {props.category}
+      </Button>
     </div >
   );
 };

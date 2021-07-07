@@ -56,6 +56,9 @@ export const fieldSchema/*: SchemaOf<FieldWithoutGeometry>*/ = yup.object().shap
 
 export const activitySchema: SchemaOf<Activity> = yup.object().shape({
   total: yup.number().required(),
+  laborTotal: yup.number().required(),
+  equipmentTotal: yup.number().required(),
+  otherTotal: yup.number().required(),
   id: yup.number().required(),
   name: yup.string().required(),
   workItems: yup.array().of(workItemSchema).required()

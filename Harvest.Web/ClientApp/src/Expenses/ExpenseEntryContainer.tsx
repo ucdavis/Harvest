@@ -16,6 +16,9 @@ const getDefaultActivity = (id: number) => ({
   id,
   name: "Generic Activity",
   total: 0,
+  laborTotal: 0,
+  equipmentTotal: 0,
+  otherTotal: 0,
   workItems: [
     new WorkItemImpl(id, 1, "Labor"),
     new WorkItemImpl(id, 2, "Equipment"),
