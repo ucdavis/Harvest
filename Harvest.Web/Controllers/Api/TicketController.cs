@@ -54,11 +54,11 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy= AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] Ticket ticket)
+        public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
         {
             var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
             var currentUser = await _userService.GetCurrentUser();
-            ticketToUpdate.WorkNotes = ticket.WorkNotes;
+            ticketToUpdate.WorkNotes = workNotes;
             ticketToUpdate.UpdatedBy = currentUser;
             ticketToUpdate.UpdatedOn = DateTime.UtcNow;
 
