@@ -250,6 +250,7 @@ export interface TicketDetails {
     createdOn: Date;
     createdBy: User;
     workNotes: string;
+    updatedBy?: User;
 }
 export interface TicketAttachment {
     id: number;

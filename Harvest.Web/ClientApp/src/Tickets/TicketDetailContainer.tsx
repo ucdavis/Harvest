@@ -55,8 +55,6 @@ export const TicketDetailContainer = () => {
     return <div>Loading...</div>;
   }
 
-
-
   return (
     <div className="card-wrapper">
       <ProjectHeader
@@ -79,11 +77,21 @@ export const TicketDetailContainer = () => {
         <p>
           {ticket.dueDate ? new Date(ticket.dueDate).toDateString() : "N/A"}
         </p>
+        {ticket.updatedOn ? (
+          <>
+            <p className="lede">Updated On</p>
+            <p>{new Date(ticket.updatedOn).toDateString()}</p>
+            <p className="lede">Updated By</p>
+            <p>{ticket.updatedBy ? ticket.updatedBy.name : "N/A"}</p>
+          </>
+        ) : null}
         <ShowFor roles={["FieldManager", "Supervisor"]}>
-            <TicketWorkNotesEdit
+          <TicketWorkNotesEdit
             ticket={ticket}
             projectId={projectId}
-            setNotes={(notes: string) => setTicket({ ...ticket, workNotes: notes })}
+            setNotes={(notes: string) =>
+              setTicket({ ...ticket, workNotes: notes })
+            }
           ></TicketWorkNotesEdit>
         </ShowFor>
         <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
