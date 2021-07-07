@@ -8,6 +8,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   expenses: Expense[];
+  setSelectedExpense: (expense: Expense) => void;
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -52,7 +53,11 @@ export const ExpenseTable = (props: Props) => {
       },
       {
         Header: "Delete",
-        Cell: <Button color="danger">Delete</Button>,
+        Cell: (row: Expense) => (
+          <Button color="danger" onClick={() => props.setSelectedExpense(row)}>
+            Delete
+          </Button>
+        ),
       },
     ],
     []

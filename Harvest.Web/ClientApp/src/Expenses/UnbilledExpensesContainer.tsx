@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 
 import { Expense } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -14,6 +15,7 @@ interface RouteParams {
 export const UnbilledExpensesContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   useEffect(() => {
     // get unbilled expenses for the project
@@ -50,9 +52,25 @@ export const UnbilledExpensesContainer = () => {
             Enter New <FontAwesomeIcon icon={faPlus} />
           </Link>
         </div>
+
+        <Modal isOpen={selectedExpense !== null}>
+          <ModalHeader>Modal title</ModalHeader>
+          <ModalBody>
+            Are you sure you want to remove this unbilled expense?
+          </ModalBody>
+          <ModalFooter>
+            <Button color="success">Confirm</Button>{" "}
+            <Button color="danger" onClick={() => setSelectedExpense(null)}>
+              Cancel
+            </Button>
+          </ModalFooter>
+        </Modal>
       </div>
 
-      <ExpenseTable expenses={expenses}></ExpenseTable>
+      <ExpenseTable
+        expenses={expenses}
+        setSelectedExpense={setSelectedExpense}
+      ></ExpenseTable>
     </div>
   );
 };
