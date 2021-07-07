@@ -4,7 +4,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
-import { ApprovalPDF } from "./ApprovalPDF";
+import { QuotePDF } from "../Pdf/QuotePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -85,8 +85,8 @@ export const ApprovalContainer = () => {
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
               <PDFDownloadLink
-                document={<ApprovalPDF quote={projectAndQuote.quote} />}
-                fileName="somename.pdf"
+                document={<QuotePDF quote={projectAndQuote.quote} />}
+                fileName="Quote.pdf"
               >
                 <button className="btn btn-link btn-sm">
                   Download PDF <FontAwesomeIcon icon={faDownload} />
