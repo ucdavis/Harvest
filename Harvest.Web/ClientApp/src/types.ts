@@ -225,6 +225,7 @@ export interface ProjectAccount {
   percentage: number;
 }
 
+//Rename to TicketCreate? (Attachments is a BlobFile[] which doesn't work when I'm pulling the attachments from the DB see TicketDetails)
 export interface Ticket {
     id: number;
     projectId: number;
@@ -234,6 +235,33 @@ export interface Ticket {
     updatedOn?: Date;
     attachments: BlobFile[];
     status: string;
+    createdOn: Date;
+}
+export interface TicketDetails {
+    id: number;
+    projectId: number;
+    name: string;
+    requirements: string;
+    dueDate?: Date;
+    updatedOn?: Date;
+    attachments: TicketAttachment[];
+    messages: TicketMessage[];
+    status: string;
+    createdOn: Date;
+    createdBy: User;
+    workNotes: string;
+    updatedBy?: User;
+}
+export interface TicketAttachment {
+    id: number;
+    fileName: string;
+    createdOn: Date;
+    createdBy: User;
+}
+export interface TicketMessage {
+    id: number;
+    message: string;
+    createdBy: User;
     createdOn: Date;
 }
 

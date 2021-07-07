@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Migrations.SqlServer;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
 {
+    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
     public class TicketController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -25,7 +27,6 @@ namespace Harvest.Web.Controllers.Api
 
 
         [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
         {
             var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
@@ -49,6 +50,23 @@ namespace Harvest.Web.Controllers.Api
         public ActionResult Create()
         {
             return View("React");
+        }
+
+        [HttpPost]
+        [Authorize(Policy= AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
+        {
+            var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+            var currentUser = await _userService.GetCurrentUser();
+            ticketToUpdate.WorkNotes = workNotes;
+            ticketToUpdate.UpdatedBy = currentUser;
+            ticketToUpdate.UpdatedOn = DateTime.UtcNow;
+
+            _dbContext.Tickets.Update(ticketToUpdate);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(ticketToUpdate);
+
         }
 
         [HttpPost]
@@ -93,5 +111,28 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(project);
         }
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public ActionResult Details(int projectId, int ticketId)
+        {
+            return View("React");
+        }
+        [HttpGet]
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public async Task<ActionResult> Get(int projectId, int ticketId)
+        {
+            var ticket = await _dbContext.Tickets
+                .Where(a => a.Id == ticketId && a.ProjectId == projectId)
+                .Select(a => new
+                    Ticket
+                    { Id= a.Id,
+                        Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
+                        Requirements = a.Requirements, WorkNotes = a.WorkNotes,
+                        UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages = a.Messages,
+                        Attachments = a.Attachments
+                    })
+                .SingleAsync();
+            return Ok(ticket);
+        }
+
     }
 }
