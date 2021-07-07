@@ -10,7 +10,8 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketAttachments } from "./TicketAttachments";
 import { TicketMessages } from "./TicketMessages";
 import { ShowFor } from "../Shared/ShowFor";
-
+import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
+import { Button, FormGroup, Input, Label } from "reactstrap";
 
 interface RouteParams {
   projectId: string;
@@ -54,6 +55,8 @@ export const TicketDetailContainer = () => {
     return <div>Loading...</div>;
   }
 
+
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
@@ -75,12 +78,14 @@ export const TicketDetailContainer = () => {
         <p className="lede">Due Date</p>
         <p>
           {ticket.dueDate ? new Date(ticket.dueDate).toDateString() : "N/A"}
-              </p>
-              <ShowFor roles={['FieldManager', 'Supervisor']}>
-                  <h2>Work Notes</h2>
-                  {/*TODO: Make this an input so it can be edited*/}
-                  <p>{ticket.workNotes}</p>
-              </ShowFor>
+        </p>
+        <ShowFor roles={["FieldManager", "Supervisor"]}>
+            <TicketWorkNotesEdit
+            ticket={ticket}
+            projectId={projectId}
+            setNotes={(notes: string) => setTicket({ ...ticket, workNotes: notes })}
+          ></TicketWorkNotesEdit>
+        </ShowFor>
         <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
         <TicketMessages messages={ticket.messages}></TicketMessages>
       </div>

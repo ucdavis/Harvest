@@ -53,6 +53,23 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
+        [Authorize(Policy= AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
+        {
+            var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+            var currentUser = await _userService.GetCurrentUser();
+            ticketToUpdate.WorkNotes = workNotes;
+            ticketToUpdate.UpdatedBy = currentUser;
+            ticketToUpdate.UpdatedOn = DateTime.UtcNow;
+
+            _dbContext.Tickets.Update(ticketToUpdate);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(ticketToUpdate);
+
+        }
+
+        [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Ticket ticket)
         {
@@ -107,7 +124,7 @@ namespace Harvest.Web.Controllers.Api
                 .Where(a => a.Id == ticketId && a.ProjectId == projectId)
                 .Select(a => new
                     Ticket
-                    {
+                    { Id= a.Id,
                         Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
                         Requirements = a.Requirements, WorkNotes = a.WorkNotes,
                         UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages = a.Messages,
