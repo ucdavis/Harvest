@@ -8,41 +8,40 @@ interface Props {
 }
 
 export const TicketWorkNotesEdit = (props: Props) => {
-  const { ticket } = props;
+  const { ticket, setNotes } = props;
 
   const update = async () => {
-    // TODO: validation
+      // TODO: validation
 
-    const response = await fetch(
-      `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${props.ticket.id}`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ticket),
+      const response = await fetch(
+          `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
+          {
+              method: "POST",
+              headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(ticket.workNotes),
+          }
+      );
+
+      if (response.ok) {
+          const data = await response.json();
+      } else {
+          alert("Something went wrong, please try again");
       }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-    } else {
-      alert("Something went wrong, please try again");
-    }
   };
 
   return (
     <>
       <h2>Work Notes</h2>
       <FormGroup>
-        <Label>Edit work notes</Label>
-        <Input
+          <Input
           type="textarea"
           name="text"
           id="workNotes"
           value={ticket.workNotes}
-          onChange={(e) => props.setNotes(e.target.value)}
+          onChange={(e) => setNotes(e.target.value)}
         />
       </FormGroup>
       <div className="row justify-content-center">
@@ -50,7 +49,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
           Update Work Notes
         </Button>
       </div>
-      <div>DEBUG: {JSON.stringify(ticket)}</div>
+      <div>DEBUG: {JSON.stringify(ticket.workNotes)}</div>
     </>
   );
 };
