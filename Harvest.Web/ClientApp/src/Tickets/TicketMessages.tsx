@@ -19,8 +19,11 @@ export const TicketMessages = (props: Props) => {
 
   return (
     <div>
-      <h2>Conversation</h2>
-      <p>{ticketMessages[0].message}</p>
+          <h2>Conversation</h2>
+          {ticketMessages.map((ticketMessage) => (
+              <p>{ticketMessage.message} from {ticketMessage.createdBy.name}</p>
+          ))}
+
     </div>
   );
 };
