@@ -10,6 +10,8 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketAttachments } from "./TicketAttachments";
 import { TicketMessages } from "./TicketMessages";
 import { ShowFor } from "../Shared/ShowFor";
+import { TicketWorkNotesEdit} from "./TicketWorkNotesEdit";
+import { Button, FormGroup, Input, Label } from "reactstrap";
 
 
 interface RouteParams {
@@ -78,8 +80,17 @@ export const TicketDetailContainer = () => {
               </p>
               <ShowFor roles={['FieldManager', 'Supervisor']}>
                   <h2>Work Notes</h2>
-                  {/*TODO: Make this an input so it can be edited*/}
-                  <p>{ticket.workNotes}</p>
+                  <FormGroup>
+                      <Label>Edit work notes</Label>
+                      <Input
+                          type="textarea"
+                          name="text"
+                          id="workNotes"
+                          value={ticket.workNotes}
+                          onChange={(e) => setTicket({ ...ticket, workNotes: e.target.value })}
+                      />
+                  </FormGroup>
+                  <TicketWorkNotesEdit TicketDetails={ticket} projectId={projectId}></TicketWorkNotesEdit>
               </ShowFor>
         <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
         <TicketMessages messages={ticket.messages}></TicketMessages>
