@@ -11,8 +11,6 @@ interface Props {
 
 export const TicketWorkNotesEdit = (props: Props) => {
     const [ticket, setTicket] = useState<TicketDetails>();
-    const projectId = useMemo(() => props.projectId, [props.projectId]);
-    const ticketId = useMemo(() => props.TicketDetails.id, [props.TicketDetails.id]);
 
     if (ticket === undefined) {
         return <div>ERROR...</div>;
@@ -22,7 +20,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
     // TODO: validation
 
     const response = await fetch(
-      `/Ticket/UpdateWorkNotes?projectId=${projectId}&ticketId=${ticketId}`,
+      `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${props.TicketDetails.id}`,
       {
         method: "POST",
         headers: {
