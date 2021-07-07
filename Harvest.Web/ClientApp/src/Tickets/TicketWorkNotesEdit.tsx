@@ -1,26 +1,20 @@
-﻿import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { Project, TicketDetails } from "../types";
-import { useMemo } from "react";
+﻿import { TicketDetails } from "../types";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 
 interface Props {
-  TicketDetails: TicketDetails;
+  ticket: TicketDetails;
   projectId: string;
+  setNotes: (notes: string) => void;
 }
 
 export const TicketWorkNotesEdit = (props: Props) => {
-    const [ticket, setTicket] = useState<TicketDetails>();
-
-    if (ticket === undefined) {
-        return <div>ERROR...</div>;
-    }
+  const { ticket } = props;
 
   const update = async () => {
     // TODO: validation
 
     const response = await fetch(
-      `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${props.TicketDetails.id}`,
+      `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${props.ticket.id}`,
       {
         method: "POST",
         headers: {
@@ -48,7 +42,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
           name="text"
           id="workNotes"
           value={ticket.workNotes}
-          onChange={(e) => setTicket({ ...ticket, workNotes: e.target.value })}
+          onChange={(e) => props.setNotes(e.target.value)}
         />
       </FormGroup>
       <div className="row justify-content-center">
