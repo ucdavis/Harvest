@@ -8,7 +8,7 @@ import { UseFieldArrayReturn, useFormContext, useWatch, useFieldArray } from "re
 
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl, QuoteContent } from "../types";
-import { useFormHelpers, ValidationErrorMessage, usePropValuesFromArray, useMinRenders } from "../Validation";
+import { useFormHelpers, ValidationErrorMessage, usePropValuesFromArray } from "../Validation";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
@@ -17,7 +17,6 @@ interface Props {
   rates: Rate[];
   path: string;
   defaultValue: Activity;
-  //onTotalChanged: () => void;
 }
 
 export const ActivityForm = (props: Props) => {
@@ -57,10 +56,10 @@ export const ActivityForm = (props: Props) => {
 
   const workItemsHelper = useFieldArray({ control, name: getPath("workItems") as "", keyName: "fieldId" });
 
-  //register("total");
-  //register("laborTotal");
-  //register("equipmentTotal");
-  //register("otherTotal");
+  register("total");
+  register("laborTotal");
+  register("equipmentTotal");
+  register("otherTotal");
 
   return (
     <div className="card-wrapper mb-4 no-green">

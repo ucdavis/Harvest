@@ -212,9 +212,6 @@ export interface WorkItem {
 
 export interface Activity {
   total: number;
-  laborTotal: number;
-  equipmentTotal: number;
-  otherTotal: number;
   id: number;
   name: string;
   workItems: WorkItem[];
