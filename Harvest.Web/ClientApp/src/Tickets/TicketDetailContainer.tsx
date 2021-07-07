@@ -56,6 +56,28 @@ export const TicketDetailContainer = () => {
     return <div>Loading...</div>;
   }
 
+  const update = async () => {
+      // TODO: validation
+
+      const response = await fetch(
+          `/Ticket/UpdateWorkNotes?projectId=${projectId}&ticketId=${ticketId}`,
+          {
+              method: "POST",
+              headers: {
+                  Accept: "application/json",
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(ticket.workNotes),
+          }
+      );
+
+      if (response.ok) {
+          const data = await response.json();
+      } else {
+          alert("Something went wrong, please try again");
+      }
+  };
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
@@ -90,6 +112,12 @@ export const TicketDetailContainer = () => {
                           onChange={(e) => setTicket({ ...ticket, workNotes: e.target.value })}
                       />
                   </FormGroup>
+                  <div className="row justify-content-center">
+                      <Button className="btn-lg" color="primary" onClick={update}>
+                          Update Work Notes
+                      </Button>
+                  </div>
+                  <div>DEBUG: {JSON.stringify(ticket.workNotes)}</div>
                   <TicketWorkNotesEdit TicketDetails={ticket} projectId={projectId}></TicketWorkNotesEdit>
               </ShowFor>
         <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
