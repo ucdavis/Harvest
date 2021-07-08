@@ -93,11 +93,15 @@ export const TicketDetailContainer = () => {
             setNotes={(notes: string) =>
               setTicket({ ...ticket, workNotes: notes })
             }
-          ></TicketWorkNotesEdit>
+          />
         </ShowFor>
-        <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
-              <TicketMessages messages={ticket.messages}></TicketMessages>
-              <TicketReply ticket={ticket} projectId={projectId} setTicket={(ticket: TicketDetails) => setTicket(ticket)}></TicketReply>
+        <TicketAttachments attachments={ticket.attachments} />
+        <TicketMessages messages={ticket.messages} />
+        <TicketReply
+          ticket={ticket}
+          projectId={projectId}
+          setTicket={(ticket: TicketDetails) => setTicket(ticket)}
+        />
       </div>
     </div>
   );

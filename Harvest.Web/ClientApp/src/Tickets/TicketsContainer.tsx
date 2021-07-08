@@ -13,7 +13,6 @@ export const TicketsContainer = () => {
   const [project, setProject] = useState<Project>();
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
-
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
@@ -28,10 +27,8 @@ export const TicketsContainer = () => {
   }, [projectId]);
 
   useEffect(() => {
-      const cb = async () => {
-      const response = await fetch(
-        `/Ticket/GetList?projectId=${projectId}`
-      );
+    const cb = async () => {
+      const response = await fetch(`/Ticket/GetList?projectId=${projectId}`);
 
       if (response.ok) {
         setTickets(await response.json());
@@ -61,7 +58,7 @@ export const TicketsContainer = () => {
         >
           Create Ticket
         </Link>
-        <TicketTable compact={false} tickets={tickets}></TicketTable>
+        <TicketTable compact={false} tickets={tickets} />
       </div>
     </div>
   );
