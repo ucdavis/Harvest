@@ -136,6 +136,11 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Reply(int projectId, int ticketId, [FromBody] TicketMessage ticketMessage)
         {
+            if (ticketMessage == null || string.IsNullOrWhiteSpace(ticketMessage.Message))
+            {
+                return BadRequest("No message entered");
+            }
+
             var currentUser = await _userService.GetCurrentUser();
             var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
 
