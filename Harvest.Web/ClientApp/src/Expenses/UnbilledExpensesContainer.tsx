@@ -34,6 +34,28 @@ export const UnbilledExpensesContainer = () => {
     cb();
   }, [projectId]);
 
+  // This function closes the modal and deletes the entry from the db
+  const confirmModal = async (expenseId: number) => {
+    const response = await fetch(`/Expense/Delete/${expenseId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      let expensesCopy = [...expenses];
+      const index = expensesCopy.findIndex(
+        (element) => element.id === expenseId
+      );
+      expensesCopy.splice(index, 1);
+
+      setExpenses(expensesCopy);
+      setSelectedExpense(null);
+    }
+  };
+
   if (expenses.length === 0) {
     return <h3>No un-billed expenses found</h3>;
   }
@@ -59,7 +81,16 @@ export const UnbilledExpensesContainer = () => {
             Are you sure you want to remove this unbilled expense?
           </ModalBody>
           <ModalFooter>
-            <Button color="success">Confirm</Button>{" "}
+            <Button
+              color="success"
+              onClick={() =>
+                selectedExpense !== null
+                  ? confirmModal(selectedExpense.id)
+                  : null
+              }
+            >
+              Confirm
+            </Button>{" "}
             <Button color="danger" onClick={() => setSelectedExpense(null)}>
               Cancel
             </Button>

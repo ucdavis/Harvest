@@ -53,8 +53,11 @@ export const ExpenseTable = (props: Props) => {
       },
       {
         Header: "Delete",
-        Cell: (row: Expense) => (
-          <Button color="danger" onClick={() => props.setSelectedExpense(row)}>
+        Cell: (data: any) => (
+          <Button
+            color="danger"
+            onClick={() => props.setSelectedExpense(data.row.original)}
+          >
             Delete
           </Button>
         ),
