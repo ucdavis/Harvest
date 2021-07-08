@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
-using Harvest.Core.Migrations.SqlServer;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
