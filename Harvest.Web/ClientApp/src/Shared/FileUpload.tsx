@@ -98,8 +98,8 @@ export const FileUpload = (props: Props) => {
       {props.files.length > 0 && (
         <small id="emailHelp" className="form-text text-muted">
           <ul>
-            {props.files.map((file) => (
-              <li key={file.fileName}>
+            {props.files.map((file, i) => (
+              <li key={`file-${i}`}>
                 {file.fileName} {!file.uploaded && "[spinner]"}
               </li>
             ))}

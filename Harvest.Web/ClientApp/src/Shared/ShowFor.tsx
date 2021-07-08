@@ -14,7 +14,7 @@ export const ShowFor = (props: Props) => {
 
   const anyMatchingRoles: boolean = useMemo(
     () => userRoles.some((role) => roles.includes(role)),
-    [...props.roles]
+    [props.roles]
   );
 
   if (
