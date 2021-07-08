@@ -5,7 +5,7 @@ import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 
 interface Props {
-    projectId: any;
+    projectId: string;
     compact: boolean;
 }
 
