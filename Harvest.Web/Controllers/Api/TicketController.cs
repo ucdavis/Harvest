@@ -134,5 +134,32 @@ namespace Harvest.Web.Controllers.Api
             return Ok(ticket);
         }
 
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        public async Task<ActionResult> Reply(int projectId, int ticketId, [FromBody] TicketMessage ticketMessage)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+
+            var ticketMessageToCreate = new TicketMessage
+            {
+                Message = ticketMessage.Message, 
+                CreatedBy = currentUser, 
+                CreatedOn = DateTime.UtcNow
+            };
+            ticket.Messages.Add(ticketMessageToCreate);
+            ticket.UpdatedBy = currentUser;
+            ticket.UpdatedOn = DateTime.UtcNow;
+            ticket.Status = "Updated";
+
+            _dbContext.Tickets.Update(ticket);
+            await _dbContext.SaveChangesAsync();
+            //TODO: Notification
+
+            //Return message instead?
+            return Ok(ticket);
+
+        }
+
     }
 }

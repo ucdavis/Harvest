@@ -1,34 +1,38 @@
-﻿import { TicketDetails } from "../types";
+﻿import React, { useState } from "react";
 import { Button, FormGroup, Input, Label } from "reactstrap";
+import { TicketDetails, TicketMessage } from "../types";
 
 interface Props {
   ticket: TicketDetails;
   projectId: string;
-  setNotes: (notes: string) => void;
+  setTicket: (ticket: TicketDetails) => void;
 }
 
-export const TicketWorkNotesEdit = (props: Props) => {
-  const { ticket, setNotes } = props;
+export const TicketReply = (props: Props) => {
+  const { ticket, setTicket, projectId } = props;
+  const [ticketMessage, setTicketMessage] = useState<TicketMessage>({
+    message: "",
+  } as TicketMessage);
 
   const update = async () => {
       // TODO: validation
 
       const response = await fetch(
-          `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
+          `/Ticket/Reply?projectId=${props.projectId}&ticketId=${ticket.id}`,
           {
               method: "POST",
               headers: {
                   Accept: "application/json",
                   "Content-Type": "application/json",
               },
-              body: JSON.stringify(ticket.workNotes),
+              body: JSON.stringify(ticketMessage),
           }
       );
 
       if (response.ok) {
           debugger;
           const data = await response.json();
-          alert("Work notes saved.");
+          alert("Reply saved.");
       } else {
           alert("Something went wrong, please try again");
       }
@@ -36,22 +40,24 @@ export const TicketWorkNotesEdit = (props: Props) => {
 
   return (
     <>
-      <h2>Work Notes</h2>
+      <h2>Reply</h2>
       <FormGroup>
-          <Input
+        <Input
           type="textarea"
           name="text"
-          id="workNotes"
-          value={ticket.workNotes}
-          onChange={(e) => setNotes(e.target.value)}
+          id="message"
+          value={ticketMessage.message}
+          onChange={(e) =>
+            setTicketMessage({ ...ticketMessage, message: e.target.value })
+          }
         />
       </FormGroup>
       <div className="row justify-content-center">
         <Button className="btn-lg" color="primary" onClick={update}>
-          Update Work Notes
+          Send
         </Button>
       </div>
-      <div>DEBUG: {JSON.stringify(ticket.workNotes)}</div>
+      <div>DEBUG: {JSON.stringify(ticketMessage)}</div>
     </>
   );
 };
