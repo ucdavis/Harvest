@@ -31,8 +31,7 @@ export const TicketReply = (props: Props) => {
 
     if (response.ok) {
         const data = await response.json();
-        ticket.messages.push(data);
-        setTicket({ ...ticket });
+        setTicket({ ...ticket, messages: [...ticket.messages, data] });
         setTicketMessage({
             message: "",
         } as TicketMessage);
