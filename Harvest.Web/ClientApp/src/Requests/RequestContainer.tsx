@@ -188,7 +188,7 @@ export const RequestContainer = () => {
             crops={project.crop}
             setCrops={(c) => setProject({ ...project, crop: c })}
             cropType={project.cropType}
-          ></Crops>
+          />
         </FormGroup>
 
         <FormGroup>
@@ -198,7 +198,7 @@ export const RequestContainer = () => {
             setUser={(u) =>
               setProject({ ...project, principalInvestigator: u })
             }
-          ></SearchPerson>
+          />
         </FormGroup>
 
         <FormGroup>
@@ -218,7 +218,7 @@ export const RequestContainer = () => {
                 return { ...proj, attachments: [...proj.attachments] };
               })
             }
-          ></FileUpload>
+          />
         </FormGroup>
 
         <FormGroup>

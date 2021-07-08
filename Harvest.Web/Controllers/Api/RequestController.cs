@@ -42,7 +42,8 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult ChangeAccount(int id) {
+        public ActionResult ChangeAccount(int id)
+        {
             return View("React");
         }
 
@@ -53,7 +54,7 @@ namespace Harvest.Web.Controllers
 
             // get the currently unapproved quote for this project
             var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == id && q.ApprovedOn == null);
-            
+
             var currentUser = await _userService.GetCurrentUser();
 
             // TODO: double check the percentages add up to 100%
@@ -82,7 +83,8 @@ namespace Harvest.Web.Controllers
                 // now that fields are locked in, add to new db fields
                 // SQL Server requires polygons be counter clock-wise, so if it isn't then reverse it
                 var poly = quoteField.Geometry;
-                if (!poly.Shell.IsCCW) {
+                if (!poly.Shell.IsCCW)
+                {
                     poly = (Polygon)poly.Reverse();
                 }
 
@@ -99,6 +101,29 @@ namespace Harvest.Web.Controllers
 
             return Ok(project);
         }
+
+        [HttpPost]
+        public async Task<ActionResult> Files(int id, [FromBody] ProjectFilesModel model)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id);
+
+            var newProject = new ProjectAttachment
+            {
+                Identifier = model.Attachments[model.Attachments.Length - 1].Identifier,
+                FileName = model.Attachments[model.Attachments.Length - 1].FileName,
+                FileSize = model.Attachments[model.Attachments.Length - 1].FileSize,
+                ContentType = model.Attachments[model.Attachments.Length - 1].ContentType,
+                CreatedOn = DateTime.UtcNow,
+                CreatedById = currentUser.Id
+            };
+
+            project.Attachments.Add(newProject);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(null);
+        }
+
 
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] Project project)
@@ -143,7 +168,8 @@ namespace Harvest.Web.Controllers
             // If there are attachments, fill out details and add to project
             foreach (var attachment in project.Attachments)
             {
-                newProject.Attachments.Add(new ProjectAttachment {
+                newProject.Attachments.Add(new ProjectAttachment
+                {
                     Identifier = attachment.Identifier,
                     FileName = attachment.FileName,
                     FileSize = attachment.FileSize,
@@ -166,5 +192,10 @@ namespace Harvest.Web.Controllers
     public class RequestApprovalModel
     {
         public Account[] Accounts { get; set; }
+    }
+
+    public class ProjectFilesModel
+    {
+        public ProjectAttachment[] Attachments { get; set; }
     }
 }
