@@ -11,6 +11,7 @@ import { TicketAttachments } from "./TicketAttachments";
 import { TicketMessages } from "./TicketMessages";
 import { ShowFor } from "../Shared/ShowFor";
 import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
+import { TicketReply } from "./TicketReply";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 
 interface RouteParams {
@@ -95,7 +96,8 @@ export const TicketDetailContainer = () => {
           ></TicketWorkNotesEdit>
         </ShowFor>
         <TicketAttachments attachments={ticket.attachments}></TicketAttachments>
-        <TicketMessages messages={ticket.messages}></TicketMessages>
+              <TicketMessages messages={ticket.messages}></TicketMessages>
+              <TicketReply ticket={ticket} projectId={projectId} setTicket={(ticket: TicketDetails) => setTicket(ticket)}></TicketReply>
       </div>
     </div>
   );
