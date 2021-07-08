@@ -21,7 +21,7 @@ export const TicketAttachments = (props: Props) => {
 
   return (
     <div>
-      <h2>Ticket Attachments</h2>
+      <h2>Ticket Attachments TODO!!!</h2>
       <p>{ticketAttachments[0].fileName}</p>
     </div>
   );
