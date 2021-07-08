@@ -156,8 +156,10 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.SaveChangesAsync();
             //TODO: Notification
 
+            var savedTm = await _dbContext.TicketMessages.Where(a => a.Id == ticketMessageToCreate.Id).Select(a => new TicketMessage{Id = a.Id, CreatedBy = a.CreatedBy, Message = a.Message}).SingleAsync();
+
             //Return message instead?
-            return Ok(ticketMessage);
+            return Ok(savedTm);
 
         }
 

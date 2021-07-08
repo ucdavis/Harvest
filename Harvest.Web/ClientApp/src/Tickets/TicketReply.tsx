@@ -15,27 +15,31 @@ export const TicketReply = (props: Props) => {
   } as TicketMessage);
 
   const update = async () => {
-      // TODO: validation
+    // TODO: validation
 
-      const response = await fetch(
-          `/Ticket/Reply?projectId=${props.projectId}&ticketId=${ticket.id}`,
-          {
-              method: "POST",
-              headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(ticketMessage),
-          }
-      );
-
-      if (response.ok) {
-          debugger;
-          const data = await response.json();
-          alert("Reply saved.");
-      } else {
-          alert("Something went wrong, please try again");
+    const response = await fetch(
+      `/Ticket/Reply?projectId=${props.projectId}&ticketId=${ticket.id}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ticketMessage),
       }
+    );
+
+    if (response.ok) {
+        const data = await response.json();
+        ticket.messages.push(data);
+        setTicket({ ...ticket });
+        setTicketMessage({
+            message: "",
+        } as TicketMessage);
+      alert("Reply saved.");
+    } else {
+      alert("Something went wrong, please try again");
+    }
   };
 
   return (
