@@ -56,7 +56,7 @@ namespace Harvest.Web.Controllers
         // Returns JSON info of the project
         public async Task<ActionResult> Get(int id)
         {
-            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id));
+            return Ok(await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id));
         }
 
         [HttpGet]
