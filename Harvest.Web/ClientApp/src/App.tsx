@@ -16,7 +16,9 @@ import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
-import { TicketContainer } from "./Tickets/TicketContainer";
+import { TicketCreate } from "./Tickets/TicketCreate";
+import { TicketsContainer } from "./Tickets/TicketsContainer";
+import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { Map } from "./Maps/Map";
 
 
@@ -44,7 +46,9 @@ function App() {
       />
       <ConditionalRoute roles={['FieldManager', 'Supervisor']} path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
-      <Route path="/ticket/create/:projectId" component={TicketContainer} />
+      <Route path="/ticket/create/:projectId" component={TicketCreate} />
+      <Route path="/ticket/list/:projectId" component={TicketsContainer} />
+      <Route path="/ticket/details/:projectId/:ticketId" component={TicketDetailContainer} />
       <Route
         path="/project/details/:projectId"
         component={ProjectDetailContainer}
