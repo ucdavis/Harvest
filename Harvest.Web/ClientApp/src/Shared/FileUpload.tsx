@@ -100,7 +100,7 @@ export const FileUpload = (props: Props) => {
           <ul>
             {props.files.map((file, i) => (
               <li key={`file-${i}`}>
-                {file.fileName} {!file.uploaded && "[spinner]"}
+                {file.fileName} {file.uploaded === false ? "[spinner" : null}
               </li>
             ))}
           </ul>
