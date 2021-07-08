@@ -157,7 +157,7 @@ namespace Harvest.Web.Controllers.Api
             //TODO: Notification
 
             //Return message instead?
-            return Ok(ticket);
+            return Ok(ticketMessage);
 
         }
 

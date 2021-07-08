@@ -26,7 +26,6 @@ export const TicketWorkNotesEdit = (props: Props) => {
       );
 
       if (response.ok) {
-          debugger;
           const data = await response.json();
           alert("Work notes saved.");
       } else {
