@@ -59,6 +59,21 @@ namespace Harvest.Web.Controllers
             return Ok(expenses);
         }
 
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> Delete(int id) {
+            var expense = await _dbContext.Expenses.FindAsync(id);
+
+            if (expense == null) {
+                return NotFound();
+            }
+
+            _dbContext.Expenses.Remove(expense);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(null);
+        }
+
         // Get all unbilled expenses for the given project
         [HttpGet]
         public async Task<ActionResult> GetUnbilled(int id)
