@@ -27,7 +27,6 @@ export const ActivitiesContainer = (props: Props) => {
 
   const laborTotal = usePropValuesFromArray("activities", "laborTotal").reduce((acc, total) => acc + total || 0, 0);
   useEffect(() => {
-    register("laborTotal");
     setValue("laborTotal", laborTotal);
   }, [laborTotal]);
 

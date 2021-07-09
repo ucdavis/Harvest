@@ -1,5 +1,9 @@
 ﻿import React, { useMemo, useCallback } from "react";
-import { FieldError, useFormState, useFormContext, useWatch, useFieldArray } from "react-hook-form"
+import {
+  useFormState, useFormContext, useWatch, FieldValues, UseFormReturn, UseFormWatch, UseFormGetValues, UseFormSetError,
+  UseFormClearErrors, UseFormSetValue, UseFormTrigger, FormState, UseFormReset, UseFormHandleSubmit, UseFormUnregister,
+  Control, UseFormRegister, UseFormSetFocus, FieldPath, WatchObserver, UnpackNestedValue, EventType
+} from "react-hook-form"
 import { ErrorMessage } from "@hookform/error-message";
 import get from "lodash/get";
 
@@ -33,16 +37,115 @@ export function ValidationErrorMessage(props: ValidationMessageProps) {
     render={({ message }) => <p className="text-danger">{message}</p>} />;
 }
 
+export function getFilteredItemsWithOriginalIndex<T>(items: T[], filter: (item: T) => boolean) {
+  return items
+    .map((item, i) => ({ item, i }))
+    .filter((itemAndIndex) => filter(itemAndIndex.item));
+}
+
 export function usePropValuesFromArray<TObj = object, TElem = any>(arrayPropPath: string, nestedPropName: string, filter: (item: TObj) => boolean = (_) => true) {
   const { control, getValues } = useFormContext();
-  const items = (getValues(arrayPropPath as "") || []) as TObj[] ;
-  const paths = items
-    .map((item, i) => ({ field: item, i }))
-    .filter((item) => filter(item.field))
+  const items = (getValues(arrayPropPath as "") || []) as TObj[];
+  const paths = getFilteredItemsWithOriginalIndex(items, filter)
     .map((item) => `${arrayPropPath}.${item.i}.${nestedPropName}`);
   const values = useWatch({ control, name: paths as ""[], defaultValue: [] }) as TElem[];
   return [...values];
 }
+
+export const isString = (value: any): value is string => typeof value === 'string';
+export const isStringArray = (value: any): value is string[] => Array.isArray(value) && (value.length === 0 || typeof value[0] === "string");
+export const isFunction = (value: unknown): value is Function => typeof value === 'function';
+
+export type UseNestedFormReturn<TFieldValues extends FieldValues = FieldValues> =
+  Omit<UseFormReturn<TFieldValues>, "formState" | "handleSubmit" | "reset" | "control">
+  & Pick<UseFormReturn<Record<string, any>>, "control">
+
+export const useNestedFormContext = <TFieldValues extends FieldValues>(path: string = ""): UseNestedFormReturn<TFieldValues> => {
+  const rootContext = useFormContext();
+  const namePrefix = (path || "") === "" ? "" : `${path}.`
+
+  const transformFieldName = useCallback((fieldName: FieldPath<TFieldValues> | ReadonlyArray<FieldPath<TFieldValues>> | WatchObserver<TFieldValues> | undefined) => {
+    if (isString(fieldName)) {
+      return namePrefix + fieldName;
+    }
+    if (isStringArray(fieldName)) {
+      return fieldName.map(n => namePrefix + n);
+    }
+    if (isFunction(fieldName)) {
+      return ((value: UnpackNestedValue<TFieldValues>, info: { name?: string; type?: EventType; value?: unknown; }) => {
+        return fieldName(value, { name: namePrefix + info.name, type: info.type, value: info.value });
+      }) as WatchObserver<Record<string, any>>;
+    }
+    return undefined;
+  }, [namePrefix]);
+
+  const watch: UseFormWatch<TFieldValues> = useCallback((
+    fieldName?: FieldPath<TFieldValues> | ReadonlyArray<FieldPath<TFieldValues>> | WatchObserver<TFieldValues>,
+    defaultValue?: unknown,
+  ) => {
+    const fullPath = transformFieldName(fieldName);
+    // there are many watch overloads, but they all go to the same 2-arg function, so just cast to a valid "" argument
+    return rootContext.watch(fullPath as "", defaultValue);
+  }, [transformFieldName]);
+
+  const unregister: UseFormUnregister<TFieldValues> = useCallback((name, options = {}) => {
+    const fullPath = transformFieldName(name) as string;
+    return rootContext.unregister(fullPath)
+  }, [transformFieldName]);
+
+  const register: UseFormRegister<TFieldValues> = useCallback(<TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>>(name: TFieldName, options = {}) => {
+    const fullPath = transformFieldName(name) as string;
+    return rootContext.register(fullPath, options)
+  }, [transformFieldName]);
+
+  const setFocus: UseFormSetFocus<TFieldValues> = useCallback((name) => {
+    const fullPath = transformFieldName(name) as string;
+    return rootContext.setFocus(fullPath)
+  }, [transformFieldName]);
+
+  const trigger: UseFormTrigger<TFieldValues> = useCallback(async (name, options = {}) => {
+    const fullPath = transformFieldName(name) as string;
+    return await rootContext.trigger(fullPath, options)
+  }, [transformFieldName]);
+
+  const setValue: UseFormSetValue<TFieldValues> = useCallback((name, value, options = {}) => {
+    const fullPath = transformFieldName(name) as string;
+    return rootContext.setValue(fullPath, value, options)
+  }, [transformFieldName]);
+
+  const getValues: UseFormGetValues<TFieldValues> = useCallback((fieldNames?: | FieldPath<TFieldValues> | ReadonlyArray<FieldPath<TFieldValues>>,) => {
+    const fullPath = transformFieldName(fieldNames) as string;
+    return rootContext.getValues(fullPath)
+  }, [transformFieldName]);
+
+  const clearErrors: UseFormClearErrors<TFieldValues> = useCallback((fieldNames) => {
+    const fullPath = transformFieldName(fieldNames) as string;
+    return rootContext.clearErrors(fullPath)
+  }, [transformFieldName]);
+
+  const setError: UseFormSetError<TFieldValues> = useCallback((name, value, options) => {
+    const fullPath = transformFieldName(name) as string;
+    return rootContext.setError(fullPath, value, options)
+  }, [transformFieldName]);
+
+  return {
+    control: rootContext.control,
+    //formstate
+    trigger,
+    register,
+    //handleSubmit
+    watch,
+    setValue,
+    getValues,
+    //reset,
+    clearErrors,
+    unregister,
+    setError,
+    setFocus
+  };// as UseFormReturn<TFieldValues>;
+
+};
+
 
 export function useFormHelpers(path: string) {
   const { control } = useFormContext();
