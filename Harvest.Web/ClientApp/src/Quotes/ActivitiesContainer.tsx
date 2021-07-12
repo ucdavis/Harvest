@@ -14,8 +14,10 @@ interface Props {
 export const ActivitiesContainer = (props: Props) => {
   const years = useMemo(() => {
     // difference in years between now and quote date
-    const yearDiff = new Date(props.project.end).getFullYear() - new Date(props.project.start).getFullYear();
-    return 3; // TODO: just for testing
+    return (
+      new Date(props.project.end).getFullYear() -
+      new Date(props.project.start).getFullYear()
+    );
   }, [props.project.start, props.project.end]);
 
   const updateActivity = (activity: Activity) => {

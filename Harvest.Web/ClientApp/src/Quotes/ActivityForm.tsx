@@ -117,7 +117,7 @@ export const ActivityForm = (props: Props) => {
                     </Dropdown>
                   </div>
                 )}
-                {props.years !== undefined && props.years && (
+                {props.years !== undefined && props.years > 1 && (
                   <button className="btn btn-link btn-sm">
                     Duplicate Activity <FontAwesomeIcon icon={faCopy} />
                   </button>
