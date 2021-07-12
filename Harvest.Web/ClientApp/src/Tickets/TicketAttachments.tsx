@@ -10,19 +10,18 @@ export const TicketAttachments = (props: Props) => {
     props.attachments,
   ]);
 
-  if (ticketAttachments === undefined || ticketAttachments.length === 0) {
-    return (
-      <div>
-        <h2>Ticket Attachments</h2>
-        <p>No Attachments</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <h2>Ticket Attachments TODO!!!</h2>
-      <p>{ticketAttachments[0].fileName}</p>
+      {ticketAttachments === undefined || ticketAttachments.length === 0 ? (
+        <p> No Messages Yet!!!</p>
+      ) : null}
+
+      {ticketAttachments.map((attachment) => (
+        <p key={`attachment-${attachment.id}`}>
+          {attachment.fileName} from {attachment.createdBy.name}
+        </p>
+      ))}
     </div>
   );
 };
