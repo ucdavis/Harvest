@@ -87,7 +87,7 @@ export const ActivityForm = (props: Props) => {
                 {props.years !== undefined && props.years > 1 && (
                   <div>
                     <Dropdown isOpen={yearDropdownOpen} toggle={toggle}>
-                      <DropdownToggle caret>
+                      <DropdownToggle color="danger" caret>
                         Year {props.activity.year} ({props.activity.adjustment}
                         %)
                       </DropdownToggle>
