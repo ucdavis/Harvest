@@ -37,7 +37,9 @@ export const ActivityForm = (props: Props) => {
     );
     allItems[itemIndex] = {
       ...workItem,
-      total: workItem.rate * workItem.quantity,
+      total:
+        (workItem.rate + (workItem.rate * props.activity.adjustment) / 100.0) *
+        workItem.quantity,
     };
 
     props.updateActivity({ ...props.activity, workItems: allItems });
@@ -70,6 +72,12 @@ export const ActivityForm = (props: Props) => {
       ...props.activity,
       adjustment,
       year,
+      workItems: props.activity.workItems.map((w) => {
+        return {
+          ...w,
+          total: (w.rate + (w.rate * adjustment) / 100.0) * w.quantity,
+        };
+      }),
     });
   };
 

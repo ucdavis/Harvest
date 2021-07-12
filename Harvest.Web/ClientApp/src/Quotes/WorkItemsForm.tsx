@@ -137,7 +137,7 @@ export const WorkItemsForm = (props: Props) => {
             )}
           </Col>
 
-          <Col xs="1">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
+          <Col xs="1">${formatCurrency(workItem.total)}</Col>
 
           <Col xs="1">
             <button
