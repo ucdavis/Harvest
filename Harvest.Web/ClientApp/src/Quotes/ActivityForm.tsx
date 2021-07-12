@@ -138,6 +138,7 @@ export const ActivityForm = (props: Props) => {
         </div>
 
         <WorkItemsForm
+          adjustment={props.activity.adjustment}
           category="Labor"
           rates={props.rates.filter((r) => r.type === "Labor")}
           workItems={props.activity.workItems.filter((w) => w.type === "Labor")}
@@ -146,6 +147,7 @@ export const ActivityForm = (props: Props) => {
           deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
+          adjustment={props.activity.adjustment}
           category="Equipment"
           rates={props.rates.filter((r) => r.type === "Equipment")}
           workItems={props.activity.workItems.filter(
@@ -156,6 +158,7 @@ export const ActivityForm = (props: Props) => {
           deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
+          adjustment={props.activity.adjustment}
           category="Other"
           rates={props.rates.filter((r) => r.type === "Other")}
           workItems={props.activity.workItems.filter((w) => w.type === "Other")}
