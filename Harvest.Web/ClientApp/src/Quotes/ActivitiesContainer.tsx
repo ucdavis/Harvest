@@ -39,6 +39,7 @@ export const ActivitiesContainer = (props: Props) => {
           updateActivity={(activity: Activity) => updateActivity(activity)}
           deleteActivity={(activity: Activity) => deleteActivity(activity)}
           rates={props.rates}
+          allowAdjustment={true}
         />
       ))}
     </div>

@@ -127,24 +127,7 @@ export const WorkItemsForm = (props: Props) => {
             </InputGroup>
           </Col>
 
-          <Col xs="2">
-            <InputGroup>
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>$</InputGroupText>
-              </InputGroupAddon>
-              <Input
-                type="number"
-                id="rate"
-                value={workItem.rate}
-                onChange={(e) =>
-                  props.updateWorkItems({
-                    ...workItem,
-                    rate: parseFloat(e.target.value ?? 0),
-                  })
-                }
-              />
-            </InputGroup>
-          </Col>
+          <Col xs="2">${formatCurrency(workItem.rate || 0)}</Col>
 
           <Col xs="1">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
 
