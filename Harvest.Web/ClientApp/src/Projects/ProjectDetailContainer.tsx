@@ -8,6 +8,7 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
+import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -80,12 +81,6 @@ export const ProjectDetailContainer = () => {
                 to={`/request/changeAccount/${project.id}`}
               >
                 Change Accounts
-              </Link>
-              <Link
-                className="btn btn-primary btn-small mr-4"
-                to={`/ticket/create/${project.id}`}
-              >
-                Create Ticket
               </Link>
             </div>
             <div className="col text-right">
@@ -167,7 +162,9 @@ export const ProjectDetailContainer = () => {
           </div>
           <div className="col-md-6">
             <RecentInvoicesContainer compact={true} projectId={projectId} />
-          </div>
+            <RecentTicketsContainer compact={true} projectId={projectId} />
+           </div>
+
         </div>
       </div>
     </div>

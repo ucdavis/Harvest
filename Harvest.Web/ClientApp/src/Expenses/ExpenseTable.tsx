@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Column, TableState } from "react-table";
+import { Button } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Expense } from "../types";
@@ -7,6 +8,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   expenses: Expense[];
+  setSelectedExpense: (expense: Expense) => void;
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -48,6 +50,17 @@ export const ExpenseTable = (props: Props) => {
           row.createdOn === undefined
             ? "N/A"
             : new Date(row.createdOn).toLocaleDateString(),
+      },
+      {
+        Header: "Delete",
+        Cell: (data: any) => (
+          <Button
+            color="danger"
+            onClick={() => props.setSelectedExpense(data.row.original)}
+          >
+            Delete
+          </Button>
+        ),
       },
     ],
     []

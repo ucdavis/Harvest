@@ -5,7 +5,7 @@ import { Invoice } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
 
 interface Props {
-  projectId: any;
+  projectId?: string;
   compact: boolean;
 }
 
