@@ -8,7 +8,7 @@ import { UseFieldArrayReturn, useFormContext, useWatch, useFieldArray } from "re
 
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl, QuoteContent } from "../types";
-import { useFormHelpers, ValidationErrorMessage, usePropValuesFromArray } from "../Validation";
+import { useFormHelpers, ValidationErrorMessage, usePropValuesFromArray, useNestedFormContext } from "../Validation";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
@@ -21,37 +21,36 @@ interface Props {
 
 export const ActivityForm = (props: Props) => {
 
-  const { getValues, setValue, register, control } = useFormContext();
+  const { getValues, setValue, register, control } = useNestedFormContext<Activity>(props.path);
 
   const { getPath, getInputValidityStyle } = useFormHelpers(props.path);
 
   const getNewWorkItem = (category: RateType) => {
-    const path = getPath("workItems");
-    const workItems = getValues(path as "activities.0.workitems");
+    const workItems = getValues("workItems");
     const newId = Math.max(...(workItems).map((w: WorkItem) => w.id), 0) + 1;
-    return new WorkItemImpl(getValues(getPath("id") as "activities.0.id"), newId, category);
+    return new WorkItemImpl(getValues("id"), newId, category);
   };
 
   const laborTotal = usePropValuesFromArray(getPath("workItems"), "total", (item: WorkItem) => item.type === "Labor")
     .reduce((acc, total) => acc + total || 0, 0);
   useEffect(() => {
-    setValue(getPath("laborTotal") as "activities.0.total", laborTotal);
+    setValue("laborTotal", laborTotal);
   }, [laborTotal]);
 
   const equipmentTotal = usePropValuesFromArray(getPath("workItems"), "total", (item: WorkItem) => item.type === "Equipment")
     .reduce((acc, total) => acc + total || 0, 0);
   useEffect(() => {
-    setValue(getPath("equipmentTotal") as "activities.0.total", equipmentTotal);
+    setValue("equipmentTotal", equipmentTotal);
   }, [equipmentTotal]);
 
   const otherTotal = usePropValuesFromArray(getPath("workItems"), "total", (item: WorkItem) => item.type === "Other")
     .reduce((acc, total) => acc + total || 0, 0);
   useEffect(() => {
-    setValue(getPath("otherTotal") as "activities.0.total", otherTotal);
+    setValue("otherTotal", otherTotal);
   }, [otherTotal]);
 
   useEffect(() => {
-    setValue(getPath("total") as "activities.0.total", laborTotal + equipmentTotal + otherTotal);
+    setValue("total", laborTotal + equipmentTotal + otherTotal);
   }, [laborTotal, equipmentTotal, otherTotal]);
 
   const workItemsHelper = useFieldArray({ control, name: getPath("workItems") as "", keyName: "fieldId" });
@@ -116,7 +115,7 @@ export const ActivityForm = (props: Props) => {
             <div>
               <input
                 className={`form-control ${getInputValidityStyle("name")}`}
-                {...register(getPath("name") as "name")}
+                {...register("name")}
                 defaultValue={props.defaultValue.name}
               />
             </div>

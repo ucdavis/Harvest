@@ -1,12 +1,12 @@
 import React, { useEffect, useCallback } from "react";
 import { Button, Col, FormGroup, InputGroup, InputGroupAddon, InputGroupText, Row, } from "reactstrap";
-import { useFormContext, useFieldArray, useWatch, useFormState, UseFieldArrayReturn } from "react-hook-form";
+import { useFormContext, useFieldArray, useWatch, useFormState, UseFieldArrayReturn, Control } from "react-hook-form";
 import get from "lodash/get";
 
 
 import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { ValidationErrorMessage, useFormHelpers } from "../Validation";
+import { ValidationErrorMessage, useFormHelpers, useNestedWatch, useNestedFormContext } from "../Validation";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
@@ -30,14 +30,15 @@ interface WorkItemProps {
 
 const WorkItemForm = (props: WorkItemProps) => {
 
-  const { setValue, control, register } = useFormContext();
+  const { setValue, control, register } = useNestedFormContext<WorkItem>(props.path);
 
   const { getPath, getInputValidityStyle } = useFormHelpers(props.path);
 
-  const [rateId, rate, quantity, unit, total] = useWatch({
+  const [rateId, rate, quantity, unit] = useNestedWatch<WorkItem>({
     control,
-    name: [getPath("rateId") as "", getPath("rate") as "", getPath("quantity") as "", getPath("unit") as "", getPath("total") as ""]
-  }) as [number, number, number, string, number];
+    name: ["rateId", "rate", "quantity", "unit"],
+    path: props.path
+  }) as [number, number, number, string];
 
   const { dirtyFields, touchedFields } = useFormState({ control });
 
@@ -53,28 +54,28 @@ const WorkItemForm = (props: WorkItemProps) => {
       // rate can be undefinied if they select the default option
       if (!!rate) {
         // new rate selected, update the work item with defaults
-        setValue(getPath("rate") as "", rate.price);
-        setValue(getPath("description") as "", requiresCustomDescription(rate.unit) ? "" : rate.description);
-        setValue(getPath("unit") as "", rate.unit);
+        setValue("rate", rate.price);
+        setValue("description", requiresCustomDescription(rate.unit) ? "" : rate.description);
+        setValue("unit", rate.unit);
       } else {
-        setValue(getPath("rate") as "", 0);
-        setValue(getPath("description") as "", "");
-        setValue(getPath("unit") as "", "");
+        setValue("rate", 0);
+        setValue("description", "");
+        setValue("unit", "");
       }
     }
   }, [rateId]);
 
   useEffect(() => {
-    setValue(getPath("total") as "", rate * quantity);
+    setValue("total", rate * quantity);
   }, [rate, quantity]);
 
 
-  register(getPath("id") as "");
-  register(getPath("description") as "");
-  register(getPath("activityId") as "");
-  register(getPath("type") as "");
-  register(getPath("rate") as "");
-  register(getPath("unit") as "");
+  register("id");
+  register("description");
+  register("activityId");
+  register("type");
+  register("rate");
+  register("unit");
 
   return (
     <Row
@@ -84,7 +85,7 @@ const WorkItemForm = (props: WorkItemProps) => {
         <FormGroup>
           <select
             className={`form-control ${getInputValidityStyle(getPath("rateId"))}`}
-            {...register(getPath("rateId") as "", { valueAsNumber: true })}
+            {...register("rateId", { valueAsNumber: true })}
             defaultValue={props.defaultValue.rateId}
           >
             <option value="0">-- Select {props.category} --</option>
@@ -98,7 +99,7 @@ const WorkItemForm = (props: WorkItemProps) => {
           {requiresCustomDescription(unit) && (
             <input
               className={`form-control ${getInputValidityStyle("description")}`}
-              {...register(getPath("description") as "")}
+              {...register("description")}
               defaultValue={props.defaultValue.description}
             />
           )}
@@ -115,7 +116,7 @@ const WorkItemForm = (props: WorkItemProps) => {
           <input
             className={`form-control ${getInputValidityStyle("quantity")}`}
             type="number"
-            {...register(getPath("quantity") as "", { valueAsNumber: true })}
+            {...register("quantity", { valueAsNumber: true })}
             defaultValue={props.defaultValue.quantity}
           />
         </InputGroup>
@@ -130,7 +131,7 @@ const WorkItemForm = (props: WorkItemProps) => {
           <input
             className={`form-control ${getInputValidityStyle("rate")}`}
             type="number"
-            {...register(getPath("rate") as "", { valueAsNumber: true })}
+            {...register("rate", { valueAsNumber: true })}
             defaultValue={props.defaultValue.rate}
           />
         </InputGroup>
@@ -151,8 +152,6 @@ const WorkItemForm = (props: WorkItemProps) => {
 }
 
 export const WorkItemsForm = (props: Props) => {
-
-  const { control, getValues } = useFormContext();
 
   const { getPath } = useFormHelpers(props.path);
 
