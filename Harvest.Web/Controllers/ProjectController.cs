@@ -41,12 +41,12 @@ namespace Harvest.Web.Controllers
 
         // TODO: move or determine proper permissions
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> Invoices(int id)
+        public async Task<ActionResult> Invoices(int projectId)
         {
-            return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == id).ToArrayAsync());
+            return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == projectId).ToArrayAsync());
         }
 
-        public ActionResult Details(int id)
+        public ActionResult Details(int projectId)
         {
             // TODO: move routes so react handles this natively and place API stuff in own controller
             return View("React");
@@ -54,44 +54,17 @@ namespace Harvest.Web.Controllers
 
         // TODO: permissions
         // Returns JSON info of the project
-        public async Task<ActionResult> Get(int id)
+        public async Task<ActionResult> Get(int projectId)
         {
-            return Ok(await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id));
+            return Ok(await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId));
         }
 
         [HttpGet]
-        public async Task<ActionResult> AccountApproval(int id)
+        public async Task<ActionResult> AccountApproval(int projectId)
         {
-            var project = await _dbContext.Projects.Include(p => p.Accounts).SingleAsync(p => p.Id == id);
+            var project = await _dbContext.Projects.Include(p => p.Accounts).SingleAsync(p => p.Id == projectId);
 
             return View(project);
-        }
-
-        [HttpPost]
-        public async Task<ActionResult> AccountApproval(int id, bool approved)
-        {
-            // TODO: Handle account not approved condition
-            // TODO: IF we want to approve accounts individually, handle that here
-            var project = await _dbContext.Projects.Include(x => x.Accounts).SingleAsync(p => p.Id == id);
-            var user = await _userService.GetCurrentUser();
-
-            // assume all accounts are approved
-            foreach (var account in project.Accounts)
-            {
-                account.ApprovedOn = DateTime.UtcNow;
-                account.ApprovedById = user.Id;
-            }
-
-            project.IsApproved = true;
-            project.Status = Project.Statuses.Active;
-
-            // TODO: log history
-
-            await _dbContext.SaveChangesAsync();
-
-            Message = "Accounts Approved. Project is now active";
-
-            return RedirectToAction("Details", new { id });
         }
 
         public async Task<IActionResult> RefreshTotal(int projectId)
