@@ -19,6 +19,7 @@ interface RouteParams {
 export const ProjectDetailContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
+  const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -126,15 +127,19 @@ export const ProjectDetailContainer = () => {
               <div className="card-content">
                 <h2>Project Attachements</h2>
                 <FileUpload
-                  files={project.attachments || []}
+                  files={newFiles}
                   setFiles={(f) => {
-                    setProject({ ...project, attachments: [...f] });
+                    setProject({
+                      ...project,
+                      attachments: [...project.attachments, f[f.length - 1]],
+                    });
+                    setNewFiles(f);
                     updateFiles(f);
                   }}
                   updateFile={(f) => {
+                    setNewFiles([...newFiles, f]);
                     setProject((proj) => {
                       if (proj) {
-                        // update just one specific file from project p
                         proj.attachments[
                           proj.attachments.findIndex(
                             (file) => file.identifier === f.identifier
