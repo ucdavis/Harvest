@@ -15,6 +15,7 @@ import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
+const ANNUAL_ADJUSTMENT_RATE = 3;
 interface Props {
   activity: Activity;
   updateActivity: (activity: Activity) => void;
@@ -64,6 +65,14 @@ export const ActivityForm = (props: Props) => {
     });
   };
 
+  const setYearAndAdjustment = (year: number, adjustment: number) => {
+    props.updateActivity({
+      ...props.activity,
+      adjustment,
+      year,
+    });
+  };
+
   return (
     <div className="card-wrapper mb-4 no-green">
       <div className="card-content">
@@ -76,13 +85,24 @@ export const ActivityForm = (props: Props) => {
 
               <div className="col-md-6 text-right">
                 {props.years !== undefined && props.years > 1 && (
-                  <div className="btn-group">
+                  <div>
                     <Dropdown isOpen={yearDropdownOpen} toggle={toggle}>
-                      <DropdownToggle caret>Year 1</DropdownToggle>
+                      <DropdownToggle caret>
+                        Year {props.activity.year} ({props.activity.adjustment}
+                        %)
+                      </DropdownToggle>
                       <DropdownMenu>
                         {Array.from(Array(props.years)).map((_, i) => (
-                          <DropdownItem key={`year-${i}`}>
-                            Year {i + 1}
+                          <DropdownItem
+                            key={`year-${i}`}
+                            onClick={(_) =>
+                              setYearAndAdjustment(
+                                i + 1,
+                                i * ANNUAL_ADJUSTMENT_RATE
+                              )
+                            }
+                          >
+                            Year {i + 1} ({i * ANNUAL_ADJUSTMENT_RATE}%)
                           </DropdownItem>
                         ))}
                       </DropdownMenu>
