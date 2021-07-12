@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { Input } from "reactstrap";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Input,
+} from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import { faCalendarWeek } from "@fortawesome/free-solid-svg-icons";
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
@@ -15,10 +20,14 @@ interface Props {
   updateActivity: (activity: Activity) => void;
   deleteActivity: (activity: Activity) => void;
   rates: Rate[];
-  allowAdjustment?: boolean;
+  years?: number;
 }
 
 export const ActivityForm = (props: Props) => {
+  const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
+
+  const toggle = () => setYearDropdownOpen((prevState) => !prevState);
+
   const updateWorkItems = (workItem: WorkItem) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
     const allItems = props.activity.workItems;
@@ -66,40 +75,21 @@ export const ActivityForm = (props: Props) => {
               </div>
 
               <div className="col-md-6 text-right">
-                {props.allowAdjustment && (
-                  <div>
-                    <button className="btn btn-link btn-sm">
-                      Adjust Year <FontAwesomeIcon icon={faCalendarWeek} />
-                    </button>
-                    <div className="btn-group">
-                      <button
-                        type="button"
-                        className="btn btn-danger dropdown-toggle"
-                        data-toggle="dropdown"
-                        aria-haspopup="true"
-                        aria-expanded="false"
-                      >
-                        Action
-                      </button>
-                      <div className="dropdown-menu">
-                        <a className="dropdown-item" href="#">
-                          Action
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Another action
-                        </a>
-                        <a className="dropdown-item" href="#">
-                          Something else here
-                        </a>
-                        <div className="dropdown-divider"></div>
-                        <a className="dropdown-item" href="#">
-                          Separated link
-                        </a>
-                      </div>
-                    </div>
+                {props.years !== undefined && props.years > 1 && (
+                  <div className="btn-group">
+                    <Dropdown isOpen={yearDropdownOpen} toggle={toggle}>
+                      <DropdownToggle caret>Year 1</DropdownToggle>
+                      <DropdownMenu>
+                        {Array.from(Array(props.years)).map((_, i) => (
+                          <DropdownItem key={`year-${i}`}>
+                            Year {i + 1}
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </Dropdown>
                   </div>
                 )}
-                {props.allowAdjustment && (
+                {props.years !== undefined && props.years && (
                   <button className="btn btn-link btn-sm">
                     Duplicate Activity <FontAwesomeIcon icon={faCopy} />
                   </button>
