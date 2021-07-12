@@ -36,24 +36,24 @@ namespace Harvest.Web.Controllers
 
         // Approve a quote for the project
         [HttpGet]
-        public ActionResult Approve(int id)
+        public ActionResult Approve(int projectId)
         {
             return View("React");
         }
 
         [HttpGet]
-        public ActionResult ChangeAccount(int id)
+        public ActionResult ChangeAccount(int projectId)
         {
             return View("React");
         }
 
         [HttpPost]
-        public async Task<ActionResult> Approve(int id, [FromBody] RequestApprovalModel model)
+        public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == id);
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
 
             // get the currently unapproved quote for this project
-            var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == id && q.ApprovedOn == null);
+            var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId && q.ApprovedOn == null);
 
             var currentUser = await _userService.GetCurrentUser();
 
@@ -61,7 +61,7 @@ namespace Harvest.Web.Controllers
             // TODO: add in fiscal officer info??
             foreach (var account in model.Accounts)
             {
-                account.ProjectId = id;
+                account.ProjectId = projectId;
 
                 // Accounts will be auto-approved by quote approver
                 account.ApprovedById = currentUser.Id;
@@ -95,7 +95,7 @@ namespace Harvest.Web.Controllers
 
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need
-            _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == id));
+            _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
 
             await _dbContext.SaveChangesAsync();
 
@@ -103,10 +103,10 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Files(int id, [FromBody] ProjectFilesModel model)
+        public async Task<ActionResult> Files(int projectId, [FromBody] ProjectFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
-            var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == id);
+            var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
 
             var newProject = new ProjectAttachment
             {
