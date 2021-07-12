@@ -1,14 +1,26 @@
-﻿import { useMemo } from "react";
-import { TicketAttachment } from "../types";
+﻿import { useMemo, useState } from "react";
+import { TicketAttachment, TicketDetails } from "../types";
+import { Button, FormGroup, Input, Label } from "reactstrap";
+import { FileUpload } from "../Shared/FileUpload";
 
 interface Props {
+  ticket: TicketDetails;
   attachments: TicketAttachment[];
+  projectId: string;
+  setTicket: (ticket: TicketDetails) => void;
 }
 
 export const TicketAttachments = (props: Props) => {
+  const { ticket, setTicket, projectId } = props;
   const ticketAttachments = useMemo(() => props.attachments, [
     props.attachments,
   ]);
+
+  const [ticketLoc, setTicketLoc] = useState<TicketDetails>({
+  } as TicketDetails);
+
+
+
 
   return (
     <div>
@@ -22,6 +34,27 @@ export const TicketAttachments = (props: Props) => {
           {attachment.fileName} from {attachment.createdBy.name}
         </p>
       ))}
+      <FormGroup>
+        <Label>Want to attach any files?</Label>
+        <FileUpload
+          files={ticket.newAttachments || []}
+          setFiles={(f) =>
+              setTicketLoc((ticket)  => ({ ...ticket, newAttachments: [...f] }))
+          }
+          updateFile={(f) =>
+            setTicketLoc((ticket) => {
+              // update just one specific file from ticket p
+              ticket.newAttachments[
+                ticket.newAttachments.findIndex(
+                  (file) => file.identifier === f.identifier
+                )
+              ] = { ...f };
+
+              return { ...ticket, newAttachments: [...ticket.newAttachments] };
+            })
+          }
+        ></FileUpload>
+      </FormGroup>
     </div>
   );
 };
