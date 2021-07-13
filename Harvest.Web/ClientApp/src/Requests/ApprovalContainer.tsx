@@ -32,8 +32,8 @@ export const ApprovalContainer = () => {
 
         setProjectAndQuote(projectWithQuote);
 
-        // if project is not in quoted status, then redirect to project details
-        if (projectWithQuote.project.status !== "Quoted") {
+        // can only approve pendingApproval projects
+        if (projectWithQuote.project.status !== "PendingApproval") {
           history.push(`/Project/Details/${projectWithQuote.project.id}`);
         }
       }

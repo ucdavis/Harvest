@@ -8,8 +8,8 @@ export type RoleName =
   | "Worker";
 export type ProjectStatus =
   | "Requested"
-  | "Quoted"
-  | "Approved"
+  | "PendingApproval"
+  | "Active"
   | "ChangeRequested"
   | "Completed";
 

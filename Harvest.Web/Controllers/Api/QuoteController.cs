@@ -68,10 +68,10 @@ namespace Harvest.Web.Controllers
             quote.Text = QuoteDetail.Serialize(quoteDetail);
 
             if (submit) {
-                quote.Status = "Submitted";
+                quote.Status = Quote.Statuses.Proposed;
 
                 var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
-                project.Status = StatusTypes.Quoted;
+                project.Status = Project.Statuses.PendingApproval;
             }
 
             await _dbContext.SaveChangesAsync();
