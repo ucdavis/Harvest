@@ -18,6 +18,7 @@ import { WorkItemsForm } from "./WorkItemsForm";
 const ANNUAL_ADJUSTMENT_RATE = 3;
 interface Props {
   activity: Activity;
+  duplicateActivity?: (activity: Activity) => void;
   updateActivity: (activity: Activity) => void;
   deleteActivity: (activity: Activity) => void;
   rates: Rate[];
@@ -118,7 +119,13 @@ export const ActivityForm = (props: Props) => {
                   </div>
                 )}
                 {props.years !== undefined && props.years > 1 && (
-                  <button className="btn btn-link btn-sm">
+                  <button
+                    className="btn btn-link btn-sm"
+                    onClick={() =>
+                      props.duplicateActivity &&
+                      props.duplicateActivity(props.activity)
+                    }
+                  >
                     Duplicate Activity <FontAwesomeIcon icon={faCopy} />
                   </button>
                 )}

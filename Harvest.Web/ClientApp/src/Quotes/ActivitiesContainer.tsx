@@ -41,12 +41,26 @@ export const ActivitiesContainer = (props: Props) => {
     props.updateQuote({ ...props.quote, activities: [...allActivities] });
   };
 
+  const duplicateActivity = (activity: Activity) => {
+    const newActivity = { ...activity };
+
+    newActivity.id = Math.max(...props.quote.activities.map((a) => a.id)) + 1;
+    newActivity.name = `${activity.name} (1)`;
+    newActivity.workItems = [...activity.workItems];
+
+    props.updateQuote({
+      ...props.quote,
+      activities: [...props.quote.activities, newActivity],
+    });
+  };
+
   return (
     <div>
       {props.quote.activities.map((activity) => (
         <ActivityForm
           key={`activity-${activity.id}`}
           activity={activity}
+          duplicateActivity={(activity: Activity) => duplicateActivity(activity)}
           updateActivity={(activity: Activity) => updateActivity(activity)}
           deleteActivity={(activity: Activity) => deleteActivity(activity)}
           rates={props.rates}
