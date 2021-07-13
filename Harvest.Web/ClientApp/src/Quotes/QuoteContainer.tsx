@@ -42,6 +42,11 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
+        if (projectWithQuote.project.status === "Quoted") {
+          // project is quoted, so we shouldn't allow editing.  just show quote detailsq
+          history.push(`/Project/Details/${projectId}`);
+        }
+
         if (projectWithQuote.quote) {
           // TODO: remove once we standardize on new quote format
           setQuote({
@@ -56,7 +61,6 @@ export const QuoteContainer = () => {
             setEditFields(true);
           }
         } else {
-          // TODO: how do we handle if different fields have different rates?
           const quoteToUse = new QuoteContentImpl();
           quoteToUse.acreageRate =
             rateJson.find((r) => r.type === "Acreage")?.price || 120;

@@ -31,11 +31,16 @@ export const ApprovalContainer = () => {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
 
         setProjectAndQuote(projectWithQuote);
+
+        // if project is not in quoted status, then redirect to project details
+        if (projectWithQuote.project.status !== "Quoted") {
+          history.push(`/Project/Details/${projectWithQuote.project.id}`);
+        }
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [history, projectId]);
 
   const approve = async () => {
     const model = { accounts };
