@@ -1,5 +1,5 @@
 ﻿import { useMemo, useState } from "react";
-import { TicketAttachment, TicketDetails } from "../types";
+import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 
@@ -19,6 +19,16 @@ export const TicketAttachments = (props: Props) => {
   const [ticketLoc, setTicketLoc] = useState<TicketDetails>({
   } as TicketDetails);
 
+  const updateFiles = async (attachments: BlobFile[]) => {
+      await fetch(`/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`, {
+          method: "POST",
+          headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ Attachments: attachments }),
+      });
+  };
 
 
 
@@ -35,12 +45,13 @@ export const TicketAttachments = (props: Props) => {
         </p>
       ))}
       <FormGroup>
-        <Label>Want to attach any files?</Label>
+        <Label>Attach files?</Label>
         <FileUpload
           files={ticket.newAttachments || []}
-          setFiles={(f) =>
-              setTicketLoc((ticket)  => ({ ...ticket, newAttachments: [...f] }))
-          }
+          setFiles={(f) => {
+              setTicketLoc((ticket) => ({ ...ticket, newAttachments: [...f] }));
+              updateFiles(f);
+          }}
           updateFile={(f) =>
             setTicketLoc((ticket) => {
               // update just one specific file from ticket p
