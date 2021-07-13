@@ -126,7 +126,7 @@ export const QuoteContainer = () => {
     project,
   ]);
 
-  const save = async () => {
+  const save = async (submit: boolean) => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
@@ -137,7 +137,7 @@ export const QuoteContainer = () => {
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
     // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
+    const saveResponse = await fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -236,8 +236,11 @@ export const QuoteContainer = () => {
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
 
-          <button className="btn btn-primary mt-4" onClick={save}>
+          <button className="btn btn-link mt-4" onClick={() => save(false)}>
             Save Quote
+          </button>
+          <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+            Submit Quote
           </button>
         </div>
       </div>

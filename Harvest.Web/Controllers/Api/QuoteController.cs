@@ -45,7 +45,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Save(int projectId, [FromBody] QuoteDetail quoteDetail)
+        public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
         {
             // Use existing quote if it exists, otherwise create new one
             var quote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).SingleOrDefaultAsync();
@@ -66,6 +66,13 @@ namespace Harvest.Web.Controllers
 
             quote.Total = (decimal)Math.Round(quoteDetail.GrandTotal, 2);
             quote.Text = QuoteDetail.Serialize(quoteDetail);
+
+            if (submit) {
+                quote.Status = "Submitted";
+
+                var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+                project.Status = StatusTypes.Quoted;
+            }
 
             await _dbContext.SaveChangesAsync();
 
