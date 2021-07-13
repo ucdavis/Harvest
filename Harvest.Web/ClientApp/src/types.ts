@@ -105,6 +105,7 @@ export class QuoteContentImpl implements QuoteContent {
   equipmentTotal = 0;
   otherTotal = 0;
   grandTotal = 0;
+  years = 1;
   fields = [];
 
   activities = [] as Activity[];
@@ -117,6 +118,7 @@ export interface QuoteContent {
   acreageRateId: number;
   acreageRateDescription: string;
   activities: Activity[];
+  years: number;
   total: number;
   acreageTotal: number;
   activitiesTotal: number;
