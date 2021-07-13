@@ -1,25 +1,16 @@
-import React, { useMemo } from "react";
+import React from "react";
 
-import { Activity, Project, QuoteContent, Rate } from "../types";
+import { Activity, QuoteContent, Rate } from "../types";
 
 import { ActivityForm } from "./ActivityForm";
 
 interface Props {
-  project: Project;
   rates: Rate[];
   quote: QuoteContent;
   updateQuote: React.Dispatch<React.SetStateAction<QuoteContent>>;
 }
 
 export const ActivitiesContainer = (props: Props) => {
-  const years = useMemo(() => {
-    // difference in years between now and quote date
-    return (
-      new Date(props.project.end).getFullYear() -
-      new Date(props.project.start).getFullYear()
-    );
-  }, [props.project.start, props.project.end]);
-
   const updateActivity = (activity: Activity) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
     const allActivities = props.quote.activities;
@@ -50,7 +41,7 @@ export const ActivitiesContainer = (props: Props) => {
           updateActivity={(activity: Activity) => updateActivity(activity)}
           deleteActivity={(activity: Activity) => deleteActivity(activity)}
           rates={props.rates}
-          years={years}
+          years={props.quote.years}
         />
       ))}
     </div>

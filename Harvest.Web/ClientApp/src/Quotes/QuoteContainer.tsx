@@ -229,7 +229,6 @@ export const QuoteContainer = () => {
               setEditFields={setEditFields}
             />
             <ActivitiesContainer
-              project={project}
               quote={quote}
               rates={rates}
               updateQuote={setQuote}
