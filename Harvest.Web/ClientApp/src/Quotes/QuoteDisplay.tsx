@@ -17,7 +17,8 @@ export const QuoteDisplay = (props: Props) => {
       <p>
         <b>
           {quote.acreageRateDescription}: {quote.acres} @{" "}
-          {formatCurrency(quote.acreageRate)} = $
+          {formatCurrency(quote.acreageRate)} * {quote.years}{" "}
+          {quote.years > 1 ? "years" : "year"} = $
           {formatCurrency(quote.acreageTotal)}
         </b>
       </p>
@@ -33,7 +34,10 @@ export const QuoteDisplay = (props: Props) => {
             </h4>
           </div>
           <div className="card-content">
-            <WorkItemDisplay workItems={activity.workItems}></WorkItemDisplay>
+            <WorkItemDisplay
+              adjustment={activity.adjustment}
+              workItems={activity.workItems}
+            ></WorkItemDisplay>
           </div>
         </div>
       ))}

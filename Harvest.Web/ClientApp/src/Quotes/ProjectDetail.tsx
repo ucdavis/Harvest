@@ -41,6 +41,8 @@ export const ProjectDetail = (props: Props) => {
             new WorkItemImpl(newActivityId, 2, "Equipment"),
             new WorkItemImpl(newActivityId, 3, "Other"),
           ],
+          year: 1, // default new activity to no adjustment
+          adjustment: 0
         },
       ],
     });
@@ -128,12 +130,18 @@ export const ProjectDetail = (props: Props) => {
                   type="number"
                   id="rate"
                   value={props.quote.acreageRate}
-                  onChange={(e) =>
-                    props.updateQuote({
-                      ...props.quote,
-                      acreageRate: parseFloat(e.target.value ?? 0),
-                    })
-                  }
+                  disabled
+                />
+              </InputGroup>
+            </Col>
+            <Col md="4">
+              <Label for="rate">Years</Label>
+              <InputGroup>
+                <Input
+                  type="number"
+                  id="years"
+                  value={props.quote.years}
+                  disabled
                 />
               </InputGroup>
             </Col>
@@ -148,7 +156,7 @@ export const ProjectDetail = (props: Props) => {
                   id="rate"
                   readOnly
                   value={formatCurrency(
-                    props.quote.acres * props.quote.acreageRate
+                    props.quote.acres * props.quote.acreageRate * props.quote.years
                   )}
                 />
               </InputGroup>

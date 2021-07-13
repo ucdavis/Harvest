@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { ProjectWithInvoice } from "../types";
+import { InvoicePDF } from "../Pdf/InvoicePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
 interface RouteParams {
   invoiceId?: string;
@@ -52,11 +57,20 @@ export const InvoiceDetailContainer = () => {
           " - Project #" +
           projectAndInvoice.project.id
         }
-      ></ProjectHeader>
+      />
       <div className="card-green-bg">
         <div className="card-content">
           <InvoiceDisplay invoice={projectAndInvoice.invoice}></InvoiceDisplay>
         </div>
+        
+        <PDFDownloadLink
+          document={<InvoicePDF invoice={projectAndInvoice.invoice} />}
+          fileName="Invoice.pdf"
+        >
+          <button className="btn btn-link btn-sm">
+            Download PDF <FontAwesomeIcon icon={faDownload} />
+          </button>
+        </PDFDownloadLink>
       </div>
     </div>
   );

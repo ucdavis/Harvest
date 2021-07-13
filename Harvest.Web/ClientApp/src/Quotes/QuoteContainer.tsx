@@ -61,6 +61,13 @@ export const QuoteContainer = () => {
           quoteToUse.acreageRate =
             rateJson.find((r) => r.type === "Acreage")?.price || 120;
 
+          // alwyas at least 1 year worth of acreage, but use max in case there is more
+          quoteToUse.years = Math.max(
+            1,
+            new Date(projectWithQuote.project.end).getFullYear() -
+              new Date(projectWithQuote.project.start).getFullYear()
+          );
+
           setQuote(quoteToUse);
           setEditFields(true); // we have no existing quote, start with editing fields
         }
@@ -75,7 +82,7 @@ export const QuoteContainer = () => {
 
   useEffect(() => {
     setQuote((q) => {
-      let acreageTotal = q.acreageRate * q.acres;
+      let acreageTotal = q.acreageRate * q.acres * q.years;
       let activitiesTotal = 0;
       let laborTotal = 0;
       let equipmentTotal = 0;
@@ -155,7 +162,10 @@ export const QuoteContainer = () => {
     return (
       <div>
         <div className="card-wrapper">
-          <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+          <ProjectHeader
+            project={project}
+            title={"Field Request #" + (project?.id || "")}
+          ></ProjectHeader>
 
           <div className="card-green-bg">
             <div className="card-content">
@@ -174,7 +184,8 @@ export const QuoteContainer = () => {
                       existing field for more info and actions
                     </li>
                     <li>
-                      To edit a field, click on it in the map and choose either edit or remove.
+                      To edit a field, click on it in the map and choose either
+                      edit or remove.
                     </li>
                     <li>When you are finished, click confirm below</li>
                   </ol>
@@ -202,7 +213,10 @@ export const QuoteContainer = () => {
 
   return (
     <div className="card-wrapper">
-      <ProjectHeader project={project} title={"Field Request #" + (project?.id || "")}></ProjectHeader>
+      <ProjectHeader
+        project={project}
+        title={"Field Request #" + (project?.id || "")}
+      ></ProjectHeader>
       <div className="card-green-bg">
         <div className="card-content">
           <div className="quote-details">

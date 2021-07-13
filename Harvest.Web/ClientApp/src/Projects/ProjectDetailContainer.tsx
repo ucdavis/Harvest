@@ -5,10 +5,12 @@ import { Progress } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 
+import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
+import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
-import { Project } from "../types";
+import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
@@ -38,12 +40,23 @@ export const ProjectDetailContainer = () => {
     return <div>Loading...</div>;
   }
 
+  const updateFiles = async (attachments: BlobFile[]) => {
+    await fetch(`/Request/Files/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Attachments: attachments }),
+    });
+  };
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
         project={project}
         title={"Field Request #" + (project?.id || "")}
-      ></ProjectHeader>
+      />
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
@@ -68,17 +81,9 @@ export const ProjectDetailContainer = () => {
               >
                 Change Accounts
               </Link>
-              <Link
-                className="btn btn-primary btn-small mr-4"
-                to={`/ticket/create/${project.id}`}
-              >
-                Create Ticket
-              </Link>
             </div>
             <div className="col text-right">
-              <ProjectUnbilledButton
-                projectId={project.id}
-              ></ProjectUnbilledButton>
+              <ProjectUnbilledButton projectId={project.id} />
             </div>
           </div>
         </div>
@@ -115,31 +120,44 @@ export const ProjectDetailContainer = () => {
             <div className="card-wrapper no-green mt-4 mb-4">
               <div className="card-content">
                 <h2>Project Attachements</h2>
-                !! Add upload file input here !!
+                <FileUpload
+                  files={project.attachments || []}
+                  setFiles={(f) => {
+                    setProject({ ...project, attachments: [...f] });
+                    updateFiles(f);
+                  }}
+                  updateFile={(f) => {
+                    setProject((proj) => {
+                      if (proj) {
+                        // update just one specific file from project p
+                        proj.attachments[
+                          proj.attachments.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+
+                        return { ...proj, attachments: [...proj.attachments] };
+                      }
+                    });
+                  }}
+                />
                 <ul className="no-list-style attached-files-list">
-                  <li>
-                    <a href="#">
-                      <FontAwesomeIcon icon={faDownload} />
-                      Filename 1.pdf
-                    </a>{" "}
-                    uploaded 9.23.2021
-                  </li>
-                  <li>
-                    <a href="#">
-                      <FontAwesomeIcon icon={faDownload} />
-                      Filename 1.pdf
-                    </a>{" "}
-                    uploaded 9.23.2021
-                  </li>
+                  {project.attachments.map((attachment, i) => (
+                    <li key={`attachment-${i}`}>
+                      {/* TODO: Add a way to download files from Azure */}
+                      <a href="#">
+                        <FontAwesomeIcon icon={faDownload} />
+                        {attachment.fileName}
+                      </a>{" "}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
           </div>
           <div className="col-md-6">
-            <RecentInvoicesContainer
-              compact={true}
-              projectId={projectId}
-            ></RecentInvoicesContainer>
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
+            <RecentTicketsContainer compact={true} projectId={projectId} />
           </div>
         </div>
       </div>

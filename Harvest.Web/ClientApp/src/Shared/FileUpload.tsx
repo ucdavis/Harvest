@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { BlobFile } from "../types";
 
@@ -98,9 +100,12 @@ export const FileUpload = (props: Props) => {
       {props.files.length > 0 && (
         <small id="emailHelp" className="form-text text-muted">
           <ul>
-            {props.files.map((file) => (
-              <li key={file.fileName}>
-                {file.fileName} {!file.uploaded && "[spinner]"}
+            {props.files.map((file, i) => (
+              <li key={`file-${i}`}>
+                {file.fileName}{" "}
+                {file.uploaded === false ? (
+                  <FontAwesomeIcon icon={faSpinner} className="fa-spin" />
+                ) : null}
               </li>
             ))}
           </ul>
