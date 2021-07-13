@@ -124,15 +124,32 @@ export const ProjectDetailContainer = () => {
                 <FileUpload
                   files={newFiles}
                   setFiles={(f) => {
+                    let files = f.slice(newFiles.length);
+                    if (newFiles.length === 0) {
+                      files = f;
+                    }
+
                     setProject({
                       ...project,
-                      attachments: [...project.attachments, f[f.length - 1]],
+                      attachments: [...project.attachments, ...files],
                     });
-                    setNewFiles(f);
+                    setNewFiles([...f]);
                     updateFiles(f);
                   }}
                   updateFile={(f) => {
-                    setNewFiles([...newFiles, f]);
+                    setNewFiles((oldFiles) => {
+                      if (oldFiles) {
+                        oldFiles[
+                          oldFiles.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+                        return [...oldFiles];
+                      }
+
+                      return oldFiles;
+                    });
+
                     setProject((proj) => {
                       if (proj) {
                         proj.attachments[
@@ -163,8 +180,7 @@ export const ProjectDetailContainer = () => {
           <div className="col-md-6">
             <RecentInvoicesContainer compact={true} projectId={projectId} />
             <RecentTicketsContainer compact={true} projectId={projectId} />
-           </div>
-
+          </div>
         </div>
       </div>
     </div>
