@@ -41,6 +41,8 @@ export const ProjectDetail = (props: Props) => {
             new WorkItemImpl(newActivityId, 2, "Equipment"),
             new WorkItemImpl(newActivityId, 3, "Other"),
           ],
+          year: 1, // default new activity to no adjustment
+          adjustment: 0
         },
       ],
     });

@@ -212,6 +212,8 @@ export interface Activity {
   total: number;
   id: number;
   name: string;
+  year: number;
+  adjustment: number;
   workItems: WorkItem[];
 }
 

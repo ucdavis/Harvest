@@ -18,6 +18,7 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
+  adjustment: number;
   category: RateType;
   rates: Rate[];
   workItems: WorkItem[];
@@ -127,9 +128,16 @@ export const WorkItemsForm = (props: Props) => {
             </InputGroup>
           </Col>
 
-          <Col xs="2">${formatCurrency(workItem.rate || 0)}</Col>
+          <Col xs="2">
+            ${formatCurrency(workItem.rate || 0)}
+            {props.adjustment > 0 && (
+              <span className="primary-color">
+                {" "} + ${formatCurrency(workItem.rate * (props.adjustment / 100))}
+              </span>
+            )}
+          </Col>
 
-          <Col xs="1">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
+          <Col xs="1">${formatCurrency(workItem.total)}</Col>
 
           <Col xs="1">
             <button

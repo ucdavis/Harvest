@@ -33,7 +33,7 @@ export const QuoteDisplay = (props: Props) => {
             </h4>
           </div>
           <div className="card-content">
-            <WorkItemDisplay workItems={activity.workItems}></WorkItemDisplay>
+            <WorkItemDisplay adjustment={activity.adjustment} workItems={activity.workItems}></WorkItemDisplay>
           </div>
         </div>
       ))}
