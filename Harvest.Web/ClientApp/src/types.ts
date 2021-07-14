@@ -52,7 +52,7 @@ export interface Invoice {
 
 export interface User {
   id: number;
-  firstName: string;
+  firstName?: string;
   lastName: string;
   email: string;
   iam: string;

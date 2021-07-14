@@ -6,7 +6,7 @@ export const investigatorSchema: SchemaOf<User> = yup
   .object()
   .shape({
     id: yup.number().required(),
-    firstName: yup.string().required(),
+    firstName: yup.string(),
     lastName: yup.string().required(),
     email: yup.string().required(),
     iam: yup.string().required(),
