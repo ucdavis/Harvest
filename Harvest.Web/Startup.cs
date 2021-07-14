@@ -188,7 +188,14 @@ namespace Harvest.Web
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller}/{action}/{id?}",
+                    defaults: new { controller = "Home", action = "Index" },
+                    constraints: new { controller = "(invoice|rate|permissions)" }
+                );
+
+                endpoints.MapControllerRoute(
+                    name: "Projects",
+                    pattern: "{controller=Home}/{action=Index}/{projectId?}");
             });
 
             // SPA needs to kick in for all paths during development
@@ -218,7 +225,7 @@ namespace Harvest.Web
 
             var initializer = new DbInitializer(dbContext);
             initializer.Initialize(recreateDb).GetAwaiter().GetResult();
-            
+
         }
     }
 }

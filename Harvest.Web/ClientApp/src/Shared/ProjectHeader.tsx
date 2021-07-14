@@ -24,7 +24,9 @@ export const ProjectHeader = (props: Props) => {
           <div className="row">
             <div className="col">
               <p className="lede">Status</p>
-              <p className="quote-status">{project.status}</p>
+              <p className={`project-status-${project.status}`}>
+                {project.status}
+              </p>
               <p className="lede">Type</p>
               <p>{project.cropType}</p>
             </div>

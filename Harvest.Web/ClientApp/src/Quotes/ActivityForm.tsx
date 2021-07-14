@@ -1,23 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
 
-import { Input } from "reactstrap";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Input,
+} from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
-import { faCalendarWeek } from "@fortawesome/free-solid-svg-icons";
 
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
 
+const ANNUAL_ADJUSTMENT_RATE = 3;
 interface Props {
   activity: Activity;
+  duplicateActivity?: (activity: Activity) => void;
   updateActivity: (activity: Activity) => void;
   deleteActivity: (activity: Activity) => void;
   rates: Rate[];
+  years?: number;
 }
 
 export const ActivityForm = (props: Props) => {
+  const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
+
+  const toggle = () => setYearDropdownOpen((prevState) => !prevState);
+
   const updateWorkItems = (workItem: WorkItem) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
     const allItems = props.activity.workItems;
@@ -26,7 +38,9 @@ export const ActivityForm = (props: Props) => {
     );
     allItems[itemIndex] = {
       ...workItem,
-      total: workItem.rate * workItem.quantity,
+      total:
+        (workItem.rate + (workItem.rate * props.activity.adjustment) / 100.0) *
+        workItem.quantity,
     };
 
     props.updateActivity({ ...props.activity, workItems: allItems });
@@ -54,49 +68,69 @@ export const ActivityForm = (props: Props) => {
     });
   };
 
+  const setYearAndAdjustment = (year: number, adjustment: number) => {
+    props.updateActivity({
+      ...props.activity,
+      adjustment,
+      year,
+      workItems: props.activity.workItems.map((w) => {
+        return {
+          ...w,
+          total: (w.rate + (w.rate * adjustment) / 100.0) * w.quantity,
+        };
+      }),
+    });
+  };
+
   return (
     <div className="card-wrapper mb-4 no-green">
       <div className="card-content">
         <div className="row justify-content-between align-items-end">
           <div className="col-md-12">
-            <div className="row justify-content-between">
+            <div className="row justify-content-between mb-2">
               <div className="col-md-6">
                 <label> Activity Name</label>
+                {props.years !== undefined && props.years > 1 && (
+                  <Dropdown
+                    className="adjust-chooser"
+                    isOpen={yearDropdownOpen}
+                    toggle={toggle}
+                  >
+                    <DropdownToggle className="btn btn-sm" color="link" caret>
+                      Year {props.activity.year} ({props.activity.adjustment}
+                      %)
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      {Array.from(Array(props.years)).map((_, i) => (
+                        <DropdownItem
+                          key={`year-${i}`}
+                          onClick={(_) =>
+                            setYearAndAdjustment(
+                              i + 1,
+                              i * ANNUAL_ADJUSTMENT_RATE
+                            )
+                          }
+                        >
+                          Year {i + 1} ({i * ANNUAL_ADJUSTMENT_RATE}%)
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                )}
               </div>
 
               <div className="col-md-6 text-right">
-                <button className="btn btn-link btn-sm">
-                  Adjust Year <FontAwesomeIcon icon={faCalendarWeek} />
-                </button>
-                <div className="btn-group">
+                {props.years !== undefined && props.years > 1 && (
                   <button
-                    type="button"
-                    className="btn btn-danger dropdown-toggle"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
+                    className="btn btn-link btn-sm"
+                    onClick={() =>
+                      props.duplicateActivity &&
+                      props.duplicateActivity(props.activity)
+                    }
                   >
-                    Action
+                    Duplicate Activity <FontAwesomeIcon icon={faCopy} />
                   </button>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="#">
-                      Action
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Another action
-                    </a>
-                    <a className="dropdown-item" href="#">
-                      Something else here
-                    </a>
-                    <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" href="#">
-                      Separated link
-                    </a>
-                  </div>
-                </div>
-                <button className="btn btn-link btn-sm">
-                  Duplicate Activity <FontAwesomeIcon icon={faCopy} />
-                </button>
+                )}
                 <button
                   className="btn btn-link btn-sm"
                   onClick={() => props.deleteActivity(props.activity)}
@@ -121,6 +155,7 @@ export const ActivityForm = (props: Props) => {
         </div>
 
         <WorkItemsForm
+          adjustment={props.activity.adjustment}
           category="Labor"
           rates={props.rates.filter((r) => r.type === "Labor")}
           workItems={props.activity.workItems.filter((w) => w.type === "Labor")}
@@ -129,6 +164,7 @@ export const ActivityForm = (props: Props) => {
           deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
+          adjustment={props.activity.adjustment}
           category="Equipment"
           rates={props.rates.filter((r) => r.type === "Equipment")}
           workItems={props.activity.workItems.filter(
@@ -139,6 +175,7 @@ export const ActivityForm = (props: Props) => {
           deleteWorkItem={deleteWorkItem}
         />
         <WorkItemsForm
+          adjustment={props.activity.adjustment}
           category="Other"
           rates={props.rates.filter((r) => r.type === "Other")}
           workItems={props.activity.workItems.filter((w) => w.type === "Other")}

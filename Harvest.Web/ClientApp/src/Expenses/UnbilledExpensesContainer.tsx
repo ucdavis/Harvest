@@ -36,7 +36,7 @@ export const UnbilledExpensesContainer = () => {
 
   // This function closes the modal and deletes the entry from the db
   const confirmModal = async (expenseId: number) => {
-    const response = await fetch(`/Expense/Delete/${expenseId}`, {
+    const response = await fetch(`/Expense/Delete?expenseId=${expenseId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

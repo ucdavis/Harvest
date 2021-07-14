@@ -38,7 +38,7 @@ namespace Harvest.Web.Controllers
         [HttpPost]
         [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
         [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult> Create(int id, [FromBody] Expense[] expenses)
+        public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
         {
             // TODO: validation!
             var user = await _userService.GetCurrentUser();
@@ -47,7 +47,7 @@ namespace Harvest.Web.Controllers
             {
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
-                expense.ProjectId = id;
+                expense.ProjectId = projectId;
                 expense.InvoiceId = null;
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
             }
@@ -61,8 +61,8 @@ namespace Harvest.Web.Controllers
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> Delete(int id) {
-            var expense = await _dbContext.Expenses.FindAsync(id);
+        public async Task<ActionResult> Delete(int expenseId) {
+            var expense = await _dbContext.Expenses.FindAsync(expenseId);
 
             if (expense == null) {
                 return NotFound();
@@ -76,16 +76,16 @@ namespace Harvest.Web.Controllers
 
         // Get all unbilled expenses for the given project
         [HttpGet]
-        public async Task<ActionResult> GetUnbilled(int id)
+        public async Task<ActionResult> GetUnbilled(int projectId)
         {
-            return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == id).ToArrayAsync());
+            return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId).ToArrayAsync());
         }
 
         // Get just the total of unbilled expenses for the current project
         [HttpGet]
-        public async Task<ActionResult> GetUnbilledTotal(int id)
+        public async Task<ActionResult> GetUnbilledTotal(int projectId)
         {
-            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == id).SumAsync(e=>e.Total));
+            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId).SumAsync(e=>e.Total));
         }
     }
 }

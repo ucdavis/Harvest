@@ -18,6 +18,7 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
+  adjustment: number;
   category: RateType;
   rates: Rate[];
   workItems: WorkItem[];
@@ -108,7 +109,7 @@ export const WorkItemsForm = (props: Props) => {
             </FormGroup>
           </Col>
 
-          <Col xs="3">
+          <Col className="col-sm-2">
             <InputGroup>
               <InputGroupAddon addonType="prepend">
                 <InputGroupText>{workItem.unit || ""}</InputGroupText>
@@ -127,26 +128,17 @@ export const WorkItemsForm = (props: Props) => {
             </InputGroup>
           </Col>
 
-          <Col xs="2">
-            <InputGroup>
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>$</InputGroupText>
-              </InputGroupAddon>
-              <Input
-                type="number"
-                id="rate"
-                value={workItem.rate}
-                onChange={(e) =>
-                  props.updateWorkItems({
-                    ...workItem,
-                    rate: parseFloat(e.target.value ?? 0),
-                  })
-                }
-              />
-            </InputGroup>
+          <Col className="col-sm-2 offset-sm-1">
+            ${formatCurrency(workItem.rate || 0)}
+            {props.adjustment > 0 && (
+              <span className="primary-color">
+                {" "}
+                + ${formatCurrency(workItem.rate * (props.adjustment / 100))}
+              </span>
+            )}
           </Col>
 
-          <Col xs="1">${formatCurrency(workItem.rate * workItem.quantity)}</Col>
+          <Col xs="1">${formatCurrency(workItem.total)}</Col>
 
           <Col xs="1">
             <button

@@ -61,26 +61,31 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col">
-              <Link
-                className="btn btn-primary btn-small mr-4"
-                to={`/quote/create/${project.id}`}
-              >
-                Create Quote
-              </Link>
+              {project.status === "Requested" && (
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/quote/create/${project.id}`}
+                >
+                  Edit Quote
+                </Link>
+              )}
 
-              <Link
-                className="btn btn-primary btn-small mr-4"
-                to={`/request/approve/${project.id}`}
-              >
-                Approve Quote
-              </Link>
-
+              {project.status === "PendingApproval" && (
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/request/approve/${project.id}`}
+                >
+                  Approve Quote
+                </Link>
+              )}
+              { project.status === "Active" && (
               <Link
                 className="btn btn-primary btn-small mr-4"
                 to={`/request/changeAccount/${project.id}`}
               >
                 Change Accounts
               </Link>
+              )}
             </div>
             <div className="col text-right">
               <ProjectUnbilledButton projectId={project.id} />
@@ -117,7 +122,7 @@ export const ProjectDetailContainer = () => {
       <div>
         <div className="row justify-content-around">
           <div className="col-md-5">
-            <div className="card-wrapper no-green mt-4">
+            <div className="card-wrapper no-green mt-4 mb-4">
               <div className="card-content">
                 <h2>Project Attachements</h2>
                 <FileUpload
@@ -155,11 +160,14 @@ export const ProjectDetailContainer = () => {
               </div>
             </div>
           </div>
-          <div className="col-md-6">
-            <RecentInvoicesContainer compact={true} projectId={projectId} />
-            <RecentTicketsContainer compact={true} projectId={projectId} />
-           </div>
-
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <RecentInvoicesContainer compact={true} projectId={projectId} />
+        </div>
+        <div className="col">
+          <RecentTicketsContainer compact={true} projectId={projectId} />
         </div>
       </div>
     </div>

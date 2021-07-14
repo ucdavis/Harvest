@@ -20,5 +20,11 @@ namespace Harvest.Web.Extensions
 
             return JsonSerializer.Serialize(roles);
         }
+
+        public static string GetUserDetails(this HttpContext context) {
+            var user = context.User.GetUserInfo();
+
+            return JsonSerializer.Serialize(user, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        }
     }
 }
