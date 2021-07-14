@@ -27,38 +27,51 @@ export const ProjectTable = (props: Props) => {
         ),
         Header: " ",
         maxWidth: 150,
+        accessor: "id",
       },
       {
+        id: "pi",
         Header: "PI",
         accessor: (row) => row.principalInvestigator.name,
       },
       {
+        id: "progress",
         Cell: (data: Cell<Project>) => {
           const percent =
             data.row.original.chargedTotal / data.row.original.quoteTotal;
           return <Progress style={{ width: "10em" }} value={percent * 100} />;
         },
+        accessor: (row) => row.chargedTotal / row.quoteTotal,
         Header: "Progress",
       },
       {
+        id: "remaining",
         Header: "Remaining",
-        accessor: (row) => '$' + formatCurrency(row.quoteTotal - row.chargedTotal)
+        accessor: (row) =>
+          "$" + formatCurrency(row.quoteTotal - row.chargedTotal),
       },
       {
         Header: "Crop Type",
-        accessor: (row) => row.cropType,
+        accessor: "cropType",
       },
       {
+        id: "startDate",
         Header: "Start",
         accessor: (row) => new Date(row.start).toLocaleDateString(),
       },
       {
+        id: "endDate",
         Header: "End",
         accessor: (row) => new Date(row.end).toLocaleDateString(),
       },
       {
         Header: "Status",
-        accessor: (row) => row.status,
+        accessor: "status",
+        Cell: (data: Cell<Project>) => (
+          <span className={`project-status-${data.row.original.status}`}>
+            {data.row.original.status}
+          </span>
+        ),
       },
     ],
     []
