@@ -287,6 +287,7 @@ export interface ProjectWithInvoice {
 
 export interface AppContextShape {
   user: {
+    detail: User;
     roles: RoleName[];
   };
 }
