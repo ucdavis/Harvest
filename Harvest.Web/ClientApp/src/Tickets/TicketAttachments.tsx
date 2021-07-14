@@ -20,7 +20,7 @@ export const TicketAttachments = (props: Props) => {
   } as TicketDetails);
 
     const updateFiles = async (attachments: BlobFile[]) => {
-        await fetch(`/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`, {
+        const response = await fetch(`/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`, {
           method: "POST",
           headers: {
               Accept: "application/json",
@@ -30,8 +30,11 @@ export const TicketAttachments = (props: Props) => {
         });
 
         if (response.ok) {
-            const data = await response.json();
-            debugger;
+            const data = await response.json() as TicketAttachment[];
+
+            setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
+
+            setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
             alert("Attachement(s) saved.");
         } else {
             alert("Something went wrong, please try again");
@@ -48,8 +51,8 @@ export const TicketAttachments = (props: Props) => {
       ) : null}
 
       {ticketAttachments.map((attachment) => (
-        <p key={`attachment-${attachment.id}`}>
-          {attachment.fileName} from {attachment.createdBy.name}
+          <p key={`attachment-${attachment.id}`}>
+              {attachment.fileName} from {attachment.createdBy.name}
         </p>
       ))}
       <FormGroup>
