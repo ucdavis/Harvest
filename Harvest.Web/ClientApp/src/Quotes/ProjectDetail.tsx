@@ -121,10 +121,11 @@ export const ProjectDetail = (props: Props) => {
               />
             </Col>
             <Col md="2">
-              <Label for="rate">Rate</Label> <br />${props.quote.acreageRate}
+              <Label>Rate</Label> <br />$
+              {formatCurrency(props.quote.acreageRate)}
             </Col>
             <Col md="2">
-              <Label for="rate">Years</Label>
+              <Label>Years</Label>
               <br />
               {props.quote.years}
             </Col>
