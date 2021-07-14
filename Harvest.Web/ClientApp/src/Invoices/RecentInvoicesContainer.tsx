@@ -36,10 +36,12 @@ export const RecentInvoicesContainer = (props: Props) => {
             <Link to={`/project/invoices/${props.projectId}`}>View All</Link>
           </div>
         </div>
-        <InvoiceTable
-          compact={props.compact}
-          invoices={invoices.slice(0, 5)}
-        ></InvoiceTable>
+        <div className="row justify-content-center">
+          <InvoiceTable
+            compact={props.compact}
+            invoices={invoices.slice(0, 5)}
+          ></InvoiceTable>
+        </div>
       </div>
     </div>
   );

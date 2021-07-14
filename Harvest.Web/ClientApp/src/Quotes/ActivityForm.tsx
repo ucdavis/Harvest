@@ -87,37 +87,39 @@ export const ActivityForm = (props: Props) => {
       <div className="card-content">
         <div className="row justify-content-between align-items-end">
           <div className="col-md-12">
-            <div className="row justify-content-between">
+            <div className="row justify-content-between mb-2">
               <div className="col-md-6">
                 <label> Activity Name</label>
+                {props.years !== undefined && props.years > 1 && (
+                  <Dropdown
+                    className="adjust-chooser"
+                    isOpen={yearDropdownOpen}
+                    toggle={toggle}
+                  >
+                    <DropdownToggle className="btn btn-sm" color="link" caret>
+                      Year {props.activity.year} ({props.activity.adjustment}
+                      %)
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      {Array.from(Array(props.years)).map((_, i) => (
+                        <DropdownItem
+                          key={`year-${i}`}
+                          onClick={(_) =>
+                            setYearAndAdjustment(
+                              i + 1,
+                              i * ANNUAL_ADJUSTMENT_RATE
+                            )
+                          }
+                        >
+                          Year {i + 1} ({i * ANNUAL_ADJUSTMENT_RATE}%)
+                        </DropdownItem>
+                      ))}
+                    </DropdownMenu>
+                  </Dropdown>
+                )}
               </div>
 
               <div className="col-md-6 text-right">
-                {props.years !== undefined && props.years > 1 && (
-                  <div>
-                    <Dropdown isOpen={yearDropdownOpen} toggle={toggle}>
-                      <DropdownToggle color="danger" caret>
-                        Year {props.activity.year} ({props.activity.adjustment}
-                        %)
-                      </DropdownToggle>
-                      <DropdownMenu>
-                        {Array.from(Array(props.years)).map((_, i) => (
-                          <DropdownItem
-                            key={`year-${i}`}
-                            onClick={(_) =>
-                              setYearAndAdjustment(
-                                i + 1,
-                                i * ANNUAL_ADJUSTMENT_RATE
-                              )
-                            }
-                          >
-                            Year {i + 1} ({i * ANNUAL_ADJUSTMENT_RATE}%)
-                          </DropdownItem>
-                        ))}
-                      </DropdownMenu>
-                    </Dropdown>
-                  </div>
-                )}
                 {props.years !== undefined && props.years > 1 && (
                   <button
                     className="btn btn-link btn-sm"
