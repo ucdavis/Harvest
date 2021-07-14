@@ -155,10 +155,14 @@ export const ProjectDetailContainer = () => {
               </div>
             </div>
           </div>
-          <div className="col-md-6">
-            <RecentInvoicesContainer compact={true} projectId={projectId} />
-            <RecentTicketsContainer compact={true} projectId={projectId} />
-          </div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <RecentInvoicesContainer compact={true} projectId={projectId} />
+        </div>
+        <div className="col">
+          <RecentTicketsContainer compact={true} projectId={projectId} />
         </div>
       </div>
     </div>
