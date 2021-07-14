@@ -2,7 +2,7 @@ import { AppContextShape, ProjectWithQuote, Rate } from "../types";
 
 export const fakeAppContext: AppContextShape = {
   user: {
-    roles: ["Admin"],
+    roles: ["System"],
   },
 };
 

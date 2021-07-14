@@ -1,6 +1,9 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Configuration
+@using Harvest.Core.Services
+@using Harvest.Core.Models
 @inject IConfiguration Configuration
+@inject IUserService UserService
 <!DOCTYPE html>
 <html>
 
@@ -58,17 +61,23 @@
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
-                        <a class="nav-link" href="/project">Projects</a>
+                    <a class="nav-link" href="/project">@if(await UserService.HasOnlyRole(Role.Codes.PI)){<text>My </text>}Projects</a>
                     </li>
-                    <li class="nav-item">
-                        <a asp-controller="Permissions" asp-action="Index" class="nav-link">Permissions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Rate" asp-action="Index" class="nav-link">Rates</a>
-                    </li>
-                    <li class="nav-item">
-                        <a asp-controller="Expense" asp-action="Entry" class="nav-link">Expenses</a>
-                    </li>
+                    @if (await UserService.HasAccess(AccessCodes.SystemAccess))
+                    {
+                        <li class="nav-item">
+                            <a asp-controller="Permissions" asp-action="Index" class="nav-link">Permissions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Rate" asp-action="Index" class="nav-link">Rates</a>
+                        </li>
+                    }
+                    @if (await UserService.HasAccess(AccessCodes.PrincipalInvestigator))
+                    {
+                        <li class="nav-item">
+                            <a asp-controller="Expense" asp-action="Entry" class="nav-link">Expenses</a>
+                        </li>
+                    }
                     <li class="nav-item">
                         <a asp-controller="TempInvoice" asp-action="Index" asp-route-projectId="5" class="nav-link">Invoices (sample)</a>
                     </li>

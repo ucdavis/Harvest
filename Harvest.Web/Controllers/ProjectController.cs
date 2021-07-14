@@ -31,19 +31,31 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
-        // TODO: move or determine proper permissions
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Active()
         {
+            var user = await _userService.GetCurrentUser();
+            var userRoles = await _dbContext.Permissions
+                .Where(p => p.UserId == user.Id)
+                .Select(p => p.Role.Name)
+                .ToArrayAsync();
+            var hasNonPiRoles = userRoles.Any(r => r != Role.Codes.PI);
+            var isPi = userRoles.Contains(Role.Codes.PI);
+
             // TODO: only show projects where between start and end?
-            return Ok(await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Where(p => p.IsActive).ToArrayAsync());
+            return Ok(await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Where(p => p.IsActive && (
+                    //PI's can only view their own projects
+                    hasNonPiRoles || isPi && p.PrincipalInvestigatorId == user.Id))
+                .ToArrayAsync());
         }
 
-        // TODO: move or determine proper permissions
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Invoices(int projectId)
         {
-            return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == projectId).ToArrayAsync());
+            var isPI = await _userService.HasOnlyRole(Role.Codes.PI);
+            var user = await _userService.GetCurrentUser();
+            var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
+            return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == projectId && hasAccess || isPI && a.Project.PrincipalInvestigatorId == user.Id).ToArrayAsync());
         }
 
         public ActionResult Details(int projectId)
@@ -52,14 +64,26 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
-        // TODO: permissions
         // Returns JSON info of the project
         public async Task<ActionResult> Get(int projectId)
         {
-            return Ok(await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId));
+            var isPI = await _userService.HasOnlyRole(Role.Codes.PI);
+            var user = await _userService.GetCurrentUser();
+            var hasAccess = await _userService.HasAccess(AccessCodes.WorkerAccess);
+            var project = await _dbContext.Projects
+                .Include(a => a.Attachments)
+                .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.CreatedBy)
+                .SingleOrDefaultAsync(p => p.Id == projectId && hasAccess || isPI && p.PrincipalInvestigatorId == user.Id);
+            if (project != null)
+            {
+                return Ok(project);
+            }
+            return NotFound();
         }
 
         [HttpGet]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> AccountApproval(int projectId)
         {
             var project = await _dbContext.Projects.Include(p => p.Accounts).SingleAsync(p => p.Id == projectId);
@@ -67,6 +91,7 @@ namespace Harvest.Web.Controllers
             return View(project);
         }
 
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<IActionResult> RefreshTotal(int projectId)
         {
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);

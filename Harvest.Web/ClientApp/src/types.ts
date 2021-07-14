@@ -1,11 +1,11 @@
 export type CropType = "Row" | "Tree";
 export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
 export type RoleName =
-  | "Admin"
   | "FieldManager"
   | "Supervisor"
   | "System"
-  | "Worker";
+  | "Worker"
+  | "PI";
 
 export interface Project {
   id: number;

@@ -32,8 +32,10 @@ namespace Harvest.Web.Handlers
                 return;
             }
 
+            var nonPiRequirements = requirement.RoleStrings.Where(r => r != Role.Codes.PI);
 
-            if (await _dbContext.Permissions.AnyAsync(p => p.User.Iam == userIamId && (requirement.RoleStrings.Contains(p.Role.Name)
+            if (await _dbContext.Permissions.AnyAsync(p => p.User.Iam == userIamId && (
+                nonPiRequirements.Contains(p.Role.Name)
                 || p.Role.Name == Role.Codes.System))) // system admin should have access to all the things
             {
                 context.Succeed(requirement);

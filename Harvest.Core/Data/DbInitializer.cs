@@ -25,10 +25,10 @@ namespace Harvest.Core.Data
 
             //Make sure roles exist
             await CheckCreateRole(Role.Codes.System);
-            await CheckCreateRole(Role.Codes.Admin);
             await CheckCreateRole(Role.Codes.FieldManager);
             await CheckCreateRole(Role.Codes.Supervisor);
             await CheckCreateRole(Role.Codes.Worker);
+            await CheckCreateRole(Role.Codes.PI);
 
             await _dbContext.SaveChangesAsync();
 

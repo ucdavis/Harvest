@@ -18,7 +18,6 @@ export const ShowFor = (props: Props) => {
   );
 
   if (
-    userRoles.includes("Admin") ||
     userRoles.includes("System") ||
     anyMatchingRoles
   ) {
