@@ -42,6 +42,11 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
+        if (projectWithQuote.project.status !== "Requested") {
+          // can only create quote for newly requests projects. 
+          history.push(`/Project/Details/${projectId}`);
+        }
+
         if (projectWithQuote.quote) {
           // TODO: remove once we standardize on new quote format
           setQuote({
@@ -56,7 +61,6 @@ export const QuoteContainer = () => {
             setEditFields(true);
           }
         } else {
-          // TODO: how do we handle if different fields have different rates?
           const quoteToUse = new QuoteContentImpl();
           quoteToUse.acreageRate =
             rateJson.find((r) => r.type === "Acreage")?.price || 120;
@@ -126,7 +130,7 @@ export const QuoteContainer = () => {
     project,
   ]);
 
-  const save = async () => {
+  const save = async (submit: boolean) => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
@@ -137,7 +141,7 @@ export const QuoteContainer = () => {
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
     // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(`/Quote/Save/${projectId}`, {
+    const saveResponse = await fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -236,8 +240,11 @@ export const QuoteContainer = () => {
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
 
-          <button className="btn btn-primary mt-4" onClick={save}>
+          <button className="btn btn-link mt-4" onClick={() => save(false)}>
             Save Quote
+          </button>
+          <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+            Submit Quote
           </button>
         </div>
       </div>

@@ -31,11 +31,16 @@ export const ApprovalContainer = () => {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
 
         setProjectAndQuote(projectWithQuote);
+
+        // can only approve pendingApproval projects
+        if (projectWithQuote.project.status !== "PendingApproval") {
+          history.push(`/Project/Details/${projectWithQuote.project.id}`);
+        }
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [history, projectId]);
 
   const approve = async () => {
     const model = { accounts };
