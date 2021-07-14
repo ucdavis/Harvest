@@ -5,19 +5,19 @@ import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 
 interface Props {
-    projectId?: string;
-    compact: boolean;
+  projectId?: string;
+  compact: boolean;
 }
 
-
 export const RecentTicketsContainer = (props: Props) => {
-
-    const [tickets, setTickets] = useState<Ticket[]>([]);
-    const maxRows = 5;
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const maxRows = 5;
 
   useEffect(() => {
-      const cb = async () => {
-        const response = await fetch(`/Ticket/GetList?projectId=${props.projectId}&maxRows=${maxRows}`);
+    const cb = async () => {
+      const response = await fetch(
+        `/Ticket/GetList?projectId=${props.projectId}&maxRows=${maxRows}`
+      );
 
       if (response.ok) {
         setTickets(await response.json());
@@ -30,19 +30,18 @@ export const RecentTicketsContainer = (props: Props) => {
   return (
     <div className="">
       <div className="card-content">
-              <h3>Last {maxRows} Updated Tickets</h3>
-          <Link
-              className="btn btn-primary btn-small mr-4"
-              to={`/ticket/create/${props.projectId}`}
-          >
-                  Create Ticket
-          </Link>
-          <Link
-              to={`/ticket/List/${props.projectId}`}
-          >
-              View All
-          </Link>
-        <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
+        <div className="row justify-content-between">
+          <h3>Last {maxRows} Updated Tickets</h3>
+          <div>
+            <Link className="mr-4" to={`/ticket/create/${props.projectId}`}>
+              Create Ticket
+            </Link>
+            <Link to={`/ticket/List/${props.projectId}`}>View All</Link>
+          </div>
+        </div>
+        <div className="row justify-content-center">
+          <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
+        </div>
       </div>
     </div>
   );

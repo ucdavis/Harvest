@@ -146,3 +146,75 @@ $nchild-wide: 24%;
 .btn-link.focus {
   text-decoration: none;
 }
+.page-link:hover {
+  color: $primary-color;
+}
+.page-item button {
+  height: 54px;
+}
+.project-status-PendingApproval {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $sunflower;
+    margin-right: 6px;
+  }
+}
+.project-status-PendingAccountApproval {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $sunflower;
+    margin-right: 6px;
+  }
+}
+.project-status-Requested {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $poppy;
+    margin-right: 6px;
+  }
+}
+.project-status-Active {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $quad;
+    margin-right: 6px;
+  }
+}
+.project-status-ChangeRequested {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $poppy;
+    margin-right: 6px;
+  }
+}
+.project-status-Completed {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $tahoe;
+    margin-right: 6px;
+  }
+}

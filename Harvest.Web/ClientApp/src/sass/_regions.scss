@@ -8,17 +8,6 @@
   .quote-info-box {
     border: 1px solid $borders;
     padding-top: 16px;
-    .quote-status {
-      &:before {
-        content: "";
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        border-radius: 5px;
-        background-color: $arboretum;
-        margin-right: 6px;
-      }
-    }
   }
 }
 .card-project-totals {
@@ -77,6 +66,9 @@
     margin-top: 8px;
   }
 }
+.adjust-chooser {
+  display: inline-block;
+}
 .map-wrapper {
   border-top: 1px solid $borders;
 }
@@ -91,11 +83,6 @@
 .approval-row {
   margin: 16px 0;
 }
-// .total-quote-col {
-//   margin-top: 12px;
-//   padding-top: 12px;
-//   border-top: 1px solid $borders;
-// }
 
 //project details
 
