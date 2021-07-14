@@ -169,14 +169,14 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        [Route("[controller]/[action]/{projectId}/{ticketId}/")]
-        public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketAttachment[] attachments)
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
             var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
 
             var ticketAttachmentsToCreate = new List<TicketAttachment>();
-            foreach (var attachment in attachments)
+            foreach (var attachment in model.Attachments)
             {
                 var ticketAttachmentToCreate = new TicketAttachment()
                 {
@@ -208,5 +208,9 @@ namespace Harvest.Web.Controllers.Api
             return Ok(savedTa);
         }
 
+    }
+    public class TicketFilesModel
+    {
+        public TicketAttachment[] Attachments { get; set; }
     }
 }

@@ -19,8 +19,8 @@ export const TicketAttachments = (props: Props) => {
   const [ticketLoc, setTicketLoc] = useState<TicketDetails>({
   } as TicketDetails);
 
-  const updateFiles = async (attachments: BlobFile[]) => {
-      await fetch(`/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`, {
+    const updateFiles = async (attachments: BlobFile[]) => {
+        await fetch(`/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`, {
           method: "POST",
           headers: {
               Accept: "application/json",
