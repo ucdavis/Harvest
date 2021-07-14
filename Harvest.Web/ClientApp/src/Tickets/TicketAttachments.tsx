@@ -39,13 +39,13 @@ export const TicketAttachments = (props: Props) => {
         } else {
             alert("Something went wrong, please try again");
         }
-  };
+    };
 
 
 
   return (
     <div>
-      <h2>Ticket Attachments TODO!!!</h2>
+      <h2>Ticket Attachments</h2>
       {ticketAttachments === undefined || ticketAttachments.length === 0 ? (
         <p> No Messages Yet!!!</p>
       ) : null}
@@ -58,7 +58,7 @@ export const TicketAttachments = (props: Props) => {
       <FormGroup>
         <Label>Attach files?</Label>
         <FileUpload
-          files={ticket.newAttachments || []}
+                  files={ticketLoc.newAttachments || []}
           setFiles={(f) => {
               setTicketLoc((ticket) => ({ ...ticket, newAttachments: [...f] }));
               updateFiles(f);
