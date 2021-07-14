@@ -58,7 +58,7 @@ export interface Invoice {
 
 export interface User {
   id: number;
-  firstName: string;
+  firstName?: string;
   lastName: string;
   email: string;
   iam: string;
@@ -293,6 +293,7 @@ export interface ProjectWithInvoice {
 
 export interface AppContextShape {
   user: {
+    detail: User;
     roles: RoleName[];
   };
 }

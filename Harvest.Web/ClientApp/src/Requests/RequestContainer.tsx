@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
@@ -9,6 +9,7 @@ import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
 import { Project, CropType } from "../types";
+import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
   projectId?: string;
@@ -16,10 +17,13 @@ interface RouteParams {
 
 export const RequestContainer = () => {
   const history = useHistory();
+  const userDetail = useContext(AppContext).user.detail;
+
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
+    principalInvestigator: userDetail
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 

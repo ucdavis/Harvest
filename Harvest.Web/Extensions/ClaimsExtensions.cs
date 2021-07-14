@@ -25,7 +25,7 @@ namespace Harvest.Web.Extensions
             var first = claimsPrincipal.Claims.FirstOrDefault(a => a.Type == ClaimTypes.GivenName && !string.IsNullOrWhiteSpace(a.Value));
             return new User
             {
-                FirstName = first?.Value,
+                FirstName = first != null ? first.Value : string.Empty,
                 LastName = claimsPrincipal.FindFirstValue(ClaimTypes.Surname),
                 Email = claimsPrincipal.FindFirstValue(ClaimTypes.Email),
                 Kerberos = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier), //???
