@@ -27,7 +27,15 @@ export const TicketAttachments = (props: Props) => {
               "Content-Type": "application/json",
           },
           body: JSON.stringify({ Attachments: attachments }),
-      });
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            debugger;
+            alert("Attachement(s) saved.");
+        } else {
+            alert("Something went wrong, please try again");
+        }
   };
 
 

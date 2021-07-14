@@ -202,7 +202,7 @@ namespace Harvest.Web.Controllers.Api
             //Debug and see if this works with multiples or at all...
             var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
 
-            var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id)).Select(a => new TicketAttachment() { Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName }).SingleAsync();
+            var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id)).Select(a => new TicketAttachment() { Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName }).ToListAsync();
 
             //Return message instead?
             return Ok(savedTa);
