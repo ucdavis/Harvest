@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
@@ -26,7 +26,6 @@ export const RequestContainer = () => {
     principalInvestigator: userDetail,
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
-  const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
   const checkRequestValidity = async (inputs: any) => {
     try {
@@ -58,18 +57,6 @@ export const RequestContainer = () => {
       cb();
     }
   }, [projectId]);
-
-  // This checks if the required fields are empty or not
-  // If they are undefined the submit button should be disabled
-  useEffect(() => {
-    if (
-      project.start !== undefined &&
-      project.end !== undefined &&
-      project.crop !== undefined
-    ) {
-      setButtonDisabled(false);
-    }
-  }, [project.crop, project.start, project.end]);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -117,6 +104,14 @@ export const RequestContainer = () => {
   const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProject({ ...project, cropType: e.target.value as CropType });
   };
+
+  var isFilledIn = useMemo(() => {
+    return (
+      project.start !== undefined &&
+      project.end !== undefined &&
+      project.crop !== undefined
+    );
+  }, [project.crop, project.start, project.end]);
 
   if (projectId !== undefined && project.id === 0) {
     // if we have a project id but it hasn't loaded yet, wait
@@ -265,7 +260,7 @@ export const RequestContainer = () => {
             className="btn-lg"
             color="primary"
             onClick={create}
-            disabled={buttonDisabled}
+            disabled={isFilledIn}
           >
             {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
