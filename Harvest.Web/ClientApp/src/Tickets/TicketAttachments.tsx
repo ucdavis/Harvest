@@ -1,6 +1,6 @@
 ﻿import { useMemo, useState } from "react";
 import { TicketAttachment, TicketDetails, BlobFile } from "../types";
-import { Button, FormGroup, Input, Label } from "reactstrap";
+import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 
 interface Props {

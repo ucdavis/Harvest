@@ -199,9 +199,9 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.SaveChangesAsync();
             //TODO: Notification
 
-            //Debug and see if this works with multiples or at all...
-            var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
 
+            var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
+            //TODO return other file info that may be needed
             var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id)).Select(a => new TicketAttachment() { Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName }).ToListAsync();
 
             //Return message instead?
