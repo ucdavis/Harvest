@@ -60,6 +60,7 @@ export const TicketCreate = () => {
 
   return (
     <div className="card-wrapper">
+
       <ProjectHeader
         project={project}
         title={"Field Request #" + (project.id || "")}

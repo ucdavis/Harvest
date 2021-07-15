@@ -1,7 +1,20 @@
 import { AppContextShape, ProjectWithQuote, Rate } from "../types";
 
+const fakeUser = {
+  id: 1,
+  firstName: "Bob",
+  lastName: "Dobalina",
+  email: "bdobalina@ucdavis.edu",
+  iam: "1000037182",
+  kerberos: "bdobalina",
+  name: "Mr Mr Mr Bob Dobalina",
+};
+
 export const fakeAppContext: AppContextShape = {
   user: {
+    detail: {
+      ...fakeUser,
+    },
     roles: ["System"],
   },
 };
@@ -16,13 +29,7 @@ export const fakeProject: ProjectWithQuote = {
     requirements: "Grow me some tomatoes",
     name: "Tomato",
     principalInvestigator: {
-      id: 1,
-      firstName: "Scott",
-      lastName: "Kirkland",
-      email: "srkirkland@ucdavis.edu",
-      iam: "1000029584",
-      kerberos: "postit",
-      name: "Scott Kirkland",
+      ...fakeUser,
     },
     location: null,
     locationCode: null,
@@ -35,13 +42,7 @@ export const fakeProject: ProjectWithQuote = {
     currentAccountVersion: 0,
     isActive: false,
     createdBy: {
-      id: 1,
-      firstName: "Scott",
-      lastName: "Kirkland",
-      email: "srkirkland@ucdavis.edu",
-      iam: "1000029584",
-      kerberos: "postit",
-      name: "Scott Kirkland",
+      ...fakeUser,
     },
     accounts: null,
     quotes: null,

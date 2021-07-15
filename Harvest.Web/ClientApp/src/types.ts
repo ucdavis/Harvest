@@ -1,11 +1,18 @@
 export type CropType = "Row" | "Tree";
 export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
 export type RoleName =
+  | "System"
   | "FieldManager"
   | "Supervisor"
-  | "System"
   | "Worker"
   | "PI";
+
+export type ProjectStatus =
+  | "Requested"
+  | "PendingApproval"
+  | "Active"
+  | "ChangeRequested"
+  | "Completed";
 
 export interface Project {
   id: number;
@@ -24,7 +31,7 @@ export interface Project {
   chargedTotal: number;
   createdBy: User;
   createdOn: Date;
-  status: string;
+  status: ProjectStatus;
   currentAccountVersion: number;
   isActive: boolean;
   accounts: null;
@@ -52,7 +59,7 @@ export interface Invoice {
 
 export interface User {
   id: number;
-  firstName: string;
+  firstName?: string;
   lastName: string;
   email: string;
   iam: string;
@@ -105,6 +112,7 @@ export class QuoteContentImpl implements QuoteContent {
   equipmentTotal = 0;
   otherTotal = 0;
   grandTotal = 0;
+  years = 1;
   fields = [];
 
   activities = [] as Activity[];
@@ -117,6 +125,7 @@ export interface QuoteContent {
   acreageRateId: number;
   acreageRateDescription: string;
   activities: Activity[];
+  years: number;
   total: number;
   acreageTotal: number;
   activitiesTotal: number;
@@ -229,42 +238,43 @@ export interface ProjectAccount {
 
 //Rename to TicketCreate? (Attachments is a BlobFile[] which doesn't work when I'm pulling the attachments from the DB see TicketDetails)
 export interface Ticket {
-    id: number;
-    projectId: number;
-    name: string;
-    requirements: string;
-    dueDate?: Date;
-    updatedOn?: Date;
-    attachments: BlobFile[];
-    status: string;
-    createdOn: Date;
+  id: number;
+  projectId: number;
+  name: string;
+  requirements: string;
+  dueDate?: Date;
+  updatedOn?: Date;
+  attachments: BlobFile[];
+  status: string;
+  createdOn: Date;
 }
 export interface TicketDetails {
-    id: number;
-    projectId: number;
-    name: string;
-    requirements: string;
-    dueDate?: Date;
-    updatedOn?: Date;
-    attachments: TicketAttachment[];
-    messages: TicketMessage[];
-    status: string;
-    createdOn: Date;
-    createdBy: User;
-    workNotes: string;
-    updatedBy?: User;
+  id: number;
+  projectId: number;
+  name: string;
+  requirements: string;
+  dueDate?: Date;
+  updatedOn?: Date;
+  attachments: TicketAttachment[];
+  messages: TicketMessage[];
+  status: string;
+  createdOn: Date;
+  createdBy: User;
+  workNotes: string;
+  updatedBy?: User;
+    newAttachments: BlobFile[];
 }
 export interface TicketAttachment {
-    id: number;
-    fileName: string;
-    createdOn: Date;
-    createdBy: User;
+  id: number;
+  fileName: string;
+  createdOn: Date;
+  createdBy: User;
 }
 export interface TicketMessage {
-    id: number;
-    message: string;
-    createdBy: User;
-    createdOn: Date;
+  id: number;
+  message: string;
+  createdBy: User;
+  createdOn: Date;
 }
 
 export interface RequestInput {
@@ -285,6 +295,7 @@ export interface ProjectWithInvoice {
 
 export interface AppContextShape {
   user: {
+    detail: User;
     roles: RoleName[];
   };
 }

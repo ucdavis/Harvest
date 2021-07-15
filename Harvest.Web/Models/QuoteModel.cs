@@ -44,6 +44,7 @@ namespace Harvest.Web.Models
         public double EquipmentTotal { get; set; }
         public double OtherTotal { get; set; }
         public double GrandTotal { get; set; }
+        public int Years { get; set; }
         public QuoteField[] Fields { get; set; }
         public Activity[] Activities { get; set; }
 

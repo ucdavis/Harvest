@@ -62,16 +62,16 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col">
-              <ShowFor roles={["FieldManager"]}>
+              <ShowFor roles={["FieldManager"]} condition={project.status === "Requested"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/quote/create/${project.id}`}
                 >
-                    Create Quote
+                    Edit Quote
                 </Link>
               </ShowFor>
 
-              <ShowFor roles={["FieldManager"]}>
+              <ShowFor roles={["FieldManager"]} condition={project.status === "PendingApproval"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/approve/${project.id}`}
@@ -80,7 +80,7 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
 
-              <ShowFor roles={["FieldManager"]}>
+              <ShowFor roles={["FieldManager"]} condition={project.status === "Active"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/changeAccount/${project.id}`}
@@ -124,7 +124,7 @@ export const ProjectDetailContainer = () => {
       <div>
         <div className="row justify-content-around">
           <div className="col-md-5">
-            <div className="card-wrapper no-green mt-4">
+            <div className="card-wrapper no-green mt-4 mb-4">
               <div className="card-content">
                 <h2>Project Attachements</h2>
                 <FileUpload
@@ -162,11 +162,14 @@ export const ProjectDetailContainer = () => {
               </div>
             </div>
           </div>
-          <div className="col-md-6">
-            <RecentInvoicesContainer compact={true} projectId={projectId} />
-            <RecentTicketsContainer compact={true} projectId={projectId} />
-           </div>
-
+        </div>
+      </div>
+      <div className="row">
+        <div className="col">
+          <RecentInvoicesContainer compact={true} projectId={projectId} />
+        </div>
+        <div className="col">
+          <RecentTicketsContainer compact={true} projectId={projectId} />
         </div>
       </div>
     </div>

@@ -31,11 +31,16 @@ export const ApprovalContainer = () => {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
 
         setProjectAndQuote(projectWithQuote);
+
+        // can only approve pendingApproval projects
+        if (projectWithQuote.project.status !== "PendingApproval") {
+          history.push(`/Project/Details/${projectWithQuote.project.id}`);
+        }
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [history, projectId]);
 
   const approve = async () => {
     const model = { accounts };
@@ -118,23 +123,7 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <h2 className="primary-font bold-font">
-                Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
-              </h2>
-              <button className="btn btn-link btn-sm btn-fa mb-2">
-                Download PDF <FontAwesomeIcon icon={faDownload} />
-              </button>
-
-              <AccountsInput
-                accounts={accounts}
-                setAccounts={setAccounts}
-                setDisabled={setDisabled}
-              />
               <div className="mt-5">
-                <p className="discreet">
-                  Please check with the above account managers before pressing
-                  approve
-                </p>
                 <button
                   className="btn btn-primary"
                   disabled={disabled}
