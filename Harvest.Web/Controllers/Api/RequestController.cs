@@ -107,18 +107,26 @@ namespace Harvest.Web.Controllers
         {
             var currentUser = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
+            var projectAttachmentsToCreate = new List<ProjectAttachment>();
 
-            var newProject = new ProjectAttachment
+            foreach (var attachment in model.Attachments)
             {
-                Identifier = model.Attachments[model.Attachments.Length - 1].Identifier,
-                FileName = model.Attachments[model.Attachments.Length - 1].FileName,
-                FileSize = model.Attachments[model.Attachments.Length - 1].FileSize,
-                ContentType = model.Attachments[model.Attachments.Length - 1].ContentType,
-                CreatedOn = DateTime.UtcNow,
-                CreatedById = currentUser.Id
-            };
+                var newProject = new ProjectAttachment
+                {
+                    Identifier = attachment.Identifier,
+                    FileName = attachment.FileName,
+                    FileSize = attachment.FileSize,
+                    ContentType = attachment.ContentType,
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedById = currentUser.Id
+                };
 
-            project.Attachments.Add(newProject);
+                projectAttachmentsToCreate.Add(newProject);
+            }
+
+            project.Attachments.AddRange(projectAttachmentsToCreate);
+      
+            _dbContext.Projects.Update(project);
             await _dbContext.SaveChangesAsync();
 
             return Ok(null);
