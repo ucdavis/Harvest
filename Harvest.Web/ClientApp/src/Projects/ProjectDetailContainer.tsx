@@ -139,7 +139,7 @@ export const ProjectDetailContainer = () => {
                       attachments: [...project.attachments, ...files],
                     });
                     setNewFiles([...f]);
-                    updateFiles(f);
+                    updateFiles(files);
                   }}
                   updateFile={(f) => {
                     setNewFiles((oldFiles) => {
