@@ -23,9 +23,10 @@ export const RequestContainer = () => {
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
-    principalInvestigator: userDetail
+    principalInvestigator: userDetail,
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
+  const [buttonDisabled, setButtonDisabled] = useState<boolean>(true);
 
   const checkRequestValidity = async (inputs: any) => {
     try {
@@ -57,6 +58,18 @@ export const RequestContainer = () => {
       cb();
     }
   }, [projectId]);
+
+  // This checks if the required fields are empty or not
+  // If they are undefined the submit button should be disabled
+  useEffect(() => {
+    if (
+      project.start !== undefined &&
+      project.end !== undefined &&
+      project.crop !== undefined
+    ) {
+      setButtonDisabled(false);
+    }
+  }, [project.crop, project.start, project.end]);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -248,7 +261,12 @@ export const RequestContainer = () => {
               );
             })}
           </ul>
-          <Button className="btn-lg" color="primary" onClick={create}>
+          <Button
+            className="btn-lg"
+            color="primary"
+            onClick={create}
+            disabled={buttonDisabled}
+          >
             {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
         </div>
