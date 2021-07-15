@@ -26,7 +26,6 @@ export const TicketWorkNotesEdit = (props: Props) => {
       );
 
       if (response.ok) {
-          await response.json();
           alert("Work notes saved.");
       } else {
           alert("Something went wrong, please try again");
