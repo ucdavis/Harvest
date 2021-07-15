@@ -42,7 +42,8 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
             {
                 using (var streamReader = new StreamReader(reader))
                 {
-                    model.Runtime = await streamReader.ReadToEndAsync();
+                    // we only care about the first line, which is just a bunch of minified JS
+                    model.Runtime = await streamReader.ReadLineAsync();
                 }
             }
 
