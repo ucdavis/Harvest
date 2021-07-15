@@ -5,6 +5,7 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
+import { ShowFor } from "../Shared/ShowFor";
 
 interface RouteParams {
   projectId?: string;
@@ -128,9 +129,11 @@ export const TicketCreate = () => {
               ></FileUpload>
           </FormGroup>
         <div className="row justify-content-center">
-          <Button className="btn-lg" color="primary" onClick={create}>
-            Create New Ticket
-          </Button>
+          <ShowFor roles={["FieldManager","Supervisor","PI"]} >
+            <Button className="btn-lg" color="primary" onClick={create}>
+              Create New Ticket
+            </Button>
+          </ShowFor>
         </div>
         <div>DEBUG: {JSON.stringify(ticket)}</div>
       </div>

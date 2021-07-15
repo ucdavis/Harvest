@@ -30,9 +30,10 @@ function App() {
     <AppContext.Provider value={Harvest}>
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
-      <Route path="/request/create/:projectId?" component={RequestContainer} />
-      <Route path="/request/approve/:projectId" component={ApprovalContainer} />
-      <Route
+      <ConditionalRoute roles={["FieldManager"]} path="/request/create/:projectId?" component={RequestContainer} />
+      <ConditionalRoute roles={["FieldManager"]} path="/request/approve/:projectId" component={ApprovalContainer} />
+      <ConditionalRoute
+        roles={["FieldManager"]}
         path="/request/changeAccount/:projectId"
         component={AccountChangeContainer}
       />
@@ -40,20 +41,22 @@ function App() {
         path="/project/invoices/:projectId"
         component={InvoiceListContainer}
       />
-      <Route
+      <ConditionalRoute
+        roles={["FieldManager"]}
         path="/invoice/details/:invoiceId"
         component={InvoiceDetailContainer}
       />
-      <ConditionalRoute roles={['FieldManager', 'Supervisor']} path="/quote/create/:projectId" component={QuoteContainer} />
+      <ConditionalRoute roles={["FieldManager"]} path="/quote/create/:projectId" component={QuoteContainer} />
       <Route exact path="/project" component={ProjectListContainer} />
-      <Route path="/ticket/create/:projectId" component={TicketCreate} />
+      <ConditionalRoute roles={["FieldManager","Supervisor","PI"]} path="/ticket/create/:projectId" component={TicketCreate} />
       <Route path="/ticket/list/:projectId" component={TicketsContainer} />
       <Route path="/ticket/details/:projectId/:ticketId" component={TicketDetailContainer} />
       <Route
         path="/project/details/:projectId"
         component={ProjectDetailContainer}
       />
-      <Route
+      <ConditionalRoute
+        roles={["FieldManager", "Supervisor", "Worker"]}
         path="/expense/entry/:projectId?"
         component={ExpenseEntryContainer}
       />
