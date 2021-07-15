@@ -1,6 +1,8 @@
-@model string[]
+@model Harvest.Web.Views.Shared.Components.DynamicScripts.DynamicScriptModel
 
-@foreach (var script in Model)
+<script>@Html.Raw(Model.Runtime)</script>
+
+@foreach (var script in Model.Scripts)
 {
     <script src="/static/js/@script"></script>
 }
