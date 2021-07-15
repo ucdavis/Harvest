@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
@@ -23,7 +23,7 @@ export const RequestContainer = () => {
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
-    principalInvestigator: userDetail
+    principalInvestigator: userDetail,
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
@@ -104,6 +104,14 @@ export const RequestContainer = () => {
   const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProject({ ...project, cropType: e.target.value as CropType });
   };
+
+  var isFilledIn = useMemo(() => {
+    return (
+      project.start !== undefined &&
+      project.end !== undefined &&
+      project.crop !== undefined
+    );
+  }, [project.crop, project.start, project.end]);
 
   if (projectId !== undefined && project.id === 0) {
     // if we have a project id but it hasn't loaded yet, wait
@@ -248,7 +256,12 @@ export const RequestContainer = () => {
               );
             })}
           </ul>
-          <Button className="btn-lg" color="primary" onClick={create}>
+          <Button
+            className="btn-lg"
+            color="primary"
+            onClick={create}
+            disabled={isFilledIn}
+          >
             {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
         </div>
