@@ -25,6 +25,10 @@ namespace Harvest.Web.Services
         Task<bool> ApproveAccounts(Project project, string[] emails);
 
         Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining);
+        Task<bool> NewTicketCreated(Project project, Ticket ticket);
+        Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage);
+        Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments);
+        Task<bool> TicketClosed(Project project, Ticket ticket);
     }
 
     public class EmailService : IEmailService
@@ -250,6 +254,26 @@ namespace Harvest.Web.Services
             }
 
             return true;
+        }
+
+        public Task<bool> NewTicketCreated(Project project, Ticket ticket)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TicketClosed(Project project, Ticket ticket)
+        {
+            throw new NotImplementedException();
         }
     }
 }
