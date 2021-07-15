@@ -1,5 +1,5 @@
 ﻿import React, { useState } from "react";
-import { Button, FormGroup, Input, Label } from "reactstrap";
+import { Button, FormGroup, Input } from "reactstrap";
 import { TicketDetails, TicketMessage } from "../types";
 
 interface Props {
@@ -18,7 +18,7 @@ export const TicketReply = (props: Props) => {
     // TODO: validation
 
     const response = await fetch(
-      `/Ticket/Reply?projectId=${props.projectId}&ticketId=${ticket.id}`,
+      `/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
         headers: {
