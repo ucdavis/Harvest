@@ -15,7 +15,7 @@ namespace Harvest.Core.Domain
             Quotes = new List<Quote>();
             Attachments = new List<ProjectAttachment>();
         }
-        
+
         [Key]
         public int Id { get; set; }
 
@@ -160,6 +160,7 @@ namespace Harvest.Core.Domain
         public class Statuses
         {
             public const string Requested = "Requested";
+            public const string PendingApproval = "PendingApproval";
             public const string PendingAccountApproval = "PendingAccountApproval";
             public const string Active = "Active";
             public const string ChangeRequested = "ChangeRequested";
@@ -168,6 +169,7 @@ namespace Harvest.Core.Domain
             public static List<string> TypeList = new List<string>
             {
                 Requested,
+                PendingApproval,
                 PendingAccountApproval,
                 Active,
                 ChangeRequested,

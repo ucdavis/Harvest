@@ -41,6 +41,8 @@ export const ProjectDetail = (props: Props) => {
             new WorkItemImpl(newActivityId, 2, "Equipment"),
             new WorkItemImpl(newActivityId, 3, "Other"),
           ],
+          year: 1, // default new activity to no adjustment
+          adjustment: 0,
         },
       ],
     });
@@ -104,7 +106,7 @@ export const ProjectDetail = (props: Props) => {
         <br />
         {props.quote.acreageRateId > 0 && (
           <Row className="align-items-baseline">
-            <Col md="4">
+            <Col md="3">
               <Label for="acres">Number of Acres</Label>
               <Input
                 type="number"
@@ -118,40 +120,21 @@ export const ProjectDetail = (props: Props) => {
                 }
               />
             </Col>
-            <Col md="4">
-              <Label for="rate">Rate</Label>
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>$</InputGroupText>
-                </InputGroupAddon>
-                <Input
-                  type="number"
-                  id="rate"
-                  value={props.quote.acreageRate}
-                  onChange={(e) =>
-                    props.updateQuote({
-                      ...props.quote,
-                      acreageRate: parseFloat(e.target.value ?? 0),
-                    })
-                  }
-                />
-              </InputGroup>
+            <Col md="2">
+              <Label>Rate</Label> <br />$
+              {formatCurrency(props.quote.acreageRate)}
+            </Col>
+            <Col md="2">
+              <Label>Years</Label>
+              <br />
+              {props.quote.years}
             </Col>
             <Col md="4">
               <Label>Total Acreage Fee</Label>
-              <InputGroup>
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>$</InputGroupText>
-                </InputGroupAddon>
-                <Input
-                  type="text"
-                  id="rate"
-                  readOnly
-                  value={formatCurrency(
-                    props.quote.acres * props.quote.acreageRate
-                  )}
-                />
-              </InputGroup>
+              <br />$
+              {formatCurrency(
+                props.quote.acres * props.quote.acreageRate * props.quote.years
+              )}
             </Col>
           </Row>
         )}

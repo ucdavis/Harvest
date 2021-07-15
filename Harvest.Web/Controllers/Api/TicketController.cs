@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -166,5 +167,50 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketFilesModel model)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+
+            var ticketAttachmentsToCreate = new List<TicketAttachment>();
+            foreach (var attachment in model.Attachments)
+            {
+                var ticketAttachmentToCreate = new TicketAttachment()
+                {
+                    Identifier = attachment.Identifier,
+                    FileName = attachment.FileName,
+                    FileSize = attachment.FileSize,
+                    ContentType = attachment.ContentType,
+                    CreatedBy = currentUser,
+                    CreatedOn = DateTime.UtcNow
+                };
+                ticketAttachmentsToCreate.Add(ticketAttachmentToCreate);
+            }
+            ticket.Attachments.AddRange(ticketAttachmentsToCreate);
+
+            ticket.UpdatedBy = currentUser;
+            ticket.UpdatedOn = DateTime.UtcNow;
+            ticket.Status = "Updated";
+
+            _dbContext.Tickets.Update(ticket);
+            await _dbContext.SaveChangesAsync();
+            //TODO: Notification
+
+
+            var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
+            //TODO return other file info that may be needed
+            var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id)).Select(a => new TicketAttachment() { Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName }).ToListAsync();
+
+            //Return message instead?
+            return Ok(savedTa);
+        }
+
+    }
+    public class TicketFilesModel
+    {
+        public TicketAttachment[] Attachments { get; set; }
     }
 }

@@ -30,7 +30,7 @@ export const ProjectListContainer = () => {
           <h1>Projects</h1>
         </div>
         <div className="col text-right">
-          <Link to="/request/create" className="btn btn btn-link ">
+          <Link to="/request/create" className="btn btn btn-primary ">
             Create New <FontAwesomeIcon icon={faPlus} />
           </Link>
         </div>
