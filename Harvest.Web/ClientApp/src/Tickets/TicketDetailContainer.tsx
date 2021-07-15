@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Project,
-  TicketAttachment,
-  TicketMessage,
   TicketDetails,
 } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -12,7 +10,6 @@ import { TicketMessages } from "./TicketMessages";
 import { ShowFor } from "../Shared/ShowFor";
 import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
 import { TicketReply } from "./TicketReply";
-import { Button, FormGroup, Input, Label } from "reactstrap";
 
 interface RouteParams {
   projectId: string;
@@ -23,8 +20,7 @@ export const TicketDetailContainer = () => {
   const { projectId, ticketId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<TicketDetails>();
-  const [attachment, setAttachment] = useState<TicketAttachment>();
-  const [message, setMessage] = useState<TicketMessage>();
+
 
   useEffect(() => {
     const cb = async () => {
