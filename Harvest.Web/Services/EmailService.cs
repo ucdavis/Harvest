@@ -10,6 +10,7 @@ using Harvest.Email.Models;
 using Harvest.Email.Models.Ticket;
 using Harvest.Email.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 namespace Harvest.Web.Services
@@ -37,6 +38,7 @@ namespace Harvest.Web.Services
         private readonly AppDbContext _dbContext;
         private readonly IEmailBodyService _emailBodyService;
         private readonly INotificationService _notificationService;
+        public const string BaseUrl = "https://harvest.caes.ucdavis.edu";
 
         public EmailService(AppDbContext dbContext, IEmailBodyService emailBodyService, INotificationService notificationService)
         {
@@ -46,7 +48,7 @@ namespace Harvest.Web.Services
         }
         public async Task<bool> ProfessorQuoteReady(Project project)
         {
-            var url = "https://harvest.caes.ucdavis.edu/request/approve/";
+            var url = $"{BaseUrl}/request/approve/";
             if (project.QuoteId == null)
             {
                 return false; //No quote
@@ -84,7 +86,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var url = "https://harvest.caes.ucdavis.edu/quote/create/";
+            var url = $"{BaseUrl}/quote/create/";
 
             var model = new NewFieldRequestModel()
             {
@@ -115,8 +117,8 @@ namespace Harvest.Web.Services
 
         public async Task<bool> ChangeRequest(Project project)
         {
-            var quoteUrl   = "https://harvest.caes.ucdavis.edu/quote/create/";
-            var projectUrl = "https://harvest.caes.ucdavis.edu/Project/Details/";
+            var quoteUrl   = $"{BaseUrl}/quote/create/";
+            var projectUrl = $"{BaseUrl}/Project/Details/";
 
             var model = new ChangeRequestModel()
             {
@@ -150,7 +152,7 @@ namespace Harvest.Web.Services
 
         private async Task<bool> QuoteDecision(Project project, bool approved)
         {
-            var url = "https://harvest.caes.ucdavis.edu/Project/Details/";
+            var url = $"{BaseUrl}/Project/Details/";
 
             var model = new QuoteDecisionModel()
             {
@@ -192,7 +194,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> ApproveAccounts(Project project, string[] emails)
         {
-            var url = "https://harvest.caes.ucdavis.edu/Project/AccountApproval/";
+            var url = $"{BaseUrl}/Project/AccountApproval/";
 
             var model = new AccountPendingApprovalModel()
             {
@@ -227,7 +229,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining)
         {
-            var url = "https://harvest.caes.ucdavis.edu/Project/Details/";
+            var url = $"{BaseUrl}/Project/Details/";
 
             var model = new InvoiceExceedsQuoteModel()
             {
@@ -262,8 +264,8 @@ namespace Harvest.Web.Services
             //Notify FieldManagersEmails
             try
             {
-                var ticketUrl = "https://harvest.caes.ucdavis.edu/Ticket/Details/";
-                var projectUrl = "https://harvest.caes.ucdavis.edu/Project/Details/";
+                var ticketUrl = $"{BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{BaseUrl}/Project/Details/";
                 var model = new NewTicketModel()
                 {
                     ProjectName = project.Name,
