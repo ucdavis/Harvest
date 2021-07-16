@@ -36,17 +36,7 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-            //var model = new ChangeRequestModel();
-            //model.InitForMjml();
 
-            //var results = await _emailBodyService.RenderBody("/Views/Emails/ChangeRequest_mjml.cshtml", model);
-
-            //var model = new TestEmailModel();
-            //model.InitForMjml();
-            //var results = await _emailBodyService.RenderBody("/Views/Emails/TestEmail_mjml.cshtml", model);
-
-            //var model = new InvoiceExceedsQuoteModel();
-            //var results = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount_mjml.cshtml", model);
 
             var model = new NewTicketModel();
 
@@ -60,49 +50,7 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestEmail()
         {
             var user = await _userService.GetCurrentUser();
-            //var model = new TestEmailModel()
-            //{
-            //    Name = user.Name
-            //};
-            //var xxx = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
-            //await _notificationService.SendSampleNotificationMessage(user.Email, xxx);
-            //var model = new QuoteDecisionModel()
-            //{
-            //    PI = user.NameAndEmail,
-            //    ProjectName = "Your Awesome Project",
-            //    ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d"),
-            //    ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d"),
-            //    Decision = "Approved",
-            //    DecisionColor = QuoteDecisionModel.Colors.Approved,
-            //    //ButtonUrl = "???"
-            //};
-
-            //var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
-
-            //var model = new TestEmailModel();
-            //model.Name = "Jason";
-            //model.MyList = new List<string>();
-            //model.MyList.Add("Test Line 1");
-            //model.MyList.Add("Test Line 2");
-            //model.MyList.Add("For The WIN");
-            //model.MyList.Add("Last Line");
-            //var emailBody = await _emailBodyService.RenderBody("/Views/Emails/TestEmail.cshtml", model);
-
-            //await _notificationService.SendNotification(new string[]{ user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
-
-            //var model = new InvoiceExceedsQuoteModel();
-            //model.PI = user.NameAndEmail;
-            //model.ProjectName = "Jason's Awesome Project";
-            //model.ProjectStart = DateTime.UtcNow.ToPacificTime().Date.Format("d");
-            //model.ProjectEnd = DateTime.UtcNow.AddYears(2).ToPacificTime().Date.Format("d");
-            //model.RemainingAmount = "$100.00";
-            //model.InvoiceAmount = "$50,000.00";
-            //model.ButtonUrl = "https://harvest.caes.ucdavis.edu";
-
-
-            //var emailBody = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
-            //await _notificationService.SendNotification(new string[] { user.Email }, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Accounts Need Approval");
-
+            
             var model = new NewTicketModel();
             model.PI = user.NameAndEmail;
             model.ProjectName = "Jason's Awesome Project";

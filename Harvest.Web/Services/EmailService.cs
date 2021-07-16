@@ -264,7 +264,6 @@ namespace Harvest.Web.Services
 
         public async Task<bool> NewTicketCreated(Project project, Ticket ticket)
         {
-            //Notify FieldManagersEmails
             try
             {
                 var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
