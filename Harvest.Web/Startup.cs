@@ -139,6 +139,7 @@ namespace Harvest.Web
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
             services.Configure<SparkpostSettings>(Configuration.GetSection("SparkPost"));
             services.Configure<StorageSettings>(Configuration.GetSection("Storage"));
+            services.Configure<EmailSettings>(Configuration.GetSection("Email"));
 
             services.AddSingleton<IFileService, FileService>();
             services.AddScoped<IFinancialService, FinancialService>();
