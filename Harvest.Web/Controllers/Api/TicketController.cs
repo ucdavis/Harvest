@@ -76,7 +76,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Create(int projectId, [FromBody] Ticket ticket)
         {
 
-            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == projectId);
             var currentUser = await _userService.GetCurrentUser();
 
             //TODO: Any authentication? 

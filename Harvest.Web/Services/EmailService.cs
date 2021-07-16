@@ -262,7 +262,22 @@ namespace Harvest.Web.Services
             //Notify FieldManagersEmails
             try
             {
-                throw new NotImplementedException();
+                var ticketUrl = "https://harvest.caes.ucdavis.edu/Ticket/Details/";
+                var projectUrl = "https://harvest.caes.ucdavis.edu/Project/Details/";
+                var model = new NewTicketModel()
+                {
+                    ProjectName = project.Name,
+                    PI = project.PrincipalInvestigator.NameAndEmail,
+                    CreatedOn = ticket.CreatedOn.ToPacificTime().Date.Format("d"),
+                    DueDate = ticket.DueDate.HasValue ? ticket.DueDate.Value.ToPacificTime().Date.Format("d") : "N/A",
+                    Subject = ticket.Name,
+                    Requirements = ticket.Requirements,
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}/{project.Id}/{ticket.Id}",
+                };
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/NewTicket.cshtml", model);
+                var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
+                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
