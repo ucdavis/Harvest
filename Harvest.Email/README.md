@@ -1,6 +1,6 @@
 # Until we update this to be more automated, these are the steps to change an email:
 * Find the file you want to edit with mjml in the name.
-* Edit it, if adding things from the model, use two @ characters so tit doesn't get replaced.
+* Edit it, if adding things from the model, use two @ characters so it doesn't get replaced.
 * Update the TestController.TestBody to use the mjml file you updated and run that.
 * Copy the results from that page witch will have header and footer mjml added to it into https://mjml.io/try-it-live
 * Preview that to make sure it looks like you want it.
