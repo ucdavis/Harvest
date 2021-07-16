@@ -142,6 +142,7 @@ namespace Harvest.Web
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
 
             services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<RewriteError404>();
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IIdentityService, IdentityService>();
             services.AddScoped<IUserService, UserService>();
@@ -184,7 +185,7 @@ namespace Harvest.Web
 
             app.UseMiddleware<LogUserNameMiddleware>();
             app.UseSerilogRequestLogging();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -197,6 +198,9 @@ namespace Harvest.Web
                 endpoints.MapControllerRoute(
                     name: "Projects",
                     pattern: "{controller=Home}/{action=Index}/{projectId?}");
+
+                //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
+                endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
             });
 
             // SPA needs to kick in for all paths during development
