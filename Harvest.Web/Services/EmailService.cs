@@ -278,7 +278,7 @@ namespace Harvest.Web.Services
                     Subject = ticket.Name,
                     Requirements = ticket.Requirements,
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
-                    ButtonUrlForTicket = $"{ticketUrl}/{project.Id}/{ticket.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
