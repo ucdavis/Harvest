@@ -21,7 +21,7 @@ namespace Harvest.Web.Views.Shared.Components.DynamicStyles
 
             // Get all CSS files
             // TODO: does loading order matter?  is there ever more than one file?
-            var fileNames = files.Where(f => Regex.IsMatch(f.Name, "^.*\\.css$")).OrderByDescending(f => f.Name).Select(f => f.Name);
+            var fileNames = files.Where(f => Regex.IsMatch(f.Name, "^.*\\.css$")).OrderBy(f => f.Name).Select(f => f.Name);
             return View(await Task.FromResult(fileNames.ToArray()));
         }
     }
