@@ -55,6 +55,7 @@ export const InvoiceTable = (props: Props) => {
       data={invoiceData}
       initialState={initialState}
       hideFilters={props.compact || false}
+      hidePagination={props.compact}
     />
   );
 };

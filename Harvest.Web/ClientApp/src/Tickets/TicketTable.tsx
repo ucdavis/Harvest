@@ -64,6 +64,7 @@ export const TicketTable = (props: Props) => {
       data={ticketData}
       initialState={initialState}
       hideFilters={props.compact || false}
+      hidePagination={props.compact}
     />
   );
 };
