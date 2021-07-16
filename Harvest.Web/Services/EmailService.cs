@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
+using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
 using Harvest.Email.Models.Ticket;
 using Harvest.Email.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -38,17 +40,18 @@ namespace Harvest.Web.Services
         private readonly AppDbContext _dbContext;
         private readonly IEmailBodyService _emailBodyService;
         private readonly INotificationService _notificationService;
-        public const string BaseUrl = "https://harvest.caes.ucdavis.edu";
+        private readonly EmailSettings _emailSettings;
 
-        public EmailService(AppDbContext dbContext, IEmailBodyService emailBodyService, INotificationService notificationService)
+        public EmailService(AppDbContext dbContext, IEmailBodyService emailBodyService, INotificationService notificationService, IOptions<EmailSettings> emailSettings)
         {
             _dbContext = dbContext;
             _emailBodyService = emailBodyService;
             _notificationService = notificationService;
+            _emailSettings = emailSettings.Value;
         }
         public async Task<bool> ProfessorQuoteReady(Project project)
         {
-            var url = $"{BaseUrl}/request/approve/";
+            var url = $"{_emailSettings.BaseUrl}/request/approve/";
             if (project.QuoteId == null)
             {
                 return false; //No quote
@@ -86,7 +89,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var url = $"{BaseUrl}/quote/create/";
+            var url = $"{_emailSettings.BaseUrl}/quote/create/";
 
             var model = new NewFieldRequestModel()
             {
@@ -117,8 +120,8 @@ namespace Harvest.Web.Services
 
         public async Task<bool> ChangeRequest(Project project)
         {
-            var quoteUrl   = $"{BaseUrl}/quote/create/";
-            var projectUrl = $"{BaseUrl}/Project/Details/";
+            var quoteUrl   = $"{_emailSettings.BaseUrl}/quote/create/";
+            var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
 
             var model = new ChangeRequestModel()
             {
@@ -152,7 +155,7 @@ namespace Harvest.Web.Services
 
         private async Task<bool> QuoteDecision(Project project, bool approved)
         {
-            var url = $"{BaseUrl}/Project/Details/";
+            var url = $"{_emailSettings.BaseUrl}/Project/Details/";
 
             var model = new QuoteDecisionModel()
             {
@@ -194,7 +197,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> ApproveAccounts(Project project, string[] emails)
         {
-            var url = $"{BaseUrl}/Project/AccountApproval/";
+            var url = $"{_emailSettings.BaseUrl}/Project/AccountApproval/";
 
             var model = new AccountPendingApprovalModel()
             {
@@ -229,7 +232,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining)
         {
-            var url = $"{BaseUrl}/Project/Details/";
+            var url = $"{_emailSettings.BaseUrl}/Project/Details/";
 
             var model = new InvoiceExceedsQuoteModel()
             {
@@ -264,8 +267,8 @@ namespace Harvest.Web.Services
             //Notify FieldManagersEmails
             try
             {
-                var ticketUrl = $"{BaseUrl}/Ticket/Details/";
-                var projectUrl = $"{BaseUrl}/Project/Details/";
+                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var model = new NewTicketModel()
                 {
                     ProjectName = project.Name,
