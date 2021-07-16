@@ -7,6 +7,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
+using Harvest.Email.Models.Ticket;
 using Harvest.Email.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -256,23 +257,38 @@ namespace Harvest.Web.Services
             return true;
         }
 
-        public Task<bool> NewTicketCreated(Project project, Ticket ticket)
+        public async Task<bool> NewTicketCreated(Project project, Ticket ticket)
         {
-            throw new NotImplementedException();
+            //Notify FieldManagersEmails
+            try
+            {
+                throw new NotImplementedException();
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email New Ticket", e);
+                return false;
+            }
+            
+
+            return true;
         }
 
         public Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage)
         {
+            //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
             throw new NotImplementedException();
         }
 
         public Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
         {
+            //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
             throw new NotImplementedException();
         }
 
         public Task<bool> TicketClosed(Project project, Ticket ticket)
         {
+            //Email PI
             throw new NotImplementedException();
         }
     }
