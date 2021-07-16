@@ -6,6 +6,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,11 +18,13 @@ namespace Harvest.Web.Controllers.Api
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public TicketController(AppDbContext dbContext, IUserService userService)
+        public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            _emailService = emailService;
         }
 
 
@@ -73,7 +76,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Create(int projectId, [FromBody] Ticket ticket)
         {
 
-            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == projectId);
             var currentUser = await _userService.GetCurrentUser();
 
             //TODO: Any authentication? 
@@ -107,6 +110,8 @@ namespace Harvest.Web.Controllers.Api
 
             await _dbContext.Tickets.AddAsync(ticketToCreate);
             await _dbContext.SaveChangesAsync();
+
+            await _emailService.NewTicketCreated(project, ticketToCreate);
 
             return Ok(project);
         }

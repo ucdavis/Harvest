@@ -5,10 +5,14 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
+using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
+using Harvest.Email.Models.Ticket;
 using Harvest.Email.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 namespace Harvest.Web.Services
@@ -25,6 +29,10 @@ namespace Harvest.Web.Services
         Task<bool> ApproveAccounts(Project project, string[] emails);
 
         Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining);
+        Task<bool> NewTicketCreated(Project project, Ticket ticket);
+        Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage);
+        Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments);
+        Task<bool> TicketClosed(Project project, Ticket ticket);
     }
 
     public class EmailService : IEmailService
@@ -32,16 +40,18 @@ namespace Harvest.Web.Services
         private readonly AppDbContext _dbContext;
         private readonly IEmailBodyService _emailBodyService;
         private readonly INotificationService _notificationService;
+        private readonly EmailSettings _emailSettings;
 
-        public EmailService(AppDbContext dbContext, IEmailBodyService emailBodyService, INotificationService notificationService)
+        public EmailService(AppDbContext dbContext, IEmailBodyService emailBodyService, INotificationService notificationService, IOptions<EmailSettings> emailSettings)
         {
             _dbContext = dbContext;
             _emailBodyService = emailBodyService;
             _notificationService = notificationService;
+            _emailSettings = emailSettings.Value;
         }
         public async Task<bool> ProfessorQuoteReady(Project project)
         {
-            var url = "https://harvest.caes.ucdavis.edu/request/approve/";
+            var url = $"{_emailSettings.BaseUrl}/request/approve/";
             if (project.QuoteId == null)
             {
                 return false; //No quote
@@ -79,7 +89,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var url = "https://harvest.caes.ucdavis.edu/quote/create/";
+            var url = $"{_emailSettings.BaseUrl}/quote/create/";
 
             var model = new NewFieldRequestModel()
             {
@@ -110,8 +120,8 @@ namespace Harvest.Web.Services
 
         public async Task<bool> ChangeRequest(Project project)
         {
-            var quoteUrl   = "https://harvest.caes.ucdavis.edu/quote/create/";
-            var projectUrl = "https://harvest.caes.ucdavis.edu/Project/Details/";
+            var quoteUrl   = $"{_emailSettings.BaseUrl}/quote/create/";
+            var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
 
             var model = new ChangeRequestModel()
             {
@@ -145,7 +155,7 @@ namespace Harvest.Web.Services
 
         private async Task<bool> QuoteDecision(Project project, bool approved)
         {
-            var url = "https://harvest.caes.ucdavis.edu/Project/Details/";
+            var url = $"{_emailSettings.BaseUrl}/Project/Details/";
 
             var model = new QuoteDecisionModel()
             {
@@ -187,7 +197,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> ApproveAccounts(Project project, string[] emails)
         {
-            var url = "https://harvest.caes.ucdavis.edu/Project/AccountApproval/";
+            var url = $"{_emailSettings.BaseUrl}/Project/AccountApproval/";
 
             var model = new AccountPendingApprovalModel()
             {
@@ -222,7 +232,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining)
         {
-            var url = "https://harvest.caes.ucdavis.edu/Project/Details/";
+            var url = $"{_emailSettings.BaseUrl}/Project/Details/";
 
             var model = new InvoiceExceedsQuoteModel()
             {
@@ -250,6 +260,55 @@ namespace Harvest.Web.Services
             }
 
             return true;
+        }
+
+        public async Task<bool> NewTicketCreated(Project project, Ticket ticket)
+        {
+            try
+            {
+                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var model = new NewTicketModel()
+                {
+                    ProjectName = project.Name,
+                    PI = project.PrincipalInvestigator.NameAndEmail,
+                    CreatedOn = ticket.CreatedOn.ToPacificTime().Date.Format("d"),
+                    DueDate = ticket.DueDate.HasValue ? ticket.DueDate.Value.ToPacificTime().Date.Format("d") : "N/A",
+                    Subject = ticket.Name,
+                    Requirements = ticket.Requirements,
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
+                };
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/NewTicket.cshtml", model);
+                var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
+                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - New Ticket");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email New Ticket", e);
+                return false;
+            }
+            
+
+            return true;
+        }
+
+        public Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage)
+        {
+            //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
+        {
+            //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TicketClosed(Project project, Ticket ticket)
+        {
+            //Email PI
+            throw new NotImplementedException();
         }
     }
 }
