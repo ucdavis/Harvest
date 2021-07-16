@@ -293,10 +293,40 @@ namespace Harvest.Web.Services
             return true;
         }
 
-        public Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage)
+        public async Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage)
         {
             //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
-            throw new NotImplementedException();
+            try
+            {
+                var emailTo = await FieldManagersEmails();
+                if (ticketMessage.CreatedById != project.PrincipalInvestigatorId)
+                {
+                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                }
+                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var model = new TicketReplyModel()
+                {
+                    ProjectName = project.Name,
+                    From = ticketMessage.CreatedBy.NameAndEmail,
+                    CreatedOn = ticketMessage.CreatedOn.ToPacificTime().Date.Format("d"),
+                    Subject = ticket.Name,
+                    Reply = ticketMessage.Message,
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
+                };
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketReply.cshtml", model);
+                var textVersion = $"A reply to the ticket in the project {model.ProjectName} by {model.From}";
+                await _notificationService.SendNotification(emailTo, emailBody, textVersion, "Harvest Notification - Ticket Reply");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Ticket Reply", e);
+                return false;
+            }
+
+
+            return true;
         }
 
         public Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)

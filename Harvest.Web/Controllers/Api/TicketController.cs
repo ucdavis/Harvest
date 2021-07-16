@@ -163,7 +163,10 @@ namespace Harvest.Web.Controllers.Api
 
             _dbContext.Tickets.Update(ticket);
             await _dbContext.SaveChangesAsync();
-            //TODO: Notification
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator)
+                .SingleAsync(a => a.Id == projectId);
+
+            await _emailService.TicketReplyAdded(project, ticket, ticketMessageToCreate);
 
             var savedTm = await _dbContext.TicketMessages.Where(a => a.Id == ticketMessageToCreate.Id).Select(a => new TicketMessage{Id = a.Id, CreatedBy = a.CreatedBy, Message = a.Message}).SingleAsync();
 
