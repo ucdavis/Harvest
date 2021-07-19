@@ -85,6 +85,7 @@ namespace Harvest.Web.Controllers
             //Ignore accounts that don't have a percentage
             project.Accounts = new List<Account>(model.Accounts.Where(a => a.Percentage > 0.0m).ToArray());
             project.Status = Project.Statuses.Active;
+            project.IsApproved = true;
             project.QuoteId = quote.Id;
             project.QuoteTotal = quote.Total;
 
@@ -194,6 +195,7 @@ namespace Harvest.Web.Controllers
                 CreatedOn = DateTime.UtcNow,
                 CreatedById = currentUser.Id,
                 IsActive = true,
+                IsApproved = false,
                 Requirements = project.Requirements,
                 Status = Project.Statuses.Requested
             };
