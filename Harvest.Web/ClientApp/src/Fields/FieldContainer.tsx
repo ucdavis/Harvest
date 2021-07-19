@@ -5,7 +5,7 @@ import {
   TileLayer,
   Popup,
   GeoJSON,
-  FeatureGroup,
+  FeatureGroup
 } from "react-leaflet";
 
 // TODO: if we need to customize leaflet directly
@@ -14,12 +14,14 @@ import {
 import { EditControl } from "react-leaflet-draw";
 
 import { EditField } from "./EditField";
+import { FieldLayers } from "./FieldLayers";
 import { FieldPopup } from "./FieldPopup";
-import { Field } from "../types";
+import { Field, Project } from "../types";
 
 interface Props {
   crops: string[];
   fields: Field[];
+  project: Project;
   updateFields: (fields: Field[]) => void;
 }
 
@@ -88,6 +90,7 @@ export class FieldContainer extends React.Component<Props, State> {
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <FieldLayers project={this.props.project}></FieldLayers>
           <FeatureGroup
             ref={(reactFGref) => {
               this._onFeatureGroupReady(reactFGref);
@@ -155,7 +158,7 @@ export class FieldContainer extends React.Component<Props, State> {
     } else {
       this.setState({ editFieldId: undefined });
     }
-  }
+  };
 
   // our render feature group, only used for dynamic drawing
   // once drawing is finished, a field is added and react-leaflet takes over with rendering and control
