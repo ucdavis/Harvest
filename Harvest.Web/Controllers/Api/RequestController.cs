@@ -57,7 +57,7 @@ namespace Harvest.Web.Controllers
 
             var currentUser = await _userService.GetCurrentUser();
 
-            // TODO: double check the percentages add up to 100%
+            var percentage = 0.0m;
             // TODO: add in fiscal officer info??
             foreach (var account in model.Accounts)
             {
@@ -66,14 +66,20 @@ namespace Harvest.Web.Controllers
                 // Accounts will be auto-approved by quote approver
                 account.ApprovedById = currentUser.Id;
                 account.ApprovedOn = DateTime.UtcNow;
+                percentage += account.Percentage;
+            }
+
+            if (percentage != 100.0m)
+            {
+                return BadRequest("Percentage of accounts is not 100%");
             }
 
             var quoteDetail = QuoteDetail.Deserialize(quote.Text);
 
             project.Acres = quoteDetail.Acres;
             project.AcreageRateId = quoteDetail.AcreageRateId;
-
-            project.Accounts = new List<Account>(model.Accounts);
+            //Ignore accounts that don't have a percentage
+            project.Accounts = new List<Account>(model.Accounts.Where(a => a.Percentage > 0.0m).ToArray());
             project.Status = Project.Statuses.Active;
             project.QuoteId = quote.Id;
             project.QuoteTotal = quote.Total;
@@ -103,11 +109,12 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> ChangeAccounts(int projectId, [FromBody] RequestApprovalModel model)
+        public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
             var currentUser = await _userService.GetCurrentUser();
 
+            var percentage = 0.0m;
             foreach (var account in model.Accounts)
             {
                 account.ProjectId = projectId;
@@ -115,9 +122,15 @@ namespace Harvest.Web.Controllers
                 // Accounts will be auto-approved by quote approver
                 account.ApprovedById = currentUser.Id;
                 account.ApprovedOn = DateTime.UtcNow;
+                percentage += account.Percentage;
             }
 
-            project.Accounts = new List<Account>(model.Accounts);
+            if (percentage != 100.0m)
+            {
+                return BadRequest("Percentage of accounts is not 100%");
+            }
+            //Ignore accounts that don't have a percentage
+            project.Accounts = new List<Account>(model.Accounts.Where(a => a.Percentage > 0).ToArray());
 
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need
