@@ -219,8 +219,11 @@ namespace Harvest.Web
                     name: "Projects",
                     pattern: "{controller=Home}/{action=Index}/{projectId?}");
 
-                //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
-                endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
+                // Handle 404 errors, but only in production.  In dev we want to let some requests fallthrough for webpack.
+                if (!env.IsDevelopment()) {
+                    //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
+                    endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
+                }
             });
 
             // SPA needs to kick in for all paths during development
