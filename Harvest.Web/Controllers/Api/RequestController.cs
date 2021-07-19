@@ -67,6 +67,10 @@ namespace Harvest.Web.Controllers
                 account.ApprovedById = currentUser.Id;
                 account.ApprovedOn = DateTime.UtcNow;
                 percentage += account.Percentage;
+                if (account.Percentage < 0)
+                {
+                    return BadRequest("Negative Percentage Detected");
+                }
             }
 
             if (percentage != 100.0m)
@@ -123,6 +127,10 @@ namespace Harvest.Web.Controllers
                 account.ApprovedById = currentUser.Id;
                 account.ApprovedOn = DateTime.UtcNow;
                 percentage += account.Percentage;
+                if (account.Percentage < 0)
+                {
+                    return BadRequest("Negative Percentage Detected");
+                }
             }
 
             if (percentage != 100.0m)
