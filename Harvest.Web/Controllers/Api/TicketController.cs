@@ -197,6 +197,7 @@ namespace Harvest.Web.Controllers.Api
                 };
                 ticketAttachmentsToCreate.Add(ticketAttachmentToCreate);
             }
+
             ticket.Attachments.AddRange(ticketAttachmentsToCreate);
 
             ticket.UpdatedBy = currentUser;
@@ -205,12 +206,17 @@ namespace Harvest.Web.Controllers.Api
 
             _dbContext.Tickets.Update(ticket);
             await _dbContext.SaveChangesAsync();
-            //TODO: Notification
 
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator)
+                .SingleAsync(a => a.Id == projectId);
 
             var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
             //TODO return other file info that may be needed
-            var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id)).Select(a => new TicketAttachment() { Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName }).ToListAsync();
+            var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id))
+                .Select(a => new TicketAttachment() {Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn})
+                .ToListAsync();
+
+            await _emailService.TicketAttachmentAdded(project, ticket, savedTa.ToArray());
 
             //Return message instead?
             return Ok(savedTa);
