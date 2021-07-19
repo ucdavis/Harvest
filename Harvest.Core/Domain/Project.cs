@@ -75,7 +75,7 @@ namespace Harvest.Core.Domain
         public int CurrentAccountVersion { get; set; }
 
         [Required]
-        public bool IsApproved { get; set; } = true;
+        public bool IsApproved { get; set; } = false;
 
         [Required]
         // need or can we filter?
