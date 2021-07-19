@@ -10,6 +10,7 @@ using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Core.Utilities;
 using Harvest.Email.Services;
+using Harvest.Web.Access;
 using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
 using Harvest.Web.Models;
@@ -90,14 +91,16 @@ namespace Harvest.Web
             services.AddAuthorization(options =>
             {
                 // no need to specify additional roles for system admin, as an exception is made for it in VerifyRoleAccessHandler
-                options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.System)));
-                options.AddPolicy(AccessCodes.AdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin)));
-
-                options.AddPolicy(AccessCodes.DepartmentAdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin, Role.Codes.Supervisor, Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.AddRequirements(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.PI)));
+                options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.SystemAccess))));
+                options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.FieldManagerAccess))));
+                options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.SupervisorAccess))));
+                options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.WorkerAccess))));
+                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigator))));
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();
@@ -155,6 +158,7 @@ namespace Harvest.Web
             services.AddScoped(provder => JsonOptions.Standard);
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

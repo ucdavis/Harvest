@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
 {
-    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
     public class TicketController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -48,6 +47,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // create a new ticket via react
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         [HttpGet]
         public ActionResult Create()
         {

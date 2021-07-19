@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
     public class QuoteController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -38,6 +38,7 @@ namespace Harvest.Web.Controllers
         }
 
         // Create a quote for project ID
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
         [HttpGet]
         public ActionResult Create(int projectId)
         {

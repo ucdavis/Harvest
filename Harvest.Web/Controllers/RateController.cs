@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.AdminAccess)]
+    [Authorize(Policy = AccessCodes.SystemAccess)]
     public class RateController : SuperController
     {
         private readonly AppDbContext _dbContext;

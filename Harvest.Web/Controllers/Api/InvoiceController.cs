@@ -17,7 +17,7 @@ using NetTopologySuite.Geometries;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
     public class InvoiceController : Controller
     {
         private readonly AppDbContext _dbContext;

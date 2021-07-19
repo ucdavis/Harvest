@@ -12,8 +12,8 @@ interface ConditionalRouteProps extends RouteProps {
 export const ConditionalRoute = (props: ConditionalRouteProps) => {
   const userRoles = useContext(AppContext).user.roles;
 
-  // if the user is an admin or system admin they can see everything
-  if (userRoles.includes("Admin") || userRoles.includes("System")) {
+  // if the user has System role they can see everything
+  if (userRoles.includes("System")) {
     return <Route {...props} />;
   }
 

@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import { Expense } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import { ShowFor } from "../Shared/ShowFor";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -67,12 +68,14 @@ export const UnbilledExpensesContainer = () => {
           <h1>Un-billed Expenses</h1>
         </div>
         <div className="col text-right">
-          <Link
-            to={`/expense/entry/${projectId}`}
-            className="btn btn btn-link "
-          >
-            Enter New <FontAwesomeIcon icon={faPlus} />
-          </Link>
+          <ShowFor roles={["FieldManager","Supervisor","Worker"]} >
+            <Link
+              to={`/expense/entry/${projectId}`}
+              className="btn btn btn-link "
+            >
+              Enter New <FontAwesomeIcon icon={faPlus} />
+            </Link>
+          </ShowFor>
         </div>
 
         <Modal isOpen={selectedExpense !== null}>
