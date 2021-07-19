@@ -20,9 +20,9 @@ export const ProjectHeader = (props: Props) => {
           </p>
           <p className="lede">Accounts</p>
           {project.accounts.map((acc: ProjectAccount) => (
-            <p key={acc.id}>
+            <div key={acc.id}>
               {acc.name} {acc.percentage}%
-            </p>
+            </div>
           ))}
           <p className="lede">Requirements</p>
           <p>{project.requirements}</p>
