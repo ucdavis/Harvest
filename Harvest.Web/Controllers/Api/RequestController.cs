@@ -103,6 +103,32 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
+        public async Task<ActionResult> ChangeAccounts(int projectId, [FromBody] RequestApprovalModel model)
+        {
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            var currentUser = await _userService.GetCurrentUser();
+
+            foreach (var account in model.Accounts)
+            {
+                account.ProjectId = projectId;
+
+                // Accounts will be auto-approved by quote approver
+                account.ApprovedById = currentUser.Id;
+                account.ApprovedOn = DateTime.UtcNow;
+            }
+
+            project.Accounts = new List<Account>(model.Accounts);
+
+            // TODO: Maybe inactivate instead?
+            // remove any existing accounts that we no longer need
+            _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(project);
+        }
+
+        [HttpPost]
         public async Task<ActionResult> Files(int projectId, [FromBody] ProjectFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
@@ -125,7 +151,7 @@ namespace Harvest.Web.Controllers
             }
 
             project.Attachments.AddRange(projectAttachmentsToCreate);
-      
+
             _dbContext.Projects.Update(project);
             await _dbContext.SaveChangesAsync();
 
