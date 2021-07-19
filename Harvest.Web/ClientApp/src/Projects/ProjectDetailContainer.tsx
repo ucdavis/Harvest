@@ -62,7 +62,7 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col">
-              <ShowFor roles={["FieldManager"]} condition={project.status === "Requested"}>
+              <ShowFor roles={["FieldManager", "Supervisor"]} condition={project.status === "Requested"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/quote/create/${project.id}`}
@@ -71,7 +71,7 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
 
-              <ShowFor roles={["FieldManager"]} condition={project.status === "PendingApproval"}>
+              <ShowFor roles={["PI"]} condition={project.status === "PendingApproval"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/approve/${project.id}`}
@@ -80,7 +80,7 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
 
-              <ShowFor roles={["FieldManager"]} condition={project.status === "Active"}>
+              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/changeAccount/${project.id}`}

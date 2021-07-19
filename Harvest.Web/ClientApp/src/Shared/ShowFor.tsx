@@ -13,7 +13,12 @@ interface Props {
 export const ShowFor = (props: Props) => {
   const { children, roles } = props;
   const userRoles = useContext(AppContext).user.roles;
-  const conditionSatisfied = isBoolean(props.condition) ? props.condition : isFunction(props.condition) ? props.condition() : true;
+  const conditionSatisfied =
+    isBoolean(props.condition)
+      ? props.condition
+      : (isFunction(props.condition)
+        ? props.condition()
+        : true);
 
   const anyMatchingRoles: boolean = useMemo(
     () => userRoles.some((role) => roles.includes(role)),

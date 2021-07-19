@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -46,19 +47,12 @@ namespace Harvest.Web.Handlers
             {
                 try
                 {
-
-                    //Try to get projectId Parameter:
-                    var projectString = _httpContext.HttpContext?.Request.RouteValues["projectId"]?.ToString();
-                    if (!string.IsNullOrWhiteSpace(projectString))
+                    var projectId = _httpContext.GetProjectId();
+                    if (projectId.HasValue && await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
                     {
-                        var projectId = Int32.Parse(projectString);
-                        if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
-                        {
-                            context.Succeed(requirement);
-                            return;
-                        }
+                        context.Succeed(requirement);
+                        return;
                     }
-
                 }
                 catch
                 {

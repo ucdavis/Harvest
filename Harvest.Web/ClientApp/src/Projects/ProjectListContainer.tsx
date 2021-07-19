@@ -7,13 +7,17 @@ import { ProjectTable } from "./ProjectTable";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-export const ProjectListContainer = () => {
+interface Props {
+  projectSource: string
+}
+
+export const ProjectListContainer = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>([]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch("/Project/Active");
+      const response = await fetch(props.projectSource);
 
       if (response.ok) {
         setProjects(await response.json());

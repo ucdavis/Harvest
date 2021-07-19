@@ -30,10 +30,10 @@ function App() {
     <AppContext.Provider value={Harvest}>
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
-      <ConditionalRoute roles={["FieldManager"]} path="/request/create/:projectId?" component={RequestContainer} />
-      <ConditionalRoute roles={["FieldManager"]} path="/request/approve/:projectId" component={ApprovalContainer} />
+      <ConditionalRoute roles={["PI"]} path="/request/create/:projectId?" component={RequestContainer} />
+      <ConditionalRoute roles={["PI"]} path="/request/approve/:projectId" component={ApprovalContainer} />
       <ConditionalRoute
-        roles={["FieldManager"]}
+        roles={["PI"]}
         path="/request/changeAccount/:projectId"
         component={AccountChangeContainer}
       />
@@ -42,12 +42,17 @@ function App() {
         component={InvoiceListContainer}
       />
       <ConditionalRoute
-        roles={["FieldManager"]}
+        roles={["FieldManager","PI"]}
         path="/invoice/details/:invoiceId"
         component={InvoiceDetailContainer}
       />
-      <ConditionalRoute roles={["FieldManager"]} path="/quote/create/:projectId" component={QuoteContainer} />
-      <Route exact path="/project" component={ProjectListContainer} />
+      <ConditionalRoute roles={["FieldManager","Supervisor"]} path="/quote/create/:projectId" component={QuoteContainer} />
+      <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project" >
+        <ProjectListContainer projectSource="/Project/Active" />
+      </ConditionalRoute>
+      <ConditionalRoute exact roles={["PI"]} path="/project/mine" >
+        <ProjectListContainer projectSource="/Project/GetMine" />
+      </ConditionalRoute>
       <ConditionalRoute roles={["FieldManager","Supervisor","PI"]} path="/ticket/create/:projectId" component={TicketCreate} />
       <Route path="/ticket/list/:projectId" component={TicketsContainer} />
       <Route path="/ticket/details/:projectId/:ticketId" component={TicketDetailContainer} />

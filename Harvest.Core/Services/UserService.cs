@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -73,11 +76,22 @@ namespace Harvest.Core.Services
 
         public async Task<IEnumerable<string>> GetCurrentRoles()
         {
+            var projectId = _httpContextAccessor.GetProjectId();
+
             var user = await GetCurrentUser();
             var userRoles = await _dbContext.Permissions
                 .Where(p => p.UserId == user.Id)
                 .Select(p => p.Role.Name)
                 .ToArrayAsync();
+
+            // if projectId is null, we just want to know if user is a PI of at least one project
+            var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigatorId == user.Id);
+
+            if (isPrincipalInvestigator)
+            {
+                return userRoles.Append(Role.Codes.PI);
+            }
+            
             return userRoles;
         }
 
@@ -96,7 +110,7 @@ namespace Harvest.Core.Services
         public static async Task<bool> HasAnyRoles(this IUserService userService, IEnumerable<string> roles)
         {
             var userRoles = await userService.GetCurrentRoles();
-            return userRoles.Any(r => roles.Contains(r));
+            return userRoles.Any(roles.Contains);
         }
         
         public static Task<bool> HasAnyRoles(this IUserService userService, string role, params string[] additionalRoles)

@@ -31,31 +31,43 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        public ActionResult Mine()
+        {
+            // // TODO: only show user's projects
+            // var projects = await _dbContext.Projects.Take(20).ToArrayAsync();
+            // return View(projects);
+            return View("React");
+        }
+
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public async Task<ActionResult> Active()
         {
+            // TODO: only show projects where between start and end?
+            return Ok(await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Where(p => p.IsActive)
+                .ToArrayAsync());
+        }
+
+        public async Task<ActionResult> GetMine()
+        {
             var user = await _userService.GetCurrentUser();
-            var userRoles = await _dbContext.Permissions
-                .Where(p => p.UserId == user.Id)
-                .Select(p => p.Role.Name)
-                .ToArrayAsync();
-            var hasNonPiRoles = userRoles.Any(r => r != Role.Codes.PI);
-            var isPi = userRoles.Contains(Role.Codes.PI);
 
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
-                .Where(p => p.IsActive && (
-                    //PI's can only view their own projects
-                    hasNonPiRoles || isPi && p.PrincipalInvestigatorId == user.Id))
+                .Where(p => p.IsActive && p.PrincipalInvestigatorId == user.Id)
                 .ToArrayAsync());
         }
 
         public async Task<ActionResult> Invoices(int projectId)
         {
-            var isPI = await _userService.HasOnlyRole(Role.Codes.PI);
             var user = await _userService.GetCurrentUser();
             var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
-            return Ok(await _dbContext.Invoices.Where(a => a.ProjectId == projectId && hasAccess || isPI && a.Project.PrincipalInvestigatorId == user.Id).ToArrayAsync());
+            return Ok(await _dbContext.Invoices.Where(a => 
+                a.ProjectId == projectId 
+                && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
+                .ToArrayAsync());
         }
 
         public ActionResult Details(int projectId)
@@ -67,14 +79,13 @@ namespace Harvest.Web.Controllers
         // Returns JSON info of the project
         public async Task<ActionResult> Get(int projectId)
         {
-            var isPI = await _userService.HasOnlyRole(Role.Codes.PI);
             var user = await _userService.GetCurrentUser();
             var hasAccess = await _userService.HasAccess(AccessCodes.WorkerAccess);
             var project = await _dbContext.Projects
                 .Include(a => a.Attachments)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
-                .SingleOrDefaultAsync(p => p.Id == projectId && hasAccess || isPI && p.PrincipalInvestigatorId == user.Id);
+                .SingleOrDefaultAsync(p => p.Id == projectId && (hasAccess || p.PrincipalInvestigatorId == user.Id));
             if (project != null)
             {
                 return Ok(project);
