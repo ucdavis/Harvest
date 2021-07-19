@@ -10,6 +10,7 @@ using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Core.Utilities;
 using Harvest.Email.Services;
+using Harvest.Web.Access;
 using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
 using Harvest.Web.Models;
@@ -21,6 +22,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -89,14 +91,16 @@ namespace Harvest.Web
             services.AddAuthorization(options =>
             {
                 // no need to specify additional roles for system admin, as an exception is made for it in VerifyRoleAccessHandler
-                options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.System)));
-                options.AddPolicy(AccessCodes.AdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin)));
-
-                options.AddPolicy(AccessCodes.DepartmentAdminAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Admin, Role.Codes.Supervisor, Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(new VerifyRoleAccess(Role.Codes.Worker)));
-                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.AddRequirements(new VerifyRoleAccess(Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.PI)));
+                options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.SystemAccess))));
+                options.AddPolicy(AccessCodes.FieldManagerAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.FieldManagerAccess))));
+                options.AddPolicy(AccessCodes.SupervisorAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.SupervisorAccess))));
+                options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.WorkerAccess))));
+                options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigator))));
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();
@@ -154,6 +158,7 @@ namespace Harvest.Web
             services.AddScoped(provder => JsonOptions.Standard);
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -176,7 +181,22 @@ namespace Harvest.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+            app.UseSpaStaticFiles(new StaticFileOptions()
+            {
+                OnPrepareResponse = (context) =>
+                {
+                    // cache our static assest, i.e. CSS and JS, for a long time
+                    if (context.Context.Request.Path.Value.StartsWith("/static"))
+                    {
+                        var headers = context.Context.Response.GetTypedHeaders();
+                        headers.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
+                        {
+                            Public = true,
+                            MaxAge = TimeSpan.FromDays(365)
+                        };
+                    }
+                }
+            });
 
             app.UseRouting();
 
@@ -199,8 +219,11 @@ namespace Harvest.Web
                     name: "Projects",
                     pattern: "{controller=Home}/{action=Index}/{projectId?}");
 
-                //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
-                endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
+                // Handle 404 errors, but only in production.  In dev we want to let some requests fallthrough for webpack.
+                if (!env.IsDevelopment()) {
+                    //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
+                    endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
+                }
             });
 
             // SPA needs to kick in for all paths during development

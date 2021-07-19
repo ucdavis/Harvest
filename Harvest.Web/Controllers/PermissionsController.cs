@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.AdminAccess)]
+    [Authorize(Policy = AccessCodes.SystemAccess)]
     public class PermissionsController : SuperController
     {
         private readonly AppDbContext _dbContext;

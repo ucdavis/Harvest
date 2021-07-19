@@ -36,7 +36,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
         {

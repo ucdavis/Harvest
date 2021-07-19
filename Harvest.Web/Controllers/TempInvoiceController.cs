@@ -44,7 +44,7 @@ namespace Harvest.Web.Controllers
         // Manually create an invoice for the given project based on all currently unbilled expenses
         // Acreage fees will be ignored for manually created invoices
         [HttpPost]
-        [Authorize(Policy = AccessCodes.DepartmentAdminAccess)]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Create(int projectId)
         {
             var result = await _invoiceService.CreateInvoice(projectId, true);

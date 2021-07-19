@@ -12,6 +12,7 @@ import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { ShowFor } from "../Shared/ShowFor";
 
 interface RouteParams {
   projectId?: string;
@@ -62,31 +63,32 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col">
-              {project.status === "Requested" && (
+              <ShowFor roles={["FieldManager", "Supervisor"]} condition={project.status === "Requested"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/quote/create/${project.id}`}
                 >
-                  Edit Quote
+                    Edit Quote
                 </Link>
-              )}
+              </ShowFor>
 
-              {project.status === "PendingApproval" && (
+              <ShowFor roles={["PI"]} condition={project.status === "PendingApproval"}>
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/approve/${project.id}`}
                 >
-                  Approve Quote
+                    Approve Quote
                 </Link>
-              )}
-              { project.status === "Active" && (
-              <Link
-                className="btn btn-primary btn-small mr-4"
-                to={`/request/changeAccount/${project.id}`}
-              >
-                Change Accounts
-              </Link>
-              )}
+              </ShowFor>
+
+              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/request/changeAccount/${project.id}`}
+                >
+                    Change Accounts
+                </Link>
+              </ShowFor>
             </div>
             <div className="col text-right">
               <ProjectUnbilledButton projectId={project.id} />

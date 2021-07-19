@@ -5,6 +5,7 @@ import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Expense } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { ShowFor } from "../Shared/ShowFor";
 
 interface Props {
   expenses: Expense[];
@@ -54,12 +55,14 @@ export const ExpenseTable = (props: Props) => {
       {
         Header: "Delete",
         Cell: (data: any) => (
-          <Button
-            color="danger"
-            onClick={() => props.setSelectedExpense(data.row.original)}
-          >
-            Delete
-          </Button>
+          <ShowFor roles={["FieldManager","Supervisor"]}>
+            <Button
+              color="danger"
+              onClick={() => props.setSelectedExpense(data.row.original)}
+            >
+                Delete
+            </Button>
+          </ShowFor>
         ),
       },
     ],

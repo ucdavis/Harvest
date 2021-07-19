@@ -38,10 +38,9 @@ namespace Harvest.Web.Controllers
         {
 
 
-            var model = new TicketReplyModel();
-
-
-            var results = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketReply_mjml.cshtml", model);
+            var model = new TicketAttachmentModel();
+            
+            var results = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -51,19 +50,21 @@ namespace Harvest.Web.Controllers
         {
             var user = await _userService.GetCurrentUser();
             
-            var model = new TicketReplyModel();
+            var model = new TicketAttachmentModel();
             model.From = user.NameAndEmail;
             model.ProjectName = "Jason's Awesome Project";
             model.CreatedOn = DateTime.UtcNow.ToPacificTime().Date.Format("d");
 
-            model.Reply =
-                "Make it so.";
+            var attachmentNames = new List<string>();
+            attachmentNames.Add("test.txt");
+            attachmentNames.Add("test2.txt");
+            model.AttachmentNames = attachmentNames.ToArray();
             model.Subject = "Test subject";
             model.ButtonUrlForProject = "https://harvest.caes.ucdavis.edu/Fake2";
             model.ButtonUrlForTicket = "https://harvest.caes.ucdavis.edu/Fake1";
 
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketReply.cshtml", model);
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
             await _notificationService.SendNotification(new string[] { user.Email }, emailBody, "A new Ticket has been create", "Harvest Notification - New Ticket");
 
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");

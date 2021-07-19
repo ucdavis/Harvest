@@ -15,7 +15,7 @@ export const fakeAppContext: AppContextShape = {
     detail: {
       ...fakeUser,
     },
-    roles: ["Admin"],
+    roles: ["System"],
   },
 };
 

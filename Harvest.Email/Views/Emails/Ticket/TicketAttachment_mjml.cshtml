@@ -1,0 +1,35 @@
+﻿@using Harvest.Email.Views.Shared
+@model Harvest.Email.Models.Ticket.TicketAttachmentModel
+
+@{
+    ViewData["EmailTitle"] = "Testing";
+    Layout = "_EmailLayout_mjml";
+}
+
+
+<mj-section>
+    <mj-column>
+        <mj-text align="center">
+            <h1>Project @@Model.ProjectName</h1>
+            <h2>New Attachment(s)</h2>
+
+            <p><strong>From: </strong>@@Model.From</p>
+            <p><strong>On: </strong>@@Model.CreatedOn</p>
+            <p><strong>Subject: </strong>@@Model.Subject</p>
+            <h3>Attachment(s) -- (open the ticket to download them)</h3>
+            @@foreach (var attachment in @@Model.AttachmentNames)
+            {
+                <p>@@attachment</p>
+            }
+        </mj-text>
+
+    </mj-column>
+</mj-section>
+
+
+<mj-section background-color="#b2c72c" padding-bottom="20px" padding-top="20px">
+    <mj-column>
+        <mj-button background-color="#352CC7" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="@@Model.ButtonUrlForTicket" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">Click Here to go to the Ticket</mj-button>
+        <mj-button background-color="#352CC7" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="@@Model.ButtonUrlForProject" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">Click Here to go to the Project</mj-button>
+    </mj-column>
+</mj-section>

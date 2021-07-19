@@ -1,11 +1,12 @@
 export type CropType = "Row" | "Tree";
 export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
 export type RoleName =
-  | "Admin"
+  | "System"
   | "FieldManager"
   | "Supervisor"
-  | "System"
-  | "Worker";
+  | "Worker"
+  | "PI";
+
 export type ProjectStatus =
   | "Requested"
   | "PendingApproval"

@@ -329,10 +329,41 @@ namespace Harvest.Web.Services
             return true;
         }
 
-        public Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
+        public async Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
         {
             //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
-            throw new NotImplementedException();
+                        try
+            {
+                var emailTo = await FieldManagersEmails();
+                var firstAttachment = ticketAttachments.First();
+                if (firstAttachment.CreatedById != project.PrincipalInvestigatorId)
+                {
+                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                }
+                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var model = new TicketAttachmentModel()
+                {
+                    ProjectName = project.Name,
+                    From = firstAttachment.CreatedBy.NameAndEmail,
+                    CreatedOn = firstAttachment.CreatedOn.ToPacificTime().Date.Format("d"),
+                    Subject = ticket.Name,   
+                    AttachmentNames = ticketAttachments.Select(x => x.FileName).ToArray(),         
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
+                };
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
+                var textVersion = $"An attachment was added to the ticket in the project {model.ProjectName} by {model.From}";
+                await _notificationService.SendNotification(emailTo, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Ticket Reply", e);
+                return false;
+            }
+
+
+            return true;
         }
 
         public Task<bool> TicketClosed(Project project, Ticket ticket)
