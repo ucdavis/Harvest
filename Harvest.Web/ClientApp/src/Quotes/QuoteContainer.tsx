@@ -207,6 +207,7 @@ export const QuoteContainer = () => {
           <FieldContainer
             crops={cropArray}
             fields={quote.fields}
+            project={project}
             updateFields={(fields) => setQuote({ ...quote, fields })}
           ></FieldContainer>
         </div>
