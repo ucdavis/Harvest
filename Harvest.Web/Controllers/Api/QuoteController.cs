@@ -29,7 +29,7 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> Get(int projectId)
         {
-            var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(p => p.Accounts).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
             var openQuote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).Select(q => QuoteDetail.Deserialize(q.Text)).SingleOrDefaultAsync();
 
             var model = new QuoteModel { Project = project, Quote = openQuote };
@@ -67,7 +67,8 @@ namespace Harvest.Web.Controllers
             quote.Total = (decimal)Math.Round(quoteDetail.GrandTotal, 2);
             quote.Text = QuoteDetail.Serialize(quoteDetail);
 
-            if (submit) {
+            if (submit)
+            {
                 quote.Status = Quote.Statuses.Proposed;
 
                 var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);

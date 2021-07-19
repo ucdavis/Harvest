@@ -42,6 +42,7 @@ namespace Harvest.Web.Controllers
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
+                .Include(p => p.Accounts)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
