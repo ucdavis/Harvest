@@ -106,11 +106,7 @@ export const RequestContainer = () => {
   };
 
   var isFilledIn = useMemo(() => {
-    return (
-      project.start !== undefined &&
-      project.end !== undefined &&
-      project.crop !== undefined
-    );
+    return project.start && project.end && project.crop;
   }, [project.crop, project.start, project.end]);
 
   if (projectId !== undefined && project.id === 0) {
@@ -260,7 +256,7 @@ export const RequestContainer = () => {
             className="btn-lg"
             color="primary"
             onClick={create}
-            disabled={isFilledIn}
+            disabled={!isFilledIn}
           >
             {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
