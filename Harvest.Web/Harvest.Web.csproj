@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Harvest.Jobs.Core.csproj" />
     <None Include="Harvest.Jobs.Invoice.csproj" />
   </ItemGroup>
 
