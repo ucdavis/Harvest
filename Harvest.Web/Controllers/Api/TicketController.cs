@@ -131,7 +131,7 @@ namespace Harvest.Web.Controllers.Api
                     { Id= a.Id,
                         Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
                         Requirements = a.Requirements, WorkNotes = a.WorkNotes,
-                        UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages = a.Messages,
+                        UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages =  a.Messages.Select(b => new TicketMessage{CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message}).ToList(),
                         Attachments = a.Attachments
                     })
                 .SingleAsync();
