@@ -109,7 +109,8 @@ export const RequestContainer = () => {
     return (
       project.start !== undefined &&
       project.end !== undefined &&
-      project.crop !== undefined
+      project.crop !== undefined &&
+      project.crop !== ""
     );
   }, [project.crop, project.start, project.end]);
 
@@ -260,7 +261,7 @@ export const RequestContainer = () => {
             className="btn-lg"
             color="primary"
             onClick={create}
-            disabled={isFilledIn}
+            disabled={!isFilledIn}
           >
             {projectId ? "Create Change Request" : "Create Field Request"}
           </Button>
