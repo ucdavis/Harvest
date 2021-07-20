@@ -17,11 +17,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
 
-        public ProjectController(AppDbContext dbContext, IUserService userService)
+        public ProjectController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this._historyService = historyService;
         }
         public ActionResult Index()
         {
@@ -114,6 +116,10 @@ namespace Harvest.Web.Controllers
             if (project.ChargedTotal != invoiceTotal)
             {
                 project.ChargedTotal = invoiceTotal;
+
+                await _historyService.AddProjectHistory(project.Id, $"{nameof(ProjectController)}.{nameof(RefreshTotal)}", "Project Total Refreshed",
+                    $"Project total updated from {originalTotal} to {project.ChargedTotal}");
+
                 await _dbContext.SaveChangesAsync();
                 return Content($"Project total updated from {originalTotal} to {project.ChargedTotal}");
             }

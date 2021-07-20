@@ -19,11 +19,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
 
-        public RequestController(AppDbContext dbContext, IUserService userService)
+        public RequestController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this._historyService = historyService;
         }
 
 
@@ -104,6 +106,8 @@ namespace Harvest.Web.Controllers
                 project.Fields.Add(field);
             }
 
+            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(Approve)}", "Quote Approved", model);
+
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);
@@ -141,6 +145,8 @@ namespace Harvest.Web.Controllers
             // remove any existing accounts that we no longer need
             _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
 
+            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(ChangeAccount)}", "Account Changed", model);
+
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);
@@ -167,6 +173,8 @@ namespace Harvest.Web.Controllers
 
                 projectAttachmentsToCreate.Add(newProject);
             }
+
+            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(Files)}", "Files(s) Attached", model);
 
             project.Attachments.AddRange(projectAttachmentsToCreate);
 
@@ -234,6 +242,8 @@ namespace Harvest.Web.Controllers
 
             // TODO: when is name determined? Currently by quote creator but can it be changed?
             newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
+
+            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(Create)}", $"Request Created ({newProject.Status})", newProject);
 
             await _dbContext.Projects.AddAsync(newProject);
             await _dbContext.SaveChangesAsync();

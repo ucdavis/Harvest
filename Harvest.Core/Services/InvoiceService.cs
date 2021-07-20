@@ -70,6 +70,7 @@ namespace Harvest.Core.Services
             {
                 //Ok, so the project has ended, we should probably create the last invoice, and close it out. Setting the project to completed.
                 project.Status = Project.Statuses.Completed;
+                await _historyService.AddProjectHistory(project, $"{nameof(InvoiceService)}.{nameof(CreateInvoice)}", "Project Completed", new InvoiceModel(newInvoice));
             }
 
             //Acreage fees are ignored for manually created invoices
@@ -90,7 +91,7 @@ namespace Harvest.Core.Services
 
             _dbContext.Invoices.Add(newInvoice);
 
-            await _historyService.AddProjectHistory(project, nameof(CreateInvoice), "Invoice created", new InvoiceModel(newInvoice));
+            await _historyService.AddProjectHistory(project, $"{nameof(InvoiceService)}.{nameof(CreateInvoice)}", "Invoice created", new InvoiceModel(newInvoice));
 
             await _dbContext.SaveChangesAsync(); //Do one save outside of this?
             return Result.Value(newInvoice.Id);
@@ -130,7 +131,7 @@ namespace Harvest.Core.Services
             };
 
             await _dbContext.Expenses.AddAsync(expense);
-            await _historyService.AddProjectHistory(project, nameof(CreateMonthlyAcreageExpense), "Monthly acreage expense created", new ExpenseModel(expense));
+            await _historyService.AddProjectHistory(project, $"{nameof(InvoiceService)}.{nameof(CreateMonthlyAcreageExpense)}", "Monthly acreage expense created", new ExpenseModel(expense));
             await _dbContext.SaveChangesAsync();
 
         }

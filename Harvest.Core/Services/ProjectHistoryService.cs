@@ -11,7 +11,13 @@ namespace Harvest.Core.Services
 {
     public interface IProjectHistoryService
     {
-        Task<ProjectHistory> AddProjectHistory(Project project, string action, string description, object detailsToSerialize, User user = null);
+
+        /// <summary>
+        /// Creates a <see cref="ProjectHistory"/> record for a given <paramref name="projectId"/>
+        /// </summary>
+        /// <remarks>If <paramref name="detailsToSerialize"/> contains domain entities, consider calling this before those entities get attached
+        /// to a <see cref="AppDbContext"/> to avoid serializing more of the object graph.</remarks>
+        Task<ProjectHistory> AddProjectHistory(int projectId, string action, string description, object detailsToSerialize, User user = null);
     }
 
     public class ProjectHistoryService : IProjectHistoryService
@@ -27,7 +33,12 @@ namespace Harvest.Core.Services
             _jsonOptions = jsonOptions;
         }
 
-        public async Task<ProjectHistory> AddProjectHistory(Project project, string action, string description, object detailsToSerialize, User user = null)
+        /// <summary>
+        /// Creates a <see cref="ProjectHistory"/> record for a given <paramref name="projectId"/>
+        /// </summary>
+        /// <remarks>If <paramref name="detailsToSerialize"/> contains domain entities, consider calling this before those entities get attached
+        /// to a <see cref="AppDbContext"/> to avoid serializing more of the object graph.</remarks>
+        public async Task<ProjectHistory> AddProjectHistory(int projectId, string action, string description, object detailsToSerialize, User user = null)
         {
             user ??= await _userService.GetCurrentUser();
 
@@ -35,7 +46,7 @@ namespace Harvest.Core.Services
 
             var projectHistory = new ProjectHistory
             {
-                Project = project,
+                ProjectId = projectId,
                 Action = action,
                 Description = user != null ? $"{description} by {user.Name}" : description,
                 Details = details,

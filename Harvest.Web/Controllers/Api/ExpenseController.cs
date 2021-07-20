@@ -18,11 +18,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
 
-        public ExpenseController(AppDbContext dbContext, IUserService userService)
+        public ExpenseController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this._historyService = historyService;
         }
 
         public ActionResult Entry()
@@ -52,6 +54,8 @@ namespace Harvest.Web.Controllers
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
             }
 
+            await _historyService.AddProjectHistory(projectId, $"{nameof(ExpenseController)}.{nameof(Create)}", "Expenses Created", expenses);
+
             _dbContext.Expenses.AddRange(expenses);
 
             await _dbContext.SaveChangesAsync();
@@ -67,6 +71,8 @@ namespace Harvest.Web.Controllers
             if (expense == null) {
                 return NotFound();
             }
+
+            await _historyService.AddProjectHistory(expense.ProjectId, $"{nameof(ExpenseController)}.{nameof(Delete)}", "Expense Deleted", expense);
 
             _dbContext.Expenses.Remove(expense);
             await _dbContext.SaveChangesAsync();

@@ -220,7 +220,7 @@ namespace Harvest.Core.Services
                 //Update running total
                 invoice.Project.ChargedTotal += invoice.Total;
 
-                await _historyService.AddProjectHistory(invoice.Project, nameof(MoveMoney), "Sloth money movement requested", new InvoiceModel(invoice));
+                await _historyService.AddProjectHistory(invoice.Project.Id, $"{nameof(SlothService)}.{nameof(MoveMoney)}", "Sloth money movement requested", new InvoiceModel(invoice));
                 await _dbContext.SaveChangesAsync();
 
 
@@ -284,14 +284,14 @@ namespace Harvest.Core.Services
                         updatedCount++;
 
                         invoice.Status = Invoice.Statuses.Completed;
-                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice completed", new InvoiceModel(invoice));
+                        await _historyService.AddProjectHistory(invoice.Project.Id, $"{nameof(SlothService)}.{nameof(ProcessTransferUpdates)}", "Invoice completed", new InvoiceModel(invoice));
                         await _dbContext.SaveChangesAsync();
                     }
                     if (slothResponse.Status == "Cancelled")
                     {
 
                         Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
-                        await _historyService.AddProjectHistory(invoice.Project, nameof(ProcessTransferUpdates), "Invoice cancelled", new InvoiceModel(invoice));
+                        await _historyService.AddProjectHistory(invoice.Project.Id, $"{nameof(SlothService)}.{nameof(ProcessTransferUpdates)}", "Invoice cancelled", new InvoiceModel(invoice));
                         rolledBackCount++;
                         //TODO: Write to the notes field? Trigger off an email?
                     }
