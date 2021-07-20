@@ -106,14 +106,7 @@ export const RequestContainer = () => {
   };
 
   var isFilledIn = useMemo(() => {
-    return (
-      project.start !== undefined &&
-      project.start !== null &&
-      project.end !== undefined &&
-      project.end !== null &&
-      project.crop !== undefined &&
-      project.crop !== ""
-    );
+    return project.start && project.end && project.crop;
   }, [project.crop, project.start, project.end]);
 
   if (projectId !== undefined && project.id === 0) {
