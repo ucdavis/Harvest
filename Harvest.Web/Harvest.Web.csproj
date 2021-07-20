@@ -46,6 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Harvest.Jobs.Invoice.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Harvest.Core\Harvest.Core.csproj" />
     <ProjectReference Include="..\Harvest.Email\Harvest.Email.csproj" />
   </ItemGroup>
