@@ -52,7 +52,7 @@ export const TicketAttachments = (props: Props) => {
 
       {ticketAttachments.map((attachment) => (
           <p key={`attachment-${attachment.id}`}>
-              {attachment.fileName} from {attachment.createdBy.name}
+              {attachment.fileName} from {attachment.createdBy?.name}
         </p>
       ))}
       <FormGroup>
