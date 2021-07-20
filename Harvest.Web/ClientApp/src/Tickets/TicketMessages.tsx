@@ -16,7 +16,7 @@ export const TicketMessages = (props: Props) => {
       ) : null}
         {ticketMessages.map((ticketMessage) => (
             <p key={`message-${ticketMessage.id}`}>
-          {ticketMessage.message} from {ticketMessage.createdBy.name}
+          {ticketMessage.message} from {ticketMessage.createdBy?.name}
         </p>
       ))}
     </div>
