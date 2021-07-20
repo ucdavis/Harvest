@@ -104,10 +104,6 @@ namespace Harvest.Web.Controllers
                 project.Fields.Add(field);
             }
 
-            // TODO: Maybe inactivate instead?
-            // remove any existing accounts that we no longer need
-            _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
-
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);

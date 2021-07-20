@@ -34,7 +34,7 @@ export interface Project {
   status: ProjectStatus;
   currentAccountVersion: number;
   isActive: boolean;
-  accounts: null;
+  accounts: ProjectAccount[];
   quotes: null;
   attachments: BlobFile[];
 }

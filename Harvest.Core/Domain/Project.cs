@@ -85,7 +85,6 @@ namespace Harvest.Core.Domain
         [Display(Name = "Created By")]
         public User CreatedBy { get; set; }
 
-        [JsonIgnore]
         public List<Account> Accounts { get; set; }
 
         [JsonIgnore]

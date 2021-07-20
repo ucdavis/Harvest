@@ -1,4 +1,4 @@
-import { Project } from "../types";
+import { Project, ProjectAccount } from "../types";
 
 interface Props {
   project: Project;
@@ -7,6 +7,7 @@ interface Props {
 
 export const ProjectHeader = (props: Props) => {
   const { project, title } = props;
+
   return (
     <div className="card-content">
       <div className="quote-info row">
@@ -17,6 +18,12 @@ export const ProjectHeader = (props: Props) => {
             Created {new Date(project.createdOn).toDateString()} by{" "}
             {project.createdBy.name}
           </p>
+          <p className="lede">Accounts</p>
+          {project.accounts.map((acc: ProjectAccount) => (
+            <div key={acc.id}>
+              {acc.name} {acc.percentage}%
+            </div>
+          ))}
           <p className="lede">Requirements</p>
           <p>{project.requirements}</p>
         </div>

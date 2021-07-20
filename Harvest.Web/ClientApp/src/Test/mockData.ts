@@ -44,7 +44,7 @@ export const fakeProject: ProjectWithQuote = {
     createdBy: {
       ...fakeUser,
     },
-    accounts: null,
+    accounts: [],
     quotes: null,
     attachments: [],
   },

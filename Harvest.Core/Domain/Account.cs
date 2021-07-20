@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -37,6 +36,7 @@ namespace Harvest.Core.Domain
         [Display(Name = "Approved By")]
         public User ApprovedBy { get; set; }
 
+        [JsonIgnore]
         public Project Project { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)

@@ -83,6 +83,7 @@ namespace Harvest.Web.Controllers
             var hasAccess = await _userService.HasAccess(AccessCodes.WorkerAccess);
             var project = await _dbContext.Projects
                 .Include(a => a.Attachments)
+                .Include(p => p.Accounts)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .SingleOrDefaultAsync(p => p.Id == projectId && (hasAccess || p.PrincipalInvestigatorId == user.Id));
