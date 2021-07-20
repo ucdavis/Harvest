@@ -108,7 +108,9 @@ export const RequestContainer = () => {
   var isFilledIn = useMemo(() => {
     return (
       project.start !== undefined &&
+      project.start !== null &&
       project.end !== undefined &&
+      project.end !== null &&
       project.crop !== undefined &&
       project.crop !== ""
     );
