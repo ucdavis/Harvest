@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Typeahead } from "react-bootstrap-typeahead";
-import { CropType } from "../types"
+import { CropType } from "../types";
 
 interface Props {
   crops: string;
@@ -9,7 +9,7 @@ interface Props {
   cropType: CropType;
 }
 
-const splitCrops = (crop: string) => crop ? crop.split(",") : [];
+const splitCrops = (crop: string) => (crop ? crop.split(",") : []);
 
 export const Crops = (props: Props) => {
   const [crops, setCrops] = useState<string[]>(splitCrops(props.crops));
@@ -25,8 +25,7 @@ export const Crops = (props: Props) => {
 
   useEffect(() => {
     setOptions(CommonCrops[props.cropType]);
-  },
-    [props.cropType]);
+  }, [props.cropType]);
 
   const onSelect = (selected: (string | { label: string })[]) => {
     if (selected && selected.length > 0) {
@@ -36,6 +35,8 @@ export const Crops = (props: Props) => {
       );
 
       props.setCrops(selectedStrings.join(","));
+    } else {
+      props.setCrops(""); //If it is cleared out...
     }
   };
 
@@ -54,7 +55,6 @@ export const Crops = (props: Props) => {
 
 // TODO: where should we keep this list?  Worth querying every time?
 const CommonCrops = {
-  "Row": ["corn", "cabbage", "celery"],
-  "Tree": ["almond", "orange"]
+  Row: ["corn", "cabbage", "celery"],
+  Tree: ["almond", "orange"],
 } as { [c: string]: string[] };
-
