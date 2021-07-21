@@ -6,10 +6,12 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Core.Models.Settings;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers.Api
 {
@@ -18,14 +20,17 @@ namespace Harvest.Web.Controllers.Api
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
+        private readonly StorageSettings storageSettings;
+        private readonly IFileService fileService; 
 
-        public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService)
+        public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService, IOptions<StorageSettings> storageSettings, IFileService fileService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
             _emailService = emailService;
+            this.storageSettings = storageSettings.Value;
+            this.fileService = fileService;
         }
-
 
         [HttpGet]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
@@ -135,6 +140,11 @@ namespace Harvest.Web.Controllers.Api
                         Attachments = a.Attachments.Select(b => new TicketAttachment{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier}).ToList()
                     })
                 .SingleAsync();
+            
+            foreach(var file in ticket.Attachments){
+                file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
+            }
+
             return Ok(ticket);
         }
 
