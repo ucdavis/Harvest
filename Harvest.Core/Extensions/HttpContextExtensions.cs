@@ -11,7 +11,15 @@ namespace Harvest.Core.Extensions
     {
         public static int? GetProjectId(this IHttpContextAccessor httpContextAccessor)
         {
-            if (int.TryParse(httpContextAccessor.HttpContext?.GetRouteValue("projectId") as string, out int projectId))
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return null;
+            }
+
+            var projectIdString =  (string)httpContext.Request.Query["projectId"] ?? httpContext.GetRouteValue("projectId") as string;
+
+            if (int.TryParse(projectIdString, out int projectId))
             {
                 return projectId;
             }
