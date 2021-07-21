@@ -6,10 +6,12 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Core.Models.Settings;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers.Api
 {
@@ -18,14 +20,17 @@ namespace Harvest.Web.Controllers.Api
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
+        private readonly StorageSettings storageSettings;
+        private readonly IFileService fileService; 
 
-        public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService)
+        public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService, IOptions<StorageSettings> storageSettings, IFileService fileService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
             _emailService = emailService;
+            this.storageSettings = storageSettings.Value;
+            this.fileService = fileService;
         }
-
 
         [HttpGet]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
@@ -132,9 +137,10 @@ namespace Harvest.Web.Controllers.Api
                         Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
                         Requirements = a.Requirements, WorkNotes = a.WorkNotes,
                         UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages =  a.Messages.Select(b => new TicketMessage{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message}).ToList(),
-                        Attachments = a.Attachments.Select(b => new TicketAttachment{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier}).ToList()
+                        Attachments = a.Attachments.Select(b => new TicketAttachment{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, b.Identifier).AbsoluteUri}).ToList(),
                     })
                 .SingleAsync();
+            
             return Ok(ticket);
         }
 
@@ -193,7 +199,7 @@ namespace Harvest.Web.Controllers.Api
                     FileSize = attachment.FileSize,
                     ContentType = attachment.ContentType,
                     CreatedBy = currentUser,
-                    CreatedOn = DateTime.UtcNow
+                    CreatedOn = DateTime.UtcNow,
                 };
                 ticketAttachmentsToCreate.Add(ticketAttachmentToCreate);
             }
@@ -213,7 +219,7 @@ namespace Harvest.Web.Controllers.Api
             var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
             //TODO return other file info that may be needed
             var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id))
-                .Select(a => new TicketAttachment() {Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn, Identifier = a.Identifier})
+                .Select(a => new TicketAttachment() {Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn, Identifier = a.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, a.Identifier).AbsoluteUri,})
                 .ToListAsync();
 
             await _emailService.TicketAttachmentAdded(project, ticket, savedTa.ToArray());

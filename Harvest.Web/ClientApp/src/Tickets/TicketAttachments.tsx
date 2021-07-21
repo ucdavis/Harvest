@@ -1,4 +1,6 @@
 ﻿import { useMemo, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
@@ -31,7 +33,7 @@ export const TicketAttachments = (props: Props) => {
 
         if (response.ok) {
             const data = await response.json() as TicketAttachment[];
-
+            
             setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
 
             setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
@@ -41,24 +43,27 @@ export const TicketAttachments = (props: Props) => {
         }
     };
 
-
-
   return (
     <div>
       <h2>Ticket Attachments</h2>
       {ticketAttachments === undefined || ticketAttachments.length === 0 ? (
         <p> No Messages Yet!!!</p>
       ) : null}
-
-      {ticketAttachments.map((attachment) => (
-          <p key={`attachment-${attachment.id}`}>
-              {attachment.fileName} from {attachment.createdBy?.name}
-        </p>
-      ))}
+     
+      <ul className="no-list-style attached-files-list">
+        {ticketAttachments.map((attachment, i) => (
+          <li key={`attachment-${i}`}>
+            <a href={attachment.sasLink} target="_blank" rel="noreferrer">
+              <FontAwesomeIcon icon={faDownload} />
+              {attachment.fileName} from {attachment.createdBy.name}
+            </a>
+          </li>
+        ))}
+      </ul>
       <FormGroup>
         <Label>Attach files?</Label>
         <FileUpload
-                  files={ticketLoc.newAttachments || []}
+          files={ticketLoc.newAttachments || []}
           setFiles={(f) => {
               setTicketLoc((ticket) => ({ ...ticket, newAttachments: [...f] }));
               updateFiles(f);
