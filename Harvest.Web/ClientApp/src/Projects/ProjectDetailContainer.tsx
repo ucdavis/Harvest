@@ -174,7 +174,7 @@ export const ProjectDetailContainer = () => {
                   {project.attachments.map((attachment, i) => (
                     <li key={`attachment-${i}`}>
                       {/* TODO: Add a way to download files from Azure */}
-                      <a href="#">
+                      <a href={attachment.sasLink}>
                         <FontAwesomeIcon icon={faDownload} />
                         {attachment.fileName}
                       </a>{" "}

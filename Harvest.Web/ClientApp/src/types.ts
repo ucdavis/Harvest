@@ -45,6 +45,7 @@ export interface BlobFile {
   fileSize: number;
   contentType: string;
   uploaded: boolean;
+  sasLink?: string;
 }
 
 export interface Invoice {
