@@ -33,7 +33,7 @@ export const TicketAttachments = (props: Props) => {
 
         if (response.ok) {
             const data = await response.json() as TicketAttachment[];
-
+            
             setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
 
             setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
@@ -53,7 +53,7 @@ export const TicketAttachments = (props: Props) => {
       <ul className="no-list-style attached-files-list">
         {ticketAttachments.map((attachment, i) => (
           <li key={`attachment-${i}`}>
-            <a href={attachment.sasLink}>
+            <a href={attachment.sasLink} target="_blank" rel="noreferrer">
               <FontAwesomeIcon icon={faDownload} />
               {attachment.fileName} from {attachment.createdBy.name}
             </a>

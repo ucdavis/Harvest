@@ -137,14 +137,10 @@ namespace Harvest.Web.Controllers.Api
                         Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
                         Requirements = a.Requirements, WorkNotes = a.WorkNotes,
                         UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages =  a.Messages.Select(b => new TicketMessage{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message}).ToList(),
-                        Attachments = a.Attachments.Select(b => new TicketAttachment{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier}).ToList()
+                        Attachments = a.Attachments.Select(b => new TicketAttachment{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, b.Identifier).AbsoluteUri}).ToList(),
                     })
                 .SingleAsync();
             
-            foreach(var file in ticket.Attachments){
-                file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
-            }
-
             return Ok(ticket);
         }
 
@@ -203,7 +199,7 @@ namespace Harvest.Web.Controllers.Api
                     FileSize = attachment.FileSize,
                     ContentType = attachment.ContentType,
                     CreatedBy = currentUser,
-                    CreatedOn = DateTime.UtcNow
+                    CreatedOn = DateTime.UtcNow,
                 };
                 ticketAttachmentsToCreate.Add(ticketAttachmentToCreate);
             }
@@ -223,7 +219,7 @@ namespace Harvest.Web.Controllers.Api
             var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
             //TODO return other file info that may be needed
             var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id))
-                .Select(a => new TicketAttachment() {Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn, Identifier = a.Identifier})
+                .Select(a => new TicketAttachment() {Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn, Identifier = a.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, a.Identifier).AbsoluteUri,})
                 .ToListAsync();
 
             await _emailService.TicketAttachmentAdded(project, ticket, savedTa.ToArray());
