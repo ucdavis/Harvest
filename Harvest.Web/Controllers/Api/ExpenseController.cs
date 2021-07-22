@@ -54,9 +54,9 @@ namespace Harvest.Web.Controllers
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
             }
 
-            await _historyService.AddProjectHistory(projectId, $"{nameof(ExpenseController)}.{nameof(Create)}", "Expenses Created", expenses);
-
             _dbContext.Expenses.AddRange(expenses);
+
+            await _historyService.ExpensesCreated(projectId, expenses);
 
             await _dbContext.SaveChangesAsync();
 
@@ -72,9 +72,8 @@ namespace Harvest.Web.Controllers
                 return NotFound();
             }
 
-            await _historyService.AddProjectHistory(expense.ProjectId, $"{nameof(ExpenseController)}.{nameof(Delete)}", "Expense Deleted", expense);
-
             _dbContext.Expenses.Remove(expense);
+            await _historyService.ExpenseDeleted(expense.ProjectId, expense);
             await _dbContext.SaveChangesAsync();
 
             return Ok(null);

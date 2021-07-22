@@ -117,15 +117,12 @@ namespace Harvest.Web.Controllers
             {
                 project.ChargedTotal = invoiceTotal;
 
-                await _historyService.AddProjectHistory(project.Id, $"{nameof(ProjectController)}.{nameof(RefreshTotal)}", "Project Total Refreshed",
-                    $"Project total updated from {originalTotal} to {project.ChargedTotal}");
-
+                await _historyService.ProjectTotalRefreshed(project.Id, project);
                 await _dbContext.SaveChangesAsync();
                 return Content($"Project total updated from {originalTotal} to {project.ChargedTotal}");
             }
 
             return Content("Project already up to date.");
-
         }
     }
 }

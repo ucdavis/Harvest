@@ -67,10 +67,8 @@ namespace Harvest.Web.Controllers.Api
             ticketToUpdate.UpdatedBy = currentUser;
             ticketToUpdate.UpdatedOn = DateTime.UtcNow;
 
-            await _historyService.AddProjectHistory(projectId, $"{nameof(TicketController)}.{nameof(UpdateWorkNotes)}", "Ticket WorkNotes Updated", 
-                $"old notes: {oldWorkNotes}{Environment.NewLine}new notes: {workNotes}");
-
             _dbContext.Tickets.Update(ticketToUpdate);
+            await _historyService.TicketNotesUpdated(projectId, ticketToUpdate);
             await _dbContext.SaveChangesAsync();
 
             return Ok(ticketToUpdate);
@@ -114,9 +112,8 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest("Something is wrong");
             }
 
-            await _historyService.AddProjectHistory(project.Id, $"{nameof(TicketController)}.{nameof(Create)}", "Ticket Created", ticketToCreate);
-
             await _dbContext.Tickets.AddAsync(ticketToCreate);
+            await _historyService.TicketCreated(project.Id, ticketToCreate);
             await _dbContext.SaveChangesAsync();
 
             await _emailService.NewTicketCreated(project, ticketToCreate);
@@ -166,14 +163,13 @@ namespace Harvest.Web.Controllers.Api
                 TicketId = ticket.Id
             };
 
-            await _historyService.AddProjectHistory(ticket.ProjectId, $"{nameof(TicketController)}.{nameof(Reply)}", "Ticket Reply Created", ticketMessageToCreate);
-
             ticket.Messages.Add(ticketMessageToCreate);
             ticket.UpdatedBy = currentUser;
             ticket.UpdatedOn = DateTime.UtcNow;
             ticket.Status = "Updated";
 
             _dbContext.Tickets.Update(ticket);
+            await _historyService.TicketReplyCreated(ticket.ProjectId, ticketMessageToCreate);
             await _dbContext.SaveChangesAsync();
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                 .SingleAsync(a => a.Id == projectId);
@@ -210,8 +206,6 @@ namespace Harvest.Web.Controllers.Api
                 ticketAttachmentsToCreate.Add(ticketAttachmentToCreate);
             }
 
-            await _historyService.AddProjectHistory(projectId, $"{nameof(TicketController)}.{nameof(UploadFiles)}", "Files(s) Attached", ticketAttachmentsToCreate);
-
             ticket.Attachments.AddRange(ticketAttachmentsToCreate);
 
             ticket.UpdatedBy = currentUser;
@@ -219,6 +213,7 @@ namespace Harvest.Web.Controllers.Api
             ticket.Status = "Updated";
 
             _dbContext.Tickets.Update(ticket);
+            await _historyService.TicketFilesAttached(projectId, ticketAttachmentsToCreate);
             await _dbContext.SaveChangesAsync();
 
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator)

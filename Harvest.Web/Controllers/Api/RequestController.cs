@@ -106,8 +106,8 @@ namespace Harvest.Web.Controllers
                 project.Fields.Add(field);
             }
 
-            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(Approve)}", "Quote Approved", model);
-
+            await _historyService.QuoteApproved(project.Id, model.Accounts);
+ 
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);
@@ -145,7 +145,7 @@ namespace Harvest.Web.Controllers
             // remove any existing accounts that we no longer need
             _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
 
-            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(ChangeAccount)}", "Account Changed", model);
+            await _historyService.AccountChanged(project.Id, model.Accounts);
 
             await _dbContext.SaveChangesAsync();
 
@@ -174,11 +174,10 @@ namespace Harvest.Web.Controllers
                 projectAttachmentsToCreate.Add(newProject);
             }
 
-            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(Files)}", "Files(s) Attached", model);
-
             project.Attachments.AddRange(projectAttachmentsToCreate);
 
             _dbContext.Projects.Update(project);
+            await _historyService.ProjectFilesAttached(project.Id, model.Attachments);
             await _dbContext.SaveChangesAsync();
 
             return Ok(null);
@@ -243,9 +242,8 @@ namespace Harvest.Web.Controllers
             // TODO: when is name determined? Currently by quote creator but can it be changed?
             newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
 
-            await _historyService.AddProjectHistory(project.Id, $"{nameof(RequestController)}.{nameof(Create)}", $"Request Created ({newProject.Status})", newProject);
-
             await _dbContext.Projects.AddAsync(newProject);
+            await _historyService.RequestCreated(project.Id, newProject);
             await _dbContext.SaveChangesAsync();
 
             return Ok(newProject);

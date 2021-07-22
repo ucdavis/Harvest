@@ -76,10 +76,12 @@ namespace Harvest.Web.Controllers
 
                 var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
                 project.Status = Project.Statuses.PendingApproval;
+                await _historyService.QuoteSubmitted(projectId, quote);
             }
-
-            await _historyService.AddProjectHistory(projectId, $"{nameof(QuoteController)}.{nameof(Save)}",
-                $"Quote {(submit ? "Submitted" : "Saved")}", quoteDetail);
+            else
+            {
+                await _historyService.QuoteSaved(projectId, quote);
+            }
 
             await _dbContext.SaveChangesAsync();
 
