@@ -39,15 +39,15 @@ namespace Harvest.Web.Controllers
         [Authorize()]
         public async Task<IActionResult> Emulate(EmulateUserViewModel model)
         {
-            Log.Information($"Emulation attempted for {model.UserEmail} by {User.Identity.Name}");
-            var lookupVal = model.UserEmail.Trim();
+            Log.Information($"Emulation attempted for {model.Search} by {User.Identity.Name}");
+            var lookupVal = model.Search.Trim();
 
             var user = await  _dbContext.Users.SingleOrDefaultAsync(u => u.Email == lookupVal || u.Kerberos == lookupVal);
             if (user == null)
             {
-                user = model.UserEmail.Contains("@")
-                    ? await _identityService.GetByEmail(model.UserEmail)
-                    : await _identityService.GetByKerberos(model.UserEmail);
+                user = model.Search.Contains("@")
+                    ? await _identityService.GetByEmail(model.Search)
+                    : await _identityService.GetByKerberos(model.Search);
             }
             if (user == null)
             {

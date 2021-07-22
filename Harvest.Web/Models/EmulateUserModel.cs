@@ -8,7 +8,7 @@ namespace Harvest.Web.Models
 {
     public class EmulateUserViewModel
     {
-        [Display(Name = "Search by Email")]
-        public string UserEmail { get; set; }
+        [Display(Name = "Search by Email or Kerb")]
+        public string Search { get; set; }
     }
 }
