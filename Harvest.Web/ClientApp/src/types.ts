@@ -45,6 +45,7 @@ export interface BlobFile {
   fileSize: number;
   contentType: string;
   uploaded: boolean;
+  sasLink?: string;
 }
 
 export interface Invoice {
@@ -262,13 +263,15 @@ export interface TicketDetails {
   createdBy: User;
   workNotes: string;
   updatedBy?: User;
-    newAttachments: BlobFile[];
+  newAttachments: BlobFile[];
 }
 export interface TicketAttachment {
   id: number;
   fileName: string;
   createdOn: Date;
   createdBy: User;
+  identifier: string;
+  sasLink?: string;
 }
 export interface TicketMessage {
   id: number;

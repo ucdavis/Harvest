@@ -5,29 +5,34 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+    
     public class RequestController : Controller
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IProjectHistoryService _historyService;
-
-        public RequestController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
+        private readonly StorageSettings storageSettings;
+        private readonly IFileService fileService;  
+        public RequestController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
+            IFileService fileService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this.storageSettings = storageSettings.Value;
+            this.fileService = fileService;
             this._historyService = historyService;
         }
-
 
         // create a new request via react
         [HttpGet]
@@ -38,18 +43,21 @@ namespace Harvest.Web.Controllers
 
         // Approve a quote for the project
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Approve(int projectId)
         {
             return View("React");
         }
 
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult ChangeAccount(int projectId)
         {
             return View("React");
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
@@ -114,6 +122,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
@@ -153,6 +162,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Files(int projectId, [FromBody] ProjectFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
@@ -168,7 +178,8 @@ namespace Harvest.Web.Controllers
                     FileSize = attachment.FileSize,
                     ContentType = attachment.ContentType,
                     CreatedOn = DateTime.UtcNow,
-                    CreatedById = currentUser.Id
+                    CreatedById = currentUser.Id,
+                    SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, attachment.Identifier).AbsoluteUri,
                 };
 
                 projectAttachmentsToCreate.Add(newProject);
@@ -180,7 +191,7 @@ namespace Harvest.Web.Controllers
             await _historyService.ProjectFilesAttached(project.Id, model.Attachments);
             await _dbContext.SaveChangesAsync();
 
-            return Ok(null);
+            return Ok(projectAttachmentsToCreate);
         }
 
 

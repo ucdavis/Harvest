@@ -66,14 +66,14 @@
                         <a class="nav-link" href="/project">Projects</a>
                     </li>
                     }
-                    else if (await UserService.HasOnlyRole(Role.Codes.PI))
+                    else
                     {
                         <li class="nav-item active">
                             <a class="nav-link" href="/project/mine">My Projects</a>
                         </li>
                     }
                     
-                    @if (await UserService.HasAccess(AccessCodes.SystemAccess))
+                    @if (await UserService.HasAccess(AccessCodes.FieldManagerAccess))
                     {
                         <li class="nav-item">
                             <a asp-controller="Permissions" asp-action="Index" class="nav-link">Permissions</a>

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Harvest.Core.Domain
 {
@@ -16,7 +17,8 @@ namespace Harvest.Core.Domain
         public int CreatedById { get; set; }
         public User CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
-
+        [NotMapped]
+        public string SasLink { get; set; }
         [Required]
         [StringLength(128)]
         public string Identifier { get; set; }

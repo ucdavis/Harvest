@@ -43,7 +43,7 @@ export const ProjectDetailContainer = () => {
   }
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    await fetch(`/Request/Files/${projectId}`, {
+    const response = await fetch(`/Request/Files/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -51,6 +51,14 @@ export const ProjectDetailContainer = () => {
       },
       body: JSON.stringify({ Attachments: attachments }),
     });
+
+    if (response.ok) {
+      const files = await response.json();
+      setProject({
+        ...project,
+        attachments: [...project.attachments, ...files],
+      });
+    }
   };
 
   return (
@@ -136,10 +144,6 @@ export const ProjectDetailContainer = () => {
                       files = f;
                     }
 
-                    setProject({
-                      ...project,
-                      attachments: [...project.attachments, ...files],
-                    });
                     setNewFiles([...f]);
                     updateFiles(files);
                   }}
@@ -173,8 +177,7 @@ export const ProjectDetailContainer = () => {
                 <ul className="no-list-style attached-files-list">
                   {project.attachments.map((attachment, i) => (
                     <li key={`attachment-${i}`}>
-                      {/* TODO: Add a way to download files from Azure */}
-                      <a href="#">
+                      <a href={attachment.sasLink} target="_blank" rel="noreferrer">
                         <FontAwesomeIcon icon={faDownload} />
                         {attachment.fileName}
                       </a>{" "}

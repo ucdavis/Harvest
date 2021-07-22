@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
@@ -18,13 +20,18 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IProjectHistoryService _historyService;
-
-        public ProjectController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
+        private readonly StorageSettings storageSettings;
+        private readonly IFileService fileService;        
+        public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
+            IFileService fileService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this.storageSettings = storageSettings.Value;
+            this.fileService = fileService;
             this._historyService = historyService;
         }
+
         public ActionResult Index()
         {
             // // TODO: only show user's projects
@@ -89,6 +96,11 @@ namespace Harvest.Web.Controllers
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .SingleOrDefaultAsync(p => p.Id == projectId && (hasAccess || p.PrincipalInvestigatorId == user.Id));
+            
+            foreach (var file in project.Attachments) {
+                file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
+            }
+
             if (project != null)
             {
                 return Ok(project);

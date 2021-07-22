@@ -20,7 +20,8 @@ export const fileSchema: SchemaOf<BlobFile> = yup.object().shape({
   fileName: yup.string().required(),
   fileSize: yup.number().required(),
   contentType: yup.string().required(),
-  uploaded: yup.boolean().required().isTrue() // files are only valid if they are done uploading
+  uploaded: yup.boolean().required().isTrue(), // files are only valid if they are done uploading
+  sasLink: yup.string()
 });
 
 export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
