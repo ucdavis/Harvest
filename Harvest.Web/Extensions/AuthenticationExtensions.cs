@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +18,12 @@ namespace Harvest.Web.Extensions
 
             var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
 
-            var roles = await dbContext.Permissions.Where(p => p.User.Iam == user.Iam).Select(p => p.Role.Name).ToArrayAsync();
+            IEnumerable<string> roles = await dbContext.Permissions.Where(p => p.User.Iam == user.Iam).Select(p => p.Role.Name).ToArrayAsync();
+
+            if (await dbContext.Projects.AnyAsync(p => p.PrincipalInvestigator.Iam == user.Iam))
+            {
+                roles = roles.Append(Role.Codes.PI);
+            }
 
             return JsonSerializer.Serialize(roles);
         }
