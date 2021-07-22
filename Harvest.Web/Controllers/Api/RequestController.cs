@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+    
     public class RequestController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -40,18 +40,21 @@ namespace Harvest.Web.Controllers
 
         // Approve a quote for the project
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Approve(int projectId)
         {
             return View("React");
         }
 
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult ChangeAccount(int projectId)
         {
             return View("React");
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
@@ -114,6 +117,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
@@ -151,6 +155,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Files(int projectId, [FromBody] ProjectFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
