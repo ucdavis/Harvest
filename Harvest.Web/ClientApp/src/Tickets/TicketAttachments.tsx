@@ -37,7 +37,7 @@ export const TicketAttachments = (props: Props) => {
             setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
 
             setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
-            alert("Attachement(s) saved.");
+            alert("Attachment(s) saved.");
         } else {
             alert("Something went wrong, please try again");
         }
