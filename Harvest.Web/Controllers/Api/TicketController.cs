@@ -21,7 +21,7 @@ namespace Harvest.Web.Controllers.Api
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly StorageSettings storageSettings;
-        private readonly IFileService fileService; 
+        private readonly IFileService fileService;
 
         public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService, IOptions<StorageSettings> storageSettings, IFileService fileService)
         {
@@ -40,7 +40,7 @@ namespace Harvest.Web.Controllers.Api
             {
                 //I actually don't like this take 5, too easy to loose that there maybe uncompleted tickets not showing here. but worry about it later.
                 //Maybe return a model that has counts and other info.
-                ticketsQuery = (IOrderedQueryable<Ticket>) ticketsQuery.Take(maxRows.Value);
+                ticketsQuery = (IOrderedQueryable<Ticket>)ticketsQuery.Take(maxRows.Value);
             }
             return Ok(await ticketsQuery.ToArrayAsync());
         }
@@ -60,7 +60,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy= AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
         {
             var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
@@ -133,14 +133,22 @@ namespace Harvest.Web.Controllers.Api
                 .Where(a => a.Id == ticketId && a.ProjectId == projectId)
                 .Select(a => new
                     Ticket
-                    { Id= a.Id,
-                        Name = a.Name, CreatedBy = a.CreatedBy, CreatedOn = a.CreatedOn, UpdatedBy = a.UpdatedBy,
-                        Requirements = a.Requirements, WorkNotes = a.WorkNotes,
-                        UpdatedOn = a.UpdatedOn, DueDate = a.DueDate, Status = a.Status, Messages =  a.Messages.Select(b => new TicketMessage{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message}).ToList(),
-                        Attachments = a.Attachments.Select(b => new TicketAttachment{Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, b.Identifier).AbsoluteUri}).ToList(),
-                    })
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    CreatedBy = a.CreatedBy,
+                    CreatedOn = a.CreatedOn,
+                    UpdatedBy = a.UpdatedBy,
+                    Requirements = a.Requirements,
+                    WorkNotes = a.WorkNotes,
+                    UpdatedOn = a.UpdatedOn,
+                    DueDate = a.DueDate,
+                    Status = a.Status,
+                    Messages = a.Messages.Select(b => new TicketMessage { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message }).ToList(),
+                    Attachments = a.Attachments.Select(b => new TicketAttachment { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, b.Identifier).AbsoluteUri }).ToList(),
+                })
                 .SingleAsync();
-            
+
             return Ok(ticket);
         }
 
@@ -158,8 +166,8 @@ namespace Harvest.Web.Controllers.Api
 
             var ticketMessageToCreate = new TicketMessage
             {
-                Message = ticketMessage.Message, 
-                CreatedBy = currentUser, 
+                Message = ticketMessage.Message,
+                CreatedBy = currentUser,
                 CreatedOn = DateTime.UtcNow
             };
             ticket.Messages.Add(ticketMessageToCreate);
@@ -174,7 +182,7 @@ namespace Harvest.Web.Controllers.Api
 
             await _emailService.TicketReplyAdded(project, ticket, ticketMessageToCreate);
 
-            var savedTm = await _dbContext.TicketMessages.Where(a => a.Id == ticketMessageToCreate.Id).Select(a => new TicketMessage{Id = a.Id, CreatedBy = a.CreatedBy, Message = a.Message}).SingleAsync();
+            var savedTm = await _dbContext.TicketMessages.Where(a => a.Id == ticketMessageToCreate.Id).Select(a => new TicketMessage { Id = a.Id, CreatedBy = a.CreatedBy, Message = a.Message }).SingleAsync();
 
             //Return message instead?
             return Ok(savedTm);
@@ -219,13 +227,32 @@ namespace Harvest.Web.Controllers.Api
             var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
             //TODO return other file info that may be needed
             var savedTa = await _dbContext.TicketAttachments.Where(a => addedIds.Contains(a.Id))
-                .Select(a => new TicketAttachment() {Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn, Identifier = a.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, a.Identifier).AbsoluteUri,})
+                .Select(a => new TicketAttachment() { Id = a.Id, CreatedBy = a.CreatedBy, FileName = a.FileName, CreatedOn = a.CreatedOn, Identifier = a.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, a.Identifier).AbsoluteUri, })
                 .ToListAsync();
 
             await _emailService.TicketAttachmentAdded(project, ticket, savedTa.ToArray());
 
             //Return message instead?
             return Ok(savedTa);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        public async Task<ActionResult> Close(int projectId, int ticketId)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+
+            ticket.Status = "Complete";
+            ticket.UpdatedBy = currentUser;
+            ticket.UpdatedOn = DateTime.UtcNow;
+
+            _dbContext.Tickets.Update(ticket);
+            await _dbContext.SaveChangesAsync();
+
+            //TODO: Notification email
+
+            return Ok();
         }
 
     }
