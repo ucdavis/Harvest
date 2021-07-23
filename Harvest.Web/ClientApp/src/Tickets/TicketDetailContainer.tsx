@@ -123,7 +123,12 @@ export const TicketDetailContainer = () => {
         />
       </div>
       <div className="row justify-content-center">
-        <Button className="btn-lg" color="primary" onClick={closeTicket}>
+        <Button
+          className="btn-lg"
+          color="primary"
+          onClick={closeTicket}
+          disabled={ticket.completed}
+        >
           Close Ticket FOREVER!!!!
         </Button>
       </div>

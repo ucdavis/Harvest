@@ -144,6 +144,7 @@ namespace Harvest.Web.Controllers.Api
                     UpdatedOn = a.UpdatedOn,
                     DueDate = a.DueDate,
                     Status = a.Status,
+                    Completed = a.Completed,
                     Messages = a.Messages.Select(b => new TicketMessage { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message }).ToList(),
                     Attachments = a.Attachments.Select(b => new TicketAttachment { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, b.Identifier).AbsoluteUri }).ToList(),
                 })
@@ -162,7 +163,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             var currentUser = await _userService.GetCurrentUser();
-            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId && !a.Completed);
 
             var ticketMessageToCreate = new TicketMessage
             {
@@ -195,7 +196,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
-            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId && !a.Completed);
 
             var ticketAttachmentsToCreate = new List<TicketAttachment>();
             foreach (var attachment in model.Attachments)
@@ -246,6 +247,8 @@ namespace Harvest.Web.Controllers.Api
             ticket.Status = "Complete";
             ticket.UpdatedBy = currentUser;
             ticket.UpdatedOn = DateTime.UtcNow;
+            ticket.Completed = true;
+            
 
             _dbContext.Tickets.Update(ticket);
             await _dbContext.SaveChangesAsync();

@@ -263,7 +263,8 @@ export interface TicketDetails {
   createdBy: User;
   workNotes: string;
   updatedBy?: User;
-  newAttachments: BlobFile[];
+    newAttachments: BlobFile[];
+    completed: boolean;
 }
 export interface TicketAttachment {
   id: number;
