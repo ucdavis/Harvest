@@ -47,7 +47,7 @@ export const TicketAttachments = (props: Props) => {
     <div>
       <h2>Ticket Attachments</h2>
       {ticketAttachments === undefined || ticketAttachments.length === 0 ? (
-        <p> No Messages Yet!!!</p>
+        <p> No Attachments Yet!!!</p>
       ) : null}
      
       <ul className="no-list-style attached-files-list">
