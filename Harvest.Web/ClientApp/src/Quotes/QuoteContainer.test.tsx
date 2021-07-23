@@ -8,6 +8,14 @@ import { fakeAppContext, fakeProject, sampleRates } from "../Test/mockData";
 
 let container: Element;
 
+jest.mock("react-leaflet", () => ({
+  MapContainer: () => <div id="MapContainer">MapContainer</div>,
+  TileLayer: () => <div id="TileLayer">TileLayer</div>,
+  Popup: () => <div id="Popup">Popup</div>,
+  GeoJSON: () => <div id="GeoJSON">GeoJSON</div>,
+  FeatureGroup: () => <div id="FeatureGroup">FeatureGroup</div>,
+}));
+
 beforeEach(() => {
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
@@ -26,7 +34,7 @@ afterEach(() => {
   // container = null;
 });
 
-describe.skip("Quote Container", () => {
+describe("Quote Container", () => {
   it("Shows loading screen", async () => {
     await act(async () => {
       render(
@@ -71,7 +79,7 @@ describe.skip("Quote Container", () => {
       );
     });
 
-    const messageContent = container.querySelector("#request-title")
+    const messageContent = document.querySelector("#request-title")
       ?.textContent;
     expect(messageContent).toContain("Field Request #3");
   });
