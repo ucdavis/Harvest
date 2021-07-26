@@ -22,7 +22,7 @@ namespace Harvest.Core.Models.History
             Percentage = account.Percentage;
             ApprovedById = account.ApprovedById;
             ApprovedOn = account.ApprovedOn;
-            ApprovedBy = UserHistoryModel.CreateFrom(account.ApprovedBy);
+            ApprovedBy = account.ApprovedBy == null ? null : new UserHistoryModel(account.ApprovedBy);
         }
 
         public int Id { get; set; }

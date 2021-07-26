@@ -11,22 +11,14 @@ namespace Harvest.Core.Models.History
     {
         public UserHistoryModel() { }
 
-        public static UserHistoryModel CreateFrom(User user)
+        public UserHistoryModel(User user)
         {
-            if (user == null)
-            {
-                return null;
-            }
-
-            return new UserHistoryModel
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                Iam = user.Iam,
-                Kerberos = user.Kerberos
-            };
+            Id = user.Id;
+            FirstName = user.FirstName;
+            LastName = user.LastName;
+            Email = user.Email;
+            Iam = user.Iam;
+            Kerberos = user.Kerberos;
         }
 
         public int Id { get; set; }

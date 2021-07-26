@@ -9,29 +9,23 @@ namespace Harvest.Core.Models.History
 {
     public class RateHistoryModel
     {
-        public static RateHistoryModel CreateFrom(Rate rate)
-        {
-            if (rate == null)
-            {
-                return null;
-            }
+        public RateHistoryModel() { }
 
-            return new RateHistoryModel
-            {
-                Id = rate.Id,
-                IsActive = rate.IsActive,
-                Type = rate.Type,
-                Description = rate.Description,
-                Unit = rate.Unit,
-                BillingUnit = rate.BillingUnit,
-                Account = rate.Account,
-                Price = rate.Price,
-                EffectiveOn = rate.EffectiveOn,
-                CreatedById = rate.CreatedById,
-                UpdatedById = rate.UpdatedById,
-                CreatedOn = rate.CreatedOn,
-                UpdatedOn = rate.UpdatedOn
-            };
+        public RateHistoryModel(Rate rate)
+        {
+            Id = rate.Id;
+            IsActive = rate.IsActive;
+            Type = rate.Type;
+            Description = rate.Description;
+            Unit = rate.Unit;
+            BillingUnit = rate.BillingUnit;
+            Account = rate.Account;
+            Price = rate.Price;
+            EffectiveOn = rate.EffectiveOn;
+            CreatedById = rate.CreatedById;
+            UpdatedById = rate.UpdatedById;
+            CreatedOn = rate.CreatedOn;
+            UpdatedOn = rate.UpdatedOn;
         }
 
         public int Id { get; set; }

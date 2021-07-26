@@ -18,7 +18,7 @@ namespace Harvest.Core.Models.History
             ContentType = attachment.ContentType;
             FileSize = attachment.FileSize;
             CreatedById = attachment.CreatedById;
-            CreatedBy = UserHistoryModel.CreateFrom(attachment.CreatedBy);
+            CreatedBy = attachment.CreatedBy == null ? null : new UserHistoryModel(attachment.CreatedBy);
             CreatedOn = attachment.CreatedOn;
             Identifier = attachment.Identifier;
         }

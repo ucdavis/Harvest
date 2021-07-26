@@ -24,10 +24,10 @@ namespace Harvest.Core.Models.History
             Requirements = project.Requirements;
             Acres = project.Acres;
             AcreageRateId = project.AcreageRateId;
-            AcreageRate = RateHistoryModel.CreateFrom(project.AcreageRate);
+            AcreageRate = project.AcreageRate == null ? null : new RateHistoryModel(project.AcreageRate);
             Name = project.Name;
             PrincipalInvestigatorId = project.PrincipalInvestigatorId;
-            PrincipalInvestigator = UserHistoryModel.CreateFrom(project.PrincipalInvestigator);
+            PrincipalInvestigator = project.PrincipalInvestigator == null ? null : new UserHistoryModel(project.PrincipalInvestigator);
             QuoteId = project.QuoteId;
             Quote = project.Quote?.Text.Deserialize<QuoteDetail>();
             OriginalProjectId = project.OriginalProjectId;
@@ -43,7 +43,7 @@ namespace Harvest.Core.Models.History
             CurrentAccountVersion = project.CurrentAccountVersion;
             IsApproved = project.IsApproved;
             IsActive = project.IsActive;
-            CreatedBy = UserHistoryModel.CreateFrom(project.CreatedBy);
+            CreatedBy = project.CreatedBy == null ? null : new UserHistoryModel(project.CreatedBy);
             Accounts = project.Accounts?.Select(a => new AccountHistoryModel(a)).ToList();
             Fields = project.Fields?.Select(f => new FieldHistoryModel(f)).ToList();
         }
