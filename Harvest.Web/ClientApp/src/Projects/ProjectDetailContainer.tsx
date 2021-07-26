@@ -174,7 +174,7 @@ export const ProjectDetailContainer = () => {
                     });
                   }}
                 />
-                <ul className="no-list-style attached-files-list">
+                {/* <ul className="no-list-style attached-files-list">
                   {project.attachments.map((attachment, i) => (
                     <li key={`attachment-${i}`}>
                       <a href={attachment.sasLink} target="_blank" rel="noreferrer">
@@ -183,7 +183,7 @@ export const ProjectDetailContainer = () => {
                       </a>{" "}
                     </li>
                   ))}
-                </ul>
+                </ul> */}
               </div>
             </div>
           </div>
