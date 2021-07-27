@@ -129,7 +129,7 @@ export const RequestContainer = () => {
               <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
-                  required={true}
+                  required={false}
                   clearIcon={null}
                   value={project.start}
                   onChange={(date) =>
@@ -145,7 +145,7 @@ export const RequestContainer = () => {
               <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
-                  required={true}
+                  required={false}
                   clearIcon={null}
                   value={project.end}
                   onChange={(date) =>
