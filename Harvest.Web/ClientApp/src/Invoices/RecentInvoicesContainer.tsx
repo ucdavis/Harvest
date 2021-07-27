@@ -27,7 +27,7 @@ export const RecentInvoicesContainer = (props: Props) => {
   }, [props.projectId]);
 
   return (
-    <ShowFor roles={["FieldManager", "PI"]} >
+    <ShowFor roles={["FieldManager", "Supervisor", "PI"]} >
       <div className="">
         <div className="card-content">
           <div className="row">
