@@ -16,6 +16,7 @@ using Harvest.Web.Middleware;
 using Harvest.Web.Models;
 using Harvest.Web.Models.Settings;
 using Harvest.Web.Services;
+using Harvest.Web.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -144,6 +145,7 @@ namespace Harvest.Web
             services.Configure<SparkpostSettings>(Configuration.GetSection("SparkPost"));
             services.Configure<StorageSettings>(Configuration.GetSection("Storage"));
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
+            services.Configure<AuthenticationSettings>(Configuration.GetSection("Authentication"));
 
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<RewriteError404>();

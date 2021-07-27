@@ -3,17 +3,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Harvest.Web.Settings;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
     [ApiExplorerSettings(IgnoreApi = true)]
     public class AccountController : Controller
     {
+        private readonly AuthenticationSettings _authenticationSettings;
+
+        public AccountController(IOptions<AuthenticationSettings> authenticationSettings)
+        {
+            _authenticationSettings = authenticationSettings.Value;
+        }
         public IActionResult AccessDenied()
         {
             return View();
         }
 
-        //TODO: Logout
+        public async Task<IActionResult> Logout() 
+        {
+            await HttpContext.SignOutAsync();
+            return Redirect($"{_authenticationSettings.Authority}/logout"); //This clears out all the sessions....
+        }
+        public async Task<IActionResult> EndEmulate() 
+        {
+
+            await HttpContext.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+        
     }
 }
