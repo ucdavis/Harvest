@@ -242,16 +242,16 @@ export const RequestContainer = () => {
             placeholder="Enter a full description of your requirements"
           />
         </FormGroup>
+        <ul>
+          {inputErrors.map((error, i) => {
+            return (
+              <li style={{ color: "red" }} key={`error-${i}`}>
+                {error}
+              </li>
+            );
+          })}
+        </ul>
         <div className="row justify-content-center">
-          <ul>
-            {inputErrors.map((error, i) => {
-              return (
-                <li style={{ color: "red" }} key={`error-${i}`}>
-                  {error}
-                </li>
-              );
-            })}
-          </ul>
           <Button
             className="btn-lg"
             color="primary"
