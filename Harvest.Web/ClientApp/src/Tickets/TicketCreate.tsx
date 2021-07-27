@@ -103,7 +103,7 @@ export const TicketCreate = () => {
               <div className="input-group" style={{ zIndex: 9000 }}>
                 <DatePicker
                   format="MM/dd/yyyy"
-                  required={true}
+                  required={false}
                   clearIcon={null}
                   value={ticket.dueDate}
                   onChange={(date) =>
