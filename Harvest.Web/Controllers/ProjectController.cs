@@ -45,7 +45,7 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
         public async Task<ActionResult> Active()
         {
             // TODO: only show projects where between start and end?
