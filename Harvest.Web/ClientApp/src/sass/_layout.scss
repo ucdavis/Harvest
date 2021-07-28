@@ -34,10 +34,6 @@ body {
     font-family: $sans-bold;
   }
 }
-.card-medium {
-  max-width: 746px;
-  margin: 0 auto;
-}
 .card-green-bg {
   background: transparentize($primary-color, 0.9);
   border-top: 1px solid $borders;

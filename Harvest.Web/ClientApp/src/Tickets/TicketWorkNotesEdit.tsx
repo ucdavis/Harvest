@@ -11,32 +11,32 @@ export const TicketWorkNotesEdit = (props: Props) => {
   const { ticket, setNotes } = props;
 
   const update = async () => {
-      // TODO: validation
+    // TODO: validation
 
-      const response = await fetch(
-          `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
-          {
-              method: "POST",
-              headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(ticket.workNotes),
-          }
-      );
-
-      if (response.ok) {
-          alert("Work notes saved.");
-      } else {
-          alert("Something went wrong, please try again");
+    const response = await fetch(
+      `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(ticket.workNotes),
       }
+    );
+
+    if (response.ok) {
+      alert("Work notes saved.");
+    } else {
+      alert("Something went wrong, please try again");
+    }
   };
 
   return (
     <>
       <h2>Work Notes</h2>
       <FormGroup>
-          <Input
+        <Input
           type="textarea"
           name="text"
           id="workNotes"
@@ -45,7 +45,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
         />
       </FormGroup>
       <div className="row justify-content-center">
-        <Button className="btn-lg" color="primary" onClick={update}>
+        <Button className="btn" color="primary" onClick={update}>
           Update Work Notes
         </Button>
       </div>
