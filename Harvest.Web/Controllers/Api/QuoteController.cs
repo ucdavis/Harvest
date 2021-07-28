@@ -18,11 +18,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
 
-        public QuoteController(AppDbContext dbContext, IUserService userService)
+        public QuoteController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this._historyService = historyService;
         }
 
         // Get info on the project as well as in-progess quote if it exists
@@ -74,6 +76,11 @@ namespace Harvest.Web.Controllers
 
                 var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
                 project.Status = Project.Statuses.PendingApproval;
+                await _historyService.QuoteSubmitted(projectId, quote);
+            }
+            else
+            {
+                await _historyService.QuoteSaved(projectId, quote);
             }
 
             await _dbContext.SaveChangesAsync();
