@@ -15,6 +15,8 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
+import { toast } from "../Util/Notifications";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -43,7 +45,7 @@ export const QuoteContainer = () => {
         setRates(rateJson);
 
         if (projectWithQuote.project.status !== "Requested") {
-          // can only create quote for newly requests projects. 
+          // can only create quote for newly requests projects.
           history.push(`/Project/Details/${projectId}`);
         }
 
@@ -82,7 +84,7 @@ export const QuoteContainer = () => {
     };
 
     cb();
-  }, [projectId]);
+  }, [history, projectId]);
 
   useEffect(() => {
     setQuote((q) => {
@@ -140,8 +142,7 @@ export const QuoteContainer = () => {
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
-    // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
+    const request = fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -150,10 +151,17 @@ export const QuoteContainer = () => {
       body: JSON.stringify(quote),
     });
 
+    toast.promise(request, {
+      loading: "Saving Quote",
+      success: "Quote saved.",
+      error: "Something went wrong, please try again",
+    });
+
+    // TODO: add progress and hide info while saving
+    const saveResponse = await request;
+
     if (saveResponse.ok) {
       history.push(`/Project/Details/${projectId}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
