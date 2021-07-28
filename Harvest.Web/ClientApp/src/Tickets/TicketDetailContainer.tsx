@@ -84,22 +84,6 @@ export const TicketDetailContainer = () => {
               <div className="row">
                 <div className="col">
                   <p>
-                    <b>Subject</b> <br />
-                    <p>{ticket.name}</p>
-                  </p>
-
-                  <p>
-                    <b>Details</b> <br />
-                    <p>{ticket.requirements}</p>
-                  </p>
-
-                  <p>
-                    <b>Status</b> <br />
-                    <p>{ticket.status}</p>
-                  </p>
-                </div>
-                <div className="col">
-                  <p>
                     <b>Created</b> <br />
                     <p>{new Date(ticket.createdOn).toDateString()}</p>
                   </p>
@@ -110,6 +94,12 @@ export const TicketDetailContainer = () => {
                       ? new Date(ticket.dueDate).toDateString()
                       : "N/A"}
                   </p>
+                  <p>
+                    <b>Status</b> <br />
+                    <p>{ticket.status}</p>
+                  </p>
+                </div>
+                <div className="col">
                   {ticket.updatedOn ? (
                     <>
                       <p>
@@ -123,6 +113,18 @@ export const TicketDetailContainer = () => {
                       </p>
                     </>
                   ) : null}
+                </div>
+              </div>
+              <div className="row">
+                <div className="col">
+                  <p>
+                    <b>Subject</b> <br />
+                    <p>{ticket.name}</p>
+                  </p>
+                  <p>
+                    <b>Details</b> <br />
+                    <p>{ticket.requirements}</p>
+                  </p>
                 </div>
               </div>
 
