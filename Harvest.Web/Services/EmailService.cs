@@ -89,7 +89,7 @@ namespace Harvest.Web.Services
 
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var url = $"{_emailSettings.BaseUrl}/quote/create/";
+            var url = $"{_emailSettings.BaseUrl}/project/details/";
 
             var model = new NewFieldRequestModel()
             {
@@ -105,13 +105,16 @@ namespace Harvest.Web.Services
 
             try
             {
+                var emails = (await FieldManagersEmails()).ToList();
+                emails.Add(project.PrincipalInvestigator.Email);
+                
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(emails.ToArray(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
-                Log.Error("Error trying to email Quote", e);
+                Log.Error("Error trying to email New Field Request", e);
                 return false;
             }
 

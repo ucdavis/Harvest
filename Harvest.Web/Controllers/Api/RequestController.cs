@@ -8,6 +8,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Web.Models;
+using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +23,16 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly StorageSettings storageSettings;
-        private readonly IFileService fileService;  
-        public RequestController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings, IFileService fileService)
+        private readonly IFileService fileService;
+        private readonly IEmailService _emailService;
+
+        public RequestController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings, IFileService fileService, IEmailService emailService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
             this.storageSettings = storageSettings.Value;
             this.fileService = fileService;
+            _emailService = emailService;
         }
 
         // create a new request via react
@@ -247,6 +251,8 @@ namespace Harvest.Web.Controllers
 
             await _dbContext.Projects.AddAsync(newProject);
             await _dbContext.SaveChangesAsync();
+
+            await _emailService.NewFieldRequest(newProject);
 
             return Ok(newProject);
         }
