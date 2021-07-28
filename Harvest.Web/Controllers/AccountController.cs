@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Harvest.Web.Settings;
+using Harvest.Web.Models.Settings;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 
@@ -12,9 +12,9 @@ namespace Harvest.Web.Controllers
     [ApiExplorerSettings(IgnoreApi = true)]
     public class AccountController : Controller
     {
-        private readonly AuthenticationSettings _authenticationSettings;
+        private readonly AuthSettings _authenticationSettings;
 
-        public AccountController(IOptions<AuthenticationSettings> authenticationSettings)
+        public AccountController(IOptions<AuthSettings> authenticationSettings)
         {
             _authenticationSettings = authenticationSettings.Value;
         }
