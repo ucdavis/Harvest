@@ -177,7 +177,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {

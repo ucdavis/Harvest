@@ -63,7 +63,8 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            //email need PI
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
             // get the currently unapproved quote for this project
             var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId && q.ApprovedOn == null);
@@ -120,6 +121,8 @@ namespace Harvest.Web.Controllers
             await _historyService.QuoteApproved(project.Id, model.Accounts);
  
             await _dbContext.SaveChangesAsync();
+
+            await _emailService.QuoteApproved(project);
 
             return Ok(project);
         }
@@ -257,8 +260,7 @@ namespace Harvest.Web.Controllers
             newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
 
             await _dbContext.Projects.AddAsync(newProject);
-            await _dbContext.SaveChangesAsync();
-            await _historyService.RequestCreated(newProject.Id, newProject);
+            await _historyService.RequestCreated(project.Id, newProject);
             await _dbContext.SaveChangesAsync();
 
             await _emailService.NewFieldRequest(newProject);
