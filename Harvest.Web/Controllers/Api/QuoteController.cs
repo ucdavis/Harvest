@@ -91,7 +91,7 @@ namespace Harvest.Web.Controllers
             if (submit)
             {
                 //Email needs the quote and PI
-                var project = await _dbContext.Projects.Include(a => a.Quote).Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+                var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
                 await _emailService.ProfessorQuoteReady(project, quote);
             }
 
