@@ -28,20 +28,18 @@ export const RecentTicketsContainer = (props: Props) => {
   }, [props.projectId]);
 
   return (
-    <div className="">
-      <div className="card-content">
-        <div className="row justify-content-between">
-          <h3>Last {maxRows} Updated Tickets</h3>
-          <div>
-            <Link className="mr-4" to={`/ticket/create/${props.projectId}`}>
-              Create Ticket
-            </Link>
-            <Link to={`/ticket/List/${props.projectId}`}>View All</Link>
-          </div>
+    <div className="card-content">
+      <div className="row justify-content-between">
+        <h3>Recent Tickets</h3>
+        <div>
+          <Link className="mr-4" to={`/ticket/create/${props.projectId}`}>
+            Create Ticket
+          </Link>
+          <Link to={`/ticket/List/${props.projectId}`}>View All</Link>
         </div>
-        <div className="row justify-content-center">
-          <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
-        </div>
+      </div>
+      <div className="row justify-content-center">
+        <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
       </div>
     </div>
   );

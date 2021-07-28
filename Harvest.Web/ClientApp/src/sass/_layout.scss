@@ -18,6 +18,7 @@ body {
   border-right: 1px solid $borders;
   border-bottom: 1px solid $borders;
   box-shadow: $box-shadow;
+  overflow: hidden;
   &.no-green {
     border-top: 8px solid #fff;
   }

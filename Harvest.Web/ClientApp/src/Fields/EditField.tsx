@@ -77,7 +77,7 @@ export const EditField = (props: Props) => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <Button color="danger" onClick={update}>
+          <Button color="link" onClick={update}>
             Cancel
           </Button>
           <Button color="primary" onClick={update}>
