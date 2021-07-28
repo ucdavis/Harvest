@@ -65,7 +65,7 @@ namespace Harvest.Web.Controllers
 
 
             var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
-            await _notificationService.SendNotification(new string[] { user.Email }, emailBody, "A new Ticket has been create", "Harvest Notification - New Ticket");
+            await _notificationService.SendNotification(new string[] { user.Email }, null, emailBody, "A new Ticket has been create", "Harvest Notification - New Ticket");
 
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }

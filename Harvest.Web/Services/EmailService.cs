@@ -72,7 +72,7 @@ namespace Harvest.Web.Services
 
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersAndPiEmails(project, true), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -87,23 +87,6 @@ namespace Harvest.Web.Services
         private async Task<string[]> FieldManagersEmails()
         {
             return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
-        }
-
-        private async Task<string[]> FieldManagersAndPiEmails(Project project, bool piFirst = false)
-        {
-            List<string> emails = new List<string>();
-            if (piFirst)
-            {
-                emails.Add(project.PrincipalInvestigator.Email);
-                emails.AddRange( await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToListAsync());
-            }
-            else
-            {
-                emails = await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToListAsync();
-                emails.Add(project.PrincipalInvestigator.Email);
-            }
-
-            return emails.ToArray();
         }
 
 
@@ -127,7 +110,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersAndPiEmails(project), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
@@ -162,7 +145,7 @@ namespace Harvest.Web.Services
 
                 var textVersion = $"A change request has been made by {model.PI} for project {model.ProjectName}.";
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - Change Request");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
             }
             catch (Exception e)
             {
@@ -194,7 +177,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
@@ -239,7 +222,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/AccountPendingApproval.cshtml", model);
 
-                await _notificationService.SendNotification(emails, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
+                await _notificationService.SendNotification(emails, null, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
             }
             catch (Exception e)
             {
@@ -271,7 +254,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
             }
             catch (Exception e)
             {
@@ -301,7 +284,7 @@ namespace Harvest.Web.Services
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - New Ticket");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
@@ -337,7 +320,7 @@ namespace Harvest.Web.Services
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketReply.cshtml", model);
                 var textVersion = $"A reply to the ticket in the project {model.ProjectName} by {model.From}";
-                await _notificationService.SendNotification(emailTo, emailBody, textVersion, "Harvest Notification - Ticket Reply");
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Ticket Reply");
             }
             catch (Exception e)
             {
@@ -374,7 +357,7 @@ namespace Harvest.Web.Services
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
                 var textVersion = $"An attachment was added to the ticket in the project {model.ProjectName} by {model.From}";
-                await _notificationService.SendNotification(emailTo, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
             }
             catch (Exception e)
             {
