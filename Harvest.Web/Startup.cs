@@ -144,7 +144,7 @@ namespace Harvest.Web
             services.Configure<SparkpostSettings>(Configuration.GetSection("SparkPost"));
             services.Configure<StorageSettings>(Configuration.GetSection("Storage"));
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
-
+            
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<RewriteError404>();
             services.AddScoped<IFinancialService, FinancialService>();
