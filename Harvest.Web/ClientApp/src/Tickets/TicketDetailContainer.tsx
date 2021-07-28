@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { Project, TicketDetails } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketAttachments } from "./TicketAttachments";
@@ -7,6 +7,7 @@ import { TicketMessages } from "./TicketMessages";
 import { ShowFor } from "../Shared/ShowFor";
 import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
 import { TicketReply } from "./TicketReply";
+import { Button } from "reactstrap";
 
 interface RouteParams {
   projectId: string;
@@ -17,6 +18,7 @@ export const TicketDetailContainer = () => {
   const { projectId, ticketId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<TicketDetails>();
+  const history = useHistory();
 
   useEffect(() => {
     const cb = async () => {
@@ -47,6 +49,26 @@ export const TicketDetailContainer = () => {
   if (project === undefined || ticket === undefined) {
     return <div>Loading...</div>;
   }
+
+  const closeTicket = async () => {
+    const response = await fetch(
+      `/Ticket/Close?projectId=${projectId}&ticketId=${ticketId}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.ok) {
+      alert("Ticket Closed.");
+      history.push(`/Project/Details/${projectId}`);
+    } else {
+      alert("Something went wrong, please try again");
+    }
+  };
 
   return (
     <div className="card-wrapper">
@@ -131,6 +153,16 @@ export const TicketDetailContainer = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="row justify-content-center">
+        <Button
+          className="btn-lg"
+          color="primary"
+          onClick={closeTicket}
+          disabled={ticket.completed}
+        >
+          Close Ticket FOREVER!!!!
+        </Button>
       </div>
     </div>
   );

@@ -56,7 +56,12 @@ export const TicketReply = (props: Props) => {
         />
       </FormGroup>
       <div className="row justify-content-center">
-        <Button className="btn" color="primary" onClick={update}>
+        <Button
+          className="btn"
+          color="primary"
+          onClick={update}
+          disabled={ticket.completed}
+        >
           Send
         </Button>
       </div>
