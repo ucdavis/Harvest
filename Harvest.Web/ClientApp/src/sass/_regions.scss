@@ -100,3 +100,7 @@
 .project-header {
   border-bottom: 1px solid $borders;
 }
+
+.leaflet-popup-content {
+  width: 250px !important;
+}
