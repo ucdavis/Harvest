@@ -30,11 +30,11 @@ export const TicketReply = (props: Props) => {
     );
 
     if (response.ok) {
-        const data = await response.json();
-        setTicket({ ...ticket, messages: [...ticket.messages, data] });
-        setTicketMessage({
-            message: "",
-        } as TicketMessage);
+      const data = await response.json();
+      setTicket({ ...ticket, messages: [...ticket.messages, data] });
+      setTicketMessage({
+        message: "",
+      } as TicketMessage);
       alert("Reply saved.");
     } else {
       alert("Something went wrong, please try again");
@@ -56,7 +56,12 @@ export const TicketReply = (props: Props) => {
         />
       </FormGroup>
       <div className="row justify-content-center">
-        <Button className="btn-lg" color="primary" onClick={update}>
+        <Button
+          className="btn-lg"
+          color="primary"
+          onClick={update}
+          disabled={ticket.completed}
+        >
           Send
         </Button>
       </div>
