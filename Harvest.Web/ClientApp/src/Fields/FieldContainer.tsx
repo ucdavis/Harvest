@@ -27,6 +27,7 @@ interface Props {
 
 interface State {
   editFieldId: number | undefined;
+  hasError: boolean;
 }
 
 // NOTE: leaflet-draw plugin is not compatible with react hooks so we use a full component here
@@ -36,7 +37,16 @@ export class FieldContainer extends React.Component<Props, State> {
 
     this.state = {
       editFieldId: undefined,
+      hasError: false
     };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.log(error, errorInfo);
   }
 
   _addDefaultField = (e: any) => {
@@ -79,6 +89,9 @@ export class FieldContainer extends React.Component<Props, State> {
   };
 
   render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong</h1>;
+    }
     return (
       <div className="map-wrapper">
         <MapContainer
