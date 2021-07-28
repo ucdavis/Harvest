@@ -19,7 +19,7 @@ namespace Harvest.Web.Services
 {
     public interface IEmailService
     {
-        Task<bool> ProfessorQuoteReady(Project project);
+        Task<bool> ProfessorQuoteReady(Project project, Quote quote);
         Task<bool> NewFieldRequest(Project project);
         Task<bool> ChangeRequest(Project project);
 
@@ -49,28 +49,30 @@ namespace Harvest.Web.Services
             _notificationService = notificationService;
             _emailSettings = emailSettings.Value;
         }
-        public async Task<bool> ProfessorQuoteReady(Project project)
+        public async Task<bool> ProfessorQuoteReady(Project project, Quote quote)
         {
             var url = $"{_emailSettings.BaseUrl}/request/approve/";
-            if (project.QuoteId == null)
+            if (quote == null)
             {
-                return false; //No quote
+                throw new Exception("No quote.");
             }
 
-            var model = new ProfessorQuoteModel()
-            {
-                ProfName = project.PrincipalInvestigator.Name,
-                ProjectName = project.Name,
-                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
-                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
-                QuoteAmount = project.QuoteTotal.ToString("C"),
-                ButtonUrl = $"{url}{project.Id}"
-            };
+
             try
             {
+                var model = new ProfessorQuoteModel()
+                {
+                    ProfName = project.PrincipalInvestigator.Name,
+                    ProjectName = project.Name,
+                    ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                    ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                    QuoteAmount = quote.Total.ToString("C"),
+                    ButtonUrl = $"{url}{project.Id}"
+                };
+
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(new string[] {project.PrincipalInvestigator.Email}, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(await FieldManagersAndPiEmails(project, true), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -86,6 +88,24 @@ namespace Harvest.Web.Services
         {
             return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
         }
+
+        private async Task<string[]> FieldManagersAndPiEmails(Project project, bool piFirst = false)
+        {
+            List<string> emails = new List<string>();
+            if (piFirst)
+            {
+                emails.Add(project.PrincipalInvestigator.Email);
+                emails.AddRange( await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToListAsync());
+            }
+            else
+            {
+                emails = await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToListAsync();
+                emails.Add(project.PrincipalInvestigator.Email);
+            }
+
+            return emails.ToArray();
+        }
+
 
         public async Task<bool> NewFieldRequest(Project project)
         {
@@ -105,12 +125,9 @@ namespace Harvest.Web.Services
 
             try
             {
-                var emails = (await FieldManagersEmails()).ToList();
-                emails.Add(project.PrincipalInvestigator.Email);
-                
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(emails.ToArray(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersAndPiEmails(project), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
