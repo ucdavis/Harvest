@@ -257,7 +257,8 @@ namespace Harvest.Web.Controllers
             newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
 
             await _dbContext.Projects.AddAsync(newProject);
-            await _historyService.RequestCreated(project.Id, newProject);
+            await _dbContext.SaveChangesAsync();
+            await _historyService.RequestCreated(newProject.Id, newProject);
             await _dbContext.SaveChangesAsync();
 
             await _emailService.NewFieldRequest(newProject);
