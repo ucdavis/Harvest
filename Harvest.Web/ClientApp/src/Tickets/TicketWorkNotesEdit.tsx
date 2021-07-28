@@ -40,7 +40,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
           type="textarea"
           name="text"
           id="workNotes"
-          value={ticket.workNotes}
+          value={ticket.workNotes? ticket.workNotes : ""}
           onChange={(e) => setNotes(e.target.value)}
         />
       </FormGroup>

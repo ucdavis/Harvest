@@ -25,7 +25,7 @@ export const ProjectTable = (props: Props) => {
             <p>{data.row.original.name}</p>
           </div>
         ),
-        Header: " ",
+        Header: "Name",
         maxWidth: 150,
         accessor: "id",
       },
