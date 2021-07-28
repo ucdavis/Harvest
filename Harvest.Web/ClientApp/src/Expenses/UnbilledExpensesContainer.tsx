@@ -68,10 +68,10 @@ export const UnbilledExpensesContainer = () => {
           <h1>Un-billed Expenses</h1>
         </div>
         <div className="col text-right">
-          <ShowFor roles={["FieldManager","Supervisor","Worker"]} >
+          <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
             <Link
               to={`/expense/entry/${projectId}`}
-              className="btn btn btn-link "
+              className="btn btn btn-primary "
             >
               Enter New <FontAwesomeIcon icon={faPlus} />
             </Link>
@@ -94,7 +94,7 @@ export const UnbilledExpensesContainer = () => {
             >
               Confirm
             </Button>{" "}
-            <Button color="danger" onClick={() => setSelectedExpense(null)}>
+            <Button color="link" onClick={() => setSelectedExpense(null)}>
               Cancel
             </Button>
           </ModalFooter>

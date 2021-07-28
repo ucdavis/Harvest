@@ -10,23 +10,27 @@ interface Props {
 export const FieldPopup = (props: Props) => {
   return (
     <div>
-      <p>
-        <b>{props.field.name}</b>
-      </p>
-      <p>{props.field.crop}</p>
-      <p>{props.field.details}</p>
-      <button
-        className="btn btn-primary btn-sm mt-4"
-        onClick={() => props.updateFieldId(props.field)}
-      >
-        Edit
-      </button>
-      <button
-        className="btn btn-primary btn-sm mt-4"
-        onClick={() => props.removeField(props.field)}
-      >
-        Remove
-      </button>
+      <div className="tooltip-title">
+        <h3>{props.field.name}</h3>
+      </div>
+      <div className="tooltip-description">
+        <p>{props.field.crop}</p>
+        <p>{props.field.details}</p>
+      </div>
+      <div className="row justify-content-between">
+        <button
+          className="btn btn-link btn-sm mt-5"
+          onClick={() => props.updateFieldId(props.field)}
+        >
+          Edit
+        </button>
+        <button
+          className="btn btn-link btn-sm mt-5"
+          onClick={() => props.removeField(props.field)}
+        >
+          Remove
+        </button>
+      </div>
     </div>
   );
 };

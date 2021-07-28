@@ -123,7 +123,8 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="mt-5">
+              <div className="text-right mt-5">
+                <button className="btn btn-link mr-2">Reject</button>
                 <button
                   className="btn btn-primary"
                   disabled={disabled}
@@ -131,7 +132,6 @@ export const ApprovalContainer = () => {
                 >
                   Approve Quote
                 </button>
-                <button className="btn btn-link mr-2">Reject</button>
               </div>
             </div>
           </div>

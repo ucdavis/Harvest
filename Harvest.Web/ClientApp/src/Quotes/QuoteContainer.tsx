@@ -43,7 +43,7 @@ export const QuoteContainer = () => {
         setRates(rateJson);
 
         if (projectWithQuote.project.status !== "Requested") {
-          // can only create quote for newly requests projects. 
+          // can only create quote for newly requests projects.
           history.push(`/Project/Details/${projectId}`);
         }
 
@@ -141,14 +141,17 @@ export const QuoteContainer = () => {
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
     // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(quote),
-    });
+    const saveResponse = await fetch(
+      `/Quote/Save/${projectId}?submit=${submit}`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(quote),
+      }
+    );
 
     if (saveResponse.ok) {
       history.push(`/Project/Details/${projectId}`);
@@ -240,13 +243,14 @@ export const QuoteContainer = () => {
             />
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
-
-          <button className="btn btn-link mt-4" onClick={() => save(false)}>
-            Save Quote
-          </button>
-          <button className="btn btn-primary mt-4" onClick={() => save(true)}>
-            Submit Quote
-          </button>
+          <div className="row justify-content-center">
+            <button className="btn btn-link mt-4" onClick={() => save(false)}>
+              Save Quote
+            </button>
+            <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+              Submit Quote
+            </button>
+          </div>
         </div>
       </div>
 
