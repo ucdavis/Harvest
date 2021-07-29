@@ -65,8 +65,8 @@ export const TicketAttachments = (props: Props) => {
         ))}
       </ul>
       <FormGroup>
-        <Label>Attach files?</Label>
-        {ticket.completed !== false ? (
+        {!ticket.completed && <Label>Attach files?</Label>}
+        {!ticket.completed && (
           <FileUpload
             files={ticketLoc.newAttachments || []}
             setFiles={(f) => {
@@ -89,7 +89,7 @@ export const TicketAttachments = (props: Props) => {
               })
             }
           ></FileUpload>
-        ) : null}
+        )}
       </FormGroup>
     </div>
   );
