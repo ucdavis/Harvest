@@ -218,3 +218,16 @@ $nchild-wide: 24%;
     margin-right: 6px;
   }
 }
+.react-date-picker__inputGroup__input:invalid {
+  background-color: rgba(38, 96, 65, 0.1);
+}
+.react-date-picker__inputGroup__input:focus-visible {
+  outline: none !important;
+}
+.react-date-picker__button:enabled:hover .react-date-picker__button__icon,
+.react-date-picker__button:enabled:focus .react-date-picker__button__icon {
+  stroke: $primary-color;
+}
+input[type="radio" i] {
+  background-color: $primary-color;
+}

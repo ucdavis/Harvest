@@ -156,7 +156,7 @@ export const ProjectDetail = (props: Props) => {
           <Col>
             <Label for="projectLocation">Project Location</Label>
           </Col>
-          <Col>
+          <Col className="text-right">
             <button
               className="btn btn-link"
               onClick={(_) => props.setEditFields(true)}

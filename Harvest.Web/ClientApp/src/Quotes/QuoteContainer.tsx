@@ -248,13 +248,14 @@ export const QuoteContainer = () => {
             />
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
-
-          <button className="btn btn-link mt-4" onClick={() => save(false)}>
-            Save Quote
-          </button>
-          <button className="btn btn-primary mt-4" onClick={() => save(true)}>
-            Submit Quote
-          </button>
+          <div className="row justify-content-center">
+            <button className="btn btn-link mt-4" onClick={() => save(false)}>
+              Save Quote
+            </button>
+            <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+              Submit Quote
+            </button>
+          </div>
         </div>
       </div>
 
