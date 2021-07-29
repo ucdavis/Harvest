@@ -16,7 +16,7 @@ import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
 import {
-  useNotifications,
+  usePromiseNotification,
 } from "../Util/Notifications";
 
 interface RouteParams {
@@ -35,7 +35,7 @@ export const QuoteContainer = () => {
 
   const [editFields, setEditFields] = useState(false);
 
-  const [notification, setNotification] = useNotifications();
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     const cb = async () => {
@@ -252,10 +252,10 @@ export const QuoteContainer = () => {
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
           <div className="row justify-content-center">
-            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.loading}>
+            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
               Save Quote
             </button>
-            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.loading}>
+            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending}>
               Submit Quote
             </button>
           </div>

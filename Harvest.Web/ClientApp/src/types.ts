@@ -304,7 +304,7 @@ export interface AppContextShape {
   };
 }
 
-export interface NotificationStatus {
-  loading: boolean;
+export interface PromiseStatus {
+  pending: boolean;
   success: boolean;
 }

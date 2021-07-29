@@ -1,6 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { NotificationStatus } from "../types";
+import { PromiseStatus } from "../types";
 
 // just re-export the whole module so we don't take direct dependencies all over
 export * from "react-hot-toast";
@@ -23,35 +23,40 @@ export const genericErrorMessage: string =
 
 // returns notification object and notification setter
 // call notification setter to initiate a loading notification
-export const useNotifications = (): [
-  NotificationStatus,
+export const usePromiseNotification = (): [
+  PromiseStatus,
   (
     promise: Promise<any>,
     loadingMessage: string,
     successMessage: string
   ) => void
 ] => {
-  const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
 
   return [
     {
-      loading,
+      pending,
       success,
-    } as NotificationStatus,
-    (promise, loadingMessage, successMessage, errorMessage = genericErrorMessage) => {
-      setLoading(true);
+    } as PromiseStatus,
+    (
+      promise,
+      loadingMessage,
+      successMessage,
+      errorMessage = genericErrorMessage
+    ) => {
+      setPending(true);
 
       toast.promise(fetchWithFailOnNotOk(promise), {
         loading: loadingMessage,
         success: () => {
           setSuccess(true);
-          setLoading(false);
+          setPending(false);
           return successMessage;
         },
         error: () => {
           setSuccess(false);
-          setLoading(false);
+          setPending(false);
           return errorMessage;
         },
       });
