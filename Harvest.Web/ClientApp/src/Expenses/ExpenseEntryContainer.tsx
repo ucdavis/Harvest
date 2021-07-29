@@ -12,7 +12,6 @@ import {
   genericErrorMessage,
   toast,
 } from "../Util/Notifications";
-import { request } from "node:http";
 
 interface RouteParams {
   projectId?: string;
