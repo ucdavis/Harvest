@@ -6,6 +6,11 @@ import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { ShowFor } from "../Shared/ShowFor";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -40,7 +45,7 @@ export const TicketCreate = () => {
   const create = async () => {
     // TODO: validation
 
-    const response = await fetch(`/Ticket/Create?projectId=${projectId}`, {
+    const request = fetch(`/Ticket/Create?projectId=${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -49,11 +54,17 @@ export const TicketCreate = () => {
       body: JSON.stringify(ticket),
     });
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Creating Ticket",
+      success: "Ticket Created",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
       const data = await response.json();
       history.push(`/Project/Details/${data.id}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 

@@ -15,6 +15,12 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -82,7 +88,7 @@ export const QuoteContainer = () => {
     };
 
     cb();
-  }, [projectId]);
+  }, [history, projectId]);
 
   useEffect(() => {
     setQuote((q) => {
@@ -140,23 +146,26 @@ export const QuoteContainer = () => {
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
+    const request = fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(quote),
+    });
+
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Saving Quote",
+      success: "Quote Saved",
+      error: genericErrorMessage,
+    });
+
     // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(
-      `/Quote/Save/${projectId}?submit=${submit}`,
-      {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(quote),
-      }
-    );
+    const saveResponse = await request;
 
     if (saveResponse.ok) {
       history.push(`/Project/Details/${projectId}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 

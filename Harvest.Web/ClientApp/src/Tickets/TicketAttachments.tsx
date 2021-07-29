@@ -4,6 +4,11 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface Props {
   ticket: TicketDetails;
@@ -23,7 +28,7 @@ export const TicketAttachments = (props: Props) => {
   );
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const response = await fetch(
+    const request = fetch(
       `/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
       {
         method: "POST",
@@ -35,15 +40,20 @@ export const TicketAttachments = (props: Props) => {
       }
     );
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Saving Attachment(s)",
+      success: "Attachment(s) Saved",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
       const data = (await response.json()) as TicketAttachment[];
 
       setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
 
       setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
-      alert("Attachment(s) saved.");
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 

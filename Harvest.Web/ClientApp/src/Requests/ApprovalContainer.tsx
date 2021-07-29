@@ -11,6 +11,11 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -44,8 +49,8 @@ export const ApprovalContainer = () => {
 
   const approve = async () => {
     const model = { accounts };
-    // TODO: validation, loading spinner
-    const response = await fetch(`/Request/Approve/${projectId}`, {
+
+    const request = fetch(`/Request/Approve/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -54,10 +59,16 @@ export const ApprovalContainer = () => {
       body: JSON.stringify(model),
     });
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Saving Approval",
+      success: "Project Approved",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
       history.replace(`/Project/Details/${projectId}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 

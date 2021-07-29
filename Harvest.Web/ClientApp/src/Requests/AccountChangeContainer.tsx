@@ -4,6 +4,11 @@ import { useHistory, useParams } from "react-router-dom";
 import { Project, ProjectAccount } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -36,7 +41,7 @@ export const AccountChangeContainer = () => {
 
   //TODO: require PI or supervisor access after updating auth policies
   const changeAccounts = async () => {
-    const response = await fetch(`/Request/ChangeAccount/${projectId}`, {
+    const request = fetch(`/Request/ChangeAccount/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -45,11 +50,17 @@ export const AccountChangeContainer = () => {
       body: JSON.stringify({ Accounts: accounts }),
     });
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Updating Accounts",
+      success: "Accounts Updated",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
       const data = await response.json();
       history.push(`/Project/Details/${data.id}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
