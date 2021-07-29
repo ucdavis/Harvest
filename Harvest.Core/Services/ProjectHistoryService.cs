@@ -32,7 +32,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts);
         Task<ProjectHistory> QuoteSaved(int projectId, Quote quote);
         Task<ProjectHistory> QuoteSubmitted(int projectId, Quote quote);
-        Task<ProjectHistory> RequestCreated(int projectId, Project project);
+        Task<ProjectHistory> RequestCreated( Project project);
         Task<ProjectHistory> TicketCreated(int projectId, Ticket ticket);
         Task<ProjectHistory> TicketFilesAttached(int projectId, IEnumerable<TicketAttachment> attachments);
         Task<ProjectHistory> TicketNotesUpdated(int projectId, Ticket ticket);
@@ -78,6 +78,12 @@ namespace Harvest.Core.Services
             MakeHistory(projectId, nameof(QuoteSaved), quote.Text); // quote.Text is a preserialized QuoteDetail
         public Task<ProjectHistory> QuoteSubmitted(int projectId, Quote quote) =>
             MakeHistory(projectId, nameof(QuoteSubmitted), quote.Text); // quote.Text is a preserialized QuoteDetail
+
+        public Task<ProjectHistory> RequestCreated(Project project) =>
+            MakeHistory2(project, nameof(RequestCreated), new ProjectHistoryModel(project));
+
+
+
         public Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts) =>
             MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)));
         public Task<ProjectHistory> RequestCreated(int projectId, Project project) =>
@@ -95,14 +101,34 @@ namespace Harvest.Core.Services
         private Task<ProjectHistory> MakeHistory(int projectId, string action, object detailsModel) =>
             MakeHistory(projectId, action, JsonSerializer.Serialize(detailsModel, _jsonOptions));
 
+        private Task<ProjectHistory> MakeHistory2(Project project, string action, object detailsModel) =>
+            MakeHistory2(project, action, JsonSerializer.Serialize(detailsModel, _jsonOptions));
+
         private async Task<ProjectHistory> MakeHistory(int projectId, string action, string detailsSerialized)
         {
+
             var projectHistory = new ProjectHistory
             {
                 Action = action,
                 Description = action.SplitCamelCase(),
                 Details = detailsSerialized,
                 ProjectId = projectId,
+                ActionDate = DateTime.UtcNow,
+                Actor = await _userService.GetCurrentUser(),
+            };
+            _dbContext.Add(projectHistory);
+            return projectHistory;
+        }
+
+        private async Task<ProjectHistory> MakeHistory2(Project project, string action, string detailsSerialized)
+        {
+
+            var projectHistory = new ProjectHistory
+            {
+                Action = action,
+                Description = action.SplitCamelCase(),
+                Details = detailsSerialized,
+                Project = project,
                 ActionDate = DateTime.UtcNow,
                 Actor = await _userService.GetCurrentUser(),
             };
