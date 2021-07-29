@@ -17,7 +17,7 @@ interface RouteParams {
 
 export const RequestContainer = () => {
   const history = useHistory();
-  const userDetail = useContext(AppContext).user.detail;
+  const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
 
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({
@@ -94,6 +94,10 @@ export const RequestContainer = () => {
     });
 
     if (response.ok) {
+      // if user is becoming a PI for first time, grant them the PI role
+      if (project.principalInvestigator.id === userDetail.id && !userRoles.includes("PI")) {
+        userRoles.push("PI");
+      }
       const data = await response.json();
       history.push(`/Project/Details/${data.id}`);
     } else {

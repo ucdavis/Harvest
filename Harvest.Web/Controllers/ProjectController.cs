@@ -48,7 +48,7 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
         public async Task<ActionResult> Active()
         {
             // TODO: only show projects where between start and end?
@@ -95,17 +95,23 @@ namespace Harvest.Web.Controllers
                 .Include(p => p.Accounts)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
-                .SingleOrDefaultAsync(p => p.Id == projectId && (hasAccess || p.PrincipalInvestigatorId == user.Id));
-            
+                .SingleOrDefaultAsync(p => p.Id == projectId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            if (!hasAccess && project.PrincipalInvestigatorId != user.Id)
+            {
+                return Forbid();
+            }
+
             foreach (var file in project.Attachments) {
                 file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
-            if (project != null)
-            {
-                return Ok(project);
-            }
-            return NotFound();
+            return Ok(project);
         }
 
         [HttpGet]

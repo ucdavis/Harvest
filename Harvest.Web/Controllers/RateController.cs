@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize(Policy = AccessCodes.WorkerAccess)]
     public class RateController : SuperController
     {
         private readonly AppDbContext _dbContext;
@@ -68,6 +68,7 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Create
         [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Create(RateEditModel model)
         {
             model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
@@ -114,6 +115,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Edit/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Edit(int id)
         {
             var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id);
@@ -124,6 +126,7 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Edit/5
         [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Edit(int id, RateEditModel model)
         {
             model.Rate.Id = id;
@@ -180,6 +183,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Delete/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Delete(int id)
         {
             var rate = await _dbContext.Rates
@@ -194,6 +198,7 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Delete/5
         [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
             var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive);

@@ -42,8 +42,8 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
-        if (projectWithQuote.project.status !== "Requested") {
-          // can only create quote for newly requests projects.
+        if (projectWithQuote.project.status !== "Requested" && projectWithQuote.project.status !== "ChangeRequested") {
+          // can only create quote for newly requests projects or change requests. 
           history.push(`/Project/Details/${projectId}`);
         }
 

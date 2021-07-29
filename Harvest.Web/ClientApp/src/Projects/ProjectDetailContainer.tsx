@@ -73,7 +73,7 @@ export const ProjectDetailContainer = () => {
             <div className="col">
               <ShowFor
                 roles={["FieldManager", "Supervisor"]}
-                condition={project.status === "Requested"}
+                condition={project.status === "Requested" || project.status === "ChangeRequested"}
               >
                 <Link
                   className="btn btn-primary btn-small mr-4"

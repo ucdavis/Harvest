@@ -27,7 +27,7 @@ export const RecentInvoicesContainer = (props: Props) => {
   }, [props.projectId]);
 
   return (
-    <ShowFor roles={["FieldManager", "PI"]}>
+    <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
       <div className="card-content">
         <div className="row justify-content-between">
           <h3>Recent Invoices</h3>

@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize]
     public class FinancialAccountController : Controller
     {
         private readonly AppDbContext _dbContext;
