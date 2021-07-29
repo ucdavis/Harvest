@@ -65,30 +65,35 @@ export const TicketAttachments = (props: Props) => {
         ))}
       </ul>
       <FormGroup>
-        {!ticket.completed && <Label>Attach files?</Label>}
         {!ticket.completed && (
-          <FileUpload
-            files={ticketLoc.newAttachments || []}
-            setFiles={(f) => {
-              setTicketLoc((ticket) => ({ ...ticket, newAttachments: [...f] }));
-              updateFiles(f);
-            }}
-            updateFile={(f) =>
-              setTicketLoc((ticket) => {
-                // update just one specific file from ticket p
-                ticket.newAttachments[
-                  ticket.newAttachments.findIndex(
-                    (file) => file.identifier === f.identifier
-                  )
-                ] = { ...f };
-
-                return {
+          <>
+            <Label>Attach files?</Label>
+            <FileUpload
+              files={ticketLoc.newAttachments || []}
+              setFiles={(f) => {
+                setTicketLoc((ticket) => ({
                   ...ticket,
-                  newAttachments: [...ticket.newAttachments],
-                };
-              })
-            }
-          ></FileUpload>
+                  newAttachments: [...f],
+                }));
+                updateFiles(f);
+              }}
+              updateFile={(f) =>
+                setTicketLoc((ticket) => {
+                  // update just one specific file from ticket p
+                  ticket.newAttachments[
+                    ticket.newAttachments.findIndex(
+                      (file) => file.identifier === f.identifier
+                    )
+                  ] = { ...f };
+
+                  return {
+                    ...ticket,
+                    newAttachments: [...ticket.newAttachments],
+                  };
+                })
+              }
+            ></FileUpload>
+          </>
         )}
       </FormGroup>
     </div>
