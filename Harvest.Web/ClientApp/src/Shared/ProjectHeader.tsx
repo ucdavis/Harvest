@@ -18,7 +18,8 @@ export const ProjectHeader = (props: Props) => {
             Created {new Date(project.createdOn).toDateString()} by{" "}
             {project.createdBy.name}
           </p>
-          <p className="lede">Accounts</p>
+          {project.accounts.length > 0 && <p className="lede">Accounts</p>}
+
           {project.accounts.map((acc: ProjectAccount) => (
             <div key={acc.id}>
               {acc.name} {acc.percentage}%
