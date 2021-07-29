@@ -15,7 +15,11 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
-import { fetchWithFailOnNotOk, genericError, toast } from "../Util/Notifications";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -154,7 +158,7 @@ export const QuoteContainer = () => {
     toast.promise(fetchWithFailOnNotOk(request), {
       loading: "Saving Quote",
       success: "Quote Saved",
-      error: genericError,
+      error: genericErrorMessage,
     });
 
     // TODO: add progress and hide info while saving

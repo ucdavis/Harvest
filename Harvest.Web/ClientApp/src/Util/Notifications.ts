@@ -14,4 +14,4 @@ export const fetchWithFailOnNotOk = (fetchPromise: Promise<any>) => {
   });
 };
 
-export const genericError: string = "Something went wrong, please try again";
+export const genericErrorMessage: string = "Something went wrong, please try again";
