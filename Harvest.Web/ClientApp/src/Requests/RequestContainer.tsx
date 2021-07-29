@@ -10,6 +10,11 @@ import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
 import { Project, CropType } from "../types";
 import AppContext from "../Shared/AppContext";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -84,7 +89,7 @@ export const RequestContainer = () => {
       return;
     }
 
-    const response = await fetch(`/Request/Create`, {
+    const request = fetch(`/Request/Create`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -93,11 +98,17 @@ export const RequestContainer = () => {
       body: JSON.stringify(project),
     });
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Creating Request",
+      success: "Request Created",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
       const data = await response.json();
       history.push(`/Project/Details/${data.id}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 

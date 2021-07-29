@@ -7,6 +7,12 @@ import { Button } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
+import { request } from "node:http";
 
 interface RouteParams {
   projectId?: string;
@@ -30,7 +36,6 @@ export const ExpenseEntryContainer = () => {
 
   const { projectId } = useParams<RouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
-  const [disabled, setDisabled] = useState<boolean>(false);
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([
@@ -82,9 +87,7 @@ export const ExpenseEntryContainer = () => {
         )
     );
 
-    console.log("expenses", expensesBody);
-
-    const response = await fetch(`/Expense/Create/${projectId}`, {
+    const request = fetch(`/Expense/Create/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -93,10 +96,16 @@ export const ExpenseEntryContainer = () => {
       body: JSON.stringify(expensesBody),
     });
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Saving Expenses",
+      success: "Expenses Saved",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
       history.push("/project");
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
@@ -151,11 +160,7 @@ export const ExpenseEntryContainer = () => {
       </div>
       <div className="card-content">
         <div className="col">
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={submit}
-            disabled={disabled}
-          >
+          <button className="btn btn-primary btn-lg" onClick={submit}>
             Submit Expense
           </button>
         </div>
