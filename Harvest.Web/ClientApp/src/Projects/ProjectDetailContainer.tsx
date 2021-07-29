@@ -13,6 +13,7 @@ import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
+import { fetchWithFailOnNotOk, genericErrorMessage, toast } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -43,7 +44,7 @@ export const ProjectDetailContainer = () => {
   }
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const response = await fetch(`/Request/Files/${projectId}`, {
+    const request = fetch(`/Request/Files/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -51,6 +52,14 @@ export const ProjectDetailContainer = () => {
       },
       body: JSON.stringify({ Attachments: attachments }),
     });
+
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Saving File(s)",
+      success: "File(s) Saved",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
 
     if (response.ok) {
       const files = await response.json();
