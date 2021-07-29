@@ -22,6 +22,7 @@ export const ApprovalContainer = () => {
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
   const [disabled, setDisabled] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     const cb = async () => {
@@ -43,6 +44,7 @@ export const ApprovalContainer = () => {
   }, [history, projectId]);
 
   const approve = async () => {
+    setSubmitting(true);
     const model = { accounts };
     // TODO: validation, loading spinner
     const response = await fetch(`/Request/Approve/${projectId}`, {
@@ -56,8 +58,10 @@ export const ApprovalContainer = () => {
 
     if (response.ok) {
       history.replace(`/Project/Details/${projectId}`);
+      setSubmitting(false);
     } else {
       alert("Something went wrong, please try again");
+      setSubmitting(false);
     }
   };
 
@@ -124,10 +128,10 @@ export const ApprovalContainer = () => {
                 </li>
               </ol>
               <div className="text-right mt-5">
-                <button className="btn btn-link mr-2">Reject</button>
+                <button className="btn btn-link mr-2" disabled={true || submitting}>Reject</button>
                 <button
                   className="btn btn-primary"
-                  disabled={disabled}
+                  disabled={disabled || submitting}
                   onClick={approve}
                 >
                   Approve Quote
