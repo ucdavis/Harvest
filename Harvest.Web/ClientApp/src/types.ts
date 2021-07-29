@@ -303,3 +303,8 @@ export interface AppContextShape {
     roles: RoleName[];
   };
 }
+
+export interface NotificationStatus {
+  loading: boolean;
+  success: boolean;
+}

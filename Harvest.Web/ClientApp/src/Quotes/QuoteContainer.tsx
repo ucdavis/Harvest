@@ -16,9 +16,7 @@ import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
 import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
+  useNotifications,
 } from "../Util/Notifications";
 
 interface RouteParams {
@@ -37,6 +35,8 @@ export const QuoteContainer = () => {
 
   const [editFields, setEditFields] = useState(false);
 
+  const [notification, setNotification] = useNotifications();
+
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
@@ -48,8 +48,11 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
-        if (projectWithQuote.project.status !== "Requested" && projectWithQuote.project.status !== "ChangeRequested") {
-          // can only create quote for newly requests projects or change requests. 
+        if (
+          projectWithQuote.project.status !== "Requested" &&
+          projectWithQuote.project.status !== "ChangeRequested"
+        ) {
+          // can only create quote for newly requests projects or change requests.
           history.push(`/Project/Details/${projectId}`);
         }
 
@@ -155,11 +158,7 @@ export const QuoteContainer = () => {
       body: JSON.stringify(quote),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Quote",
-      success: "Quote Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Quote", "Quote Saved");
 
     // TODO: add progress and hide info while saving
     const saveResponse = await request;
@@ -253,10 +252,10 @@ export const QuoteContainer = () => {
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
           <div className="row justify-content-center">
-            <button className="btn btn-link mt-4" onClick={() => save(false)}>
+            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.loading}>
               Save Quote
             </button>
-            <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.loading}>
               Submit Quote
             </button>
           </div>
