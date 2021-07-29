@@ -55,8 +55,8 @@ export const TicketCreate = () => {
     });
 
     toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Quote",
-      success: "Quote Saved",
+      loading: "Creating Ticket",
+      success: "Ticket Created",
       error: genericErrorMessage,
     });
 

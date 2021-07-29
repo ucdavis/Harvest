@@ -1,6 +1,11 @@
 ﻿import React, { useState } from "react";
 import { Button, FormGroup, Input } from "reactstrap";
 import { TicketDetails, TicketMessage } from "../types";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface Props {
   ticket: TicketDetails;
@@ -17,7 +22,7 @@ export const TicketReply = (props: Props) => {
   const update = async () => {
     // TODO: validation
 
-    const response = await fetch(
+    const request = fetch(
       `/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
@@ -29,15 +34,20 @@ export const TicketReply = (props: Props) => {
       }
     );
 
+    const response = await request;
+
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Saving Reply",
+      success: "Reply Saved",
+      error: genericErrorMessage,
+    });
+
     if (response.ok) {
       const data = await response.json();
       setTicket({ ...ticket, messages: [...ticket.messages, data] });
       setTicketMessage({
         message: "",
       } as TicketMessage);
-      alert("Reply saved.");
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 

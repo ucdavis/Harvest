@@ -8,6 +8,11 @@ import { ShowFor } from "../Shared/ShowFor";
 import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
 import { TicketReply } from "./TicketReply";
 import { Button } from "reactstrap";
+import {
+  fetchWithFailOnNotOk,
+  genericErrorMessage,
+  toast,
+} from "../Util/Notifications";
 
 interface RouteParams {
   projectId: string;
@@ -51,7 +56,7 @@ export const TicketDetailContainer = () => {
   }
 
   const closeTicket = async () => {
-    const response = await fetch(
+    const request = fetch(
       `/Ticket/Close?projectId=${projectId}&ticketId=${ticketId}`,
       {
         method: "POST",
@@ -62,11 +67,16 @@ export const TicketDetailContainer = () => {
       }
     );
 
+    toast.promise(fetchWithFailOnNotOk(request), {
+      loading: "Closing Ticket",
+      success: "Ticket Closed",
+      error: genericErrorMessage,
+    });
+
+    const response = await request;
+
     if (response.ok) {
-      alert("Ticket Closed.");
       history.push(`/Project/Details/${projectId}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
