@@ -65,20 +65,11 @@ namespace Harvest.Web.Controllers
 
 
             var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
-            await _notificationService.SendNotification(new string[] { user.Email }, emailBody, "A new Ticket has been create", "Harvest Notification - New Ticket");
+            await _notificationService.SendNotification(new string[] { user.Email }, null, emailBody, "A new Ticket has been create", "Harvest Notification - New Ticket");
 
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
 
-        public async Task<IActionResult> TestQuoteNotify()
-        {
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 7);
-            if (await _emailService.ProfessorQuoteReady(project))
-            {
-                return Content("Done.");
-            }
-            return Content("Looks like there was a problem.");
-        }
 
         public async Task<IActionResult> TestNewFieldNotify()
         {

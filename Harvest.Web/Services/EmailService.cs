@@ -19,7 +19,7 @@ namespace Harvest.Web.Services
 {
     public interface IEmailService
     {
-        Task<bool> ProfessorQuoteReady(Project project);
+        Task<bool> ProfessorQuoteReady(Project project, Quote quote);
         Task<bool> NewFieldRequest(Project project);
         Task<bool> ChangeRequest(Project project);
 
@@ -49,28 +49,30 @@ namespace Harvest.Web.Services
             _notificationService = notificationService;
             _emailSettings = emailSettings.Value;
         }
-        public async Task<bool> ProfessorQuoteReady(Project project)
+        public async Task<bool> ProfessorQuoteReady(Project project, Quote quote)
         {
             var url = $"{_emailSettings.BaseUrl}/request/approve/";
-            if (project.QuoteId == null)
+            if (quote == null)
             {
-                return false; //No quote
+                throw new Exception("No quote.");
             }
 
-            var model = new ProfessorQuoteModel()
-            {
-                ProfName = project.PrincipalInvestigator.Name,
-                ProjectName = project.Name,
-                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
-                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
-                QuoteAmount = project.QuoteTotal.ToString("C"),
-                ButtonUrl = $"{url}{project.Id}"
-            };
+
             try
             {
+                var model = new ProfessorQuoteModel()
+                {
+                    ProfName = project.PrincipalInvestigator.Name,
+                    ProjectName = project.Name,
+                    ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                    ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                    QuoteAmount = quote.Total.ToString("C"),
+                    ButtonUrl = $"{url}{project.Id}"
+                };
+
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(new string[] {project.PrincipalInvestigator.Email}, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -87,9 +89,10 @@ namespace Harvest.Web.Services
             return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
         }
 
+
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var url = $"{_emailSettings.BaseUrl}/quote/create/";
+            var url = $"{_emailSettings.BaseUrl}/project/details/";
 
             var model = new NewFieldRequestModel()
             {
@@ -107,11 +110,11 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
-                Log.Error("Error trying to email Quote", e);
+                Log.Error("Error trying to email New Field Request", e);
                 return false;
             }
 
@@ -142,7 +145,7 @@ namespace Harvest.Web.Services
 
                 var textVersion = $"A change request has been made by {model.PI} for project {model.ProjectName}.";
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - Change Request");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
             }
             catch (Exception e)
             {
@@ -174,7 +177,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
@@ -219,7 +222,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/AccountPendingApproval.cshtml", model);
 
-                await _notificationService.SendNotification(emails, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
+                await _notificationService.SendNotification(emails, null, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
             }
             catch (Exception e)
             {
@@ -251,7 +254,7 @@ namespace Harvest.Web.Services
             {
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
             }
             catch (Exception e)
             {
@@ -281,7 +284,7 @@ namespace Harvest.Web.Services
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
-                await _notificationService.SendNotification(await FieldManagersEmails(), emailBody, textVersion, "Harvest Notification - New Ticket");
+                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
@@ -317,7 +320,7 @@ namespace Harvest.Web.Services
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketReply.cshtml", model);
                 var textVersion = $"A reply to the ticket in the project {model.ProjectName} by {model.From}";
-                await _notificationService.SendNotification(emailTo, emailBody, textVersion, "Harvest Notification - Ticket Reply");
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Ticket Reply");
             }
             catch (Exception e)
             {
@@ -354,7 +357,7 @@ namespace Harvest.Web.Services
                 };
                 var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
                 var textVersion = $"An attachment was added to the ticket in the project {model.ProjectName} by {model.From}";
-                await _notificationService.SendNotification(emailTo, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
             }
             catch (Exception e)
             {

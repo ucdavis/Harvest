@@ -5,7 +5,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Utilities;
 using NetTopologySuite.Geometries;
 
-namespace Harvest.Web.Models
+namespace Harvest.Core.Models
 {
     public class QuoteModel
     {

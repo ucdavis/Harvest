@@ -1,12 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using Harvest.Core.Utilities;
 using Humanizer;
 
 namespace Harvest.Core.Extensions
 {
     public static class StringExtensions
     {
+
+        public static T Deserialize<T>(this string value) => 
+            string.IsNullOrWhiteSpace(value) ? default : JsonSerializer.Deserialize<T>(value, JsonOptions.Standard);
+
+        public static T DeserializeWithGeoJson<T>(this string value) =>
+            string.IsNullOrWhiteSpace(value) ? default : JsonSerializer.Deserialize<T>(value, JsonOptions.Standard.WithGeoJson());
+
+        // shameless copypasta from https://stackoverflow.com/a/5796793
+        public static string SplitCamelCase(this string str)
+        {
+            return Regex.Replace(
+                Regex.Replace(
+                    str,
+                    @"(\P{Ll})(\P{Ll}\p{Ll})",
+                    "$1 $2"
+                ),
+                @"(\p{Ll})(\P{Ll})",
+                "$1 $2"
+            );
+        }
+
         public static string SafeHumanizeTitle(this string value)
         {
             if (string.IsNullOrWhiteSpace(value))

@@ -27,18 +27,13 @@ export const RecentInvoicesContainer = (props: Props) => {
   }, [props.projectId]);
 
   return (
-    <ShowFor roles={["FieldManager", "Supervisor", "PI"]} >
-      <div className="">
-        <div className="card-content">
-          <div className="row">
-            <div className="col-md-10">
-              <h3>Recent Invoices</h3>
-            </div>
-            <div className="col-md-2">
-              <Link to={`/project/invoices/${props.projectId}`}>View All</Link>
-            </div>
-          </div>
+    <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
+      <div className="card-content">
+        <div className="row justify-content-between">
+          <h3>Recent Invoices</h3>
+          <Link to={`/project/invoices/${props.projectId}`}>View All</Link>
         </div>
+
         <div className="row justify-content-center">
           <InvoiceTable
             compact={props.compact}

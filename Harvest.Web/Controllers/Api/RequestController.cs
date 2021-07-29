@@ -8,6 +8,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Web.Models;
+using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,14 +22,19 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
-        private readonly StorageSettings storageSettings;
-        private readonly IFileService fileService;  
-        public RequestController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings, IFileService fileService)
+        private readonly IProjectHistoryService _historyService;
+        private readonly StorageSettings _storageSettings;
+        private readonly IFileService _fileService;
+        private readonly IEmailService _emailService;
+
+        public RequestController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings, IFileService fileService, IProjectHistoryService historyService, IEmailService emailService)
         {
-            this._dbContext = dbContext;
-            this._userService = userService;
-            this.storageSettings = storageSettings.Value;
-            this.fileService = fileService;
+            _dbContext = dbContext;
+            _userService = userService;
+            _storageSettings = storageSettings.Value;
+            _fileService = fileService;
+            _emailService = emailService;
+            _historyService = historyService;
         }
 
         // create a new request via react
@@ -57,7 +63,8 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            //email need PI
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
             // get the currently unapproved quote for this project
             var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId && q.ApprovedOn == null);
@@ -111,7 +118,11 @@ namespace Harvest.Web.Controllers
                 project.Fields.Add(field);
             }
 
+            await _historyService.QuoteApproved(project.Id, model.Accounts);
+ 
             await _dbContext.SaveChangesAsync();
+
+            await _emailService.QuoteApproved(project);
 
             return Ok(project);
         }
@@ -149,6 +160,8 @@ namespace Harvest.Web.Controllers
             // remove any existing accounts that we no longer need
             _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
 
+            await _historyService.AccountChanged(project.Id, model.Accounts);
+
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);
@@ -172,7 +185,7 @@ namespace Harvest.Web.Controllers
                     ContentType = attachment.ContentType,
                     CreatedOn = DateTime.UtcNow,
                     CreatedById = currentUser.Id,
-                    SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, attachment.Identifier).AbsoluteUri,
+                    SasLink = _fileService.GetDownloadUrl(_storageSettings.ContainerName, attachment.Identifier).AbsoluteUri,
                 };
 
                 projectAttachmentsToCreate.Add(newProject);
@@ -181,6 +194,7 @@ namespace Harvest.Web.Controllers
             project.Attachments.AddRange(projectAttachmentsToCreate);
 
             _dbContext.Projects.Update(project);
+            await _historyService.ProjectFilesAttached(project.Id, model.Attachments);
             await _dbContext.SaveChangesAsync();
 
             return Ok(projectAttachmentsToCreate);
@@ -246,7 +260,10 @@ namespace Harvest.Web.Controllers
             newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
 
             await _dbContext.Projects.AddAsync(newProject);
+            await _historyService.RequestCreated(project.Id, newProject);
             await _dbContext.SaveChangesAsync();
+
+            await _emailService.NewFieldRequest(newProject);
 
             return Ok(newProject);
         }
