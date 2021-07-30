@@ -2,15 +2,15 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
-export function useInputValidator<TValues>(schema: AnyObjectSchema) {
-  type TKey = keyof TValues;
+export function useInputValidator<T>(schema: AnyObjectSchema) {
+  type TKey = keyof T;
 
   const [errors, setErrors] = useState({} as Record<TKey, string>);
 
-  const validateField = useDebounceCallback(async (name: TKey, value: TValues[TKey]) => {
-    const valuesWithSingleProp = { [name]: value } as unknown as TValues;
+  const validateField = useDebounceCallback(async (name: TKey, value: T[TKey]) => {
+    const tempObject = { [name]: value } as unknown as T;
     try {
-      await schema.validateAt(name as string, valuesWithSingleProp);
+      await schema.validateAt(name as string, tempObject);
       if ((errors[name] || "") !== "") {
         setErrors({ ...errors, [name]: "" });
       }
@@ -32,7 +32,7 @@ export function useInputValidator<TValues>(schema: AnyObjectSchema) {
       : null;
   }
 
-  const valueChanged = (name: TKey, value: TValues[TKey]) => {
+  const valueChanged = (name: TKey, value: T[TKey]) => {
     validateField(name, value);
   };
 
