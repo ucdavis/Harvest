@@ -11,11 +11,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -27,6 +23,8 @@ export const ApprovalContainer = () => {
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
   const [disabled, setDisabled] = useState<boolean>(true);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     const cb = async () => {
@@ -59,11 +57,7 @@ export const ApprovalContainer = () => {
       body: JSON.stringify(model),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Approval",
-      success: "Project Approved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Approval", "Project Approved");
 
     const response = await request;
 
@@ -138,7 +132,7 @@ export const ApprovalContainer = () => {
                 <button className="btn btn-link mr-2">Reject</button>
                 <button
                   className="btn btn-primary"
-                  disabled={disabled}
+                  disabled={disabled || notification.pending}
                   onClick={approve}
                 >
                   Approve Quote
