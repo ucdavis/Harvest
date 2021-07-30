@@ -41,7 +41,7 @@ interface WorkItemFormProps {
 const WorkItemForm = (props: WorkItemFormProps) => {
   const { workItem } = props;
 
-  const { valueChanged, InputErrorMessage } = useInputValidator(workItem, workItemSchema);
+  const { valueChanged, InputErrorMessage } = useInputValidator<WorkItem>(workItemSchema);
 
   const rateItemChanged = (
     e: React.ChangeEvent<HTMLInputElement>

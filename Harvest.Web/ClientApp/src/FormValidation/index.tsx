@@ -2,7 +2,8 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
-export function useInputValidator<TValues, TKey extends keyof TValues>(values: TValues, schema: AnyObjectSchema) {
+export function useInputValidator<TValues>(schema: AnyObjectSchema) {
+  type TKey = keyof TValues;
 
   const [errors, setErrors] = useState({} as Record<TKey, string>);
 
