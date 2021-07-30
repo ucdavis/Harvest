@@ -4,9 +4,30 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
 import { ProjectDetailContainer } from "./ProjectDetailContainer";
-import { fakeAppContext, fakeProject } from "../Test/mockData";
+import {
+  fakeAppContext,
+  fakeInvoices,
+  fakeProject,
+  fakeTickets,
+} from "../Test/mockData";
 
 let container: Element;
+
+// jest.mock("../Shared/FileUpload", () => {
+//   return {
+//     default: () => {
+//       return <div id="FileUpload">FileUpload</div>;
+//     },
+//   };
+// });
+
+// jest.mock("../Shared/FileUpload", () => {
+//   return {
+//     default: () => {
+//       return <div id="FileUpload">FileUpload</div>;
+//     },
+//   };
+// });
 
 beforeEach(() => {
   (global as any).Harvest = fakeAppContext;
@@ -44,15 +65,43 @@ describe("Project Detail Container", () => {
 
   it("Load details", async () => {
     await act(async () => {
-      const response = {
+      const projectResponse = {
         status: 200,
         ok: true,
         json: () => Promise.resolve(fakeProject),
       };
+      
+      const unbilledResponse = {
+        status: 200,
+        ok: true,
+        text: () => Promise.resolve("0.00"),
+      };
+
+      const fileResponse = {
+        status: 200,
+        ok: true,
+        text: () => Promise.resolve("file 1"),
+      };
+
+      const invoiceResponse = {
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve(fakeInvoices),
+      };
+
+      const ticketResponses = {
+        status: 200,
+        ok: true,
+        json: () => Promise.resolve(fakeTickets),
+      };
 
       global.fetch = jest
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(response));
+        .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse))
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses));
 
       render(
         <MemoryRouter initialEntries={["/project/details/3"]}>
