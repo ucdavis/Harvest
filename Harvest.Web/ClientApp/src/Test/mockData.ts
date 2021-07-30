@@ -1,4 +1,11 @@
-import { AppContextShape, Project, ProjectWithQuote, Rate } from "../types";
+import {
+  AppContextShape,
+  Invoice,
+  Project,
+  ProjectWithQuote,
+  Rate,
+  Ticket,
+} from "../types";
 
 const fakeUser = {
   id: 1,
@@ -79,6 +86,72 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
   },
   quote: null,
 };
+
+export const fakeInvoices: Invoice[] = [
+  {
+    id: 1,
+    total: 100,
+    createdOn: new Date("2021-03-15T00:00:00"),
+    notes: "hello",
+    status: "Requested",
+    expenses: [],
+    transfers: [],
+  },
+  {
+    id: 2,
+    total: 200,
+    createdOn: new Date("2021-03-15T00:00:00"),
+    notes: "hello",
+    status: "Requested",
+    expenses: [],
+    transfers: [],
+  },
+  {
+    id: 3,
+    total: 300,
+    createdOn: new Date("2021-03-15T00:00:00"),
+    notes: "hello",
+    status: "Requested",
+    expenses: [],
+    transfers: [],
+  },
+];
+
+export const fakeTickets: Ticket[] = [
+  {
+    id: 1,
+    projectId: 3,
+    name: "Ticket 1",
+    requirements: "none",
+    dueDate: new Date("2021-03-15T00:00:00"),
+    updatedOn: new Date("2021-04-15T00:00:00"),
+    attachments: [],
+    status: "Requested",
+    createdOn: new Date("2021-01-15T00:00:00")
+  },
+  {
+    id: 2,
+    projectId: 3,
+    name: "Ticket 2",
+    requirements: "none",
+    dueDate: new Date("2021-03-15T00:00:00"),
+    updatedOn: new Date("2021-04-15T00:00:00"),
+    attachments: [],
+    status: "Requested",
+    createdOn: new Date("2021-01-15T00:00:00")
+  },
+  {
+    id: 3,
+    projectId: 3,
+    name: "Ticket 3",
+    requirements: "none",
+    dueDate: new Date("2021-03-15T00:00:00"),
+    updatedOn: new Date("2021-04-15T00:00:00"),
+    attachments: [],
+    status: "Requested",
+    createdOn: new Date("2021-01-15T00:00:00")
+  }
+];
 
 export const sampleRates: Rate[] = [
   {
