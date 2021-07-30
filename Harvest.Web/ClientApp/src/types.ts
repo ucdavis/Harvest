@@ -303,3 +303,8 @@ export interface AppContextShape {
     roles: RoleName[];
   };
 }
+
+export interface PromiseStatus {
+  pending: boolean;
+  success: boolean;
+}
