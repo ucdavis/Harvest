@@ -41,7 +41,7 @@ interface WorkItemFormProps {
 const WorkItemForm = (props: WorkItemFormProps) => {
   const { workItem } = props;
 
-  const { valueChanged, InputErrorMessage } = useInputValidator<WorkItem>(workItemSchema);
+  const { valueChanged, onChange, InputErrorMessage, getClassName } = useInputValidator<WorkItem>(workItemSchema);
 
   const rateItemChanged = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -112,16 +112,17 @@ const WorkItemForm = (props: WorkItemFormProps) => {
           <InputGroupText>{workItem.unit || ""}</InputGroupText>
         </InputGroupAddon>
         <Input
+          className={getClassName("quantity")}
           type="number"
           id="units"
           value={workItem.quantity}
-          onChange={(e) => {
+          onChange={onChange("quantity", (e) => {
             props.updateWorkItems({
               ...workItem,
               quantity: parseFloat(e.target.value ?? 0),
             });
-            valueChanged("quantity", e.target.value ?? 0);
-          }}
+            //valueChanged("quantity", e.target.value ?? 0);
+          })}
         />
       </InputGroup>
       <InputErrorMessage name="quantity" />

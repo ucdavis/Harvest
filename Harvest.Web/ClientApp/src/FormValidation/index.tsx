@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import React, { useState, ChangeEventHandler, ChangeEvent } from "react";
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
@@ -24,6 +24,12 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
 
   }, 250);
 
+  const getClassName = (name: TKey, passThroughClassNames: string = "") => {
+    return (errors[name] || "") !== ""
+      ? `${passThroughClassNames} is-invalid`
+      : passThroughClassNames;
+  }
+
   const InputErrorMessage = ({ name }: { name: TKey }) => {
     const message = errors[name];
 
@@ -36,14 +42,23 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     validateField(name, value);
   };
 
+  const onChange = (name: TKey, handler: ChangeEventHandler<HTMLInputElement> | null = null) => (e: ChangeEvent<HTMLInputElement>) => {
+    handler && handler(e);
+    // If T[TKey] is a number, this doesn't actually convert the string to a number.
+    // But yup doesn't seem to mind, and that's what counts.
+    valueChanged(name, e.target.value as unknown as T[TKey]);
+  };
+
   const onBlur = (name: TKey) => (e: HTMLInputElement) => {
     // TODO: Add some basic functions for managing touched and dirty state
   };
 
   return {
     valueChanged,
+    onChange,
     onBlur,
-    InputErrorMessage
+    InputErrorMessage,
+    getClassName
   }
 }
 
