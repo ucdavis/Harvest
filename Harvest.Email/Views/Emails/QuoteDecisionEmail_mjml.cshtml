@@ -12,6 +12,10 @@
         <mj-text align="center">
             <p>Quote has been</p>
             <h1>@@Model.Decision</h1>
+            @@if(!string.IsNullOrWhiteSpace(Model.RejectReason))
+            {
+            <h2>@@Model.RejectReason</h2>
+            }
         </mj-text>
     </mj-column>
 </mj-section>
