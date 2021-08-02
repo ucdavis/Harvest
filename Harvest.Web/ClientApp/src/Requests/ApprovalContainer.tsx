@@ -7,6 +7,7 @@ import { AccountsInput } from "./AccountsInput";
 import { QuotePDF } from "../Pdf/QuotePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
+import { RejectQuote } from "../Quotes/RejectQuote";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -129,7 +130,7 @@ export const ApprovalContainer = () => {
                 </li>
               </ol>
               <div className="text-right mt-5">
-                <button className="btn btn-link mr-2">Reject</button>
+                <RejectQuote></RejectQuote>
                 <button
                   className="btn btn-primary"
                   disabled={disabled || notification.pending}
