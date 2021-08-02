@@ -50,7 +50,8 @@ export const QuoteContainer = () => {
 
         if (
           projectWithQuote.project.status !== "Requested" &&
-          projectWithQuote.project.status !== "ChangeRequested"
+          projectWithQuote.project.status !== "ChangeRequested" &&
+          projectWithQuote.project.status !== "QuoteRejected"
         ) {
           // can only create quote for newly requests projects or change requests.
           history.push(`/Project/Details/${projectId}`);

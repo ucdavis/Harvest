@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { Project } from "../types";
+import { Project, Ticket } from "../types";
 import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
@@ -23,7 +23,7 @@ export const RejectQuote = (props: Props) => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({ reason }),
     });
 
     setNotification(request, "Saving", "Quote Rejection Saved");
@@ -31,7 +31,9 @@ export const RejectQuote = (props: Props) => {
     const response = await request;
 
     if (response.ok) {
-      history.replace(`/Project/Details/${props.project.id}`);
+      const { ticket }: { ticket: Ticket } = await response.json();
+
+      history.replace(`/ticket/details/${props.project.id}/${ticket.id}`);
     }
   };
   return (

@@ -30,6 +30,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> ProjectFilesAttached(int projectId, IEnumerable<ProjectAttachment> attachments);
         Task<ProjectHistory> ProjectTotalRefreshed(int projectId, Project project);
         Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts);
+        Task<ProjectHistory> QuoteRejected(int projectId, string reason);
         Task<ProjectHistory> QuoteSaved(int projectId, Quote quote);
         Task<ProjectHistory> QuoteSubmitted(int projectId, Quote quote);
         Task<ProjectHistory> RequestCreated(Project project);
@@ -82,6 +83,8 @@ namespace Harvest.Core.Services
             MakeHistory(project, nameof(RequestCreated), new ProjectHistoryModel(project));
         public Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts) =>
             MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)));
+        public Task<ProjectHistory> QuoteRejected(int projectId, string reason) =>
+            MakeHistory(projectId, nameof(QuoteRejected), reason);
         public Task<ProjectHistory> TicketCreated(int projectId, Ticket ticket) =>
             MakeHistory(projectId, nameof(TicketCreated), new TicketHistoryModel(ticket));
         public Task<ProjectHistory> TicketFilesAttached(int projectId, IEnumerable<TicketAttachment> attachments) =>

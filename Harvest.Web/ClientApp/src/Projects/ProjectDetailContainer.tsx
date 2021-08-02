@@ -82,7 +82,8 @@ export const ProjectDetailContainer = () => {
                 roles={["FieldManager", "Supervisor"]}
                 condition={
                   project.status === "Requested" ||
-                  project.status === "ChangeRequested"
+                  project.status === "ChangeRequested" || 
+                  project.status === "QuoteRejected"
                 }
               >
                 <Link
