@@ -31,9 +31,7 @@ export const RejectQuote = (props: Props) => {
     const response = await request;
 
     if (response.ok) {
-      const { ticket }: { ticket: Ticket } = await response.json();
-
-      history.replace(`/ticket/details/${props.project.id}/${ticket.id}`);
+      history.replace(`/project/details/${props.project.id}`);
     }
   };
   return (
