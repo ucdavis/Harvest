@@ -6,7 +6,9 @@ import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { ShowFor } from "../Shared/ShowFor";
+import { ticketSchema } from "../schemas";
 import { usePromiseNotification } from "../Util/Notifications";
+import { ValidationError } from "yup";
 
 interface RouteParams {
   projectId?: string;
@@ -14,6 +16,7 @@ interface RouteParams {
 
 export const TicketCreate = () => {
   const { projectId } = useParams<RouteParams>();
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<Ticket>({
     requirements: "",
@@ -40,8 +43,30 @@ export const TicketCreate = () => {
   if (project === undefined) {
     return <div>Loading...</div>;
   }
+
+  
+  const checkTicketValidity = async (inputs: any) => {
+    try {
+      await ticketSchema.validate(inputs, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        return err.errors;
+      }
+    }
+  };
+
   const create = async () => {
-    // TODO: validation
+
+    const ticketErrors = await checkTicketValidity(ticket);
+
+    if (ticketErrors) {
+      if (ticketErrors.length > 0) {
+        setInputErrors(ticketErrors);
+        return;
+      } else {
+        setInputErrors([]);
+      }
+    }
 
     const request = fetch(`/Ticket/Create?projectId=${projectId}`, {
       method: "POST",
@@ -139,6 +164,15 @@ export const TicketCreate = () => {
                   }
                 ></FileUpload>
               </FormGroup>
+              <ul>
+            {inputErrors.map((error, i) => {
+              return (
+                <li className="text-danger" key={`error-${i}`}>
+                  {error}
+                </li>
+              );
+            })}
+            </ul>
               <div className="row justify-content-center">
                 <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
                   <Button className="btn-lg" color="primary" onClick={create} disabled={notification.pending}>
