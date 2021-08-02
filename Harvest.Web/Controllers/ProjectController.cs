@@ -55,6 +55,7 @@ namespace Harvest.Web.Controllers
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Where(p => p.IsActive)
+                .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
