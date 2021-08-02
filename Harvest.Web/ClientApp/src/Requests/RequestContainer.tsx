@@ -10,11 +10,7 @@ import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
 import { Project, CropType } from "../types";
 import AppContext from "../Shared/AppContext";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -31,6 +27,8 @@ export const RequestContainer = () => {
     principalInvestigator: userDetail,
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   const checkRequestValidity = async (inputs: any) => {
     try {
@@ -98,11 +96,7 @@ export const RequestContainer = () => {
       body: JSON.stringify(project),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Creating Request",
-      success: "Request Created",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Creating Request", "Request Created");
 
     const response = await request;
 
@@ -272,7 +266,7 @@ export const RequestContainer = () => {
               className="btn-lg"
               color="primary"
               onClick={create}
-              disabled={!isFilledIn}
+              disabled={!isFilledIn || notification.pending}
             >
               {projectId ? "Create Change Request" : "Create Field Request"}
             </Button>

@@ -1,10 +1,6 @@
 ﻿import { TicketDetails } from "../types";
 import { Button, FormGroup, Input } from "reactstrap";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
   ticket: TicketDetails;
@@ -14,6 +10,8 @@ interface Props {
 
 export const TicketWorkNotesEdit = (props: Props) => {
   const { ticket, setNotes } = props;
+
+  const [notification, setNotification] = usePromiseNotification();
 
   const update = async () => {
     // TODO: validation
@@ -30,11 +28,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
       }
     );
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Work Notes",
-      success: "Work Notes Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Work Notes", "Work Notes Saved");
 
     await request;
   };
@@ -52,7 +46,12 @@ export const TicketWorkNotesEdit = (props: Props) => {
         />
       </FormGroup>
       <div className="row justify-content-center">
-        <Button className="btn" color="primary" onClick={update}>
+        <Button
+          className="btn"
+          color="primary"
+          onClick={update}
+          disabled={notification.pending}
+        >
           Update Work Notes
         </Button>
       </div>
