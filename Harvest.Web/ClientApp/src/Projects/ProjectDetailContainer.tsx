@@ -79,6 +79,17 @@ export const ProjectDetailContainer = () => {
           <div className="row justify-content-between">
             <div className="col">
               <ShowFor
+                roles={["Supervisor", "FieldManager"]}
+                condition={project.status === "Active"}
+              >
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/expense/entry/${project.id}`}
+                >
+                  Enter Expenses
+                </Link>
+              </ShowFor>
+              <ShowFor
                 roles={["FieldManager", "Supervisor"]}
                 condition={
                   project.status === "Requested" ||
