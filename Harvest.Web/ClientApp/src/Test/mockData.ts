@@ -1,5 +1,6 @@
 import {
   AppContextShape,
+  BlobFile,
   Invoice,
   Project,
   ProjectWithQuote,
@@ -17,12 +18,31 @@ const fakeUser = {
   name: "Mr Mr Mr Bob Dobalina",
 };
 
+const fakeAttachments: BlobFile[] = [
+  {
+    identifier: "1",
+    fileName: "file1.pdf",
+    fileSize: 22,
+    contentType: "application/pdf",
+    uploaded: true,
+    sasLink: "link1"
+  },
+  {
+    identifier: "1",
+    fileName: "file2.pdf",
+    fileSize: 22,
+    contentType: "application/pdf",
+    uploaded: true,
+    sasLink: "link2"
+  },
+]
+
 export const fakeAppContext: AppContextShape = {
   user: {
     detail: {
       ...fakeUser,
     },
-    roles: ["System"],
+    roles: ["System", "FieldManager", "PI"],
   },
 };
 
@@ -52,7 +72,7 @@ export const fakeProject: Project = {
   },
   accounts: [],
   quotes: null,
-  attachments: [],
+  attachments: fakeAttachments,
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
