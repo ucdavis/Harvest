@@ -62,7 +62,7 @@ export const TicketCreate = () => {
     const ticketErrors = await checkTicketValidity(ticket);
 
     if (ticketErrors) {
-      if (ticketErrors.length > 0) {
+      if (ticketErrors?.length > 0) {
         setInputErrors(ticketErrors);
         return;
       } else {
@@ -174,7 +174,7 @@ export const TicketCreate = () => {
               <ul>
             {inputErrors.map((error, i) => {
               return (
-                <li style={{ color: "red" }} key={`error-${i}`}>
+                <li className="text-danger" key={`error-${i}`}>
                   {error}
                 </li>
               );
