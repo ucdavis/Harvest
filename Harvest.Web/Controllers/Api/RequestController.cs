@@ -129,6 +129,21 @@ namespace Harvest.Web.Controllers
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        public async Task<ActionResult> RejectQuote(int projectId, [FromBody] string reason) {
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+
+            project.Status = Project.Statuses.Requested;  // TODO: do we want a rejected status?
+
+            // TODO: history for rejected quote
+            // TODO: email for rejected quote including reason
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(project);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);

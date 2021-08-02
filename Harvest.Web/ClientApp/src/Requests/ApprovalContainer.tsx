@@ -130,7 +130,7 @@ export const ApprovalContainer = () => {
                 </li>
               </ol>
               <div className="text-right mt-5">
-                <RejectQuote></RejectQuote>
+                <RejectQuote project={projectAndQuote.project}></RejectQuote>
                 <button
                   className="btn btn-primary"
                   disabled={disabled || notification.pending}
