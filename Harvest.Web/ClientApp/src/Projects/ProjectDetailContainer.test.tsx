@@ -84,9 +84,9 @@ describe("Project Detail Container", () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
         .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
         .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(ticketResponses));
+        .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
       render(
         <MemoryRouter initialEntries={["/project/details/3"]}>
@@ -138,9 +138,9 @@ describe("Project Detail Container", () => {
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
         .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
         .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(ticketResponses));
+        .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
@@ -197,9 +197,9 @@ it("Display correct number of recent tickets", async () => {
       .fn()
       .mockImplementationOnce(() => Promise.resolve(projectResponse))
       .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-      .mockImplementationOnce(() => Promise.resolve(fileResponse))
+      .mockImplementationOnce(() => Promise.resolve(ticketResponses))
       .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-      .mockImplementationOnce(() => Promise.resolve(ticketResponses));
+      .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
     render(
       <AppContext.Provider value={(global as any).Harvest}>
@@ -255,9 +255,9 @@ it("Display correct number of attachments", async () => {
       .fn()
       .mockImplementationOnce(() => Promise.resolve(projectResponse))
       .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-      .mockImplementationOnce(() => Promise.resolve(fileResponse))
+      .mockImplementationOnce(() => Promise.resolve(ticketResponses))
       .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-      .mockImplementationOnce(() => Promise.resolve(ticketResponses));
+      .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
     render(
       <MemoryRouter initialEntries={["/project/details/3"]}>
