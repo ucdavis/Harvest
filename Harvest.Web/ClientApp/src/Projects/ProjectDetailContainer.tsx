@@ -79,7 +79,7 @@ export const ProjectDetailContainer = () => {
           <div className="row justify-content-between">
             <div className="col">
               <ShowFor
-                roles={["Worker", "Supervisor", "FieldManager"]}
+                roles={["Supervisor", "FieldManager"]}
                 condition={project.status === "Active"}
               >
                 <Link
