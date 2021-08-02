@@ -4,6 +4,7 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
   ticket: TicketDetails;
@@ -18,38 +19,44 @@ export const TicketAttachments = (props: Props) => {
     props.attachments,
   ]);
 
-  const [ticketLoc, setTicketLoc] = useState<TicketDetails>({
-  } as TicketDetails);
+  const [ticketLoc, setTicketLoc] = useState<TicketDetails>(
+    {} as TicketDetails
+  );
 
-    const updateFiles = async (attachments: BlobFile[]) => {
-        const response = await fetch(`/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`, {
-          method: "POST",
-          headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ Attachments: attachments }),
-        });
+  const [notification, setNotification] = usePromiseNotification();
 
-        if (response.ok) {
-            const data = await response.json() as TicketAttachment[];
-            
-            setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
+  const updateFiles = async (attachments: BlobFile[]) => {
+    const request = fetch(
+      `/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ Attachments: attachments }),
+      }
+    );
+    setNotification(request, "Saving Attachment(s)", "Attachment(s) Saved");
 
-            setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
-            alert("Attachement(s) saved.");
-        } else {
-            alert("Something went wrong, please try again");
-        }
-    };
+    const response = await request;
+
+    if (response.ok) {
+      const data = (await response.json()) as TicketAttachment[];
+
+      setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
+
+      setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
+    }
+  };
 
   return (
     <div>
       <h2>Ticket Attachments</h2>
       {ticketAttachments === undefined || ticketAttachments.length === 0 ? (
-        <p> No Messages Yet!!!</p>
+        <p> No Attachments Yet!!!</p>
       ) : null}
-     
+
       <ul className="no-list-style attached-files-list">
         {ticketAttachments.map((attachment, i) => (
           <li key={`attachment-${i}`}>
@@ -61,26 +68,37 @@ export const TicketAttachments = (props: Props) => {
         ))}
       </ul>
       <FormGroup>
-        <Label>Attach files?</Label>
-        <FileUpload
-          files={ticketLoc.newAttachments || []}
-          setFiles={(f) => {
-              setTicketLoc((ticket) => ({ ...ticket, newAttachments: [...f] }));
-              updateFiles(f);
-          }}
-          updateFile={(f) =>
-            setTicketLoc((ticket) => {
-              // update just one specific file from ticket p
-              ticket.newAttachments[
-                ticket.newAttachments.findIndex(
-                  (file) => file.identifier === f.identifier
-                )
-              ] = { ...f };
+        {!ticket.completed && (
+          <>
+            <Label>Attach files?</Label>
+            <FileUpload
+              disabled={notification.pending}
+              files={ticketLoc.newAttachments || []}
+              setFiles={(f) => {
+                setTicketLoc((ticket) => ({
+                  ...ticket,
+                  newAttachments: [...f],
+                }));
+                updateFiles(f);
+              }}
+              updateFile={(f) =>
+                setTicketLoc((ticket) => {
+                  // update just one specific file from ticket p
+                  ticket.newAttachments[
+                    ticket.newAttachments.findIndex(
+                      (file) => file.identifier === f.identifier
+                    )
+                  ] = { ...f };
 
-              return { ...ticket, newAttachments: [...ticket.newAttachments] };
-            })
-          }
-        ></FileUpload>
+                  return {
+                    ...ticket,
+                    newAttachments: [...ticket.newAttachments],
+                  };
+                })
+              }
+            ></FileUpload>
+          </>
+        )}
       </FormGroup>
     </div>
   );

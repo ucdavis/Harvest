@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Route } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 
 import AppContext from "./Shared/AppContext";
 import { AppContextShape } from "./types";
@@ -28,9 +29,10 @@ declare var Harvest: AppContextShape;
 function App() {
   return (
     <AppContext.Provider value={Harvest}>
+      <Toaster />
       <Route exact path="/" component={Home} />
       <Route exact path="/home/spa" component={Spa} />
-      <Route exact path="/request/create/" component={RequestContainer} />
+      <Route exact path="/request/create/:projectId?" component={RequestContainer} />
       <ConditionalRoute roles={["PI"]} path="/request/approve/:projectId" component={ApprovalContainer} />
       <ConditionalRoute
         roles={["PI"]}

@@ -14,7 +14,7 @@ namespace Harvest.Core.Services
     public interface INotificationService
     {
         Task SendSampleNotificationMessage(string email, string body);
-        Task SendNotification(string[] emails, string body, string textVersion, string subject = "Harvest Notification");
+        Task SendNotification(string[] emails, string[] ccEmails, string body, string textVersion, string subject = "Harvest Notification");
     }
 
     public class NotificationService : INotificationService
@@ -49,7 +49,7 @@ namespace Harvest.Core.Services
             }
         }
 
-        public async Task SendNotification(string[] emails, string body, string textVersion, string subject = "Harvest Notification")
+        public async Task SendNotification(string[] emails, string[] ccEmails, string body, string textVersion, string subject = "Harvest Notification")
         {
             if (_emailSettings.DisableSend.Equals("Yes", StringComparison.OrdinalIgnoreCase))
             {
@@ -60,6 +60,14 @@ namespace Harvest.Core.Services
                 foreach (var email in emails)
                 {
                     message.To.Add(new MailAddress(email, email));
+                }
+
+                if (ccEmails != null && ccEmails.Length > 0)
+                {
+                    foreach (var ccEmail in ccEmails)
+                    {
+                        message.CC.Add(new MailAddress(ccEmail));
+                    }
                 }
 
                 // body is our fallback text and we'll add an HTML view as an alternate.

@@ -7,6 +7,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Harvest.Web.Models;
+using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,15 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
+        private readonly IEmailService _emailService;
 
-        public QuoteController(AppDbContext dbContext, IUserService userService)
+        public QuoteController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService, IEmailService emailService)
         {
-            this._dbContext = dbContext;
-            this._userService = userService;
+            _dbContext = dbContext;
+            _userService = userService;
+            _historyService = historyService;
+            _emailService = emailService;
         }
 
         // Get info on the project as well as in-progess quote if it exists
@@ -74,9 +79,21 @@ namespace Harvest.Web.Controllers
 
                 var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
                 project.Status = Project.Statuses.PendingApproval;
+                await _historyService.QuoteSubmitted(projectId, quote);
+            }
+            else
+            {
+                await _historyService.QuoteSaved(projectId, quote);
             }
 
             await _dbContext.SaveChangesAsync();
+
+            if (submit)
+            {
+                //Email needs the quote and PI
+                var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+                await _emailService.ProfessorQuoteReady(project, quote);
+            }
 
             return Ok(quote);
         }

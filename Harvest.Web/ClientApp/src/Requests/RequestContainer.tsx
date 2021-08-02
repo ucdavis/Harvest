@@ -10,6 +10,7 @@ import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
 import { Project, CropType } from "../types";
 import AppContext from "../Shared/AppContext";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -17,7 +18,7 @@ interface RouteParams {
 
 export const RequestContainer = () => {
   const history = useHistory();
-  const userDetail = useContext(AppContext).user.detail;
+  const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
 
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({
@@ -26,6 +27,8 @@ export const RequestContainer = () => {
     principalInvestigator: userDetail,
   } as Project);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   const checkRequestValidity = async (inputs: any) => {
     try {
@@ -84,7 +87,7 @@ export const RequestContainer = () => {
       return;
     }
 
-    const response = await fetch(`/Request/Create`, {
+    const request = fetch(`/Request/Create`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -93,11 +96,17 @@ export const RequestContainer = () => {
       body: JSON.stringify(project),
     });
 
+    setNotification(request, "Creating Request", "Request Created");
+
+    const response = await request;
+
     if (response.ok) {
+      // if user is becoming a PI for first time, grant them the PI role
+      if (project.principalInvestigator.id === userDetail.id && !userRoles.includes("PI")) {
+        userRoles.push("PI");
+      }
       const data = await response.json();
       history.push(`/Project/Details/${data.id}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
@@ -115,134 +124,134 @@ export const RequestContainer = () => {
   }
 
   return (
-    <div className="card-wrapper card-medium">
-      <div className="card-content">
-        <div className="card-head">
-          <h2>
-            {projectId ? "Create Change Request" : "Create Field Request"}
-          </h2>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
-            <div className="form-group">
-              <Label>When to Start?</Label>
-              <div className="input-group" style={{ zIndex: 9000 }}>
-                <DatePicker
-                  format="MM/dd/yyyy"
-                  required={true}
-                  clearIcon={null}
-                  value={project.start}
-                  onChange={(date) =>
-                    setProject({ ...project, start: date as Date })
-                  }
-                />
+    <div className="row justify-content-center">
+      <div className="card-wrapper col-md-6">
+        <div className="card-content">
+          <div className="card-head">
+            <h2>
+              {projectId ? "Create Change Request" : "Create Field Request"}
+            </h2>
+          </div>
+          <div className="row">
+            <div className="col-md-6">
+              <div className="form-group">
+                <Label>When to Start?</Label>
+                <div className="input-group" style={{ zIndex: 9000 }}>
+                  <DatePicker
+                    format="MM/dd/yyyy"
+                    required={false}
+                    clearIcon={null}
+                    value={project.start}
+                    onChange={(date) =>
+                      setProject({ ...project, start: date as Date })
+                    }
+                  />
+                </div>
               </div>
             </div>
+            <div className="col-md-6">
+              <FormGroup>
+                <Label>When to Finish?</Label>
+                <div className="input-group" style={{ zIndex: 9000 }}>
+                  <DatePicker
+                    format="MM/dd/yyyy"
+                    required={false}
+                    clearIcon={null}
+                    value={project.end}
+                    onChange={(date) =>
+                      setProject({ ...project, end: date as Date })
+                    }
+                  />
+                </div>
+              </FormGroup>
+            </div>
           </div>
-          <div className="col-md-6">
-            <FormGroup>
-              <Label>When to Finish?</Label>
-              <div className="input-group" style={{ zIndex: 9000 }}>
-                <DatePicker
-                  format="MM/dd/yyyy"
-                  required={true}
-                  clearIcon={null}
-                  value={project.end}
-                  onChange={(date) =>
-                    setProject({ ...project, end: date as Date })
-                  }
-                />
-              </div>
-            </FormGroup>
-          </div>
-        </div>
-        <FormGroup>
-          <Label>Which type of crop will we grow?</Label>
-          <div className="custom-control custom-radio">
-            <input
-              type="radio"
-              id="rowCropInput"
-              name="rowCropInput"
-              className="custom-control-input"
-              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
-              value="Row"
-              checked={project.cropType === "Row"}
-              onChange={handleCropTypeChange}
+          <FormGroup>
+            <Label>Which type of crop will we grow?</Label>
+            <div className="custom-control custom-radio">
+              <input
+                type="radio"
+                id="rowCropInput"
+                name="rowCropInput"
+                className="custom-control-input"
+                style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                value="Row"
+                checked={project.cropType === "Row"}
+                onChange={handleCropTypeChange}
+              />
+              <label className="custom-control-label" htmlFor="rowCropInput">
+                Row Crops
+              </label>
+            </div>
+            <div className="custom-control custom-radio">
+              <input
+                type="radio"
+                id="treeCropInput"
+                name="treeCropInput"
+                className="custom-control-input"
+                style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                value="Tree"
+                checked={project.cropType === "Tree"}
+                onChange={handleCropTypeChange}
+              />
+              <label className="custom-control-label" htmlFor="treeCropInput">
+                Tree Crops
+              </label>
+            </div>
+          </FormGroup>
+
+          <FormGroup tag="fieldset">
+            <Label>What crop(s) will we grow?</Label>
+            <Crops
+              crops={project.crop}
+              setCrops={(c) => setProject({ ...project, crop: c })}
+              cropType={project.cropType}
             />
-            <label className="custom-control-label" htmlFor="rowCropInput">
-              Row Crops
-            </label>
-          </div>
-          <div className="custom-control custom-radio">
-            <input
-              type="radio"
-              id="treeCropInput"
-              name="treeCropInput"
-              className="custom-control-input"
-              style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
-              value="Tree"
-              checked={project.cropType === "Tree"}
-              onChange={handleCropTypeChange}
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Who will be the PI?</Label>
+            <SearchPerson
+              user={project.principalInvestigator}
+              setUser={(u) =>
+                setProject({ ...project, principalInvestigator: u })
+              }
             />
-            <label className="custom-control-label" htmlFor="treeCropInput">
-              Tree Crops
-            </label>
-          </div>
-        </FormGroup>
+          </FormGroup>
 
-        <FormGroup tag="fieldset">
-          <Label>What crop(s) will we grow?</Label>
-          <Crops
-            crops={project.crop}
-            setCrops={(c) => setProject({ ...project, crop: c })}
-            cropType={project.cropType}
-          />
-        </FormGroup>
+          <FormGroup>
+            <Label>Want to attach any files?</Label>
+            <FileUpload
+              files={project.attachments || []}
+              setFiles={(f) => setProject({ ...project, attachments: [...f] })}
+              updateFile={(f) =>
+                setProject((proj) => {
+                  // update just one specific file from project p
+                  proj.attachments[
+                    proj.attachments.findIndex(
+                      (file) => file.identifier === f.identifier
+                    )
+                  ] = { ...f };
 
-        <FormGroup>
-          <Label>Who will be the PI?</Label>
-          <SearchPerson
-            user={project.principalInvestigator}
-            setUser={(u) =>
-              setProject({ ...project, principalInvestigator: u })
-            }
-          />
-        </FormGroup>
+                  return { ...proj, attachments: [...proj.attachments] };
+                })
+              }
+            />
+          </FormGroup>
 
-        <FormGroup>
-          <Label>Want to attach any files?</Label>
-          <FileUpload
-            files={project.attachments || []}
-            setFiles={(f) => setProject({ ...project, attachments: [...f] })}
-            updateFile={(f) =>
-              setProject((proj) => {
-                // update just one specific file from project p
-                proj.attachments[
-                  proj.attachments.findIndex(
-                    (file) => file.identifier === f.identifier
-                  )
-                ] = { ...f };
-
-                return { ...proj, attachments: [...proj.attachments] };
-              })
-            }
-          />
-        </FormGroup>
-
-        <FormGroup>
-          <Label>What are the requirements?</Label>
-          <Input
-            type="textarea"
-            name="text"
-            id="requirements"
-            value={project.requirements}
-            onChange={(e) =>
-              setProject({ ...project, requirements: e.target.value })
-            }
-            placeholder="Enter a full description of your requirements"
-          />
-        </FormGroup>
-        <div className="row justify-content-center">
+          <FormGroup>
+            <Label>What are the requirements?</Label>
+            <Input
+              type="textarea"
+              name="text"
+              id="requirements"
+              value={project.requirements}
+              onChange={(e) =>
+                setProject({ ...project, requirements: e.target.value })
+              }
+              placeholder="Enter a full description of your requirements"
+            />
+          </FormGroup>
           <ul>
             {inputErrors.map((error, i) => {
               return (
@@ -252,16 +261,18 @@ export const RequestContainer = () => {
               );
             })}
           </ul>
-          <Button
-            className="btn-lg"
-            color="primary"
-            onClick={create}
-            disabled={!isFilledIn}
-          >
-            {projectId ? "Create Change Request" : "Create Field Request"}
-          </Button>
+          <div className="row justify-content-center">
+            <Button
+              className="btn-lg"
+              color="primary"
+              onClick={create}
+              disabled={!isFilledIn || notification.pending}
+            >
+              {projectId ? "Create Change Request" : "Create Field Request"}
+            </Button>
+          </div>
+          <div>DEBUG: {JSON.stringify(project)}</div>
         </div>
-        <div>DEBUG: {JSON.stringify(project)}</div>
       </div>
     </div>
   );

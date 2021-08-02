@@ -55,12 +55,12 @@ export const ExpenseTable = (props: Props) => {
       {
         Header: "Delete",
         Cell: (data: any) => (
-          <ShowFor roles={["FieldManager","Supervisor"]}>
+          <ShowFor roles={["FieldManager", "Supervisor"]}>
             <Button
-              color="danger"
+              color="link"
               onClick={() => props.setSelectedExpense(data.row.original)}
             >
-                Delete
+              Delete
             </Button>
           </ShowFor>
         ),

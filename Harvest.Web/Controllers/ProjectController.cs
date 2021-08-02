@@ -19,14 +19,17 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
         private readonly StorageSettings storageSettings;
         private readonly IFileService fileService;        
-        public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings, IFileService fileService)
+        public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
+            IFileService fileService, IProjectHistoryService historyService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
             this.storageSettings = storageSettings.Value;
             this.fileService = fileService;
+            this._historyService = historyService;
         }
 
         public ActionResult Index()
@@ -45,13 +48,14 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
         public async Task<ActionResult> Active()
         {
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Where(p => p.IsActive)
+                .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
@@ -92,17 +96,23 @@ namespace Harvest.Web.Controllers
                 .Include(p => p.Accounts)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
-                .SingleOrDefaultAsync(p => p.Id == projectId && (hasAccess || p.PrincipalInvestigatorId == user.Id));
-            
+                .SingleOrDefaultAsync(p => p.Id == projectId);
+
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            if (!hasAccess && project.PrincipalInvestigatorId != user.Id)
+            {
+                return Forbid();
+            }
+
             foreach (var file in project.Attachments) {
                 file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
-            if (project != null)
-            {
-                return Ok(project);
-            }
-            return NotFound();
+            return Ok(project);
         }
 
         [HttpGet]
@@ -125,12 +135,13 @@ namespace Harvest.Web.Controllers
             if (project.ChargedTotal != invoiceTotal)
             {
                 project.ChargedTotal = invoiceTotal;
+
+                await _historyService.ProjectTotalRefreshed(project.Id, project);
                 await _dbContext.SaveChangesAsync();
                 return Content($"Project total updated from {originalTotal} to {project.ChargedTotal}");
             }
 
             return Content("Project already up to date.");
-
         }
     }
 }

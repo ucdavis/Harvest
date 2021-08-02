@@ -48,17 +48,16 @@ export const TicketsContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
+
       <div className="card-content">
-        <div className="card-head">
-          <h2>List of all tickets for your project</h2>
+        <div className="row justify-content-between">
+          <h3>List of all tickets for your project</h3>
+
+          <Link to={`/ticket/create/${projectId}`}>Create Ticket</Link>
         </div>
-        <Link
-          className="btn btn-primary btn-small mr-4"
-          to={`/ticket/create/${projectId}`}
-        >
-          Create Ticket
-        </Link>
-        <TicketTable compact={false} tickets={tickets} />
+        <div className="row justify-content-center">
+          <TicketTable compact={false} tickets={tickets} />
+        </div>
       </div>
     </div>
   );

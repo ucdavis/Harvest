@@ -6,6 +6,9 @@ import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { ShowFor } from "../Shared/ShowFor";
+import { ticketSchema } from "../schemas";
+import { usePromiseNotification } from "../Util/Notifications";
+import { ValidationError } from "yup";
 
 interface RouteParams {
   projectId?: string;
@@ -13,12 +16,15 @@ interface RouteParams {
 
 export const TicketCreate = () => {
   const { projectId } = useParams<RouteParams>();
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<Ticket>({
     requirements: "",
     name: "",
   } as Ticket);
   const history = useHistory();
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     const cb = async () => {
@@ -27,7 +33,7 @@ export const TicketCreate = () => {
       if (response.ok) {
         const proj: Project = await response.json();
         setProject(proj);
-        setTicket(t => ({ ...t, projectId: proj.id }));
+        setTicket((t) => ({ ...t, projectId: proj.id }));
       }
     };
 
@@ -37,10 +43,32 @@ export const TicketCreate = () => {
   if (project === undefined) {
     return <div>Loading...</div>;
   }
-  const create = async () => {
-    // TODO: validation
 
-    const response = await fetch(`/Ticket/Create?projectId=${projectId}`, {
+  
+  const checkTicketValidity = async (inputs: any) => {
+    try {
+      await ticketSchema.validate(inputs, { abortEarly: false });
+    } catch (err) {
+      if (err instanceof ValidationError) {
+        return err.errors;
+      }
+    }
+  };
+
+  const create = async () => {
+
+    const ticketErrors = await checkTicketValidity(ticket);
+
+    if (ticketErrors) {
+      if (ticketErrors.length > 0) {
+        setInputErrors(ticketErrors);
+        return;
+      } else {
+        setInputErrors([]);
+      }
+    }
+
+    const request = fetch(`/Ticket/Create?projectId=${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -48,95 +76,114 @@ export const TicketCreate = () => {
       },
       body: JSON.stringify(ticket),
     });
+    setNotification(request, "Creating Ticket", "Ticket Created");
+
+    const response = await request;
 
     if (response.ok) {
-        const data = await response.json();
-        history.push(`/Project/Details/${data.id}`);
-    } else {
-        alert("Something went wrong, please try again");
+      const data = await response.json();
+      history.push(`/Project/Details/${data.id}`);
     }
   };
 
-
   return (
     <div className="card-wrapper">
-
       <ProjectHeader
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-      <div className="card-content">
-        <div className="card-head">
-          <h2>Create new ticket for your project</h2>
-        </div>
-        <FormGroup>
-          <Label>Subject</Label>
-          <Input
-            type="text"
-            name="name"
-            id="name"
-            value={ticket.name}
-            onChange={(e) =>
-              setTicket({ ...ticket, name: e.target.value })
-            }
-            placeholder="Enter a short description for this request"
-          />
-        </FormGroup>
+      <div className="card-green-bg">
+        <div className="row justify-content-center">
+          <div className="col-md-6 card-wrapper no-green mt-4 mb-4">
+            <div className="card-content">
+              <h2>Create new ticket for your project</h2>
 
-        <FormGroup>
-          <Label>What are the details of your ticket request?</Label>
-          <Input
-            type="textarea"
-            name="text"
-            id="requirements"
-            value={ticket.requirements}
-            onChange={(e) =>
-              setTicket({ ...ticket, requirements: e.target.value })
-            }
-            placeholder="Enter a full description of your requirements"
-          />
-        </FormGroup>
-        <div className="row">
-          <div className="col-md-6">
-            <div className="form-group">
-              <Label>Due Date?</Label>
-              <div className="input-group" style={{ zIndex: 9000 }}>
-                <DatePicker
-                  format="MM/dd/yyyy"
-                  required={true}
-                  clearIcon={null}
-                  value={ticket.dueDate}
-                  onChange={(date) =>
-                    setTicket({ ...ticket, dueDate: date as Date })
+              <FormGroup>
+                <Label>Subject</Label>
+                <Input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={ticket.name}
+                  onChange={(e) =>
+                    setTicket({ ...ticket, name: e.target.value })
                   }
+                  placeholder="Enter a short description for this request"
                 />
+              </FormGroup>
+
+              <FormGroup>
+                <Label>What are the details of your ticket request?</Label>
+                <Input
+                  type="textarea"
+                  name="text"
+                  id="requirements"
+                  value={ticket.requirements}
+                  onChange={(e) =>
+                    setTicket({ ...ticket, requirements: e.target.value })
+                  }
+                  placeholder="Enter a full description of your requirements"
+                />
+              </FormGroup>
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-group">
+                    <Label>Due Date?</Label>
+                    <div className="input-group" style={{ zIndex: 9000 }}>
+                      <DatePicker
+                        format="MM/dd/yyyy"
+                        required={false}
+                        clearIcon={null}
+                        value={ticket.dueDate}
+                        onChange={(date) =>
+                          setTicket({ ...ticket, dueDate: date as Date })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
+              <FormGroup>
+                <Label>Want to attach any files?</Label>
+                <FileUpload
+                  files={ticket.attachments || []}
+                  setFiles={(f) =>
+                    setTicket((tick) => ({ ...tick, attachments: [...f] }))
+                  }
+                  updateFile={(f) =>
+                    setTicket((tick) => {
+                      // update just one specific file from ticket p
+                      tick.attachments[
+                        tick.attachments.findIndex(
+                          (file) => file.identifier === f.identifier
+                        )
+                      ] = { ...f };
+
+                      return { ...tick, attachments: [...tick.attachments] };
+                    })
+                  }
+                ></FileUpload>
+              </FormGroup>
+              <ul>
+            {inputErrors.map((error, i) => {
+              return (
+                <li className="text-danger" key={`error-${i}`}>
+                  {error}
+                </li>
+              );
+            })}
+            </ul>
+              <div className="row justify-content-center">
+                <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
+                  <Button className="btn-lg" color="primary" onClick={create} disabled={notification.pending}>
+                    Create New Ticket
+                  </Button>
+                </ShowFor>
+              </div>
+              <div>DEBUG: {JSON.stringify(ticket)}</div>
             </div>
           </div>
         </div>
-          <FormGroup>
-              <Label>Want to attach any files?</Label>
-              <FileUpload
-                  files={ticket.attachments || []}
-                  setFiles={(f) => setTicket((tick) => ({ ...tick, attachments: [...f] }))}
-                  updateFile={(f) =>
-                          setTicket((tick) => {
-                              // update just one specific file from ticket p
-                              tick.attachments[tick.attachments.findIndex(file => file.identifier === f.identifier)] = { ...f };
-
-                              return { ...tick, attachments: [...tick.attachments] };
-                          })
-                      }
-              ></FileUpload>
-          </FormGroup>
-        <div className="row justify-content-center">
-          <ShowFor roles={["FieldManager","Supervisor","PI"]} >
-            <Button className="btn-lg" color="primary" onClick={create}>
-              Create New Ticket
-            </Button>
-          </ShowFor>
-        </div>
-        <div>DEBUG: {JSON.stringify(ticket)}</div>
       </div>
     </div>
   );

@@ -15,6 +15,10 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
+import {
+  usePromiseNotification,
+} from "../Util/Notifications";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -31,6 +35,8 @@ export const QuoteContainer = () => {
 
   const [editFields, setEditFields] = useState(false);
 
+  const [notification, setNotification] = usePromiseNotification();
+
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
@@ -42,8 +48,11 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
-        if (projectWithQuote.project.status !== "Requested") {
-          // can only create quote for newly requests projects. 
+        if (
+          projectWithQuote.project.status !== "Requested" &&
+          projectWithQuote.project.status !== "ChangeRequested"
+        ) {
+          // can only create quote for newly requests projects or change requests.
           history.push(`/Project/Details/${projectId}`);
         }
 
@@ -82,7 +91,7 @@ export const QuoteContainer = () => {
     };
 
     cb();
-  }, [projectId]);
+  }, [history, projectId]);
 
   useEffect(() => {
     setQuote((q) => {
@@ -140,8 +149,7 @@ export const QuoteContainer = () => {
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
-    // TODO: add progress and hide info while saving
-    const saveResponse = await fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
+    const request = fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -150,10 +158,13 @@ export const QuoteContainer = () => {
       body: JSON.stringify(quote),
     });
 
+    setNotification(request, "Saving Quote", "Quote Saved");
+
+    // TODO: add progress and hide info while saving
+    const saveResponse = await request;
+
     if (saveResponse.ok) {
       history.push(`/Project/Details/${projectId}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
@@ -240,13 +251,14 @@ export const QuoteContainer = () => {
             />
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
-
-          <button className="btn btn-link mt-4" onClick={() => save(false)}>
-            Save Quote
-          </button>
-          <button className="btn btn-primary mt-4" onClick={() => save(true)}>
-            Submit Quote
-          </button>
+          <div className="row justify-content-center">
+            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
+              Save Quote
+            </button>
+            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending}>
+              Submit Quote
+            </button>
+          </div>
         </div>
       </div>
 

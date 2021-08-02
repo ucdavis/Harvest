@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize()]
     public class PeopleController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -40,6 +40,7 @@ namespace Harvest.Web.Controllers
 
         // create a new request via react
         [HttpGet]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public ActionResult Create()
         {
             return View("React");

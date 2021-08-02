@@ -9,7 +9,7 @@ export const ProjectHeader = (props: Props) => {
   const { project, title } = props;
 
   return (
-    <div className="card-content">
+    <div className="card-content project-header">
       <div className="quote-info row">
         <div className="col-md-6">
           <h2 id="request-title">{title}</h2>
@@ -18,7 +18,8 @@ export const ProjectHeader = (props: Props) => {
             Created {new Date(project.createdOn).toDateString()} by{" "}
             {project.createdBy.name}
           </p>
-          <p className="lede">Accounts</p>
+          {project.accounts.length > 0 && <p className="lede">Accounts</p>}
+
           {project.accounts.map((acc: ProjectAccount) => (
             <div key={acc.id}>
               {acc.name} {acc.percentage}%

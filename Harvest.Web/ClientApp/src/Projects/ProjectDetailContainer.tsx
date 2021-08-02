@@ -13,6 +13,7 @@ import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -22,6 +23,8 @@ export const ProjectDetailContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -43,7 +46,7 @@ export const ProjectDetailContainer = () => {
   }
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const response = await fetch(`/Request/Files/${projectId}`, {
+    const request = fetch(`/Request/Files/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -51,6 +54,10 @@ export const ProjectDetailContainer = () => {
       },
       body: JSON.stringify({ Attachments: attachments }),
     });
+
+    setNotification(request, "Saving File(s)", "File(s) Saved");
+
+    const response = await request;
 
     if (response.ok) {
       const files = await response.json();
@@ -71,21 +78,41 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col">
-              <ShowFor roles={["FieldManager", "Supervisor"]} condition={project.status === "Requested"}>
+              <ShowFor
+                roles={["Supervisor", "FieldManager"]}
+                condition={project.status === "Active"}
+              >
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/expense/entry/${project.id}`}
+                >
+                  Enter Expenses
+                </Link>
+              </ShowFor>
+              <ShowFor
+                roles={["FieldManager", "Supervisor"]}
+                condition={
+                  project.status === "Requested" ||
+                  project.status === "ChangeRequested"
+                }
+              >
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/quote/create/${project.id}`}
                 >
-                    Edit Quote
+                  Edit Quote
                 </Link>
               </ShowFor>
 
-              <ShowFor roles={["PI"]} condition={project.status === "PendingApproval"}>
+              <ShowFor
+                roles={["PI"]}
+                condition={project.status === "PendingApproval"}
+              >
                 <Link
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/approve/${project.id}`}
                 >
-                    Approve Quote
+                  Approve Quote
                 </Link>
               </ShowFor>
 
@@ -94,7 +121,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/changeAccount/${project.id}`}
                 >
-                    Change Accounts
+                  Change Accounts
                 </Link>
               </ShowFor>
             </div>
@@ -131,12 +158,21 @@ export const ProjectDetailContainer = () => {
         </div>
       </div>
       <div>
-        <div className="row justify-content-around">
+        <div className="row project-detail-tables">
+          <div className="col-md-6">
+            <RecentTicketsContainer compact={true} projectId={projectId} />
+          </div>
+          <div className="col-md-6">
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
+          </div>
+        </div>
+        <div className="row justify-content-center">
           <div className="col-md-5">
             <div className="card-wrapper no-green mt-4 mb-4">
               <div className="card-content">
                 <h2>Project Attachements</h2>
                 <FileUpload
+                  disabled={notification.pending}
                   files={newFiles}
                   setFiles={(f) => {
                     let files = f.slice(newFiles.length);
@@ -177,7 +213,11 @@ export const ProjectDetailContainer = () => {
                 <ul className="no-list-style attached-files-list">
                   {project.attachments.map((attachment, i) => (
                     <li key={`attachment-${i}`}>
-                      <a href={attachment.sasLink} target="_blank" rel="noreferrer">
+                      <a
+                        href={attachment.sasLink}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         <FontAwesomeIcon icon={faDownload} />
                         {attachment.fileName}
                       </a>{" "}
@@ -187,14 +227,6 @@ export const ProjectDetailContainer = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="row">
-        <div className="col">
-          <RecentInvoicesContainer compact={true} projectId={projectId} />
-        </div>
-        <div className="col">
-          <RecentTicketsContainer compact={true} projectId={projectId} />
         </div>
       </div>
     </div>

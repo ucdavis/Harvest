@@ -11,6 +11,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -22,6 +23,8 @@ export const ApprovalContainer = () => {
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
   const [disabled, setDisabled] = useState<boolean>(true);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     const cb = async () => {
@@ -44,8 +47,8 @@ export const ApprovalContainer = () => {
 
   const approve = async () => {
     const model = { accounts };
-    // TODO: validation, loading spinner
-    const response = await fetch(`/Request/Approve/${projectId}`, {
+
+    const request = fetch(`/Request/Approve/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -54,10 +57,12 @@ export const ApprovalContainer = () => {
       body: JSON.stringify(model),
     });
 
+    setNotification(request, "Saving Approval", "Project Approved");
+
+    const response = await request;
+
     if (response.ok) {
       history.replace(`/Project/Details/${projectId}`);
-    } else {
-      alert("Something went wrong, please try again");
     }
   };
 
@@ -123,15 +128,15 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="mt-5">
+              <div className="text-right mt-5">
+                <button className="btn btn-link mr-2">Reject</button>
                 <button
                   className="btn btn-primary"
-                  disabled={disabled}
+                  disabled={disabled || notification.pending}
                   onClick={approve}
                 >
                   Approve Quote
                 </button>
-                <button className="btn btn-link mr-2">Reject</button>
               </div>
             </div>
           </div>
