@@ -249,6 +249,12 @@ export interface Ticket {
   status: string;
   createdOn: Date;
 }
+
+export interface TicketInput {
+  name: string;
+  requirements: string;
+  attachments: BlobFile[];
+}
 export interface TicketDetails {
   id: number;
   projectId: number;
@@ -263,8 +269,8 @@ export interface TicketDetails {
   createdBy: User;
   workNotes: string;
   updatedBy?: User;
-    newAttachments: BlobFile[];
-    completed: boolean;
+  newAttachments: BlobFile[];
+  completed: boolean;
 }
 export interface TicketAttachment {
   id: number;
