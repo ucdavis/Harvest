@@ -35,11 +35,13 @@ describe("Project Detail Container", () => {
   it("Shows loading screen", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={["/project/details/3"]}>
-          <Route path="/project/details/:projectId">
-            <ProjectDetailContainer />
-          </Route>
-        </MemoryRouter>,
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
         container
       );
     });
@@ -89,11 +91,13 @@ describe("Project Detail Container", () => {
         .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
       render(
-        <MemoryRouter initialEntries={["/project/details/3"]}>
-          <Route path="/project/details/:projectId">
-            <ProjectDetailContainer />
-          </Route>
-        </MemoryRouter>,
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
         container
       );
     });
