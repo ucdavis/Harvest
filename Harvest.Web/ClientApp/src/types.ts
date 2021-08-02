@@ -10,6 +10,7 @@ export type RoleName =
 export type ProjectStatus =
   | "Requested"
   | "PendingApproval"
+  | "QuoteRejected"
   | "Active"
   | "ChangeRequested"
   | "Completed";

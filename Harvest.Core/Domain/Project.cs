@@ -160,6 +160,7 @@ namespace Harvest.Core.Domain
         {
             public const string Requested = "Requested";
             public const string PendingApproval = "PendingApproval";
+            public const string QuoteRejected = "QuoteRejected";
             public const string PendingAccountApproval = "PendingAccountApproval";
             public const string Active = "Active";
             public const string ChangeRequested = "ChangeRequested";
@@ -169,6 +170,7 @@ namespace Harvest.Core.Domain
             {
                 Requested,
                 PendingApproval,
+                QuoteRejected,
                 PendingAccountApproval,
                 Active,
                 ChangeRequested,
