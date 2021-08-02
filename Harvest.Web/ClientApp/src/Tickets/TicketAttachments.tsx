@@ -4,11 +4,7 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
   ticket: TicketDetails;
@@ -27,6 +23,8 @@ export const TicketAttachments = (props: Props) => {
     {} as TicketDetails
   );
 
+  const [notification, setNotification] = usePromiseNotification();
+
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = fetch(
       `/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
@@ -39,12 +37,7 @@ export const TicketAttachments = (props: Props) => {
         body: JSON.stringify({ Attachments: attachments }),
       }
     );
-
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Attachment(s)",
-      success: "Attachment(s) Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Attachment(s)", "Attachment(s) Saved");
 
     const response = await request;
 
@@ -79,6 +72,7 @@ export const TicketAttachments = (props: Props) => {
           <>
             <Label>Attach files?</Label>
             <FileUpload
+              disabled={notification.pending}
               files={ticketLoc.newAttachments || []}
               setFiles={(f) => {
                 setTicketLoc((ticket) => ({

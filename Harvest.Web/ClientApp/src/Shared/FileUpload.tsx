@@ -7,6 +7,7 @@ import { BlobServiceClient } from "@azure/storage-blob";
 import { BlobFile } from "../types";
 
 interface Props {
+  disabled?: boolean;
   files: BlobFile[];
   setFiles: (files: BlobFile[]) => void;
   updateFile: (file: BlobFile) => void;
@@ -92,6 +93,7 @@ export const FileUpload = (props: Props) => {
   return (
     <div>
       <input
+        disabled={props.disabled === true}
         type="file"
         multiple={true}
         className="form-control-file"

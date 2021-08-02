@@ -6,11 +6,7 @@ import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { ShowFor } from "../Shared/ShowFor";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -24,6 +20,8 @@ export const TicketCreate = () => {
     name: "",
   } as Ticket);
   const history = useHistory();
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     const cb = async () => {
@@ -53,12 +51,7 @@ export const TicketCreate = () => {
       },
       body: JSON.stringify(ticket),
     });
-
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Creating Ticket",
-      success: "Ticket Created",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Creating Ticket", "Ticket Created");
 
     const response = await request;
 
@@ -148,7 +141,7 @@ export const TicketCreate = () => {
               </FormGroup>
               <div className="row justify-content-center">
                 <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
-                  <Button className="btn-lg" color="primary" onClick={create}>
+                  <Button className="btn-lg" color="primary" onClick={create} disabled={notification.pending}>
                     Create New Ticket
                   </Button>
                 </ShowFor>

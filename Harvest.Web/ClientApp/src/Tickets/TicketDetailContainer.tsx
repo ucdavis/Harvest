@@ -8,11 +8,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
 import { TicketReply } from "./TicketReply";
 import { Button } from "reactstrap";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId: string;
@@ -24,6 +20,8 @@ export const TicketDetailContainer = () => {
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<TicketDetails>();
   const history = useHistory();
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     const cb = async () => {
@@ -66,13 +64,8 @@ export const TicketDetailContainer = () => {
         },
       }
     );
-
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Closing Ticket",
-      success: "Ticket Closed",
-      error: genericErrorMessage,
-    });
-
+    setNotification(request, "Closing Ticket", "Ticket Closed");
+ 
     const response = await request;
 
     if (response.ok) {
@@ -171,7 +164,7 @@ export const TicketDetailContainer = () => {
           className="btn-lg"
           color="primary"
           onClick={closeTicket}
-          disabled={ticket.completed}
+          disabled={ticket.completed || notification.pending}
         >
           Close Ticket FOREVER!!!!
         </Button>

@@ -7,11 +7,7 @@ import { Button } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -40,6 +36,8 @@ export const ExpenseEntryContainer = () => {
   const [activities, setActivities] = useState<Activity[]>([
     getDefaultActivity(1),
   ]);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -95,11 +93,7 @@ export const ExpenseEntryContainer = () => {
       body: JSON.stringify(expensesBody),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Expenses",
-      success: "Expenses Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Expenses", "Expenses Saved");
 
     const response = await request;
 
@@ -159,7 +153,7 @@ export const ExpenseEntryContainer = () => {
       </div>
       <div className="card-content">
         <div className="col">
-          <button className="btn btn-primary btn-lg" onClick={submit}>
+          <button className="btn btn-primary btn-lg" onClick={submit} disabled={notification.pending}>
             Submit Expense
           </button>
         </div>
