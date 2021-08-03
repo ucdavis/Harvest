@@ -152,7 +152,7 @@ namespace Harvest.Web.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            await _emailService.NewTicketCreated(project, ticketToCreate);
+            await _emailService.QuoteDenied(project, model.Reason);
 
             return Ok(new { project, ticket = ticketToCreate });
         }
