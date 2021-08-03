@@ -134,7 +134,7 @@ describe("Project Detail Container", () => {
     expect(rows?.length).toBe(3);
   });
 
-  it("Display correct number of recent tickets", async () => {
+  it("Display correct number of attachments", async () => {
     await act(async () => {
       global.fetch = jest
         .fn()
@@ -156,9 +156,9 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const ticketTable = document.querySelectorAll("tbody")[1];
-    const rows = ticketTable?.querySelectorAll(".rt-tr-group");
+    const attachmentList = container.querySelector(".no-list-style");
+    const attachemntsLength = attachmentList?.getElementsByTagName("li");
 
-    expect(rows?.length).toBe(3);
+    expect(attachemntsLength?.length).toBe(2);
   });
 });
