@@ -131,8 +131,8 @@ export const ExpenseEntryContainer = () => {
     const newActivityId = Math.max(...activities.map((a) => a.id), 0) + 1;
     setActivities((acts) => [...acts, getDefaultActivity(newActivityId)]);
   };
-// return true if the sum of the acctivity totals is greater than 0
-  const isValid = (activities: Activity[]) =>
+// return true if the sum of the activity totals is greater than 0
+  const isValid = () =>
     activities.reduce((prev, curr) => prev + curr.total || 0, 0) > 0;
 
   if (projectId === undefined) {
@@ -167,7 +167,7 @@ export const ExpenseEntryContainer = () => {
           <button
             className="btn btn-primary btn-lg"
             onClick={submit}
-            disabled={notification.pending || !isValid(activities)}
+            disabled={notification.pending || !isValid()}
           >
             Submit Expense
           </button>
