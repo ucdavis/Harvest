@@ -125,6 +125,14 @@ export const ProjectDetailContainer = () => {
                   Change Accounts
                 </Link>
               </ShowFor>
+              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/request/create/${project.id}`}
+                >
+                  Request Project Change
+                </Link>
+              </ShowFor>
             </div>
             <div className="col text-right">
               <ProjectUnbilledButton projectId={project.id} />
