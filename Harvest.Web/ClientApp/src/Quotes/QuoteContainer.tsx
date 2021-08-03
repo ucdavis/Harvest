@@ -18,7 +18,8 @@ import { QuoteTotals } from "./QuoteTotals";
 import {
   usePromiseNotification,
 } from "../Util/Notifications";
-import { ValidationProvider } from "../FormValidation";
+import { useInputValidator } from "../FormValidation";
+import { quoteContentSchema } from "../schemas";
 
 interface RouteParams {
   projectId?: string;
@@ -28,6 +29,8 @@ export const QuoteContainer = () => {
   const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
+
+  const { formErrorCount } = useInputValidator<QuoteContent>(quoteContentSchema);
 
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
@@ -230,44 +233,42 @@ export const QuoteContainer = () => {
   }
 
   return (
-    <ValidationProvider>
-      <div className="card-wrapper">
-        <ProjectHeader
-          project={project}
-          title={"Field Request #" + (project?.id || "")}
-        ></ProjectHeader>
-        <div className="card-green-bg">
-          <div className="card-content">
-            <div className="quote-details">
-              <h2>Quote Details</h2>
-              <hr />
-              <ProjectDetail
-                rates={rates}
-                quote={quote}
-                updateQuote={setQuote}
-                setEditFields={setEditFields}
-              />
-              <ActivitiesContainer
-                quote={quote}
-                rates={rates}
-                updateQuote={setQuote}
-              />
-            </div>
-            <QuoteTotals quote={quote}></QuoteTotals>
-            <div className="row justify-content-center">
-              <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
-                Save Quote
+    <div className="card-wrapper">
+      <ProjectHeader
+        project={project}
+        title={"Field Request #" + (project?.id || "")}
+      ></ProjectHeader>
+      <div className="card-green-bg">
+        <div className="card-content">
+          <div className="quote-details">
+            <h2>Quote Details</h2>
+            <hr />
+            <ProjectDetail
+              rates={rates}
+              quote={quote}
+              updateQuote={setQuote}
+              setEditFields={setEditFields}
+            />
+            <ActivitiesContainer
+              quote={quote}
+              rates={rates}
+              updateQuote={setQuote}
+            />
+          </div>
+          <QuoteTotals quote={quote}></QuoteTotals>
+          <div className="row justify-content-center">
+            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
+              Save Quote
             </button>
-              <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending}>
-                Submit Quote
+            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending || formErrorCount > 0}>
+              Submit Quote
             </button>
-            </div>
           </div>
         </div>
-
-        <div>Debug: {JSON.stringify(quote)}</div>
-        <div>Debug Rates: {JSON.stringify(rates)}</div>
       </div>
-    </ValidationProvider>
+
+      <div>Debug: {JSON.stringify(quote)}</div>
+      <div>Debug Rates: {JSON.stringify(rates)}</div>
+    </div>
   );
 };

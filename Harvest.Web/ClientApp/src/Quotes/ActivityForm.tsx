@@ -14,6 +14,8 @@ import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
+import { useInputValidator } from "../FormValidation";
+import { activitySchema } from "../schemas";
 
 const ANNUAL_ADJUSTMENT_RATE = 3;
 interface Props {
@@ -29,6 +31,9 @@ export const ActivityForm = (props: Props) => {
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
 
   const toggle = () => setYearDropdownOpen((prevState) => !prevState);
+
+  const { onChange, InputErrorMessage, getClassName } = useInputValidator<Activity>(activitySchema);
+
 
   const updateWorkItems = (workItem: WorkItem) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
@@ -141,16 +146,18 @@ export const ActivityForm = (props: Props) => {
             </div>
 
             <Input
+              className={getClassName("name")}
               type="text"
               id="activityName"
               value={props.activity.name}
-              onChange={(e) =>
+              onChange={onChange("name",(e) =>
                 props.updateActivity({
                   ...props.activity,
                   name: e.target.value,
-                })
+                }))
               }
             ></Input>
+            <InputErrorMessage name="name"/>
           </div>
         </div>
 

@@ -41,7 +41,7 @@ interface WorkItemFormProps {
 const WorkItemForm = (props: WorkItemFormProps) => {
   const { workItem } = props;
 
-  const { valueChanged, onChange, InputErrorMessage, getClassName } = useInputValidator<WorkItem>(workItemSchema);
+  const { onChange, InputErrorMessage, getClassName } = useInputValidator<WorkItem>(workItemSchema);
 
   const rateItemChanged = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -72,15 +72,16 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
   return <Row
     className="activity-line-item align-items-center"
-    
+
   >
     <Col xs="5">
       <FormGroup>
         <Input
+          className={getClassName("rateId")}
           type="select"
           name="select"
           defaultValue={workItem.rateId}
-          onChange={rateItemChanged}
+          onChange={onChange("rateId", rateItemChanged)}
         >
           <option value="0">-- Select {props.category} --</option>
           {props.rates.map((r) => (
@@ -89,20 +90,23 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             </option>
           ))}
         </Input>
-        {requiresCustomDescription(workItem.unit) && (
+        <InputErrorMessage name="rateId" />
+        {requiresCustomDescription(workItem.unit) && (<>
           <Input
+            className={getClassName("description")}
             type="text"
             name="OtherDescription"
             value={workItem.description}
             placeholder="Description"
-            onChange={(e) =>
+            onChange={onChange("description", (e) =>
               props.updateWorkItems({
                 ...workItem,
                 description: e.target.value,
-              })
+              }))
             }
           ></Input>
-        )}
+          <InputErrorMessage name="description" />
+        </>)}
       </FormGroup>
     </Col>
 
@@ -116,13 +120,11 @@ const WorkItemForm = (props: WorkItemFormProps) => {
           type="number"
           id="units"
           value={workItem.quantity}
-          onChange={onChange("quantity", (e) => {
+          onChange={onChange("quantity", (e) => 
             props.updateWorkItems({
               ...workItem,
               quantity: parseFloat(e.target.value ?? 0),
-            });
-            //valueChanged("quantity", e.target.value ?? 0);
-          })}
+            }))}
         />
       </InputGroup>
       <InputErrorMessage name="quantity" />
@@ -206,7 +208,7 @@ export const WorkItemsForm = (props: WorkItemsFormProps) => {
           workItem={workItem}
           updateWorkItems={props.updateWorkItems}
           deleteWorkItem={props.deleteWorkItem}
-      />))}
+        />))}
       <Button
         className="btn-sm"
         color="link"

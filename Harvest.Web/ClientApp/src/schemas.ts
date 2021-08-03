@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import { BlobFile, RequestInput, User, TicketInput, WorkItem } from "./types";
+import { BlobFile, RequestInput, User, TicketInput, WorkItem, Activity } from "./types";
 
 export const investigatorSchema: SchemaOf<User> = yup
   .object()
@@ -51,4 +51,39 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   quantity: yup.number().required().positive(),
   unit: yup.string().defined(),
   total: yup.number().required().positive()
+});
+
+export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  crop: yup.string().required(),
+  details: yup.string(),
+  //geometry: ? //not sure of a clean way to validate GeoJSON.Polygon
+});
+
+export const activitySchema: SchemaOf<Activity> = yup.object().shape({
+  total: yup.number().required(),
+  id: yup.number().required(),
+  name: yup.string().required(),
+  year: yup.number().required(),
+  adjustment: yup.number().required(),
+  workItems: yup.array().of(workItemSchema).required()
+});
+
+export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shape({
+  projectName: yup.string().required(),
+  acres: yup.number().min(0).required(),
+  acreageRate: yup.number().required(),
+  acreageRateId: yup.number().required(),
+  acreageRateDescription: yup.string().required(),
+  activities: yup.array().of(activitySchema).required(),
+  years: yup.number().integer().min(0).required(),
+  total: yup.number().min(0).required(),
+  acreageTotal: yup.number().required(),
+  activitiesTotal: yup.number().required(),
+  laborTotal: yup.number().required(),
+  equipmentTotal: yup.number().required(),
+  otherTotal: yup.number().required(),
+  grandTotal: yup.number().required(),
+  fields: yup.array().of(fieldSchema).required()
 });
