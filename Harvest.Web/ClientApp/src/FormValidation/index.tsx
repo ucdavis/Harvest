@@ -1,4 +1,4 @@
-﻿import React, { useState, ChangeEventHandler, ChangeEvent, useContext, useEffect, useRef } from "react";
+﻿import React, { useState, FocusEventHandler, ChangeEventHandler, ChangeEvent, FocusEvent, useContext, useEffect, useRef } from "react";
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
@@ -45,7 +45,6 @@ export const ValidationProvider: React.FC = ({ children }) => {
     setFormIsDirty,
     resetForm,
     formIsReset,
-    //setFormIsReset
   }
 
   return <ValidationContext.Provider value={contextState}>{children}</ValidationContext.Provider>;
@@ -128,11 +127,12 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     }
   };
 
-  const onBlur = (name: TKey) => (e: HTMLInputElement) => {
+  const onBlur = (name: TKey) => (e: FocusEvent<HTMLInputElement>) => {
     setFormIsTouched(true);
     if (!touchedFields.some(f => f === name)) {
       setTouchedFields([...touchedFields, name]);
     }
+    validateField(name, e.target.value as unknown as T[TKey]);
   };
 
   const fieldIsTouched = (name: TKey) => touchedFields.some(f => f === name);

@@ -26,7 +26,7 @@ interface Props {
 }
 
 export const ProjectDetail = (props: Props) => {
-  const { onChange, InputErrorMessage, getClassName } = useInputValidator<QuoteContent>(quoteContentSchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<QuoteContent>(quoteContentSchema);
 
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {
@@ -82,6 +82,7 @@ export const ProjectDetail = (props: Props) => {
           onChange={onChange("projectName",(e) =>
             props.updateQuote({ ...props.quote, projectName: e.target.value }))
           }
+          onBlur={onBlur("projectName")}
         />
         <InputErrorMessage name="projectName"/>
         <br />
@@ -98,6 +99,7 @@ export const ProjectDetail = (props: Props) => {
                   props.rates.find((r) => r.id === parseInt(e.target.value))
                 ))
               }
+              onBlur={onBlur("acreageRateId")}
             >
               <option value="0">-- Select Acreage Rate --</option>
               {props.rates
@@ -127,6 +129,7 @@ export const ProjectDetail = (props: Props) => {
                     acres: parseFloat(e.target.value),
                   }))
                 }
+                onBlur={onBlur("acres")}
               />
               <InputErrorMessage name="acres" />
             </Col>

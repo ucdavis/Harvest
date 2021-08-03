@@ -41,7 +41,7 @@ interface WorkItemFormProps {
 const WorkItemForm = (props: WorkItemFormProps) => {
   const { workItem } = props;
 
-  const { onChange, InputErrorMessage, getClassName } = useInputValidator<WorkItem>(workItemSchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<WorkItem>(workItemSchema);
 
   const rateItemChanged = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -82,6 +82,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
           name="select"
           defaultValue={workItem.rateId}
           onChange={onChange("rateId", rateItemChanged)}
+          onBlur={onBlur("rateId")}
         >
           <option value="0">-- Select {props.category} --</option>
           {props.rates.map((r) => (
@@ -104,6 +105,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
                 description: e.target.value,
               }))
             }
+            onBlur={onBlur("description")}
           ></Input>
           <InputErrorMessage name="description" />
         </>)}
@@ -124,7 +126,9 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             props.updateWorkItems({
               ...workItem,
               quantity: parseFloat(e.target.value ?? 0),
-            }))}
+            }))
+          }
+          onBlur={onBlur("quantity")}
         />
       </InputGroup>
       <InputErrorMessage name="quantity" />

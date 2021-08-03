@@ -32,7 +32,7 @@ export const ActivityForm = (props: Props) => {
 
   const toggle = () => setYearDropdownOpen((prevState) => !prevState);
 
-  const { onChange, InputErrorMessage, getClassName } = useInputValidator<Activity>(activitySchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<Activity>(activitySchema);
 
 
   const updateWorkItems = (workItem: WorkItem) => {
@@ -156,6 +156,7 @@ export const ActivityForm = (props: Props) => {
                   name: e.target.value,
                 }))
               }
+              onBlur={onBlur("name")}
             ></Input>
             <InputErrorMessage name="name"/>
           </div>
