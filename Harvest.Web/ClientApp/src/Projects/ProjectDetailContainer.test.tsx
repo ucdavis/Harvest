@@ -56,25 +56,25 @@ describe("Project Detail Container", () => {
       ok: true,
       json: () => Promise.resolve(fakeProject),
     };
-  
+
     const unbilledResponse = {
       status: 200,
       ok: true,
       text: () => Promise.resolve("0.00"),
     };
-  
+
     const fileResponse = {
       status: 200,
       ok: true,
       text: () => Promise.resolve("file 1"),
     };
-  
+
     const invoiceResponse = {
       status: 200,
       ok: true,
       json: () => Promise.resolve(fakeInvoices),
     };
-  
+
     const ticketResponses = {
       status: 200,
       ok: true,
@@ -112,31 +112,31 @@ describe("Project Detail Container", () => {
       ok: true,
       json: () => Promise.resolve(fakeProject),
     };
-  
+
     const unbilledResponse = {
       status: 200,
       ok: true,
       text: () => Promise.resolve("0.00"),
     };
-  
+
     const fileResponse = {
       status: 200,
       ok: true,
       text: () => Promise.resolve("file 1"),
     };
-  
+
     const invoiceResponse = {
       status: 200,
       ok: true,
       json: () => Promise.resolve(fakeInvoices),
     };
-  
+
     const ticketResponses = {
       status: 200,
       ok: true,
       json: () => Promise.resolve(fakeTickets),
     };
-    
+
     await act(async () => {
       global.fetch = jest
         .fn()
@@ -163,32 +163,34 @@ describe("Project Detail Container", () => {
 
     expect(attachemntsLength?.length).toBe(2);
   });
+});
 
+describe("Project Detail Container's tickets and invoices", () => {
   it("Display correct number of recent invoices", async () => {
     const projectResponse = {
       status: 200,
       ok: true,
       json: () => Promise.resolve(fakeProject),
     };
-  
+
     const unbilledResponse = {
       status: 200,
       ok: true,
       text: () => Promise.resolve("0.00"),
     };
-  
+
     const fileResponse = {
       status: 200,
       ok: true,
       text: () => Promise.resolve("file 1"),
     };
-  
+
     const invoiceResponse = {
       status: 200,
       ok: true,
       json: () => Promise.resolve(fakeInvoices),
     };
-  
+
     const ticketResponses = {
       status: 200,
       ok: true,
