@@ -133,4 +133,32 @@ describe("Project Detail Container", () => {
 
     expect(rows?.length).toBe(3);
   });
+
+  it("Display correct number of recent tickets", async () => {
+    await act(async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketTable = document.querySelectorAll("tbody")[1];
+    const rows = ticketTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(3);
+  });
 });
