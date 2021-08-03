@@ -106,64 +106,6 @@ describe("Project Detail Container", () => {
     expect(fieldTitle).toContain("Field Request #3");
   });
 
-  it("Display correct number of recent invoices", async () => {
-    const projectResponse = {
-      status: 200,
-      ok: true,
-      json: () => Promise.resolve(fakeProject),
-    };
-  
-    const unbilledResponse = {
-      status: 200,
-      ok: true,
-      text: () => Promise.resolve("0.00"),
-    };
-  
-    const fileResponse = {
-      status: 200,
-      ok: true,
-      text: () => Promise.resolve("file 1"),
-    };
-  
-    const invoiceResponse = {
-      status: 200,
-      ok: true,
-      json: () => Promise.resolve(fakeInvoices),
-    };
-  
-    const ticketResponses = {
-      status: 200,
-      ok: true,
-      json: () => Promise.resolve(fakeTickets),
-    };
-
-    await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(projectResponse))
-        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
-
-      render(
-        <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
-        </AppContext.Provider>,
-        container
-      );
-    });
-
-    const invoiceTable = document.querySelectorAll("tbody")[0];
-    const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
-
-    expect(rows?.length).toBe(3);
-  });
-
   it("Display correct number of attachments", async () => {
     const projectResponse = {
       status: 200,
@@ -220,5 +162,63 @@ describe("Project Detail Container", () => {
     const attachemntsLength = attachmentList?.getElementsByTagName("li");
 
     expect(attachemntsLength?.length).toBe(2);
+  });
+
+  it("Display correct number of recent invoices", async () => {
+    const projectResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeProject),
+    };
+  
+    const unbilledResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("0.00"),
+    };
+  
+    const fileResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("file 1"),
+    };
+  
+    const invoiceResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeInvoices),
+    };
+  
+    const ticketResponses = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeTickets),
+    };
+
+    await act(async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const invoiceTable = document.querySelectorAll("tbody")[0];
+    const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(3);
   });
 });
