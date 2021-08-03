@@ -62,25 +62,7 @@ describe("Project Detail Container", () => {
     json: () => Promise.resolve(fakeTickets),
   };
 
-  it("Shows loading screen", async () => {
-    await act(async () => {
-      render(
-        <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
-        </AppContext.Provider>,
-        container
-      );
-    });
-
-    const messageContent = container.querySelector("div")?.textContent;
-    expect(messageContent).toContain("Loading");
-  });
-
-  it("Load details", async () => {
+  it("Display correct number of recent tickets", async () => {
     await act(async () => {
       global.fetch = jest
         .fn()
@@ -102,11 +84,13 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const fieldTitle = container.querySelector("#request-title")?.textContent;
-    expect(fieldTitle).toContain("Field Request #3");
+    const ticketTable = document.querySelectorAll("tbody")[1];
+    const rows = ticketTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(3);
   });
 
-  it("Display correct number of attachments", async () => {    
+  it("Display correct number of recent invoices", async () => {
     await act(async () => {
       global.fetch = jest
         .fn()
@@ -128,9 +112,9 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const attachmentList = container.querySelector(".no-list-style");
-    const attachemntsLength = attachmentList?.getElementsByTagName("li");
+    const invoiceTable = document.querySelectorAll("tbody")[0];
+    const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
 
-    expect(attachemntsLength?.length).toBe(2);
+    expect(rows?.length).toBe(3);
   });
 });
