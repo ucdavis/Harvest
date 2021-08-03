@@ -105,4 +105,32 @@ describe("Project Detail Container", () => {
     const fieldTitle = container.querySelector("#request-title")?.textContent;
     expect(fieldTitle).toContain("Field Request #3");
   });
+
+  it("Display correct number of recent invoices", async () => {
+    await act(async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const invoiceTable = document.querySelectorAll("tbody")[0];
+    const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(3);
+  });
 });
