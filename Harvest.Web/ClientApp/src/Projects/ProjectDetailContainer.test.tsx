@@ -32,6 +32,36 @@ afterEach(() => {
 });
 
 describe("Project Detail Container", () => {
+  const projectResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeProject),
+  };
+
+  const unbilledResponse = {
+    status: 200,
+    ok: true,
+    text: () => Promise.resolve("0.00"),
+  };
+
+  const fileResponse = {
+    status: 200,
+    ok: true,
+    text: () => Promise.resolve("file 1"),
+  };
+
+  const invoiceResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeInvoices),
+  };
+
+  const ticketResponses = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeTickets),
+  };
+
   it("Shows loading screen", async () => {
     await act(async () => {
       render(
@@ -48,5 +78,31 @@ describe("Project Detail Container", () => {
 
     const messageContent = container.querySelector("div")?.textContent;
     expect(messageContent).toContain("Loading");
+  });
+
+  it("Load details", async () => {
+    await act(async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
+        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const fieldTitle = container.querySelector("#request-title")?.textContent;
+    expect(fieldTitle).toContain("Field Request #3");
   });
 });
