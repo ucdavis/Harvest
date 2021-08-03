@@ -32,36 +32,6 @@ afterEach(() => {
 });
 
 describe("Project Detail Container", () => {
-  const projectResponse = {
-    status: 200,
-    ok: true,
-    json: () => Promise.resolve(fakeProject),
-  };
-
-  const unbilledResponse = {
-    status: 200,
-    ok: true,
-    text: () => Promise.resolve("0.00"),
-  };
-
-  const fileResponse = {
-    status: 200,
-    ok: true,
-    text: () => Promise.resolve("file 1"),
-  };
-
-  const invoiceResponse = {
-    status: 200,
-    ok: true,
-    json: () => Promise.resolve(fakeInvoices),
-  };
-
-  const ticketResponses = {
-    status: 200,
-    ok: true,
-    json: () => Promise.resolve(fakeTickets),
-  };
-
   it("Shows loading screen", async () => {
     await act(async () => {
       render(
@@ -81,6 +51,36 @@ describe("Project Detail Container", () => {
   });
 
   it("Load details", async () => {
+    const projectResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeProject),
+    };
+  
+    const unbilledResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("0.00"),
+    };
+  
+    const fileResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("file 1"),
+    };
+  
+    const invoiceResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeInvoices),
+    };
+  
+    const ticketResponses = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeTickets),
+    };
+
     await act(async () => {
       global.fetch = jest
         .fn()
@@ -107,6 +107,36 @@ describe("Project Detail Container", () => {
   });
 
   it("Display correct number of recent invoices", async () => {
+    const projectResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeProject),
+    };
+  
+    const unbilledResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("0.00"),
+    };
+  
+    const fileResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("file 1"),
+    };
+  
+    const invoiceResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeInvoices),
+    };
+  
+    const ticketResponses = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeTickets),
+    };
+
     await act(async () => {
       global.fetch = jest
         .fn()
@@ -135,6 +165,36 @@ describe("Project Detail Container", () => {
   });
 
   it("Display correct number of attachments", async () => {
+    const projectResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeProject),
+    };
+  
+    const unbilledResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("0.00"),
+    };
+  
+    const fileResponse = {
+      status: 200,
+      ok: true,
+      text: () => Promise.resolve("file 1"),
+    };
+  
+    const invoiceResponse = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeInvoices),
+    };
+  
+    const ticketResponses = {
+      status: 200,
+      ok: true,
+      json: () => Promise.resolve(fakeTickets),
+    };
+    
     await act(async () => {
       global.fetch = jest
         .fn()
