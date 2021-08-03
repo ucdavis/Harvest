@@ -17,7 +17,7 @@ using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
-    
+
     public class RequestController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -119,12 +119,42 @@ namespace Harvest.Web.Controllers
             }
 
             await _historyService.QuoteApproved(project.Id, model.Accounts);
- 
+
             await _dbContext.SaveChangesAsync();
 
             await _emailService.QuoteApproved(project);
 
             return Ok(project);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        public async Task<ActionResult> RejectQuote(int projectId, [FromBody] QuoteRejectionModel model)
+        {
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+
+            var currentUser = await _userService.GetCurrentUser();
+
+            var ticketToCreate = new Ticket();
+            ticketToCreate.ProjectId = projectId;
+            ticketToCreate.Name = "Quote rejected";
+            ticketToCreate.Requirements = model.Reason;
+            ticketToCreate.DueDate = null;
+            ticketToCreate.CreatedById = currentUser.Id;
+            ticketToCreate.CreatedOn = DateTime.UtcNow;
+
+            await _dbContext.Tickets.AddAsync(ticketToCreate);
+            await _historyService.TicketCreated(project.Id, ticketToCreate);
+
+            project.Status = Project.Statuses.QuoteRejected;
+
+            await _historyService.QuoteRejected(project.Id, model.Reason);
+
+            await _dbContext.SaveChangesAsync();
+
+            await _emailService.QuoteDenied(project, model.Reason);
+
+            return Ok(new { project, ticket = ticketToCreate });
         }
 
         [HttpPost]
@@ -277,5 +307,9 @@ namespace Harvest.Web.Controllers
     public class ProjectFilesModel
     {
         public ProjectAttachment[] Attachments { get; set; }
+    }
+
+    public class QuoteRejectionModel {
+        public string Reason { get; set; }
     }
 }

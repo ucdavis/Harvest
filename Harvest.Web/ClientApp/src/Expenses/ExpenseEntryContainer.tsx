@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Activity, Expense, Rate, WorkItemImpl } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
@@ -7,11 +7,8 @@ import { Button } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
+import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
   projectId?: string;
@@ -40,6 +37,10 @@ export const ExpenseEntryContainer = () => {
   const [activities, setActivities] = useState<Activity[]>([
     getDefaultActivity(1),
   ]);
+
+  const { roles } = useContext(AppContext).user;
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -95,16 +96,17 @@ export const ExpenseEntryContainer = () => {
       body: JSON.stringify(expensesBody),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Expenses",
-      success: "Expenses Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Expenses", "Expenses Saved");
 
     const response = await request;
 
     if (response.ok) {
-      history.push("/project");
+      // go to the project page unless you are a worker -- worker can't see the project page
+      if (roles.includes("Worker")) {
+        history.push("/");
+      } else {
+        history.push(`/project/details/${projectId}`);
+      }
     }
   };
 
@@ -159,7 +161,11 @@ export const ExpenseEntryContainer = () => {
       </div>
       <div className="card-content">
         <div className="col">
-          <button className="btn btn-primary btn-lg" onClick={submit}>
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={submit}
+            disabled={notification.pending}
+          >
             Submit Expense
           </button>
         </div>

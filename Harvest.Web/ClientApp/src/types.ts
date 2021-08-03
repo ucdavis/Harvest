@@ -10,6 +10,7 @@ export type RoleName =
 export type ProjectStatus =
   | "Requested"
   | "PendingApproval"
+  | "QuoteRejected"
   | "Active"
   | "ChangeRequested"
   | "Completed";
@@ -249,6 +250,12 @@ export interface Ticket {
   status: string;
   createdOn: Date;
 }
+
+export interface TicketInput {
+  name: string;
+  requirements: string;
+  attachments: BlobFile[];
+}
 export interface TicketDetails {
   id: number;
   projectId: number;
@@ -263,8 +270,8 @@ export interface TicketDetails {
   createdBy: User;
   workNotes: string;
   updatedBy?: User;
-    newAttachments: BlobFile[];
-    completed: boolean;
+  newAttachments: BlobFile[];
+  completed: boolean;
 }
 export interface TicketAttachment {
   id: number;
@@ -302,4 +309,9 @@ export interface AppContextShape {
     detail: User;
     roles: RoleName[];
   };
+}
+
+export interface PromiseStatus {
+  pending: boolean;
+  success: boolean;
 }

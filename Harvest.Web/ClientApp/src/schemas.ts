@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import { BlobFile, RequestInput, User, WorkItem } from "./types";
+import { BlobFile, RequestInput, User, TicketInput, WorkItem } from "./types";
 
 export const investigatorSchema: SchemaOf<User> = yup
   .object()
@@ -34,6 +34,12 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   principalInvestigator: investigatorSchema,
   files: yup.array().of(fileSchema)
 });
+
+export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
+  name: yup.string().required('Subject is required'),
+  requirements: yup.string().required('Ticket details are required'),
+  attachments: yup.array().of(fileSchema)
+}); 
 
 export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   id: yup.number().required().default(0),

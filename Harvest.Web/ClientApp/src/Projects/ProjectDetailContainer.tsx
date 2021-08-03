@@ -13,7 +13,7 @@ import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
-import { fetchWithFailOnNotOk, genericErrorMessage, toast } from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface RouteParams {
   projectId?: string;
@@ -23,6 +23,8 @@ export const ProjectDetailContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -53,11 +55,7 @@ export const ProjectDetailContainer = () => {
       body: JSON.stringify({ Attachments: attachments }),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving File(s)",
-      success: "File(s) Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving File(s)", "File(s) Saved");
 
     const response = await request;
 
@@ -81,8 +79,23 @@ export const ProjectDetailContainer = () => {
           <div className="row justify-content-between">
             <div className="col">
               <ShowFor
+                roles={["Supervisor", "FieldManager"]}
+                condition={project.status === "Active"}
+              >
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/expense/entry/${project.id}`}
+                >
+                  Enter Expenses
+                </Link>
+              </ShowFor>
+              <ShowFor
                 roles={["FieldManager", "Supervisor"]}
-                condition={project.status === "Requested" || project.status === "ChangeRequested"}
+                condition={
+                  project.status === "Requested" ||
+                  project.status === "ChangeRequested" || 
+                  project.status === "QuoteRejected"
+                }
               >
                 <Link
                   className="btn btn-primary btn-small mr-4"
@@ -160,6 +173,7 @@ export const ProjectDetailContainer = () => {
               <div className="card-content">
                 <h2>Project Attachements</h2>
                 <FileUpload
+                  disabled={notification.pending}
                   files={newFiles}
                   setFiles={(f) => {
                     let files = f.slice(newFiles.length);

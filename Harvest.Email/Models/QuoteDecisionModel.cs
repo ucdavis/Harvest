@@ -17,6 +17,8 @@ namespace Harvest.Email.Models
         public string ButtonUrl { get; set; }
         public string DecisionColor { get; set; } = "#7aeb34";
 
+        public string RejectReason { get; set; }
+
         public class Colors
         {
             public const string Approved = "#7aeb34";

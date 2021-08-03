@@ -1,3 +1,7 @@
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { PromiseStatus } from "../types";
+
 // just re-export the whole module so we don't take direct dependencies all over
 export * from "react-hot-toast";
 
@@ -14,4 +18,48 @@ export const fetchWithFailOnNotOk = (fetchPromise: Promise<any>) => {
   });
 };
 
-export const genericErrorMessage: string = "Something went wrong, please try again";
+export const genericErrorMessage: string =
+  "Something went wrong, please try again";
+
+// returns notification object and notification setter
+// call notification setter to initiate a loading notification
+export const usePromiseNotification = (): [
+  PromiseStatus,
+  (
+    promise: Promise<any>,
+    loadingMessage: string,
+    successMessage: string
+  ) => void
+] => {
+  const [pending, setPending] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  return [
+    {
+      pending,
+      success,
+    } as PromiseStatus,
+    (
+      promise,
+      loadingMessage,
+      successMessage,
+      errorMessage = genericErrorMessage
+    ) => {
+      setPending(true);
+
+      toast.promise(fetchWithFailOnNotOk(promise), {
+        loading: loadingMessage,
+        success: () => {
+          setSuccess(true);
+          setPending(false);
+          return successMessage;
+        },
+        error: () => {
+          setSuccess(false);
+          setPending(false);
+          return errorMessage;
+        },
+      });
+    },
+  ];
+};

@@ -38,9 +38,10 @@ namespace Harvest.Web.Controllers
         {
 
 
-            var model = new TicketAttachmentModel();
+            var model = new QuoteDecisionModel();
+            model.RejectReason = "test";
             
-            var results = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment_mjml.cshtml", model);
+            var results = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -93,7 +94,7 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestQuoteDenied()
         {
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == 11);
-            if (await _emailService.QuoteDenied(project))
+            if (await _emailService.QuoteDenied(project, "Testy McTestFace"))
             {
                 return Content("Done.");
             }

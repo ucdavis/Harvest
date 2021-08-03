@@ -1,11 +1,7 @@
 ﻿import React, { useState } from "react";
 import { Button, FormGroup, Input } from "reactstrap";
 import { TicketDetails, TicketMessage } from "../types";
-import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
   ticket: TicketDetails;
@@ -18,6 +14,8 @@ export const TicketReply = (props: Props) => {
   const [ticketMessage, setTicketMessage] = useState<TicketMessage>({
     message: "",
   } as TicketMessage);
+
+  const [notification, setNotification] = usePromiseNotification();
 
   const update = async () => {
     // TODO: validation
@@ -33,14 +31,10 @@ export const TicketReply = (props: Props) => {
         body: JSON.stringify(ticketMessage),
       }
     );
+    
+    setNotification(request, "Saving Reply", "Reply Saved");
 
     const response = await request;
-
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Reply",
-      success: "Reply Saved",
-      error: genericErrorMessage,
-    });
 
     if (response.ok) {
       const data = await response.json();
@@ -70,7 +64,7 @@ export const TicketReply = (props: Props) => {
           className="btn"
           color="primary"
           onClick={update}
-          disabled={ticket.completed}
+          disabled={ticket.completed || notification.pending}
         >
           Send
         </Button>

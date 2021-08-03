@@ -16,9 +16,7 @@ import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
 import {
-  fetchWithFailOnNotOk,
-  genericErrorMessage,
-  toast,
+  usePromiseNotification,
 } from "../Util/Notifications";
 import { ValidationProvider } from "../FormValidation";
 
@@ -38,6 +36,8 @@ export const QuoteContainer = () => {
 
   const [editFields, setEditFields] = useState(false);
 
+  const [notification, setNotification] = usePromiseNotification();
+
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
@@ -49,8 +49,12 @@ export const QuoteContainer = () => {
         setProject(projectWithQuote.project);
         setRates(rateJson);
 
-        if (projectWithQuote.project.status !== "Requested" && projectWithQuote.project.status !== "ChangeRequested") {
-          // can only create quote for newly requests projects or change requests. 
+        if (
+          projectWithQuote.project.status !== "Requested" &&
+          projectWithQuote.project.status !== "ChangeRequested" &&
+          projectWithQuote.project.status !== "QuoteRejected"
+        ) {
+          // can only create quote for newly requests projects or change requests.
           history.push(`/Project/Details/${projectId}`);
         }
 
@@ -156,11 +160,7 @@ export const QuoteContainer = () => {
       body: JSON.stringify(quote),
     });
 
-    toast.promise(fetchWithFailOnNotOk(request), {
-      loading: "Saving Quote",
-      success: "Quote Saved",
-      error: genericErrorMessage,
-    });
+    setNotification(request, "Saving Quote", "Quote Saved");
 
     // TODO: add progress and hide info while saving
     const saveResponse = await request;
@@ -230,7 +230,7 @@ export const QuoteContainer = () => {
   }
 
   return (
-    //<ValidationProvider>
+    <ValidationProvider>
       <div className="card-wrapper">
         <ProjectHeader
           project={project}
@@ -255,10 +255,10 @@ export const QuoteContainer = () => {
             </div>
             <QuoteTotals quote={quote}></QuoteTotals>
             <div className="row justify-content-center">
-              <button className="btn btn-link mt-4" onClick={() => save(false)}>
+              <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
                 Save Quote
             </button>
-              <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+              <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending}>
                 Submit Quote
             </button>
             </div>
@@ -268,6 +268,6 @@ export const QuoteContainer = () => {
         <div>Debug: {JSON.stringify(quote)}</div>
         <div>Debug Rates: {JSON.stringify(rates)}</div>
       </div>
-    //</ValidationProvider>
+    </ValidationProvider>
   );
 };
