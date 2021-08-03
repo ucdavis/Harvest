@@ -24,7 +24,7 @@ namespace Harvest.Web.Services
         Task<bool> ChangeRequest(Project project);
 
         Task<bool> QuoteApproved(Project project);
-        Task<bool> QuoteDenied(Project project);
+        Task<bool> QuoteDenied(Project project, string reason);
 
         Task<bool> ApproveAccounts(Project project, string[] emails);
 
@@ -156,7 +156,7 @@ namespace Harvest.Web.Services
             return true;
         }
 
-        private async Task<bool> QuoteDecision(Project project, bool approved)
+        private async Task<bool> QuoteDecision(Project project, string reason, bool approved)
         {
             var url = $"{_emailSettings.BaseUrl}/Project/Details/";
 
@@ -168,7 +168,8 @@ namespace Harvest.Web.Services
                 ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                 Decision = approved ? "Approved":"Denied",
                 DecisionColor = approved ? QuoteDecisionModel.Colors.Approved : QuoteDecisionModel.Colors.Denied,
-                ButtonUrl = $"{url}{project.Id}"
+                ButtonUrl = $"{url}{project.Id}",
+                RejectReason = reason
             };
 
             var textVersion = $"A quote has been {model.Decision} for project {model.ProjectName} by {model.PI}";
@@ -190,12 +191,12 @@ namespace Harvest.Web.Services
 
         public async Task<bool> QuoteApproved(Project project)
         {
-            return await QuoteDecision(project, true);
+            return await QuoteDecision(project, null, true);
         }
 
-        public async Task<bool> QuoteDenied(Project project)
+        public async Task<bool> QuoteDenied(Project project, string reason)
         {
-            return await QuoteDecision(project, false);
+            return await QuoteDecision(project, reason, false);
         }
 
         public async Task<bool> ApproveAccounts(Project project, string[] emails)
