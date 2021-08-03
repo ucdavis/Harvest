@@ -24,12 +24,12 @@ beforeEach(() => {
 afterEach(() => {
   // cleanup on exiting
   // clear any mocks living on fetch
-  if ((global.fetch as any).mockReset) {
-    (global.fetch as any).mockReset();
+  if ((global.fetch as any).mockClear) {
+    (global.fetch as any).mockClear();
   }
   unmountComponentAtNode(container);
   container.remove();
-});
+}, 10000);
 
 describe("Project Detail Container", () => {
   it("Shows loading screen", async () => {
