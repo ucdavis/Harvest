@@ -20,6 +20,7 @@ import {
   genericErrorMessage,
   toast,
 } from "../Util/Notifications";
+import { ValidationProvider } from "../FormValidation";
 
 interface RouteParams {
   projectId?: string;
@@ -75,7 +76,7 @@ export const QuoteContainer = () => {
           quoteToUse.years = Math.max(
             1,
             new Date(projectWithQuote.project.end).getFullYear() -
-              new Date(projectWithQuote.project.start).getFullYear()
+            new Date(projectWithQuote.project.start).getFullYear()
           );
 
           setQuote(quoteToUse);
@@ -140,9 +141,9 @@ export const QuoteContainer = () => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
-        (a.workItems = a.workItems.filter(
-          (w) => w.quantity !== 0 || w.total !== 0
-        ))
+      (a.workItems = a.workItems.filter(
+        (w) => w.quantity !== 0 || w.total !== 0
+      ))
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
@@ -229,42 +230,44 @@ export const QuoteContainer = () => {
   }
 
   return (
-    <div className="card-wrapper">
-      <ProjectHeader
-        project={project}
-        title={"Field Request #" + (project?.id || "")}
-      ></ProjectHeader>
-      <div className="card-green-bg">
-        <div className="card-content">
-          <div className="quote-details">
-            <h2>Quote Details</h2>
-            <hr />
-            <ProjectDetail
-              rates={rates}
-              quote={quote}
-              updateQuote={setQuote}
-              setEditFields={setEditFields}
-            />
-            <ActivitiesContainer
-              quote={quote}
-              rates={rates}
-              updateQuote={setQuote}
-            />
-          </div>
-          <QuoteTotals quote={quote}></QuoteTotals>
-          <div className="row justify-content-center">
-            <button className="btn btn-link mt-4" onClick={() => save(false)}>
-              Save Quote
+    //<ValidationProvider>
+      <div className="card-wrapper">
+        <ProjectHeader
+          project={project}
+          title={"Field Request #" + (project?.id || "")}
+        ></ProjectHeader>
+        <div className="card-green-bg">
+          <div className="card-content">
+            <div className="quote-details">
+              <h2>Quote Details</h2>
+              <hr />
+              <ProjectDetail
+                rates={rates}
+                quote={quote}
+                updateQuote={setQuote}
+                setEditFields={setEditFields}
+              />
+              <ActivitiesContainer
+                quote={quote}
+                rates={rates}
+                updateQuote={setQuote}
+              />
+            </div>
+            <QuoteTotals quote={quote}></QuoteTotals>
+            <div className="row justify-content-center">
+              <button className="btn btn-link mt-4" onClick={() => save(false)}>
+                Save Quote
             </button>
-            <button className="btn btn-primary mt-4" onClick={() => save(true)}>
-              Submit Quote
+              <button className="btn btn-primary mt-4" onClick={() => save(true)}>
+                Submit Quote
             </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>Debug: {JSON.stringify(quote)}</div>
-      <div>Debug Rates: {JSON.stringify(rates)}</div>
-    </div>
+        <div>Debug: {JSON.stringify(quote)}</div>
+        <div>Debug Rates: {JSON.stringify(rates)}</div>
+      </div>
+    //</ValidationProvider>
   );
 };
