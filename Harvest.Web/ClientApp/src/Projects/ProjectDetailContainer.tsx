@@ -130,7 +130,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-small mr-4"
                   to={`/request/create/${project.id}`}
                 >
-                  Request Project Change
+                  Change Requirements
                 </Link>
               </ShowFor>
             </div>
