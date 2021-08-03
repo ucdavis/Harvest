@@ -164,7 +164,7 @@ export const ExpenseEntryContainer = () => {
           <button
             className="btn btn-primary btn-lg"
             onClick={submit}
-            disabled={notification.pending}
+            disabled={notification.pending || activities.map((activity) => activity.total).reduce((a, b) => a + b, 0) === 0}
           >
             Submit Expense
           </button>
@@ -172,6 +172,7 @@ export const ExpenseEntryContainer = () => {
       </div>
 
       <div>DEBUG: {JSON.stringify(activities)}</div>
+      <div>DEBUG Grand Total: {activities.map((activity) => activity.total).reduce((a, b) => a + b, 0)}</div>
     </div>
   );
 };
