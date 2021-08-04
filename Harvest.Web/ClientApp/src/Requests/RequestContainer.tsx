@@ -11,6 +11,7 @@ import { requestSchema } from "../schemas";
 import { Project, CropType } from "../types";
 import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 
 interface RouteParams {
   projectId?: string;
@@ -102,7 +103,10 @@ export const RequestContainer = () => {
 
     if (response.ok) {
       // if user is becoming a PI for first time, grant them the PI role
-      if (project.principalInvestigator.id === userDetail.id && !userRoles.includes("PI")) {
+      if (
+        project.principalInvestigator.id === userDetail.id &&
+        !userRoles.includes("PI")
+      ) {
         userRoles.push("PI");
       }
       const data = await response.json();
@@ -127,6 +131,12 @@ export const RequestContainer = () => {
     <div className="row justify-content-center">
       <div className="card-wrapper col-md-6">
         <div className="card-content">
+          {projectId !== undefined && (
+            <ProjectHeader
+              project={project}
+              title={"Original Field Request #" + (project?.id || "")}
+            />
+          )}
           <div className="card-head">
             <h2>
               {projectId ? "Create Change Request" : "Create Field Request"}
