@@ -78,7 +78,6 @@ export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shap
   acreageRateDescription: yup.string().required(),
   activities: yup.array().of(activitySchema).required(),
   years: yup.number().integer().min(0).required(),
-  total: yup.number().min(0).required(),
   acreageTotal: yup.number().required(),
   activitiesTotal: yup.number().required(),
   laborTotal: yup.number().required(),

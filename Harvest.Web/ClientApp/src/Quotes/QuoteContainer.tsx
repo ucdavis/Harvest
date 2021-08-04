@@ -20,6 +20,7 @@ import {
 } from "../Util/Notifications";
 import { useInputValidator } from "../FormValidation";
 import { quoteContentSchema } from "../schemas";
+import { checkValidity } from "../Util/ValidationHelpers";
 
 interface RouteParams {
   projectId?: string;
@@ -29,6 +30,7 @@ export const QuoteContainer = () => {
   const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
 
   const { formErrorCount } = useInputValidator<QuoteContent>(quoteContentSchema);
 
@@ -145,6 +147,14 @@ export const QuoteContainer = () => {
   ]);
 
   const save = async (submit: boolean) => {
+    if (submit) {
+      const errors = await checkValidity(quote, quoteContentSchema);
+      setInputErrors(errors);
+      if (errors.length > 0) {
+        return;
+      }
+    }
+
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
@@ -258,6 +268,17 @@ export const QuoteContainer = () => {
             />
           </div>
           <QuoteTotals quote={quote}></QuoteTotals>
+          <div className="row justify-content-center">
+            <ul>
+              {inputErrors.map((error, i) => {
+                return (
+                  <li className="text-danger" key={`error-${i}`}>
+                    {error}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
           <div className="row justify-content-center">
             <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
               Save Quote
