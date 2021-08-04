@@ -173,7 +173,7 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> RejectQuote(int projectId, [FromBody] QuoteRejectionModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
 
