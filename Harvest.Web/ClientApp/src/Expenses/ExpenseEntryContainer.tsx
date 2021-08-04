@@ -32,7 +32,7 @@ export const ExpenseEntryContainer = () => {
 
   const { projectId } = useParams<RouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
-
+  
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([
     getDefaultActivity(1),
@@ -131,6 +131,9 @@ export const ExpenseEntryContainer = () => {
     const newActivityId = Math.max(...activities.map((a) => a.id), 0) + 1;
     setActivities((acts) => [...acts, getDefaultActivity(newActivityId)]);
   };
+// return true if the sum of the activity totals is greater than 0
+  const isValid = () =>
+    activities.reduce((prev, curr) => prev + curr.total || 0, 0) > 0;
 
   if (projectId === undefined) {
     // need to pick the project we want to use
@@ -164,7 +167,7 @@ export const ExpenseEntryContainer = () => {
           <button
             className="btn btn-primary btn-lg"
             onClick={submit}
-            disabled={notification.pending}
+            disabled={notification.pending || !isValid()}
           >
             Submit Expense
           </button>
@@ -172,6 +175,7 @@ export const ExpenseEntryContainer = () => {
       </div>
 
       <div>DEBUG: {JSON.stringify(activities)}</div>
+      <div>DEBUG Grand Total: {activities.map((activity) => activity.total).reduce((a, b) => a + b || 0, 0)}</div>
     </div>
   );
 };
