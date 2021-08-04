@@ -9,6 +9,7 @@ import { ConditionalRoute } from './ConditionalRoute'
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
+import { HomeContainer } from "./Home/HomeContainer";
 import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
@@ -31,8 +32,7 @@ function App() {
   return (
     <AppContext.Provider value={Harvest}>
       <Toaster />
-      <Route exact path="/" component={Home} />
-      <Route exact path="/home/spa" component={Spa} />
+      <Route exact path="/" component={HomeContainer} />
       <Route exact path="/request/create/:projectId?" component={RequestContainer} />
       <ConditionalRoute roles={["PI"]} path="/request/approve/:projectId" component={ApprovalContainer} />
       <ConditionalRoute
@@ -75,8 +75,5 @@ function App() {
     </AppContext.Provider>
   );
 }
-
-const Home = () => <div>Home</div>;
-const Spa = () => <div className="sassy">I am a SPA</div>;
 
 export default App;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
-import { ProjectAccount, ProjectWithQuote } from "../types";
+import { Project, ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { QuotePDF } from "../Pdf/QuotePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -63,7 +63,8 @@ export const ApprovalContainer = () => {
     const response = await request;
 
     if (response.ok) {
-      history.replace(`/Project/Details/${projectId}`);
+      const proj: Project = await response.json();
+      history.replace(`/Project/Details/${proj.id}`);
     }
   };
 

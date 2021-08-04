@@ -173,6 +173,8 @@ export const QuoteContainer = () => {
     }
   };
 
+  const isValid = () => quote.grandTotal > 0;
+
   if (!project) {
     return <div>Loading</div>;
   }
@@ -260,7 +262,7 @@ export const QuoteContainer = () => {
             <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
               Save Quote
             </button>
-            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending || formErrorCount > 0}>
+            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending || !isValid() || formErrorCount > 0}>
               Submit Quote
             </button>
           </div>
@@ -269,6 +271,7 @@ export const QuoteContainer = () => {
 
       <div>Debug: {JSON.stringify(quote)}</div>
       <div>Debug Rates: {JSON.stringify(rates)}</div>
+      <div>Debug: Total:{quote.grandTotal}</div>
     </div>
   );
 };

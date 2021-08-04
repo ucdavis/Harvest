@@ -93,7 +93,7 @@ export const ProjectDetailContainer = () => {
                 roles={["FieldManager", "Supervisor"]}
                 condition={
                   project.status === "Requested" ||
-                  project.status === "ChangeRequested" || 
+                  project.status === "ChangeRequested" ||
                   project.status === "QuoteRejected"
                 }
               >
@@ -123,6 +123,14 @@ export const ProjectDetailContainer = () => {
                   to={`/request/changeAccount/${project.id}`}
                 >
                   Change Accounts
+                </Link>
+              </ShowFor>
+              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/request/create/${project.id}`}
+                >
+                  Change Requirements
                 </Link>
               </ShowFor>
             </div>
@@ -159,14 +167,16 @@ export const ProjectDetailContainer = () => {
         </div>
       </div>
       <div>
-        <div className="row project-detail-tables">
-          <div className="col-md-6">
-            <RecentTicketsContainer compact={true} projectId={projectId} />
+        {project.status !== "ChangeRequested" && (
+          <div className="row project-detail-tables">
+            <div className="col-md-6">
+              <RecentTicketsContainer compact={true} projectId={projectId} />
+            </div>
+            <div className="col-md-6">
+              <RecentInvoicesContainer compact={true} projectId={projectId} />
+            </div>
           </div>
-          <div className="col-md-6">
-            <RecentInvoicesContainer compact={true} projectId={projectId} />
-          </div>
-        </div>
+        )}
         <div className="row justify-content-center">
           <div className="col-md-5">
             <div className="card-wrapper no-green mt-4 mb-4">
