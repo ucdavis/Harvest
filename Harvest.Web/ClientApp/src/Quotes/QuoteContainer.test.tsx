@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
 import { QuoteContainer } from "./QuoteContainer";
-import { fakeAppContext, fakeProject, sampleRates } from "../Test/mockData";
+import { fakeAppContext, fakeProjectWithQuote, sampleRates } from "../Test/mockData";
 import { ValidationProvider } from "../FormValidation";
 
 let container: Element;
@@ -56,7 +56,7 @@ describe("Quote Container", () => {
       const response = {
         status: 200,
         ok: true,
-        json: () => Promise.resolve(fakeProject),
+        json: () => Promise.resolve(fakeProjectWithQuote),
       };
 
       const response2 = {
