@@ -2,7 +2,8 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
-import { ValidationContext } from "./ValidationProvider"
+import { ValidationContext } from "./ValidationProvider";
+import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
 export function useInputValidator<T>(schema: AnyObjectSchema) {
   type TKey = keyof T;
@@ -21,8 +22,8 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   const [dirtyFields, setDirtyFields] = useState([] as TKey[]);
 
   useEffect(() => {
-    const errorCount = Object.values(errors).filter(v => (v || "") !== "").length;
-    const previousErrorCount = Object.values(previousErrors).filter(v => (v || "") !== "").length;
+    const errorCount = Object.values(errors).filter(notEmptyOrFalsey).length;
+    const previousErrorCount = Object.values(previousErrors).filter(notEmptyOrFalsey).length;
     if (errorCount !== previousErrorCount) {
       setFormErrorCount(formErrorCount + errorCount - previousErrorCount);
     }
@@ -40,7 +41,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     const tempObject = { [name]: value } as unknown as T;
     try {
       await schema.validateAt(name as string, tempObject);
-      if ((errors[name] || "") !== "") {
+      if (notEmptyOrFalsey(errors[name])) {
         setErrors({ ...errors, [name]: "" });
       }
     } catch (e: unknown) {
@@ -53,7 +54,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   }, 250);
 
   const getClassName = (name: TKey, passThroughClassNames: string = "") => {
-    return (errors[name] || "") !== ""
+    return notEmptyOrFalsey(errors[name])
       ? `${passThroughClassNames} is-invalid`
       : passThroughClassNames;
   }
@@ -61,7 +62,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   const InputErrorMessage = ({ name }: { name: TKey }) => {
     const message = errors[name];
 
-    return ((message || "") !== "")
+    return notEmptyOrFalsey(errors[name])
       ? <p className="text-danger">{message}</p>
       : null;
   }
@@ -94,7 +95,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   const resetField = (name: TKey) => {
     setTouchedFields(touchedFields.filter(f => f === name));
     setDirtyFields(dirtyFields.filter(f => f === name));
-    if ((errors[name] || "") !== "") {
+    if (notEmptyOrFalsey(errors[name])) {
       setErrors({ ...errors, [name]: "" });
     }
   };
