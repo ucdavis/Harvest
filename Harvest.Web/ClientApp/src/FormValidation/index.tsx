@@ -67,12 +67,12 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   const [dirtyFields, setDirtyFields] = useState([] as TKey[]);
 
   useEffect(() => {
-    const errorCount = Object.keys(errors).length;
-    const previousErrorCount = Object.keys(previousErrors).length;
+    const errorCount = Object.values(errors).filter(v => (v || "") !== "").length;
+    const previousErrorCount = Object.values(previousErrors).filter(v => (v || "") !== "").length;
     if (errorCount !== previousErrorCount) {
       setFormErrorCount(formErrorCount + errorCount - previousErrorCount);
     }
-  }, [errors, previousErrors]);
+  }, [errors]);
 
   useEffect(() => {
     if (formIsReset) {
@@ -164,7 +164,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
 // provides previous value of given state
 function usePrevious<T>(value: T) {
   const ref = useRef<T>();
-  useEffect(() => { ref.current = value; }, [value]);
+  useEffect(() => { ref.current = value; });
   return ref.current;
 }
 
