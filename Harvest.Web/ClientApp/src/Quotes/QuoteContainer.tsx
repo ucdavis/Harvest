@@ -280,7 +280,7 @@ export const QuoteContainer = () => {
             </ul>
           </div>
           <div className="row justify-content-center">
-            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
+            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending || formErrorCount > 0}>
               Save Quote
             </button>
             <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending || !isValid() || formErrorCount > 0}>
