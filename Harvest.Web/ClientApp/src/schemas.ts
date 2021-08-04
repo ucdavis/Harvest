@@ -46,11 +46,11 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   activityId: yup.number().required().integer(),
   type: yup.mixed().required().oneOf(["Acreage", "Equipment", "Other", "Labor"]),
   rateId: yup.number().required().default(0),
-  rate: yup.number().required().positive(),
+  rate: yup.number().required().positive("Work item rate must be a positive number"),
   description: yup.string().defined(),
-  quantity: yup.number().required().positive(),
+  quantity: yup.number().required().positive("Work item time/unit must be a positive nmber"),
   unit: yup.string().defined(),
-  total: yup.number().required().positive()
+  total: yup.number().required().positive("Work item total must be positive")
 });
 
 export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
@@ -62,22 +62,22 @@ export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
 });
 
 export const activitySchema: SchemaOf<Activity> = yup.object().shape({
-  total: yup.number().required(),
+  total: yup.number().required("Activity total is required"),
   id: yup.number().required(),
-  name: yup.string().required(),
-  year: yup.number().required(),
-  adjustment: yup.number().required(),
+  name: yup.string().required("Activity name is required"),
+  year: yup.number().required("Activity year is required"),
+  adjustment: yup.number().required("Activity adjustment is required"),
   workItems: yup.array().of(workItemSchema).required()
 });
 
 export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shape({
-  projectName: yup.string().required(),
-  acres: yup.number().min(0).required(),
-  acreageRate: yup.number().required(),
+  projectName: yup.string().required("Project name is required"),
+  acres: yup.number().min(0, "Number of acres cannot be negative").required("Number of acres is required"),
+  acreageRate: yup.number().required("Acreage rate is required"),
   acreageRateId: yup.number().required(),
-  acreageRateDescription: yup.string().required(),
+  acreageRateDescription: yup.string().defined(),
   activities: yup.array().of(activitySchema).required(),
-  years: yup.number().integer().min(0).required(),
+  years: yup.number().integer().min(0, "Years cannot be negative").required(),
   acreageTotal: yup.number().required(),
   activitiesTotal: yup.number().required(),
   laborTotal: yup.number().required(),

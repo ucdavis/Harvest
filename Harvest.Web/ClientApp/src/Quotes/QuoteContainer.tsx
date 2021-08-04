@@ -147,14 +147,6 @@ export const QuoteContainer = () => {
   ]);
 
   const save = async (submit: boolean) => {
-    if (submit) {
-      const errors = await checkValidity(quote, quoteContentSchema);
-      setInputErrors(errors);
-      if (errors.length > 0) {
-        return;
-      }
-    }
-
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
@@ -163,6 +155,14 @@ export const QuoteContainer = () => {
       ))
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
+
+    if (submit) {
+      const errors = await checkValidity(quote, quoteContentSchema);
+      setInputErrors(errors);
+      if (errors.length > 0) {
+        return;
+      }
+    }
 
     const request = fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
