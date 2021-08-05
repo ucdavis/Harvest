@@ -24,8 +24,8 @@ export const FieldManagerHome = () => {
       <ul className="list-group quick-actions">
         {projects !== undefined && projects.length > 0 && (
           <li className="list-group-item">
-            <Link to="/">
-              (TODO) View Projects Requiring Attention{" "}
+            <Link to="/project/needsAttention">
+              View Projects Requiring Attention{" "}
               <span className="badge badge-pill badge-primary">
                 {projects.length}
               </span>

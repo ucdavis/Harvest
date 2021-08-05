@@ -34,17 +34,16 @@ namespace Harvest.Web.Controllers
 
         public ActionResult Index()
         {
-            // // TODO: only show user's projects
-            // var projects = await _dbContext.Projects.Take(20).ToArrayAsync();
-            // return View(projects);
             return View("React");
         }
 
         public ActionResult Mine()
         {
-            // // TODO: only show user's projects
-            // var projects = await _dbContext.Projects.Take(20).ToArrayAsync();
-            // return View(projects);
+            return View("React");
+        }
+
+        public ActionResult NeedsAttention()
+        {
             return View("React");
         }
 
@@ -66,6 +65,7 @@ namespace Harvest.Web.Controllers
             var attentionStatuses = new string[] { Project.Statuses.Requested, Project.Statuses.ChangeRequested, Project.Statuses.QuoteRejected }.ToArray();
 
             return Ok(await _dbContext.Projects.AsNoTracking()
+                .Include(p => p.PrincipalInvestigator)
                 .Where(p => p.IsActive && attentionStatuses.Contains(p.Status))
                 .OrderBy(p => p.CreatedOn) // older is more important, so it should be first
                 .ToArrayAsync());
