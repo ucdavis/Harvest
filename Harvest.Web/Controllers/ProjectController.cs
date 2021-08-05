@@ -21,7 +21,7 @@ namespace Harvest.Web.Controllers
         private readonly IUserService _userService;
         private readonly IProjectHistoryService _historyService;
         private readonly StorageSettings storageSettings;
-        private readonly IFileService fileService;        
+        private readonly IFileService fileService;
         public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
             IFileService fileService, IProjectHistoryService historyService)
         {
@@ -59,6 +59,29 @@ namespace Harvest.Web.Controllers
                 .ToArrayAsync());
         }
 
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> RequiringManagerAttention()
+        {
+            // return basic info on projects which are waiting for manager attention
+            var attentionStatuses = new string[] { Project.Statuses.Requested, Project.Statuses.ChangeRequested, Project.Statuses.QuoteRejected }.ToArray();
+
+            return Ok(await _dbContext.Projects.AsNoTracking()
+                .Where(p => p.IsActive && attentionStatuses.Contains(p.Status))
+                .OrderBy(p => p.CreatedOn) // older is more important, so it should be first
+                .ToArrayAsync());
+        }
+
+        public async Task<ActionResult> RequiringPIAttention()
+        {
+            // return basic info on projects which are waiting for PI attention
+            var attentionStatuses = new string[] { Project.Statuses.PendingApproval, Project.Statuses.PendingAccountApproval }.ToArray();
+
+            return Ok(await _dbContext.Projects.AsNoTracking()
+                .Where(p => p.IsActive && attentionStatuses.Contains(p.Status))
+                .Select(p => new { p.Id, p.Status, p.Name })
+                .ToArrayAsync());
+        }
+
         public async Task<ActionResult> GetMine()
         {
             var user = await _userService.GetCurrentUser();
@@ -74,8 +97,8 @@ namespace Harvest.Web.Controllers
         {
             var user = await _userService.GetCurrentUser();
             var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
-            return Ok(await _dbContext.Invoices.Where(a => 
-                a.ProjectId == projectId 
+            return Ok(await _dbContext.Invoices.Where(a =>
+                a.ProjectId == projectId
                 && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
                 .ToArrayAsync());
         }
@@ -108,7 +131,8 @@ namespace Harvest.Web.Controllers
                 return Forbid();
             }
 
-            foreach (var file in project.Attachments) {
+            foreach (var file in project.Attachments)
+            {
                 file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
