@@ -75,4 +75,30 @@ describe("Expense Entry Container", () => {
 
     expect(price?.textContent).toContain("$60.00");
   });
+
+  it("Total Value", async () => {
+    await act(async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(rateResponse));
+      
+      render(
+        <MemoryRouter initialEntries={["/expense/entry/3"]}>
+          <Route path="/expense/entry/:projectId">
+            <ExpenseEntryContainer />
+          </Route>
+        </MemoryRouter>,
+        container
+      );
+    });
+
+    const dropDown = container.querySelector("select");
+    Simulate.change(dropDown, { target: { value: "3" }});
+
+    const unitsInput = container.querySelector("#units");
+    Simulate.change(unitsInput, { target: { value: "3" }});
+    const total = container.querySelector(".col-1");
+
+    expect(total?.textContent).toContain("$180.00");
+  });
 });
