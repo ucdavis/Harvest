@@ -71,7 +71,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
   };
 
   return <Row
-    className="activity-line-item align-items-center"
+    className="activity-line-item"
 
   >
     <Col xs="5">
