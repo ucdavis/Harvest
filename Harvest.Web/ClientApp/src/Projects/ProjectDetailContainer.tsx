@@ -77,7 +77,7 @@ export const ProjectDetailContainer = () => {
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
-            <div className="col">
+            <div className="col-md-7">
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
                 condition={project.status === "Active"}
@@ -134,7 +134,7 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
             </div>
-            <div className="col text-right">
+            <div className="col-md-5 text-right">
               <ProjectUnbilledButton projectId={project.id} />
             </div>
           </div>
