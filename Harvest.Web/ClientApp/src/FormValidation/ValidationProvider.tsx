@@ -14,7 +14,7 @@ export interface ValidationContextState {
 
 export const ValidationContext = React.createContext<ValidationContextState | null>(null);
 
-export const ValidationProvider: React.FC = ({ children }) => {
+export const useValidationContext = () => {
 
   const [formErrorCount, setFormErrorCount] = useState(0);
   const [formIsTouched, setFormIsTouched] = useState(false);
@@ -33,7 +33,7 @@ export const ValidationProvider: React.FC = ({ children }) => {
     }
   }, [formErrorCount, formIsTouched, formIsDirty, contextIsReset, setcontextIsReset]);
 
-  const contextState: ValidationContextState = {
+  const context: ValidationContextState = {
     formErrorCount,
     setFormErrorCount,
     formIsTouched,
@@ -44,6 +44,16 @@ export const ValidationProvider: React.FC = ({ children }) => {
     contextIsReset,
   }
 
-  return <ValidationContext.Provider value={contextState}>{children}</ValidationContext.Provider>;
+  return context;
+}
+
+export interface ValidationProviderProps {
+  context?: ValidationContextState
+}
+
+export const ValidationProvider: React.FC<ValidationProviderProps> = (props) => {
+  const defaultContext = useValidationContext();
+
+  return <ValidationContext.Provider value={props.context || defaultContext}>{props.children}</ValidationContext.Provider>;
 }
 

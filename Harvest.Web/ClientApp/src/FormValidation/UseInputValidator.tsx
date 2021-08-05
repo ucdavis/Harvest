@@ -2,16 +2,15 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
-import { ValidationContext } from "./ValidationProvider";
+import { ValidationContext, ValidationContextState, useValidationContext } from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
 export function useInputValidator<T>(schema: AnyObjectSchema) {
   type TKey = keyof T;
 
-  const context = useContext(ValidationContext);
-  if (context === null) {
-    throw new Error("Form does not appear to be wrapped in a <ValidationProvider>");
-  }
+  const defaultContext = useValidationContext();
+  const providerContext = useContext(ValidationContext);
+  const context = providerContext || defaultContext;
 
   const { formErrorCount, setFormErrorCount, formIsTouched, setFormIsTouched, formIsDirty,
     setFormIsDirty, resetContext, contextIsReset } = context;
@@ -112,7 +111,8 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     formIsDirty,
     fieldIsDirty,
     resetContext,
-    resetField
+    resetField,
+    context
   }
 }
 
