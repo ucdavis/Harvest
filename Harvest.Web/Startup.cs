@@ -101,6 +101,8 @@ namespace Harvest.Web
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.WorkerAccess))));
                 options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigator))));
+                options.AddPolicy(AccessCodes.PrincipalInvestigatorAndWorker, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigatorAndWorker))));
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();

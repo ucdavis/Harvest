@@ -24,6 +24,7 @@ namespace Harvest.Web.Access
                 AccessCodes.WorkerAccess => new[] { Role.Codes.Worker, Role.Codes.Supervisor, Role.Codes.FieldManager },
                 // PI can access anything restricted to PI role
                 AccessCodes.PrincipalInvestigator => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager },
+                AccessCodes.PrincipalInvestigatorAndWorker => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.Worker },
                 _ => throw new ArgumentException($"{nameof(accessCode)} is not a valid {nameof(AccessCodes)} constant")
             };
         }

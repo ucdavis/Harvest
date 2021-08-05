@@ -87,10 +87,11 @@ namespace Harvest.Web.Controllers
         }
 
         // Returns JSON info of the project
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorAndWorker)]
         public async Task<ActionResult> Get(int projectId)
         {
             var user = await _userService.GetCurrentUser();
-            var hasAccess = await _userService.HasAccess(AccessCodes.WorkerAccess);
+
             var project = await _dbContext.Projects
                 .Include(a => a.Attachments)
                 .Include(p => p.Accounts)
@@ -103,10 +104,6 @@ namespace Harvest.Web.Controllers
                 return NotFound();
             }
 
-            if (!hasAccess && project.PrincipalInvestigatorId != user.Id)
-            {
-                return Forbid();
-            }
 
             foreach (var file in project.Attachments) {
                 file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
