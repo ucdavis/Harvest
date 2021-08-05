@@ -14,8 +14,7 @@ export interface ValidationContextState {
 
 export const ValidationContext = React.createContext<ValidationContextState | null>(null);
 
-export const useValidationContext = () => {
-
+export const useOrCreateValidationContext = (context?: ValidationContextState | null) => {
   const [formErrorCount, setFormErrorCount] = useState(0);
   const [formIsTouched, setFormIsTouched] = useState(false);
   const [formIsDirty, setFormIsDirty] = useState(false);
@@ -33,7 +32,12 @@ export const useValidationContext = () => {
     }
   }, [formErrorCount, formIsTouched, formIsDirty, contextIsReset, setcontextIsReset]);
 
-  const context: ValidationContextState = {
+  if (context) {
+    // wishing this early return could be earlier, but RULES of HOOKS
+    return context;
+  }
+
+  const newContext: ValidationContextState = {
     formErrorCount,
     setFormErrorCount,
     formIsTouched,
@@ -44,7 +48,7 @@ export const useValidationContext = () => {
     contextIsReset,
   }
 
-  return context;
+  return newContext;
 }
 
 export interface ValidationProviderProps {
@@ -52,8 +56,8 @@ export interface ValidationProviderProps {
 }
 
 export const ValidationProvider: React.FC<ValidationProviderProps> = (props) => {
-  const defaultContext = useValidationContext();
+  const context = useOrCreateValidationContext(props.context);
 
-  return <ValidationContext.Provider value={props.context || defaultContext}>{props.children}</ValidationContext.Provider>;
+  return <ValidationContext.Provider value={context}>{props.children}</ValidationContext.Provider>;
 }
 

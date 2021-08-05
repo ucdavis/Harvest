@@ -2,15 +2,13 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
-import { ValidationContext, ValidationContextState, useValidationContext } from "./ValidationProvider";
+import { ValidationContext, ValidationContextState, useOrCreateValidationContext } from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
 export function useInputValidator<T>(schema: AnyObjectSchema) {
   type TKey = keyof T;
 
-  const defaultContext = useValidationContext();
-  const providerContext = useContext(ValidationContext);
-  const context = providerContext || defaultContext;
+  const context = useOrCreateValidationContext(useContext(ValidationContext));
 
   const { formErrorCount, setFormErrorCount, formIsTouched, setFormIsTouched, formIsDirty,
     setFormIsDirty, resetContext, contextIsReset } = context;
