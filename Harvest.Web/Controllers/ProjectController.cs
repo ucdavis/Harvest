@@ -79,6 +79,7 @@ namespace Harvest.Web.Controllers
             return Ok(await _dbContext.Projects.AsNoTracking()
                 .Where(p => p.IsActive && attentionStatuses.Contains(p.Status))
                 .Select(p => new { p.Id, p.Status, p.Name })
+                .Take(4)
                 .ToArrayAsync());
         }
 
