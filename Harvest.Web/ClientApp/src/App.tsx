@@ -22,6 +22,7 @@ import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { Map } from "./Maps/Map";
+import { ValidationProvider } from "./FormValidation";
 
 
 // Global variable containing top-level app settings and info
@@ -48,7 +49,9 @@ function App() {
         path="/invoice/details/:invoiceId"
         component={InvoiceDetailContainer}
       />
-      <ConditionalRoute roles={["FieldManager","Supervisor"]} path="/quote/create/:projectId" component={QuoteContainer} />
+      <ConditionalRoute roles={["FieldManager", "Supervisor"]} path="/quote/create/:projectId" >
+        <ValidationProvider><QuoteContainer /></ValidationProvider>
+      </ConditionalRoute>
       <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project" >
         <ProjectListContainer projectSource="/Project/Active" />
       </ConditionalRoute>

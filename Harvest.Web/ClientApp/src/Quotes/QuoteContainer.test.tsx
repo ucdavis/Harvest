@@ -5,6 +5,7 @@ import { act } from "react-dom/test-utils";
 
 import { QuoteContainer } from "./QuoteContainer";
 import { fakeAppContext, fakeProjectWithQuote, sampleRates } from "../Test/mockData";
+import { ValidationProvider } from "../FormValidation";
 
 let container: Element;
 
@@ -40,7 +41,7 @@ describe("Quote Container", () => {
       render(
         <MemoryRouter initialEntries={["/quote/create/1"]}>
           <Route path="/quote/create/:projectId">
-            <QuoteContainer />
+            <ValidationProvider><QuoteContainer /></ValidationProvider>
           </Route>
         </MemoryRouter>,
         container
@@ -72,7 +73,7 @@ describe("Quote Container", () => {
       render(
         <MemoryRouter initialEntries={["/quote/create/3"]}>
           <Route path="/quote/create/:projectId">
-            <QuoteContainer />
+            <ValidationProvider><QuoteContainer /></ValidationProvider>
           </Route>
         </MemoryRouter>,
         container

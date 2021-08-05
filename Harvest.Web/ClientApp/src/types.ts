@@ -128,7 +128,6 @@ export interface QuoteContent {
   acreageRateDescription: string;
   activities: Activity[];
   years: number;
-  total: number;
   acreageTotal: number;
   activitiesTotal: number;
   laborTotal: number;
