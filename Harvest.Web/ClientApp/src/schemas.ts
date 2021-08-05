@@ -48,7 +48,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   rateId: yup.number().required().default(0),
   rate: yup.number().required().positive("Work item rate must be a positive number"),
   description: yup.string().defined(),
-  quantity: yup.number().required().positive("Work item time/unit must be a positive nmber"),
+  quantity: yup.number().required().positive("Work item time/unit must be a positive number"),
   unit: yup.string().defined(),
   total: yup.number().required().positive("Work item total must be positive")
 });
