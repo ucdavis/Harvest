@@ -49,9 +49,7 @@ function App() {
         path="/invoice/details/:invoiceId"
         component={InvoiceDetailContainer}
       />
-      <ConditionalRoute roles={["FieldManager", "Supervisor"]} path="/quote/create/:projectId" >
-        <ValidationProvider><QuoteContainer /></ValidationProvider>
-      </ConditionalRoute>
+      <ConditionalRoute roles={["FieldManager", "Supervisor"]} path="/quote/create/:projectId" component={QuoteContainer} />
       <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project" >
         <ProjectListContainer projectSource="/Project/Active" />
       </ConditionalRoute>
