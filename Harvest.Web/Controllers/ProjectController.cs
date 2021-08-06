@@ -48,12 +48,23 @@ namespace Harvest.Web.Controllers
         }
 
         [Authorize(Policy = AccessCodes.WorkerAccess)]
-        public async Task<ActionResult> Active()
+        public async Task<ActionResult> All()
         {
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Where(p => p.IsActive)
+                .OrderBy(p => p.Name)
+                .ToArrayAsync());
+        }
+
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
+        public async Task<ActionResult> Active()
+        {
+            // TODO: only show projects where between start and end?
+            return Ok(await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Where(p => p.IsActive && p.Status == Project.Statuses.Active)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }

@@ -57,9 +57,6 @@ export const InvoicePDF = (props: Props) => {
   const acreageExpenses = invoice.expenses.filter(
     (expense) => expense.type === "Acreage"
   );
-  const accounts = invoice.transfers.filter(
-    (transfer) => transfer.type === "Debit"
-  );
   const activities = groupBy(
     invoice.expenses.filter((expense) => expense.type !== "Acreage"),
     (expense) => expense.activity || "Activity"
@@ -98,7 +95,7 @@ export const InvoicePDF = (props: Props) => {
         })}
 
         {/* TODO: Need to add accounts section when accounts are displayed */}
-        
+
         <TotalSection
           acreageTotal={acreageTotal}
           laborTotal={laborTotal}
