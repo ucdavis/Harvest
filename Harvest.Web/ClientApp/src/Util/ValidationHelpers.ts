@@ -1,4 +1,4 @@
-﻿import { AnySchema, SchemaOf, ValidationError } from "yup";
+﻿import { AnySchema, ValidationError } from "yup";
 
 export interface ValidateOptions {
   strict?: boolean;
