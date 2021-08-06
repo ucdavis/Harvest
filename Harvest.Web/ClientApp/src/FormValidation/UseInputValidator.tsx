@@ -96,6 +96,14 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
       setErrors({ ...errors, [name]: "" });
     }
   };
+  const resetLocalFields = () => {
+    setTouchedFields([]);
+    setDirtyFields([]);
+    const errorCount = Object.values(errors).filter(notEmptyOrFalsey).length;
+    // update formErrorCount immediately instead of waiting for effect in case the owning component is about to be removed
+    setFormErrorCount(formErrorCount - errorCount);
+    setErrors({} as Record<TKey, string>);
+  }
 
   return {
     valueChanged,
@@ -110,6 +118,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     fieldIsDirty,
     resetContext,
     resetField,
+    resetLocalFields,
     context
   }
 }
