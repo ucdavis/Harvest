@@ -5,6 +5,7 @@ import { act } from "react-dom/test-utils";
 
 import { RequestContainer } from "./RequestContainer";
 import { fakeAppContext, fakeProject } from "../Test/mockData";
+import 'jest-canvas-mock';
 
 let container: Element;
 
