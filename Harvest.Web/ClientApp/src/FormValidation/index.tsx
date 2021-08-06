@@ -1,3 +1,3 @@
-﻿export { ValidationProvider } from "./ValidationProvider";
+﻿export * from "./ValidationProvider";
 export * from "./UseInputValidator"
 
