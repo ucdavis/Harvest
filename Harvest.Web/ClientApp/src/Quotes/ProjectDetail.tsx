@@ -2,16 +2,7 @@ import React from "react";
 
 import { QuoteContent, Rate, WorkItemImpl } from "../types";
 
-import {
-  Button,
-  Col,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Label,
-  Row,
-} from "reactstrap";
+import { Button, Col, Input, Label, Row } from "reactstrap";
 
 import { formatCurrency } from "../Util/NumberFormatting";
 import { Location } from "../Fields/Location";
@@ -26,7 +17,12 @@ interface Props {
 }
 
 export const ProjectDetail = (props: Props) => {
-  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<QuoteContent>(quoteContentSchema);
+  const {
+    onChange,
+    InputErrorMessage,
+    getClassName,
+    onBlur,
+  } = useInputValidator<QuoteContent>(quoteContentSchema);
 
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {
@@ -79,12 +75,12 @@ export const ProjectDetail = (props: Props) => {
           type="text"
           id="projectName"
           value={props.quote.projectName}
-          onChange={onChange("projectName",(e) =>
-            props.updateQuote({ ...props.quote, projectName: e.target.value }))
-          }
+          onChange={onChange("projectName", (e) =>
+            props.updateQuote({ ...props.quote, projectName: e.target.value })
+          )}
           onBlur={onBlur("projectName")}
         />
-        <InputErrorMessage name="projectName"/>
+        <InputErrorMessage name="projectName" />
         <br />
         <Row className="align-items-baseline">
           <Col>
@@ -97,8 +93,8 @@ export const ProjectDetail = (props: Props) => {
               onChange={onChange("acreageRateId", (e) =>
                 setAcreageRate(
                   props.rates.find((r) => r.id === parseInt(e.target.value))
-                ))
-              }
+                )
+              )}
               onBlur={onBlur("acreageRateId")}
             >
               <option value="0">-- Select Acreage Rate --</option>
@@ -127,8 +123,8 @@ export const ProjectDetail = (props: Props) => {
                   props.updateQuote({
                     ...props.quote,
                     acres: parseFloat(e.target.value),
-                  }))
-                }
+                  })
+                )}
                 onBlur={onBlur("acres")}
               />
               <InputErrorMessage name="acres" />
