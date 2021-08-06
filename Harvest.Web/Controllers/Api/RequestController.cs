@@ -144,6 +144,7 @@ namespace Harvest.Web.Controllers
             project.Status = Project.Statuses.Active;
             project.IsApproved = true;
             project.QuoteTotal = (decimal)quoteDetail.GrandTotal;
+            project.Name = quoteDetail.ProjectName;
 
             foreach (var quoteField in quoteDetail.Fields)
             {
