@@ -1,7 +1,24 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
 
 import AppContext from "../Shared/AppContext";
+import { WorkerHome } from "./WorkerHome";
+import { FieldManagerHome } from "./FieldManagerHome";
+import { SupervisorHome } from "./SupervisorHome";
+import { PIHome } from "./PIHome";
+import { RoleName } from "../types";
+
+const ShowCustomActions = (roles: RoleName[]) => {
+  if (roles.includes("FieldManager")) {
+    return <FieldManagerHome />;
+  } else if (roles.includes("Supervisor")) {
+    return <SupervisorHome />;
+  } else if (roles.includes("Worker")) {
+    return <WorkerHome />;
+  } else {
+    // basic view for PI or person without role
+    return <PIHome />;
+  }
+};
 
 export const HomeContainer = () => {
   const userInfo = useContext(AppContext);
@@ -16,24 +33,7 @@ export const HomeContainer = () => {
           tempor incididunt ut labore et dolore magna aliqua.
         </p>
         <hr />
-        <h5>Quick Actions</h5>
-        <ul className="list-group quick-actions">
-          <li className="list-group-item">
-            <Link to="/project">Cras justo odio</Link>
-          </li>
-          <li className="list-group-item">
-            <Link to="/project">Dapibus ac facilisis in</Link>
-          </li>
-          <li className="list-group-item">
-            <Link to="/project">Morbi leo risus</Link>
-          </li>
-          <li className="list-group-item">
-            <Link to="/project">Porta ac consectetur ac</Link>
-          </li>
-          <li className="list-group-item">
-            <Link to="/project">Vestibulum at ero</Link>
-          </li>
-        </ul>
+        {ShowCustomActions(userInfo.user.roles)}
       </div>
       <div className="col text-center">
         <img

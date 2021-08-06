@@ -65,10 +65,12 @@ namespace Harvest.Web.Controllers
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> Delete(int expenseId) {
+        public async Task<ActionResult> Delete(int expenseId)
+        {
             var expense = await _dbContext.Expenses.FindAsync(expenseId);
 
-            if (expense == null) {
+            if (expense == null)
+            {
                 return NotFound();
             }
 
@@ -90,7 +92,24 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<ActionResult> GetUnbilledTotal(int projectId)
         {
-            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId).SumAsync(e=>e.Total));
+            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId).SumAsync(e => e.Total));
+        }
+
+        // Get just the total of unbilled expenses for the current project
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
+        [HttpGet]
+        public async Task<ActionResult> GetRecentExpensedProjects()
+        {
+            var user = await _userService.GetCurrentUser();
+
+            // get projects where user has entered an expense in the last month
+            var projects = await _dbContext.Projects.AsNoTracking()
+                .Where(p => p.IsActive && p.Expenses.Any(e => e.CreatedById == user.Id && e.CreatedOn > DateTime.UtcNow.AddMonths(-1)))
+                .Select(p => new { p.Id, p.Status, p.Name })
+                .Take(4) // limit to 4 projects
+                .ToArrayAsync();
+
+            return Ok(projects);
         }
     }
 }

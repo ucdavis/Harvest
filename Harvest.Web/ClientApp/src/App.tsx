@@ -53,6 +53,9 @@ function App() {
       <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project" >
         <ProjectListContainer projectSource="/Project/Active" />
       </ConditionalRoute>
+      <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project/needsAttention" >
+        <ProjectListContainer projectSource="/Project/RequiringManagerAttention" />
+      </ConditionalRoute>
       <ConditionalRoute exact roles={["PI"]} path="/project/mine" >
         <ProjectListContainer projectSource="/Project/GetMine" />
       </ConditionalRoute>
