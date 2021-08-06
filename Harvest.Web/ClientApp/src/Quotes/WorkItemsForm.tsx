@@ -159,34 +159,6 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
 
 export const WorkItemsForm = (props: WorkItemsFormProps) => {
-  const rateItemChanged = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    workItem: WorkItem
-  ) => {
-    const rateId = parseInt(e.target.value);
-    const rate = props.rates.find((r) => r.id === rateId);
-
-    // rate can be undefinied if they select the default option
-    if (rate !== undefined) {
-      // new rate selected, update the work item with defaults
-      props.updateWorkItems({
-        ...workItem,
-        description: requiresCustomDescription(rate.unit)
-          ? ""
-          : rate.description,
-        rateId,
-        rate: rate.price,
-        unit: rate.unit,
-        total: 0,
-      });
-    }
-  };
-
-  // TODO: Determine a better way of working out which other options need extra description text
-  const requiresCustomDescription = (unit: string) => {
-    return props.category === "Other" && unit === "Unit";
-  };
-
   return (
     <div className="activity-line">
       <Row>
