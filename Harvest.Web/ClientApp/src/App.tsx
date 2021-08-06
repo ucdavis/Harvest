@@ -65,7 +65,7 @@ function App() {
         roles={["FieldManager", "Supervisor"]}
         path="/project"
       >
-        <ProjectListContainer projectSource="/Project/Active" />
+        <ProjectListContainer projectSource="/Project/All" />
       </ConditionalRoute>
       <ConditionalRoute
         exact
