@@ -92,10 +92,10 @@
                         <a asp-controller="TempInvoice" asp-action="Index" asp-route-projectId="5" class="nav-link">Invoices (sample)</a>
                     </li>
                 </ul>
-                <div class="mt-2 mt-md-0">
+                <div class="row align-items-center">
                     Welcome @User.GetNameClaim()
                     <form class="flexer" asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
-                        <button type="submit">Sign out</button>
+                        <button class="btn btn-link btn-sm" type="submit">Sign out</button>
                     </form>
                 </div>
             </div>

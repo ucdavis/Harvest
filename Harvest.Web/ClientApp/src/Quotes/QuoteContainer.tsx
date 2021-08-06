@@ -18,6 +18,9 @@ import { QuoteTotals } from "./QuoteTotals";
 import {
   usePromiseNotification,
 } from "../Util/Notifications";
+import { useInputValidator, ValidationProvider } from "../FormValidation";
+import { quoteContentSchema } from "../schemas";
+import { checkValidity } from "../Util/ValidationHelpers";
 
 interface RouteParams {
   projectId?: string;
@@ -27,6 +30,9 @@ export const QuoteContainer = () => {
   const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
+
+  const { formErrorCount, context } = useInputValidator<QuoteContent>(quoteContentSchema);
 
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
@@ -79,7 +85,7 @@ export const QuoteContainer = () => {
           quoteToUse.years = Math.max(
             1,
             new Date(projectWithQuote.project.end).getFullYear() -
-              new Date(projectWithQuote.project.start).getFullYear()
+            new Date(projectWithQuote.project.start).getFullYear()
           );
 
           setQuote(quoteToUse);
@@ -144,11 +150,19 @@ export const QuoteContainer = () => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
-        (a.workItems = a.workItems.filter(
-          (w) => w.quantity !== 0 || w.total !== 0
-        ))
+      (a.workItems = a.workItems.filter(
+        (w) => w.quantity !== 0 || w.total !== 0
+      ))
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
+
+    if (submit) {
+      const errors = await checkValidity(quote, quoteContentSchema);
+      setInputErrors(errors);
+      if (errors.length > 0) {
+        return;
+      }
+    }
 
     const request = fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
@@ -168,6 +182,8 @@ export const QuoteContainer = () => {
       history.push(`/Project/Details/${projectId}`);
     }
   };
+
+  const isValid = () => quote.grandTotal > 0;
 
   if (!project) {
     return <div>Loading</div>;
@@ -229,42 +245,56 @@ export const QuoteContainer = () => {
   }
 
   return (
-    <div className="card-wrapper">
-      <ProjectHeader
-        project={project}
-        title={"Field Request #" + (project?.id || "")}
-      ></ProjectHeader>
-      <div className="card-green-bg">
-        <div className="card-content">
-          <div className="quote-details">
-            <h2>Quote Details</h2>
-            <hr />
-            <ProjectDetail
-              rates={rates}
-              quote={quote}
-              updateQuote={setQuote}
-              setEditFields={setEditFields}
-            />
-            <ActivitiesContainer
-              quote={quote}
-              rates={rates}
-              updateQuote={setQuote}
-            />
-          </div>
-          <QuoteTotals quote={quote}></QuoteTotals>
-          <div className="row justify-content-center">
-            <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending}>
-              Save Quote
+    <ValidationProvider context={context}>
+      <div className="card-wrapper">
+        <ProjectHeader
+          project={project}
+          title={"Field Request #" + (project?.id || "")}
+        ></ProjectHeader>
+        <div className="card-green-bg">
+          <div className="card-content">
+            <div className="quote-details">
+              <h2>Quote Details</h2>
+              <hr />
+              <ProjectDetail
+                rates={rates}
+                quote={quote}
+                updateQuote={setQuote}
+                setEditFields={setEditFields}
+              />
+              <ActivitiesContainer
+                quote={quote}
+                rates={rates}
+                updateQuote={setQuote}
+              />
+            </div>
+            <QuoteTotals quote={quote}></QuoteTotals>
+            <div className="row justify-content-center">
+              <ul>
+                {inputErrors.map((error, i) => {
+                  return (
+                    <li className="text-danger" key={`error-${i}`}>
+                      {error}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <div className="row justify-content-center">
+              <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending || formErrorCount > 0}>
+                Save Quote
             </button>
-            <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending}>
-              Submit Quote
+              <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending || !isValid() || formErrorCount > 0}>
+                Submit Quote
             </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div>Debug: {JSON.stringify(quote)}</div>
-      <div>Debug Rates: {JSON.stringify(rates)}</div>
-    </div>
+        <div>Debug: {JSON.stringify(quote)}</div>
+        <div>Debug Rates: {JSON.stringify(rates)}</div>
+        <div>Debug: Total:{quote.grandTotal}</div>
+      </div>
+    </ValidationProvider>
   );
 };

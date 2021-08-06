@@ -9,6 +9,7 @@ import { ConditionalRoute } from './ConditionalRoute'
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
+import { HomeContainer } from "./Home/HomeContainer";
 import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
@@ -21,6 +22,7 @@ import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { Map } from "./Maps/Map";
+import { ValidationProvider } from "./FormValidation";
 
 
 // Global variable containing top-level app settings and info
@@ -30,8 +32,7 @@ function App() {
   return (
     <AppContext.Provider value={Harvest}>
       <Toaster />
-      <Route exact path="/" component={Home} />
-      <Route exact path="/home/spa" component={Spa} />
+      <Route exact path="/" component={HomeContainer} />
       <Route exact path="/request/create/:projectId?" component={RequestContainer} />
       <ConditionalRoute roles={["PI"]} path="/request/approve/:projectId" component={ApprovalContainer} />
       <ConditionalRoute
@@ -48,9 +49,12 @@ function App() {
         path="/invoice/details/:invoiceId"
         component={InvoiceDetailContainer}
       />
-      <ConditionalRoute roles={["FieldManager","Supervisor"]} path="/quote/create/:projectId" component={QuoteContainer} />
+      <ConditionalRoute roles={["FieldManager", "Supervisor"]} path="/quote/create/:projectId" component={QuoteContainer} />
       <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project" >
         <ProjectListContainer projectSource="/Project/Active" />
+      </ConditionalRoute>
+      <ConditionalRoute exact roles={["FieldManager", "Supervisor"]} path="/project/needsAttention" >
+        <ProjectListContainer projectSource="/Project/RequiringManagerAttention" />
       </ConditionalRoute>
       <ConditionalRoute exact roles={["PI"]} path="/project/mine" >
         <ProjectListContainer projectSource="/Project/GetMine" />
@@ -72,8 +76,5 @@ function App() {
     </AppContext.Provider>
   );
 }
-
-const Home = () => <div>Home</div>;
-const Spa = () => <div className="sassy">I am a SPA</div>;
 
 export default App;

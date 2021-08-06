@@ -7,7 +7,7 @@
   }
   .quote-info-box {
     border: 1px solid $borders;
-    padding-top: 16px;
+    padding: 24px;
   }
 }
 .card-project-totals {
@@ -104,3 +104,7 @@
 .leaflet-popup-content {
   width: 250px !important;
 }
+
+// #logoutForm {
+//   display: inline-block;
+// }

@@ -29,7 +29,7 @@ namespace Harvest.Core.Models.History
             PrincipalInvestigatorId = project.PrincipalInvestigatorId;
             PrincipalInvestigator = project.PrincipalInvestigator == null ? null : new UserHistoryModel(project.PrincipalInvestigator);
             QuoteId = project.QuoteId;
-            Quote = project.Quote?.Text.Deserialize<QuoteDetail>();
+            Quote = project.Quote?.Text.DeserializeWithGeoJson<QuoteDetail>();
             OriginalProjectId = project.OriginalProjectId;
             QuoteTotal = project.QuoteTotal;
             ChargedTotal = project.ChargedTotal;

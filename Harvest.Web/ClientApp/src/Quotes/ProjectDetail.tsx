@@ -15,6 +15,8 @@ import {
 
 import { formatCurrency } from "../Util/NumberFormatting";
 import { Location } from "../Fields/Location";
+import { useInputValidator } from "../FormValidation";
+import { quoteContentSchema } from "../schemas";
 
 interface Props {
   rates: Rate[];
@@ -24,6 +26,8 @@ interface Props {
 }
 
 export const ProjectDetail = (props: Props) => {
+  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<QuoteContent>(quoteContentSchema);
+
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {
     const newActivityId =
@@ -71,26 +75,31 @@ export const ProjectDetail = (props: Props) => {
       <Col md="6">
         <Label for="projectName">Project Name</Label>
         <Input
+          className={getClassName("projectName")}
           type="text"
           id="projectName"
           value={props.quote.projectName}
-          onChange={(e) =>
-            props.updateQuote({ ...props.quote, projectName: e.target.value })
+          onChange={onChange("projectName",(e) =>
+            props.updateQuote({ ...props.quote, projectName: e.target.value }))
           }
+          onBlur={onBlur("projectName")}
         />
+        <InputErrorMessage name="projectName"/>
         <br />
         <Row className="align-items-baseline">
           <Col>
             <Label>Acreage Rate</Label>
             <Input
+              className={getClassName("acreageRateId")}
               type="select"
               name="acreageRate"
               value={props.quote.acreageRateId}
-              onChange={(e) =>
+              onChange={onChange("acreageRateId", (e) =>
                 setAcreageRate(
                   props.rates.find((r) => r.id === parseInt(e.target.value))
-                )
+                ))
               }
+              onBlur={onBlur("acreageRateId")}
             >
               <option value="0">-- Select Acreage Rate --</option>
               {props.rates
@@ -101,6 +110,7 @@ export const ProjectDetail = (props: Props) => {
                   </option>
                 ))}
             </Input>
+            <InputErrorMessage name="acreageRateId" />
           </Col>
         </Row>
         <br />
@@ -109,16 +119,19 @@ export const ProjectDetail = (props: Props) => {
             <Col md="3">
               <Label for="acres">Number of Acres</Label>
               <Input
+                className={getClassName("acres")}
                 type="number"
                 id="acres"
                 value={props.quote.acres}
-                onChange={(e) =>
+                onChange={onChange("acres", (e) =>
                   props.updateQuote({
                     ...props.quote,
                     acres: parseFloat(e.target.value),
-                  })
+                  }))
                 }
+                onBlur={onBlur("acres")}
               />
+              <InputErrorMessage name="acres" />
             </Col>
             <Col md="2">
               <Label>Rate</Label> <br />$

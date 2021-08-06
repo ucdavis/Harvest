@@ -63,16 +63,61 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
-            //email need PI
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+            Project project;
+            QuoteDetail quoteDetail;
 
-            // get the currently unapproved quote for this project
-            var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId && q.ApprovedOn == null);
+            if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
+            {
+                // this was a change request that has been approved, so copy everything over to original and inActiveate change request
+                var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
 
+                // quote for change request
+                var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
+                quoteDetail = QuoteDetail.Deserialize(quote.Text);
+
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == changeRequestProject.OriginalProjectId);
+
+                changeRequestProject.IsActive = false; // soft delete change request so we don't see it anymore
+
+                // replace original project info with newly approved project info
+                project.PrincipalInvestigatorId = changeRequestProject.PrincipalInvestigatorId;
+                project.Crop = changeRequestProject.Crop;
+                project.CropType = changeRequestProject.CropType;
+                project.Start = changeRequestProject.Start;
+                project.End = changeRequestProject.End;
+                project.IsApproved = true;
+                project.Requirements = changeRequestProject.Requirements;
+                project.Status = Project.Statuses.Active;
+                project.Accounts = new List<Account>();
+                project.Attachments = new List<ProjectAttachment>(); 
+
+                // clear old accounts
+                _dbContext.Accounts.RemoveRange(_dbContext.Accounts.Where(a => a.ProjectId == project.Id));
+
+                // change attachments to point to original project if they are not already part of that project
+                var originalAttachments = await _dbContext.ProjectAttachments.Where(a => a.ProjectId == project.Id).ToListAsync();
+                var changeRequestAttachments = await _dbContext.ProjectAttachments.Where(a => a.ProjectId == changeRequestProject.Id).ToListAsync();
+
+                foreach (var attachment in changeRequestAttachments) {
+                    // if this new attachment isn't one of the original attachments, then reassign to the original project
+                    if (!originalAttachments.Any(a => a.Identifier == attachment.Identifier)) {
+                        attachment.Project = project;
+                    }
+                }
+            }
+            else
+            {
+                // not a change request, so just get the project
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+
+                var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
+                quoteDetail = QuoteDetail.Deserialize(quote.Text);
+            }
+            
             var currentUser = await _userService.GetCurrentUser();
 
             var percentage = 0.0m;
-            // TODO: add in fiscal officer info??
+
             foreach (var account in model.Accounts)
             {
                 account.ProjectId = projectId;
@@ -92,16 +137,13 @@ namespace Harvest.Web.Controllers
                 return BadRequest("Percentage of accounts is not 100%");
             }
 
-            var quoteDetail = QuoteDetail.Deserialize(quote.Text);
-
             project.Acres = quoteDetail.Acres;
             project.AcreageRateId = quoteDetail.AcreageRateId;
             //Ignore accounts that don't have a percentage
             project.Accounts = new List<Account>(model.Accounts.Where(a => a.Percentage > 0.0m).ToArray());
             project.Status = Project.Statuses.Active;
             project.IsApproved = true;
-            project.QuoteId = quote.Id;
-            project.QuoteTotal = quote.Total;
+            project.QuoteTotal = (decimal)quoteDetail.GrandTotal;
 
             foreach (var quoteField in quoteDetail.Fields)
             {
@@ -131,7 +173,7 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> RejectQuote(int projectId, [FromBody] QuoteRejectionModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
 
@@ -152,7 +194,7 @@ namespace Harvest.Web.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            await _emailService.NewTicketCreated(project, ticketToCreate);
+            await _emailService.QuoteDenied(project, model.Reason);
 
             return Ok(new { project, ticket = ticketToCreate });
         }
@@ -255,6 +297,21 @@ namespace Harvest.Web.Controllers
                 // this project already exists, so we are requesting a change
                 newProject.Status = Project.Statuses.ChangeRequested;
                 newProject.OriginalProjectId = project.Id;
+
+                // get the quote for this project and copy over so we have a good starting point
+                var originalProjectQuote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == project.Id);
+
+                var quoteCopy = new Quote
+                {
+                    Project = newProject,
+                    InitiatedById = originalProjectQuote.InitiatedById,
+                    CreatedDate = originalProjectQuote.CreatedDate,
+                    Status = Quote.Statuses.Created,
+                    Text = originalProjectQuote.Text,
+                    Total = originalProjectQuote.Total,
+                };
+
+                await _dbContext.AddAsync(quoteCopy);
             }
 
             // create PI if needed and assign to project
@@ -309,7 +366,8 @@ namespace Harvest.Web.Controllers
         public ProjectAttachment[] Attachments { get; set; }
     }
 
-    public class QuoteRejectionModel {
+    public class QuoteRejectionModel
+    {
         public string Reason { get; set; }
     }
 }
