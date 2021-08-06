@@ -15,6 +15,8 @@ interface Props {
 export const ExpenseTable = (props: Props) => {
   const expenseData = useMemo(() => props.expenses, [props.expenses]);
 
+  const { setSelectedExpense } = props;
+
   const columns: Column<Expense>[] = useMemo(
     () => [
       {
@@ -58,7 +60,7 @@ export const ExpenseTable = (props: Props) => {
           <ShowFor roles={["FieldManager", "Supervisor"]}>
             <Button
               color="link"
-              onClick={() => props.setSelectedExpense(data.row.original)}
+              onClick={() => setSelectedExpense(data.row.original)}
             >
               Delete
             </Button>
@@ -66,7 +68,7 @@ export const ExpenseTable = (props: Props) => {
         ),
       },
     ],
-    []
+    [setSelectedExpense]
   );
 
   const initialState: Partial<TableState<any>> = {
