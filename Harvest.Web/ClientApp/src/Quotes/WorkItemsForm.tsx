@@ -62,6 +62,16 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         unit: rate.unit,
         total: 0,
       });
+    } else {
+      // reset values to prevent stale data from impacting logic elsewhere
+      props.updateWorkItems({
+        ...workItem,
+        rateId: 0,
+        rate: 0,
+        unit: "",
+        description: "",
+        total: 0
+      });
     }
   };
 
