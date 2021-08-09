@@ -41,7 +41,7 @@ interface WorkItemFormProps {
 const WorkItemForm = (props: WorkItemFormProps) => {
   const { workItem } = props;
 
-  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<WorkItem>(workItemSchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur, resetLocalFields } = useInputValidator<WorkItem>(workItemSchema);
 
   const rateItemChanged = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -61,6 +61,16 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         rate: rate.price,
         unit: rate.unit,
         total: 0,
+      });
+    } else {
+      // reset values to prevent stale data from impacting logic elsewhere
+      props.updateWorkItems({
+        ...workItem,
+        rateId: 0,
+        rate: 0,
+        unit: "",
+        description: "",
+        total: 0
       });
     }
   };
@@ -149,7 +159,10 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     <Col xs="1">
       <button
         className="btn btn-link mt-0"
-        onClick={() => props.deleteWorkItem(workItem)}
+        onClick={() => {
+          resetLocalFields();
+          props.deleteWorkItem(workItem);
+        }}
       >
         <FontAwesomeIcon icon={faTrashAlt} />
       </button>

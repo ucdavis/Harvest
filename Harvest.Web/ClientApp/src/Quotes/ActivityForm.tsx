@@ -32,7 +32,7 @@ export const ActivityForm = (props: Props) => {
 
   const toggle = () => setYearDropdownOpen((prevState) => !prevState);
 
-  const { onChange, InputErrorMessage, getClassName, onBlur } = useInputValidator<Activity>(activitySchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur, resetLocalFields } = useInputValidator<Activity>(activitySchema);
 
 
   const updateWorkItems = (workItem: WorkItem) => {
@@ -138,7 +138,10 @@ export const ActivityForm = (props: Props) => {
                 )}
                 <button
                   className="btn btn-link btn-sm"
-                  onClick={() => props.deleteActivity(props.activity)}
+                  onClick={() => {
+                    resetLocalFields();
+                    props.deleteActivity(props.activity);
+                  }}
                 >
                   Remove activity <FontAwesomeIcon icon={faMinusCircle} />
                 </button>

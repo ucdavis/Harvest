@@ -10,6 +10,11 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { usePromiseNotification } from "../Util/Notifications";
 import AppContext from "../Shared/AppContext";
 
+import { useOrCreateValidationContext, ValidationProvider } from "../FormValidation";
+import { workItemSchema } from "../schemas";
+import { checkValidity } from "../Util/ValidationHelpers";
+import * as yup from "yup";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -32,7 +37,9 @@ export const ExpenseEntryContainer = () => {
 
   const { projectId } = useParams<RouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
-  
+  const [inputErrors, setInputErrors] = useState<string[]>([]);
+  const context = useOrCreateValidationContext();
+
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([
     getDefaultActivity(1),
@@ -65,7 +72,18 @@ export const ExpenseEntryContainer = () => {
   };
 
   const submit = async () => {
-    // TODO: disable the submit button and maybe just some sort of full screen processing UI
+    // TODO: some sort of full screen processing UI
+
+    const workItems = activities.flatMap((activity) =>
+      activity.workItems.filter(w => w.rateId !== 0 && w.total > 0));
+
+    const errors = workItems.length === 0
+      ? ["No expenses were completed"]
+      : await checkValidity(workItems, yup.array().of(workItemSchema));
+    setInputErrors(errors);
+    if (errors.length > 0) {
+      return;
+    }
 
     // transform activity workItems to expenses
     // we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
@@ -131,7 +149,7 @@ export const ExpenseEntryContainer = () => {
     const newActivityId = Math.max(...activities.map((a) => a.id), 0) + 1;
     setActivities((acts) => [...acts, getDefaultActivity(newActivityId)]);
   };
-// return true if the sum of the activity totals is greater than 0
+  // return true if the sum of the activity totals is greater than 0
   const isValid = () =>
     activities.reduce((prev, curr) => prev + curr.total || 0, 0) > 0;
 
@@ -143,39 +161,52 @@ export const ExpenseEntryContainer = () => {
   }
 
   return (
-    <div className="card-wrapper">
-      <div className="card-content">
-        <h1>Add Expenses for Project #{projectId}</h1>
-        <br />
-        <div>
-          {activities.map((activity) => (
-            <ActivityForm
-              key={`activity-${activity.id}`}
-              activity={activity}
-              updateActivity={(activity: Activity) => updateActivity(activity)}
-              deleteActivity={(activity: Activity) => deleteActivity(activity)}
-              rates={rates}
-            />
-          ))}
+    <ValidationProvider context={context}>
+      <div className="card-wrapper">
+        <div className="card-content">
+          <h1>Add Expenses for Project #{projectId}</h1>
+          <br />
+          <div>
+            {activities.map((activity) => (
+              <ActivityForm
+                key={`activity-${activity.id}`}
+                activity={activity}
+                updateActivity={(activity: Activity) => updateActivity(activity)}
+                deleteActivity={(activity: Activity) => deleteActivity(activity)}
+                rates={rates}
+              />
+            ))}
+          </div>
+          <Button className="mb-4" color="link" size="lg" onClick={addActivity}>
+            Add Activity <FontAwesomeIcon icon={faPlus} />
+          </Button>
         </div>
-        <Button className="mb-4" color="link" size="lg" onClick={addActivity}>
-          Add Activity <FontAwesomeIcon icon={faPlus} />
-        </Button>
-      </div>
-      <div className="card-content">
-        <div className="col">
-          <button
-            className="btn btn-primary btn-lg"
-            onClick={submit}
-            disabled={notification.pending || !isValid()}
-          >
-            Submit Expense
+        {inputErrors.length > 0 && <div className="card-content">
+          <ul>
+            {inputErrors.map((error, i) => {
+              return (
+                <li className="text-danger" key={`error-${i}`}>
+                  {error}
+                </li>
+              );
+            })}
+          </ul>
+        </div>}
+        <div className="card-content">
+          <div className="col">
+            <button
+              className="btn btn-primary btn-lg"
+              onClick={submit}
+              disabled={notification.pending || !isValid() || context.formErrorCount > 0}
+            >
+              Submit Expense
           </button>
+          </div>
         </div>
-      </div>
 
-      <div>DEBUG: {JSON.stringify(activities)}</div>
-      <div>DEBUG Grand Total: {activities.map((activity) => activity.total).reduce((a, b) => a + b || 0, 0)}</div>
-    </div>
+        <div>DEBUG: {JSON.stringify(activities)}</div>
+        <div>DEBUG Grand Total: {activities.map((activity) => activity.total).reduce((a, b) => a + b || 0, 0)}</div>
+      </div>
+    </ValidationProvider>
   );
 };
