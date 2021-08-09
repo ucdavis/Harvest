@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { Project, Ticket } from "../types";
+import { Project } from "../types";
 import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
