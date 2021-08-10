@@ -289,7 +289,6 @@ export const RequestContainer = () => {
                   {projectId ? "Create Change Request" : "Create Field Request"}
                 </Button>
               </div>
-              <div>DEBUG: {JSON.stringify(project)}</div>
             </div>
           </div>
         </div>

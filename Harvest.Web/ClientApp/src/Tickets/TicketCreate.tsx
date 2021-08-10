@@ -180,7 +180,6 @@ export const TicketCreate = () => {
                   </Button>
                 </ShowFor>
               </div>
-              <div>DEBUG: {JSON.stringify(ticket)}</div>
             </div>
           </div>
         </div>

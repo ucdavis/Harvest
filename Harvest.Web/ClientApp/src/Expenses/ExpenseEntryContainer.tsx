@@ -203,9 +203,6 @@ export const ExpenseEntryContainer = () => {
           </button>
           </div>
         </div>
-
-        <div>DEBUG: {JSON.stringify(activities)}</div>
-        <div>DEBUG Grand Total: {activities.map((activity) => activity.total).reduce((a, b) => a + b || 0, 0)}</div>
       </div>
     </ValidationProvider>
   );
