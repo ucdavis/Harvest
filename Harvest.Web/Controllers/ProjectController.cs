@@ -42,6 +42,11 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        public ActionResult Map()
+        {
+            return View("React");
+        }
+
         public ActionResult NeedsAttention()
         {
             return View("React");
@@ -145,6 +150,20 @@ namespace Harvest.Web.Controllers
             }
 
             return Ok(project);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> GetFiles()
+        {
+            var quotes = await _dbContext.Quotes.Select(q => QuoteDetail.Deserialize(q.Text)).ToListAsync();
+            var fields = new List<QuoteField>();
+
+            foreach (var quote in quotes) {
+                fields.AddRange(quote.Fields);
+            }
+
+            return Ok(fields);
         }
 
         [HttpGet]
