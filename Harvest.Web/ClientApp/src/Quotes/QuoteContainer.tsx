@@ -239,7 +239,6 @@ export const QuoteContainer = () => {
             updateFields={(fields) => setQuote({ ...quote, fields })}
           ></FieldContainer>
         </div>
-        <div>Debug: {JSON.stringify(quote)}</div>
       </div>
     );
   }
@@ -290,10 +289,6 @@ export const QuoteContainer = () => {
             </div>
           </div>
         </div>
-
-        <div>Debug: {JSON.stringify(quote)}</div>
-        <div>Debug Rates: {JSON.stringify(rates)}</div>
-        <div>Debug: Total:{quote.grandTotal}</div>
       </div>
     </ValidationProvider>
   );

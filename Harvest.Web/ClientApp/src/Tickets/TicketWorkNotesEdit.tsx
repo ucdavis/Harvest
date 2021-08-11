@@ -55,7 +55,6 @@ export const TicketWorkNotesEdit = (props: Props) => {
           Update Work Notes
         </Button>
       </div>
-      <div>DEBUG: {JSON.stringify(ticket.workNotes)}</div>
     </>
   );
 };

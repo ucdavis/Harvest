@@ -189,7 +189,6 @@ export const AccountsInput = (props: Props) => {
           </Col>
         </Row>
       )}
-      <div>DEBUG: {JSON.stringify(accounts)}</div>
       {error && <span className="text-danger">{error}</span>}
       <p className="discreet mt-5">
         Please check with your account manager for each account above before

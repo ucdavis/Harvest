@@ -68,7 +68,6 @@ export const InvoiceDisplay = (props: Props) => {
             </CardBody>
         </Card>
         <InvoiceTotals invoice={props.invoice}></InvoiceTotals>
-        DEBUG: {JSON.stringify(invoice)}
     </div>
   );
 };
