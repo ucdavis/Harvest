@@ -15,6 +15,7 @@ import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
+import { ProjectFields } from "./Projects/ProjectFields";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
@@ -100,7 +101,7 @@ function App() {
         path="/expense/unbilled/:projectId"
         component={UnbilledExpensesContainer}
       />
-      <Route path="/home/map" component={Map} />
+      <Route exact path="/project/map" component={ProjectFields}/>
     </AppContext.Provider>
   );
 }
