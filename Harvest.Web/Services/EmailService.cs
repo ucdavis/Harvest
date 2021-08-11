@@ -33,6 +33,12 @@ namespace Harvest.Web.Services
         Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage);
         Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments);
         Task<bool> TicketClosed(Project project, Ticket ticket);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="days">Specifies number of days before the project ends to include in the notification</param>
+        /// <returns></returns>
+        Task<int> SendExpiringProjectsNotification(int days);
     }
 
     public class EmailService : IEmailService
@@ -374,6 +380,36 @@ namespace Harvest.Web.Services
         {
             //Email PI
             throw new NotImplementedException();
+        }
+
+        public async Task<int> SendExpiringProjectsNotification(int days = 7)
+        {
+            try
+            {
+                var emailTo = await FieldManagersEmails();
+                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Name != null && a.End <= DateTime.UtcNow.AddDays(days))
+                    .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
+                    {
+                        EndDate = s.End.ToShortDateString(),
+                        Name = s.Name,
+                        ProjectUrl = $"{_emailSettings.BaseUrl}/Project/Details/{s.Id}"
+                    }).ToArrayAsync();
+                if (model == null || model.Length == 0)
+                {
+                    Log.Information($"No projects have expired or will expire in {days} days");
+                    return 0;
+                }
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ExpiringProjects.cshtml", model);
+                var textVersion = $"One or more projects have expired or will expire in {days} days.";
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Expiring Projects");
+                return model.Length;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing expiring projects", ex);
+            }
+
+            return 0;
         }
     }
 }

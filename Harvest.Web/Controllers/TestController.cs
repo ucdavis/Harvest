@@ -38,10 +38,13 @@ namespace Harvest.Web.Controllers
         {
 
 
-            var model = new QuoteDecisionModel();
-            model.RejectReason = "test";
-            
-            var results = await _emailBodyService.RenderBody("/Views/Emails/QuoteDecisionEmail_mjml.cshtml", model);
+            var model = new List<ExpiringProjectsModel>();
+            model.Add(new ExpiringProjectsModel{EndDate = DateTime.Now.ToShortDateString(), Name = "Test Proj", ProjectUrl = "https://harvest.caes.ucdavis.edu/Fake1" });
+            model.Add(new ExpiringProjectsModel { EndDate = DateTime.Now.ToShortDateString(), Name = "Test 2", ProjectUrl = "https://harvest.caes.ucdavis.edu/Fake2" });
+            model.Add(new ExpiringProjectsModel { EndDate = DateTime.Now.ToShortDateString(), Name = "Test 3", ProjectUrl = "https://harvest.caes.ucdavis.edu/Fake3" });
+
+
+            var results = await _emailBodyService.RenderBody("/Views/Emails/ExpiringProjects_mjml.cshtml", model.ToArray());
 
             return Content(results);
         }
@@ -50,23 +53,18 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestEmail()
         {
             var user = await _userService.GetCurrentUser();
+
+            var model = await _dbContext.Projects.Where(a => a.IsActive && a.Name != null && a.End <= DateTime.UtcNow.AddYears(1))
+                .OrderBy(a => a.End).Take(5).Select(s => new ExpiringProjectsModel
+                {
+                    EndDate = s.End.ToShortDateString(), Name = s.Name,
+                    ProjectUrl = $"https://harvest.caes.ucdavis.edu/Project/Details/{s.Id}"
+                }).ToArrayAsync();
             
-            var model = new TicketAttachmentModel();
-            model.From = user.NameAndEmail;
-            model.ProjectName = "Jason's Awesome Project";
-            model.CreatedOn = DateTime.UtcNow.ToPacificTime().Date.Format("d");
-
-            var attachmentNames = new List<string>();
-            attachmentNames.Add("test.txt");
-            attachmentNames.Add("test2.txt");
-            model.AttachmentNames = attachmentNames.ToArray();
-            model.Subject = "Test subject";
-            model.ButtonUrlForProject = "https://harvest.caes.ucdavis.edu/Fake2";
-            model.ButtonUrlForTicket = "https://harvest.caes.ucdavis.edu/Fake1";
 
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
-            await _notificationService.SendNotification(new string[] { user.Email }, null, emailBody, "A new Ticket has been create", "Harvest Notification - New Ticket");
+            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ExpiringProjects.cshtml", model);
+            await _notificationService.SendNotification(new string[] { user.Email }, null, emailBody, "EXPIRE", "EXPIRE");
 
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
         }
@@ -130,6 +128,13 @@ namespace Harvest.Web.Controllers
                 return Content("Done.");
             }
             return Content("Looks like there was a problem.");
+        }
+
+        public async Task<IActionResult> TestExpiringProjects()
+        {
+            var numProjects = await _emailService.SendExpiringProjectsNotification(7);
+
+            return Content($"Sent email for {numProjects} projects");
         }
     }
 }
