@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -11,7 +12,7 @@ namespace Harvest.Core.Extensions
     public static class StringExtensions
     {
 
-        public static T Deserialize<T>(this string value) => 
+        public static T Deserialize<T>(this string value) =>
             string.IsNullOrWhiteSpace(value) ? default : JsonSerializer.Deserialize<T>(value, JsonOptions.Standard);
 
         public static T DeserializeWithGeoJson<T>(this string value) =>
@@ -40,7 +41,7 @@ namespace Harvest.Core.Extensions
 
             return value.ToLower().Humanize(LetterCasing.Title); //Lower it so all caps gets changed
         }
-        
+
 
         public static string SafeToLower(this string value)
         {
@@ -80,5 +81,31 @@ namespace Harvest.Core.Extensions
                 ? value1.Truncate(maxValue1Chars) + value2
                 : value2;
         }
+
+        // Naive utility for converting Serilog templates and arguments to a string
+        public static string FormatTemplate(this string messageTemplate, object parameter, params object[] additionalParameters)
+        {
+            return FormatTemplate(messageTemplate, new[] { parameter }.Concat(additionalParameters));
+        }
+
+        // Naive utility for converting Serilog templates and arguments to a string
+        public static string FormatTemplate(this string messageTemplate, IEnumerable<object> parameters)
+        {
+            var objects = parameters as object[] ?? parameters.ToArray();
+
+            if (objects.Length == 0)
+            {
+                return messageTemplate;
+            }
+
+            if (objects.Length != Regex.Matches(messageTemplate, "{.*?}").Count)
+            {
+                throw new ArgumentException("Number of arguments does not match number of template parameters");
+            }
+
+            var i = 0;
+            return Regex.Replace(messageTemplate, "{.*?}", _ => objects[i++].ToString());
+        }
+
     }
 }
