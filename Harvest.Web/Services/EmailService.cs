@@ -386,7 +386,7 @@ namespace Harvest.Web.Services
             try
             {
                 var emailTo = await FieldManagersEmails();
-                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Name != null && a.End <= DateTime.UtcNow.AddDays(days))
+                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.End <= DateTime.UtcNow.AddDays(days))
                     .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
                     {
                         EndDate = s.End.ToShortDateString(),
