@@ -12,7 +12,6 @@ using Harvest.Email.Models.Ticket;
 using Harvest.Email.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 namespace Harvest.Web.Services
@@ -387,7 +386,7 @@ namespace Harvest.Web.Services
             try
             {
                 var emailTo = await FieldManagersEmails();
-                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Name != null && a.End <= DateTime.UtcNow.AddDays(days))
+                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Name != null && a.End <= DateTime.UtcNow.AddDays(days))
                     .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
                     {
                         EndDate = s.End.ToShortDateString(),
