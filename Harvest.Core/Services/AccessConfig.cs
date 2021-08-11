@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 
-namespace Harvest.Web.Access
+namespace Harvest.Core.Services
 {
     public class AccessConfig
     {

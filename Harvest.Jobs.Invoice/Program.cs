@@ -65,13 +65,14 @@ namespace Harvest.Jobs.Invoice
             //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
             services.AddSingleton(provder => JsonOptions.Standard);
             services.AddSingleton<IHttpContextAccessor, NullHttpContextAccessor>();
+            services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
 
             return services.BuildServiceProvider();
         }
 
         private static async Task ProcessInvoices(IInvoiceService invoiceService, ISlothService slothService)
         {
-           var invoiceCount = await invoiceService.CreateInvoices();
+           var invoiceCount = await invoiceService.CreateInvoices(true);
             _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
 
             var slothMoneyMoveCount = 0;
@@ -82,20 +83,13 @@ namespace Harvest.Jobs.Invoice
                 foreach (var createdInvoice in createdInvoices)
                 {
                     var response = await slothService.MoveMoney(createdInvoice);
-                    if (response == null)
+                    if (!response.IsError)
                     {
-                        _log.Information("Invoice not found. Id: {createdInvoice}", createdInvoice);
-                        continue;
+                        slothMoneyMoveCount++;
                     }
-
-                    if (!response.Success)
-                    {
-                        _log.Information("Invoice error. Id: {createdInvoice}, Error: {error}", createdInvoice, response.Message);
-                    }
-
-                    slothMoneyMoveCount++;
                 }
-                _log.Information("Money Moved Invoices: {slothMoneyMoveCount}", slothMoneyMoveCount);
+                _log.Information("Successfully requested money movement for {processedInvoiceCount} out of {createdInvoiceCount}", 
+                    slothMoneyMoveCount, createdInvoices.Count);
             }
 
             await slothService.ProcessTransferUpdates();
