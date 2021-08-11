@@ -154,14 +154,9 @@ namespace Harvest.Web.Controllers
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> GetFiles()
+        public async Task<ActionResult> GetFields()
         {
-            var quotes = await _dbContext.Quotes.Select(q => QuoteDetail.Deserialize(q.Text)).ToListAsync();
-            var fields = new List<QuoteField>();
-
-            foreach (var quote in quotes) {
-                fields.AddRange(quote.Fields);
-            }
+            var fields = await _dbContext.Fields.ToListAsync();
 
             return Ok(fields);
         }
