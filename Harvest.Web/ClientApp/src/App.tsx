@@ -100,7 +100,12 @@ function App() {
         path="/expense/unbilled/:projectId"
         component={UnbilledExpensesContainer}
       />
-      <Route exact path="/project/map" component={ProjectFields}/>
+      <ConditionalRoute
+        roles={["FieldManager", "Supervisor"]}
+        exact
+        path="/project/map"
+        component={ProjectFields}
+      />
     </AppContext.Provider>
   );
 }
