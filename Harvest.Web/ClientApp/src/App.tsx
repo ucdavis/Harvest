@@ -22,7 +22,6 @@ import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
-import { Map } from "./Maps/Map";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;

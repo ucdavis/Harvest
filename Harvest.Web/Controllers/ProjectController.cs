@@ -156,7 +156,7 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> GetFields()
         {
-            var fields = await _dbContext.Fields.ToListAsync();
+            var fields = await _dbContext.Fields.Where(f => f.IsActive == true).ToListAsync();
 
             return Ok(fields);
         }
