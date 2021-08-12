@@ -278,21 +278,21 @@ namespace Harvest.Core.Services
                     var slothResponse = JsonSerializer.Deserialize<SlothResponseModel>(content, _serializerOptions);
                     Log.Information("Invoice {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
                         invoice.Id, slothResponse.Status, invoice.SlothTransactionId);
-                    if (slothResponse.Status == "Completed")
+                    switch (slothResponse.Status)
                     {
-                        updatedCount++;
+                        case SlothStatuses.Completed:
+                            updatedCount++;
 
-                        invoice.Status = Invoice.Statuses.Completed;
-                        await _historyService.InvoiceCompleted(invoice.ProjectId, invoice);
-                        await _dbContext.SaveChangesAsync();
-                    }
-                    if (slothResponse.Status == "Cancelled")
-                    {
-
-                        Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
-                        await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
-                        rolledBackCount++;
-                        //TODO: Write to the notes field? Trigger off an email?
+                            invoice.Status = Invoice.Statuses.Completed;
+                            await _historyService.InvoiceCompleted(invoice.ProjectId, invoice);
+                            await _dbContext.SaveChangesAsync();
+                            break;
+                        case SlothStatuses.Cancelled:
+                            Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
+                            await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
+                            rolledBackCount++;
+                            //TODO: Write to the notes field? Trigger off an email?
+                            break;
                     }
                 }
                 else

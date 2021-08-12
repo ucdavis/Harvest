@@ -83,7 +83,7 @@ namespace Harvest.Core.Services
             //Should only be possible during a manual override
             if (unbilledExpenses.Length == 0)
             {
-                return Result.Error("No existing unbilled expenses found");
+                return Result.Error("No unbilled expenses found for project: {projectId}", projectId);
             }
 
             var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = projectId, Status = Invoice.Statuses.Created, Total = unbilledExpenses.Sum(x => x.Total) };
