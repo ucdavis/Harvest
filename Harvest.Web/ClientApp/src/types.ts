@@ -194,6 +194,7 @@ export class WorkItemImpl implements WorkItem {
   rateId = 0;
   unit = "hr";
   quantity;
+  markup = false;
   total = 0;
 
   constructor(activityId: number, id: number, type: RateType) {
@@ -215,6 +216,7 @@ export interface WorkItem {
   description: string;
   quantity: number;
   unit: string;
+  markup: boolean;
   total: number;
 }
 

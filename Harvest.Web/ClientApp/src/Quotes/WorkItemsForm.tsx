@@ -41,11 +41,15 @@ interface WorkItemFormProps {
 const WorkItemForm = (props: WorkItemFormProps) => {
   const { workItem } = props;
 
-  const { onChange, InputErrorMessage, getClassName, onBlur, resetLocalFields } = useInputValidator<WorkItem>(workItemSchema);
+  const {
+    onChange,
+    InputErrorMessage,
+    getClassName,
+    onBlur,
+    resetLocalFields,
+  } = useInputValidator<WorkItem>(workItemSchema);
 
-  const rateItemChanged = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const rateItemChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rateId = parseInt(e.target.value);
     const rate = props.rates.find((r) => r.id === rateId);
 
@@ -70,7 +74,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         rate: 0,
         unit: "",
         description: "",
-        total: 0
+        total: 0,
       });
     }
   };
@@ -80,104 +84,132 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     return props.category === "Other" && unit === "Unit";
   };
 
-  return <Row
-    className="activity-line-item"
-
-  >
-    <Col xs="5">
-      <FormGroup>
-        <Input
-          className={getClassName("rateId")}
-          type="select"
-          name="select"
-          defaultValue={workItem.rateId}
-          onChange={onChange("rateId", rateItemChanged)}
-          onBlur={onBlur("rateId")}
-        >
-          <option value="0">-- Select {props.category} --</option>
-          {props.rates.map((r) => (
-            <option key={`rate-${r.type}-${r.id}`} value={r.id}>
-              {r.description}
-            </option>
-          ))}
-        </Input>
-        <InputErrorMessage name="rateId" />
-        {requiresCustomDescription(workItem.unit) && (<>
+  return (
+    <Row className="activity-line-item">
+      <Col xs={props.category === "Other" ? 4 : 5}>
+        <FormGroup>
           <Input
-            className={getClassName("description")}
-            type="text"
-            name="OtherDescription"
-            value={workItem.description}
-            placeholder="Description"
-            onChange={onChange("description", (e) =>
+            className={getClassName("rateId")}
+            type="select"
+            name="select"
+            defaultValue={workItem.rateId}
+            onChange={onChange("rateId", rateItemChanged)}
+            onBlur={onBlur("rateId")}
+          >
+            <option value="0">-- Select {props.category} --</option>
+            {props.rates.map((r) => (
+              <option key={`rate-${r.type}-${r.id}`} value={r.id}>
+                {r.description}
+              </option>
+            ))}
+          </Input>
+          <InputErrorMessage name="rateId" />
+          {requiresCustomDescription(workItem.unit) && (
+            <>
+              <Input
+                className={getClassName("description")}
+                type="text"
+                name="OtherDescription"
+                value={workItem.description}
+                placeholder="Description"
+                onChange={onChange("description", (e) =>
+                  props.updateWorkItems({
+                    ...workItem,
+                    description: e.target.value,
+                  })
+                )}
+                onBlur={onBlur("description")}
+              ></Input>
+              <InputErrorMessage name="description" />
+            </>
+          )}
+        </FormGroup>
+      </Col>
+
+      {props.category === "Other" && (
+        <Col className="col-sm-1">
+          <Input
+            type="checkbox"
+            id="markup"
+            checked={workItem.markup}
+            onChange={(e) => {
+              // apply or remove the 20% markup depending on checked state
               props.updateWorkItems({
                 ...workItem,
-                description: e.target.value,
-              }))
-            }
-            onBlur={onBlur("description")}
-          ></Input>
-          <InputErrorMessage name="description" />
-        </>)}
-      </FormGroup>
-    </Col>
-
-    <Col className="col-sm-2">
-      <InputGroup>
-        <InputGroupAddon addonType="prepend">
-          <InputGroupText>{workItem.unit || ""}</InputGroupText>
-        </InputGroupAddon>
-        <Input
-          className={getClassName("quantity")}
-          type="number"
-          id="units"
-          value={workItem.quantity}
-          onChange={onChange("quantity", (e) => 
-            props.updateWorkItems({
-              ...workItem,
-              quantity: parseFloat(e.target.value ?? 0),
-            }))
-          }
-          onBlur={onBlur("quantity")}
-        />
-      </InputGroup>
-      <InputErrorMessage name="quantity" />
-    </Col>
-
-    <Col className="col-sm-2 offset-sm-1">
-      ${formatCurrency(workItem.rate || 0)}
-      {props.adjustment > 0 && (
-        <span className="primary-color">
-          {" "}
-                + ${formatCurrency(workItem.rate * (props.adjustment / 100))}
-        </span>
+                markup: e.target.checked,
+              });
+            }}
+          />
+        </Col>
       )}
-    </Col>
 
-    <Col xs="1">${formatCurrency(workItem.total)}</Col>
+      <Col className="col-sm-2">
+        <InputGroup>
+          <InputGroupAddon addonType="prepend">
+            <InputGroupText>{workItem.unit || ""}</InputGroupText>
+          </InputGroupAddon>
+          <Input
+            className={getClassName("quantity")}
+            type="number"
+            id="units"
+            value={workItem.quantity}
+            onChange={onChange("quantity", (e) =>
+              props.updateWorkItems({
+                ...workItem,
+                quantity: parseFloat(e.target.value ?? 0),
+              })
+            )}
+            onBlur={onBlur("quantity")}
+          />
+        </InputGroup>
+        <InputErrorMessage name="quantity" />
+      </Col>
 
-    <Col xs="1">
-      <button
-        className="btn btn-link mt-0"
-        onClick={() => {
-          resetLocalFields();
-          props.deleteWorkItem(workItem);
-        }}
-      >
-        <FontAwesomeIcon icon={faTrashAlt} />
-      </button>
-    </Col>
-  </Row>
+      <Col className="col-sm-2 offset-sm-1">
+        ${formatCurrency(workItem.rate || 0)}
+        {props.adjustment > 0 && (
+          <span className="primary-color">
+            {" "}
+            + ${formatCurrency(workItem.rate * (props.adjustment / 100))}
+          </span>
+        )}
+      </Col>
+
+      <Col xs="1">${formatCurrency(workItem.total)}</Col>
+
+      <Col xs="1">
+        <button
+          className="btn btn-link mt-0"
+          onClick={() => {
+            resetLocalFields();
+            props.deleteWorkItem(workItem);
+          }}
+        >
+          <FontAwesomeIcon icon={faTrashAlt} />
+        </button>
+      </Col>
+    </Row>
+  );
 };
-
 
 export const WorkItemsForm = (props: WorkItemsFormProps) => {
   return (
     <div className="activity-line">
       <Row>
-        <Col xs="5">
-          <label>{props.category}</label>
-        </Col>
+        {props.category === "Other" ? (
+          <>
+            <Col xs="4">
+              <label>{props.category}</label>
+            </Col>
+            <Col xs="1">
+              <label>Markup</label>
+            </Col>
+          </>
+        ) : (
+          <Col xs="5">
+            <label>{props.category}</label>
+          </Col>
+        )}
         <Col xs="3">
           <label>{props.category === "Labor" ? "Time" : "Unit"}</label>
         </Col>
@@ -197,7 +229,8 @@ export const WorkItemsForm = (props: WorkItemsFormProps) => {
           workItem={workItem}
           updateWorkItems={props.updateWorkItems}
           deleteWorkItem={props.deleteWorkItem}
-        />))}
+        />
+      ))}
       <Button
         className="btn-sm"
         color="link"
