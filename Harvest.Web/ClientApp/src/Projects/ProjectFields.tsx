@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { GeoJSON, MapContainer, TileLayer, Popup } from "react-leaflet";
-
+import { Project } from "../types";
 import { getBoundingBox } from "../Util/Geography";
 import { LatLngBoundsExpression } from "leaflet";
 
@@ -11,6 +11,7 @@ interface ProjectField {
   crop: string;
   details: string;
   location: GeoJSON.Polygon;
+  project: Project;
   projectId: number;
 }
 
@@ -23,6 +24,7 @@ export const ProjectFields = () => {
 
       if (response.ok) {
         const result = await response.json();
+        console.log(result);
         setFields(result);
       }
     };
@@ -52,9 +54,14 @@ export const ProjectFields = () => {
         <GeoJSON key={`field-${i}`} data={field.location}>
           <Popup>
             <div>
+              <div className="tooltip-title">
+                <h3>{field.project.name}</h3>
+              </div>
               <div className="tooltip-description">
                 <p>Crops: {field.crop}</p>
                 <p>{field.details}</p>
+                <p>Start Date: {new Intl.DateTimeFormat('en-US').format(new Date(field.project.start))}</p>
+                <p>End Date: {new Intl.DateTimeFormat('en-US').format(new Date(field.project.end))}</p>
                 <Link to={`/project/details/${field.projectId}`}>
                   Project Details
                 </Link>
