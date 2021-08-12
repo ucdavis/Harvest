@@ -77,7 +77,6 @@ export const FileUpload = (props: Props) => {
 
       UploadFile(sasUrl, newFile, addedFile.arrayBuffer()).then((_) => {
         // TODO, check for an error
-
         // file is done uploading, so update uploaded details
         props.updateFile({ ...newFile, uploaded: true });
       });

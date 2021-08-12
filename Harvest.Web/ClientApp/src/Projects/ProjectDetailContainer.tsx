@@ -207,18 +207,6 @@ export const ProjectDetailContainer = () => {
 
                       return oldFiles;
                     });
-
-                    setProject((proj) => {
-                      if (proj) {
-                        proj.attachments[
-                          proj.attachments.findIndex(
-                            (file) => file.identifier === f.identifier
-                          )
-                        ] = { ...f };
-
-                        return { ...proj, attachments: [...proj.attachments] };
-                      }
-                    });
                   }}
                 />
                 <ul className="no-list-style attached-files-list">
