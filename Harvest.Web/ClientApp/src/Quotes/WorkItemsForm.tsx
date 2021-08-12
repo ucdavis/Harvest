@@ -127,7 +127,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
       </Col>
 
       {props.category === "Other" && (
-        <Col className="col-sm-1">
+        <Col className="col-sm-1 text-center">
           <Input
             type="checkbox"
             id="markup"
@@ -177,7 +177,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
       <Col xs="1">${formatCurrency(workItem.total)}</Col>
 
-      <Col xs="1">
+      <Col xs="1" className="trash-col">
         <button
           className="btn btn-link mt-0"
           onClick={() => {
