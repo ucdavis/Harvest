@@ -128,18 +128,33 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
       {props.category === "Other" && (
         <Col className="col-sm-1 text-center">
-          <Input
-            type="checkbox"
-            id="markup"
-            checked={workItem.markup}
-            onChange={(e) => {
-              // apply or remove the 20% markup depending on checked state
-              props.updateWorkItems({
-                ...workItem,
-                markup: e.target.checked,
-              });
-            }}
-          />
+          <div className="custom-control custom-switch">
+            <Input
+              type="checkbox"
+              id="markup"
+              className="custom-control-input"
+              checked={workItem.markup}
+              onChange={(e) => {
+                // apply or remove the 20% markup depending on checked state
+                props.updateWorkItems({
+                  ...workItem,
+                  markup: e.target.checked,
+                });
+              }}
+            />
+            <label className="custom-control-label"></label>
+          </div>
+
+          {/* <div className="custom-control custom-switch">
+            <input
+              type="checkbox"
+              className="custom-control-input"
+              id="customSwitch1"
+            />
+            <label className="custom-control-label">
+              Toggle this switch element
+            </label>
+          </div> */}
         </Col>
       )}
 
