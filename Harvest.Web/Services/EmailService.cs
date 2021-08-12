@@ -12,7 +12,6 @@ using Harvest.Email.Models.Ticket;
 using Harvest.Email.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
 namespace Harvest.Web.Services
@@ -32,7 +31,13 @@ namespace Harvest.Web.Services
         Task<bool> NewTicketCreated(Project project, Ticket ticket);
         Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage);
         Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments);
-        Task<bool> TicketClosed(Project project, Ticket ticket);
+        Task<bool> TicketClosed(Project project, Ticket ticket, User ClosedBy);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="days">Specifies number of days before the project ends to include in the notification</param>
+        /// <returns></returns>
+        Task<int> SendExpiringProjectsNotification(int days);
     }
 
     public class EmailService : IEmailService
@@ -370,10 +375,73 @@ namespace Harvest.Web.Services
             return true;
         }
 
-        public Task<bool> TicketClosed(Project project, Ticket ticket)
+        public async Task<bool> TicketClosed(Project project, Ticket ticket, User closedBy)
         {
-            //Email PI
-            throw new NotImplementedException();
+            try
+            {
+                string[] emailTo = null;
+                string[] ccEmails = null;
+                if (ticket.Project.PrincipalInvestigatorId == closedBy.Id)
+                {
+                    emailTo = await FieldManagersEmails();
+                    ccEmails = new[] {project.PrincipalInvestigator.Email};
+                }
+                else
+                {
+                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    ccEmails = await FieldManagersEmails();
+                }
+
+                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var model = new TicketReplyModel()
+                {
+                    ProjectName = project.Name,
+                    Subject = ticket.Name,
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
+                };
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketClosed.cshtml", model);
+                var textVersion = "Ticket Has been closed.";
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Ticket Closed");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Close Ticket notification", e);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<int> SendExpiringProjectsNotification(int days = 7)
+        {
+            try
+            {
+                var emailTo = await FieldManagersEmails();
+                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.End <= DateTime.UtcNow.AddDays(days))
+                    .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
+                    {
+                        EndDate = s.End.ToShortDateString(),
+                        Name = s.Name,
+                        ProjectUrl = $"{_emailSettings.BaseUrl}/Project/Details/{s.Id}"
+                    }).ToArrayAsync();
+                if (model == null || model.Length == 0)
+                {
+                    Log.Information($"No projects have expired or will expire in {days} days");
+                    return 0;
+                }
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ExpiringProjects.cshtml", model);
+                var textVersion = $"One or more projects have expired or will expire in {days} days.";
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Expiring Projects");
+                return model.Length;
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing expiring projects", ex);
+            }
+
+            return 0;
         }
     }
 }

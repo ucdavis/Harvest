@@ -69,7 +69,6 @@ export const TicketReply = (props: Props) => {
           Send
         </Button>
       </div>
-      <div>DEBUG: {JSON.stringify(ticketMessage)}</div>
     </>
   );
 };

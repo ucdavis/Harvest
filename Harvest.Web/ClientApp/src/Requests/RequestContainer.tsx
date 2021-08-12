@@ -97,7 +97,12 @@ export const RequestContainer = () => {
       body: JSON.stringify(project),
     });
 
-    setNotification(request, "Creating Request", "Request Created");
+      if (project.principalInvestigator.iam !== userDetail.iam) {
+          setNotification(request, `Creating Request For ${project.principalInvestigator.name}`, `Request Created For ${project.principalInvestigator.name}`);
+      } else {
+          setNotification(request, "Creating Request", "Request Created");
+      }
+    
 
     const response = await request;
 
@@ -109,8 +114,13 @@ export const RequestContainer = () => {
       ) {
         userRoles.push("PI");
       }
-      const data = await response.json();
-      history.push(`/Project/Details/${data.id}`);
+        const data = await response.json();
+        if (data.principalInvestigator.id !== data.createdBy.id) {
+            
+            history.push('/');
+        } else {
+            history.push(`/Project/Details/${data.id}`);
+        }
     }
   };
 
@@ -289,7 +299,6 @@ export const RequestContainer = () => {
                   {projectId ? "Create Change Request" : "Create Field Request"}
                 </Button>
               </div>
-              <div>DEBUG: {JSON.stringify(project)}</div>
             </div>
           </div>
         </div>

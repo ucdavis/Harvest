@@ -42,7 +42,6 @@ export const QuoteDisplay = (props: Props) => {
         </div>
       ))}
       <QuoteTotals quote={props.quote}></QuoteTotals>
-      DEBUG: {JSON.stringify(quote)}
     </div>
   );
 };

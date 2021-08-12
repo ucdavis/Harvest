@@ -1,0 +1,37 @@
+﻿@using Harvest.Email.Views.Shared
+@model IEnumerable<Harvest.Email.Models.ExpiringProjectsModel>
+
+@{
+    ViewData["EmailTitle"] = "Testing";
+    Layout = "_EmailLayout_mjml";
+}
+
+
+<mj-section>
+    <mj-column>
+        <mj-text align="center">
+            <h1>Expiring/Expired Projects to be closed out.</h1>
+            <p>Project(s) awaiting final billing review and ready to be closed out:</p>
+
+        </mj-text>
+        <mj-table>
+            <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
+                <th style="padding: 0 15px 0 0;">Name</th>
+                <th style="padding: 0 15px;">Ends</th>
+                <th style="padding: 0 0 0 15px;">Link</th>
+            </tr>
+            @@foreach (var item in Model)
+            {
+                <tr>
+                <td style="padding: 0 15px 0 0;">@@item.Name</td>
+                <td style="padding: 0 15px;">@@item.EndDate</td>
+                    <td style="padding: 0 0 0 15px;">
+                        <a href="@@item.ProjectUrl">Project Details</a>
+                    </td>
+                </tr>
+            }
+        </mj-table>
+    </mj-column>
+</mj-section>
+
+
