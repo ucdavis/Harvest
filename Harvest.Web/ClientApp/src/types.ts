@@ -83,6 +83,7 @@ export interface Expense {
   description: string;
   type: RateType;
   quantity: number;
+  markup: boolean;
   rate: Rate | null;
   rateId: number;
   price: number;
