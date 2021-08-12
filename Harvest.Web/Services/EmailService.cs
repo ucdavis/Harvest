@@ -31,7 +31,7 @@ namespace Harvest.Web.Services
         Task<bool> NewTicketCreated(Project project, Ticket ticket);
         Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage);
         Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments);
-        Task<bool> TicketClosed(Project project, Ticket ticket);
+        Task<bool> TicketClosed(Project project, Ticket ticket, User ClosedBy);
         /// <summary>
         /// 
         /// </summary>
@@ -375,10 +375,43 @@ namespace Harvest.Web.Services
             return true;
         }
 
-        public Task<bool> TicketClosed(Project project, Ticket ticket)
+        public async Task<bool> TicketClosed(Project project, Ticket ticket, User closedBy)
         {
-            //Email PI
-            throw new NotImplementedException();
+            try
+            {
+                string[] emailTo = null;
+                string[] ccEmails = null;
+                if (ticket.Project.PrincipalInvestigatorId == closedBy.Id)
+                {
+                    emailTo = await FieldManagersEmails();
+                    ccEmails = new[] {project.PrincipalInvestigator.Email};
+                }
+                else
+                {
+                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    ccEmails = await FieldManagersEmails();
+                }
+
+                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var model = new TicketReplyModel()
+                {
+                    ProjectName = project.Name,
+                    Subject = ticket.Name,
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
+                };
+                var emailBody = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketClosed.cshtml", model);
+                var textVersion = "Ticket Has been closed.";
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Ticket Closed");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Close Ticket notification", e);
+                return false;
+            }
+
+            return true;
         }
 
         public async Task<int> SendExpiringProjectsNotification(int days = 7)

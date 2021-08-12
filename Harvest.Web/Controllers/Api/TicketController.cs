@@ -252,7 +252,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Close(int projectId, int ticketId)
         {
             var currentUser = await _userService.GetCurrentUser();
-            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
+            var ticket = await _dbContext.Tickets.Include(a => a.Project).ThenInclude(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
 
             ticket.Status = "Complete";
             ticket.UpdatedBy = currentUser;
@@ -263,7 +263,7 @@ namespace Harvest.Web.Controllers.Api
             _dbContext.Tickets.Update(ticket);
             await _dbContext.SaveChangesAsync();
 
-            //TODO: Notification email
+            await _emailService.TicketClosed(ticket.Project, ticket, currentUser);
 
             return Ok();
         }

@@ -38,13 +38,11 @@ namespace Harvest.Web.Controllers
         {
 
 
-            var model = new List<ExpiringProjectsModel>();
-            model.Add(new ExpiringProjectsModel{EndDate = DateTime.Now.ToShortDateString(), Name = "Test Proj", ProjectUrl = "https://harvest.caes.ucdavis.edu/Fake1" });
-            model.Add(new ExpiringProjectsModel { EndDate = DateTime.Now.ToShortDateString(), Name = "Test 2", ProjectUrl = "https://harvest.caes.ucdavis.edu/Fake2" });
-            model.Add(new ExpiringProjectsModel { EndDate = DateTime.Now.ToShortDateString(), Name = "Test 3", ProjectUrl = "https://harvest.caes.ucdavis.edu/Fake3" });
+            var model = new TicketReplyModel();
 
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/ExpiringProjects_mjml.cshtml", model.ToArray());
+
+            var results = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketClosed_mjml.cshtml", model);
 
             return Content(results);
         }
