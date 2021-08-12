@@ -125,6 +125,9 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("Markup")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -840,9 +843,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
-                        .WithMany()
+                        .WithMany("Expenses")
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Rate", "Rate")
@@ -1138,6 +1141,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Navigation("Accounts");
 
                     b.Navigation("Attachments");
+
+                    b.Navigation("Expenses");
 
                     b.Navigation("Fields");
 
