@@ -326,6 +326,206 @@ namespace Harvest.Core.Data
             rate.Unit = "Per Acre";
 
             await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Closed System";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 500.00m;
+            rate.Unit = "Each";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Dolly";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 125.00m;
+            rate.Unit = "Daily";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Drip Tape Install/Remove";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 55.00m;
+            rate.Unit = "Per Acre";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Forklift";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 16.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES GPS Leveller";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 57.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES 10' Tye Drill Planter";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 76.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES 20' Great Plains Drill Planter";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 18.00m;
+            rate.Unit = "Per Acre";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Monosem Planter";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 35.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Preplant Cultivator/In-season Cultivator";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 65.00m;
+            rate.Unit = "Per Acre";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Tractor - GPS";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 132.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Tractor John Deere 7810";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 114.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Tractor John Deere 5090M";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 34.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Trailer";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 16.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Truck";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 427.00m;
+            rate.Unit = "Per Month";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Truck Special Service";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 105.00m;
+            rate.Unit = "Daily";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Truck 1997 Ford F-150";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 63.00m;
+            rate.Unit = "Daily";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Weld/Scraper";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 30.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES JD Booster Pump";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 15.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES Lister";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 65.00m;
+            rate.Unit = "Hourly";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Equipment;
+            rate.Description = "CAES GT Cart Strip Weight";
+            rate.BillingUnit = "CA&ES";
+            rate.Account = "3-FRMRATE";
+            rate.Price = 184.00m;
+            rate.Unit = "Per Strip Weighed";
+
+            await _dbContext.Rates.AddAsync(rate);
         }
 
         private async Task CreateOtherRates(User createdBy)
