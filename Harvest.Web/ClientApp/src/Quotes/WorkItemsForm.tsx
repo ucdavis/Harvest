@@ -9,6 +9,7 @@ import {
   InputGroupAddon,
   InputGroupText,
   Row,
+  UncontrolledTooltip,
 } from "reactstrap";
 
 import { Rate, RateType, WorkItem } from "../types";
@@ -202,7 +203,13 @@ export const WorkItemsForm = (props: WorkItemsFormProps) => {
               <label>{props.category}</label>
             </Col>
             <Col xs="1">
-              <label>Markup</label>
+              <label id="markupLabel">Markup</label>
+              <UncontrolledTooltip
+                placement="right"
+                target="markupLabel"
+              >
+                Adds a 20% parts markup to the total price
+              </UncontrolledTooltip>
             </Col>
           </>
         ) : (
