@@ -72,7 +72,7 @@ namespace Harvest.Jobs.Invoice
 
         private static async Task ProcessInvoices(IInvoiceService invoiceService, ISlothService slothService)
         {
-           var invoiceCount = await invoiceService.CreateInvoices(true);
+           var invoiceCount = await invoiceService.CreateInvoices();
             _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
 
             var slothMoneyMoveCount = 0;
