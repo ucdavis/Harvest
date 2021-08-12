@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Harvest.Core.Domain;
@@ -92,7 +93,9 @@ namespace Harvest.Core.Data
                 return;
             }
 
-            var createdBy = await _dbContext.Users.FirstAsync();
+            var createdBy = await _dbContext.Users.Where(a => a.Kerberos == "jsylvest").FirstAsync();
+
+            await CreateAcerageRates(createdBy);
 
             var rate = DefaultRate(createdBy);
             rate.Type = Rate.Types.Acreage;
@@ -171,6 +174,29 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 34.91m;
             rate.Unit = "Per Acre";
+
+            await _dbContext.Rates.AddAsync(rate);
+        }
+
+        private async Task CreateAcerageRates(User createdBy)
+        {
+            var rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Acreage;
+            rate.Description = "Russell Ranch Acreage";
+            rate.BillingUnit = "Russell Ranch";
+            rate.Account = "3-RRACRES";
+            rate.Price = 1150.00m;
+            rate.Unit = "Per Acre per Year";
+
+            await _dbContext.Rates.AddAsync(rate);
+
+            rate = DefaultRate(createdBy);
+            rate.Type = Rate.Types.Acreage;
+            rate.Description = "Plant Sciences Row Crop Acreage";
+            rate.BillingUnit = "Plant Sciences";
+            rate.Account = "3-APSNFLV";
+            rate.Price = 1150.00m;
+            rate.Unit = "Per Acre per Year";
 
             await _dbContext.Rates.AddAsync(rate);
         }
