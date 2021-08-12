@@ -57,10 +57,10 @@ export const InvoiceDetailContainer = () => {
         <div className="card-content">
           <InvoiceDisplay invoice={projectAndInvoice.invoice}></InvoiceDisplay>
         </div>
-        
+
         <PDFDownloadLink
           document={<InvoicePDF invoice={projectAndInvoice.invoice} />}
-          fileName="Invoice.pdf"
+          fileName={`Invoice-${invoiceId}-Project-${projectAndInvoice.project.name}.pdf`}
         >
           <button className="btn btn-link btn-sm">
             Download PDF <FontAwesomeIcon icon={faDownload} />
