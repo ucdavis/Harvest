@@ -15,13 +15,13 @@ import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
+import { ProjectFields } from "./Projects/ProjectFields";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
-import { Map } from "./Maps/Map";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -100,7 +100,12 @@ function App() {
         path="/expense/unbilled/:projectId"
         component={UnbilledExpensesContainer}
       />
-      <Route path="/home/map" component={Map} />
+      <ConditionalRoute
+        roles={["FieldManager", "Supervisor"]}
+        exact
+        path="/project/map"
+        component={ProjectFields}
+      />
     </AppContext.Provider>
   );
 }

@@ -42,6 +42,11 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        public ActionResult Map()
+        {
+            return View("React");
+        }
+
         public ActionResult NeedsAttention()
         {
             return View("React");
@@ -145,6 +150,15 @@ namespace Harvest.Web.Controllers
             }
 
             return Ok(project);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> GetFields()
+        {
+            var fields = await _dbContext.Fields.Where(f => f.IsActive && f.Project.Status == Project.Statuses.Active).Include(f => f.Project).ToListAsync();
+
+            return Ok(fields);
         }
 
         [HttpGet]
