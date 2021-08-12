@@ -34,6 +34,7 @@ namespace Harvest.Core.Models.InvoiceModels
             Total = invoice.Total;
             CreatedOn = invoice.CreatedOn;
             Notes = invoice.Notes;
+            Status = invoice.Status;
             Expenses = (invoice.Expenses?.Select(e => new ExpenseModel(e)) ?? Enumerable.Empty<ExpenseModel>()).ToList();
             Transfers = (invoice.Transfers?.Select(a => new TransferModel(a)) ?? Enumerable.Empty<TransferModel>()).ToList();
         }

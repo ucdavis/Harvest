@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Harvest.Core.Extensions;
+using Serilog;
+using Serilog.Context;
+using Serilog.Events;
 
 namespace Harvest.Core.Models
 {
@@ -21,7 +27,50 @@ namespace Harvest.Core.Models
     // the generic argument. So adding a bit of type inference and implicit casting makes for a better experience without getting too fancy...
     public static class Result
     {
-        public static ResultError Error(string errorMessage) => new ResultError(errorMessage);
+        public static ResultError Error(string messageTemplate, 
+            LogEventLevel logLevel = LogEventLevel.Error,
+            [CallerFilePath] string callerFilePath = "", 
+            [CallerLineNumber] int callerLineNumber = 0)
+        {
+            using var _ = LogContext.PushProperty("FileName", Path.GetFileName(callerFilePath));
+            LogContext.PushProperty("LineNumber", callerLineNumber);
+            Log.Write(logLevel, messageTemplate);
+            return new ResultError(messageTemplate);
+        }
+
+        public static ResultError Error(string messageTemplate, object prop0, object prop1, object prop2,
+            LogEventLevel logLevel = LogEventLevel.Error,
+            [CallerFilePath] string callerFilePath = "",
+            [CallerLineNumber] int callerLineNumber = 0)
+        {
+            using var _ = LogContext.PushProperty("FileName", Path.GetFileName(callerFilePath));
+            LogContext.PushProperty("LineNumber", callerLineNumber);
+            Log.Write(logLevel, messageTemplate, prop0, prop1, prop2);
+            return new ResultError(messageTemplate.FormatTemplate(prop0, prop1, prop2));
+        }
+
+        public static ResultError Error(string messageTemplate, object prop0, object prop1,
+            LogEventLevel logLevel = LogEventLevel.Error,
+            [CallerFilePath] string callerFilePath = "",
+            [CallerLineNumber] int callerLineNumber = 0)
+        {
+            using var _ = LogContext.PushProperty("FileName", Path.GetFileName(callerFilePath));
+            LogContext.PushProperty("LineNumber", callerLineNumber);
+            Log.Write(logLevel, messageTemplate, prop0, prop1);
+            return new ResultError(messageTemplate.FormatTemplate(prop0, prop1));
+        }
+
+        public static ResultError Error(string messageTemplate, object prop0,
+            LogEventLevel logLevel = LogEventLevel.Error,
+            [CallerFilePath] string callerFilePath = "",
+            [CallerLineNumber] int callerLineNumber = 0)
+        {
+            using var _ = LogContext.PushProperty("FileName", Path.GetFileName(callerFilePath));
+            LogContext.PushProperty("LineNumber", callerLineNumber);
+            Log.Write(logLevel, messageTemplate, prop0);
+            return new ResultError(messageTemplate.FormatTemplate(prop0));
+        }
+
         public static Result<T> Value<T>(T value) => new Result<T>(value);
 
         public class ResultError

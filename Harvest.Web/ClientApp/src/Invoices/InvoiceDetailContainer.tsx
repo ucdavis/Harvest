@@ -51,7 +51,7 @@ export const InvoiceDetailContainer = () => {
     <div className="card-wrapper">
       <ProjectHeader
         project={projectAndInvoice.project}
-        title={`Invoice #${invoiceId} - Project #${projectAndInvoice.project.id}`}
+        title={`Invoice #${invoiceId} (${projectAndInvoice.invoice.status}) - Project #${projectAndInvoice.project.id}`}
       />
       <div className="card-green-bg">
         <div className="card-content">

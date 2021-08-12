@@ -17,7 +17,7 @@ namespace Harvest.Core.Services
     public interface IInvoiceService
     {
         Task<Result<int>> CreateInvoice(int projectId, bool manualOverride = false);
-        Task<int> CreateInvoices();
+        Task<int> CreateInvoices(bool manualOverride = false);
         Task<List<int>> GetCreatedInvoiceIds();
     }
 
@@ -72,16 +72,18 @@ namespace Harvest.Core.Services
                 project.Status = Project.Statuses.Completed;
             }
 
-            //Acreage fees are ignored for manually created invoices
-            //TODO: Create the acreage expense with correct amount 
-            await CreateMonthlyAcreageExpense(project);
+            if (!manualOverride)
+            {
+                //Acreage fees are ignored for manually created invoices
+                await CreateMonthlyAcreageExpense(project);
+            }
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
 
-            //Shouldn't happen once we create the acreage expense 
+            //Should only be possible during a manual override
             if (unbilledExpenses.Length == 0)
             {
-                return Result.Error("No existing unbilled expenses found");
+                return Result.Error("No unbilled expenses found for project: {projectId}", projectId);
             }
 
             var newInvoice = new Invoice { CreatedOn = DateTime.UtcNow, ProjectId = projectId, Status = Invoice.Statuses.Created, Total = unbilledExpenses.Sum(x => x.Total) };
@@ -139,14 +141,14 @@ namespace Harvest.Core.Services
 
         }
 
-        public async Task<int> CreateInvoices()
+        public async Task<int> CreateInvoices(bool manualOverride = false)
         {
-            var activeProjects = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active)
+            var activeProjects = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Accounts.Any())
                 .ToListAsync();
             var counter = 0;
             foreach (var activeProject in activeProjects)
             {
-                if (!(await CreateInvoice(activeProject.Id)).IsError)
+                if (!(await CreateInvoice(activeProject.Id, manualOverride)).IsError)
                 {
                     //Log something if invoice created?
                     counter++;

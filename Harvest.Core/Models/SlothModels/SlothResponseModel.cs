@@ -8,8 +8,13 @@ namespace Harvest.Core.Models.SlothModels
         public string Id { get; set; }
         public string KfsTrackingNumber { get; set; }
         public string Status { get; set; }
+    }
 
-        public bool Success { get; set; } = true;
-        public string Message { get; set; } //Error Message
+    public static class SlothStatuses
+    {
+        public const string PendingApproval = "PendingApproval";
+        public const string Scheduled = "Scheduled";
+        public const string Completed = "Completed";
+        public const string Cancelled = "Cancelled";
     }
 }

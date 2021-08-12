@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 
@@ -46,6 +47,10 @@ namespace Harvest.Jobs.Core
 
             // standard logger
             var logConfig = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                // .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning) // uncomment this to hide EF core general info logs
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .Enrich.WithExceptionDetails();
 
@@ -60,7 +65,7 @@ namespace Harvest.Jobs.Core
         private static LoggerConfiguration WriteToElasticSearchCustom(this LoggerConfiguration logConfig)
         {
             // get logging config for ES endpoint (re-use some stackify settings for now)
-            var loggingSection = _configuration.GetSection("ElasticApm");
+            var loggingSection = _configuration.GetSection("Serilog");
 
             var esUrl = loggingSection.GetValue<string>("ElasticUrl"); //logging
 
@@ -70,7 +75,7 @@ namespace Harvest.Jobs.Core
                 return logConfig;
             }
 
-            logConfig.Enrich.WithProperty("Application", loggingSection.GetValue<string>("ServiceName"));
+            logConfig.Enrich.WithProperty("Application", loggingSection.GetValue<string>("AppName"));
             logConfig.Enrich.WithProperty("AppEnvironment", loggingSection.GetValue<string>("Environment"));
 
             if (Uri.TryCreate(esUrl, UriKind.Absolute, out var elasticUri))
