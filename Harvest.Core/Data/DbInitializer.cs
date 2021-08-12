@@ -88,7 +88,7 @@ namespace Harvest.Core.Data
         private async Task CheckCreateSampleRates()
         {
 
-            if (await _dbContext.Rates.AnyAsync())
+            if (await _dbContext.Rates.AnyAsync(a => a.IsActive))
             {
                 return;
             }
