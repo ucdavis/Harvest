@@ -6,8 +6,8 @@ import { Ticket } from "../types";
 import { Link } from "react-router-dom";
 
 interface Props {
-    tickets: Ticket[];
-    compact?: boolean;
+  tickets: Ticket[];
+  compact?: boolean;
 }
 
 export const TicketTable = (props: Props) => {
@@ -37,13 +37,15 @@ export const TicketTable = (props: Props) => {
       },
       {
         Header: "Updated",
-        accessor: (row) =>
-          row.updatedOn ? new Date(row.updatedOn).toLocaleDateString() : "",
+        accessor: "updatedOn",
+        Cell: (data: Cell<Ticket>) =>
+          data.value ? new Date(data.value).toLocaleDateString() : "",
       },
       {
         Header: "Due",
-        accessor: (row) =>
-          row.dueDate ? new Date(row.dueDate).toLocaleDateString() : "",
+        accessor: "dueDate",
+        Cell: (data: Cell<Ticket>) =>
+          data.value ? new Date(data.value).toLocaleDateString() : "",
       },
       {
         Header: "Subject",
