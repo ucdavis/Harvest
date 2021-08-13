@@ -142,7 +142,7 @@ namespace Harvest.Core.Services
                 var credit = await _financialService.IsValid(expense.Key);
                 if (!credit.IsValid)
                 {
-                    return Result.Error("Unable to validate credit account {creditAccount}: {creditMessage}", expense.Key, credit.Message);
+                    Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expense.Key, credit.Message);
                 }
                 var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
                 if(totalCost >= 0.01m)
