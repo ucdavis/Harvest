@@ -57,12 +57,16 @@ export const ProjectTable = (props: Props) => {
       {
         id: "startDate",
         Header: "Start",
-        accessor: (row) => new Date(row.start).toLocaleDateString(),
+        accessor: "start",
+        Cell: (data: Cell<Project>) =>
+          new Date(data.value).toLocaleDateString(),
       },
       {
         id: "endDate",
         Header: "End",
-        accessor: (row) => new Date(row.end).toLocaleDateString(),
+        accessor: "end",
+        Cell: (data: Cell<Project>) =>
+          new Date(data.value).toLocaleDateString(),
       },
       {
         Header: "Status",
