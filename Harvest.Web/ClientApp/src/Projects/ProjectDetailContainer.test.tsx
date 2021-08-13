@@ -128,7 +128,7 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const attachedFilesList = container.querySelector(".no-list-style");
+    const attachedFilesList = container.querySelector(".attached-files-list");
     const attachemntsLength = attachedFilesList?.getElementsByTagName("li");
 
     expect(attachemntsLength?.length).toBe(2);
