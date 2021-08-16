@@ -27,6 +27,8 @@ namespace Harvest.Core.Domain
         [Range(0.01, Double.MaxValue, ErrorMessage = "Quantity must be greater than 0.01")]
         public decimal Quantity { get; set; }
 
+        public bool Markup { get; set; }
+
         [Range(0.01, Double.MaxValue, ErrorMessage = "Total must be greater than 0.01")]
         public decimal Total { get; set; }
 

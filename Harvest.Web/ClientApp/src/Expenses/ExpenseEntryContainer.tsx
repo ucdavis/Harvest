@@ -98,6 +98,7 @@ export const ExpenseEntryContainer = () => {
             price: workItem.rate,
             type: workItem.type,
             quantity: workItem.quantity,
+            markup: workItem.markup,
             total: workItem.total,
             rateId: workItem.rateId,
             rate: null,

@@ -242,3 +242,8 @@ $nchild-wide: 24%;
 input[type="radio" i] {
   background-color: $primary-color;
 }
+.badge {
+  padding: 4px;
+  border: 1px solid $borders;
+  border-radius: 1px;
+}

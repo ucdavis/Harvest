@@ -16,6 +16,7 @@ import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 import { WorkItemsForm } from "./WorkItemsForm";
 import { useInputValidator } from "../FormValidation";
 import { activitySchema } from "../schemas";
+import { calculateAdjustedTotal } from "../Util/Calculations";
 
 const ANNUAL_ADJUSTMENT_RATE = 3;
 interface Props {
@@ -32,8 +33,13 @@ export const ActivityForm = (props: Props) => {
 
   const toggle = () => setYearDropdownOpen((prevState) => !prevState);
 
-  const { onChange, InputErrorMessage, getClassName, onBlur, resetLocalFields } = useInputValidator<Activity>(activitySchema);
-
+  const {
+    onChange,
+    InputErrorMessage,
+    getClassName,
+    onBlur,
+    resetLocalFields,
+  } = useInputValidator<Activity>(activitySchema);
 
   const updateWorkItems = (workItem: WorkItem) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
@@ -43,9 +49,7 @@ export const ActivityForm = (props: Props) => {
     );
     allItems[itemIndex] = {
       ...workItem,
-      total:
-        (workItem.rate + (workItem.rate * props.activity.adjustment) / 100.0) *
-        workItem.quantity,
+      total: calculateAdjustedTotal(workItem, props.activity.adjustment),
     };
 
     props.updateActivity({ ...props.activity, workItems: allItems });
@@ -81,7 +85,7 @@ export const ActivityForm = (props: Props) => {
       workItems: props.activity.workItems.map((w) => {
         return {
           ...w,
-          total: (w.rate + (w.rate * adjustment) / 100.0) * w.quantity,
+          total: calculateAdjustedTotal(w, adjustment),
         };
       }),
     });
@@ -153,15 +157,15 @@ export const ActivityForm = (props: Props) => {
               type="text"
               id="activityName"
               value={props.activity.name}
-              onChange={onChange("name",(e) =>
+              onChange={onChange("name", (e) =>
                 props.updateActivity({
                   ...props.activity,
                   name: e.target.value,
-                }))
-              }
+                })
+              )}
               onBlur={onBlur("name")}
             ></Input>
-            <InputErrorMessage name="name"/>
+            <InputErrorMessage name="name" />
           </div>
         </div>
 
