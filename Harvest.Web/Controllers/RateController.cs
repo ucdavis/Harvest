@@ -41,7 +41,7 @@ namespace Harvest.Web.Controllers
         // GET: RateController/Active
         public async Task<ActionResult> Active()
         {
-            var rates = await _dbContext.Rates.Where(a => a.IsActive).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id }).ToArrayAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id }).ToArrayAsync();
             return Ok(rates);
         }
 
