@@ -1,6 +1,4 @@
-using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Harvest.Core.Domain;
 using Harvest.Core.Utilities;
 using NetTopologySuite.Geometries;
@@ -80,5 +78,6 @@ namespace Harvest.Core.Models
         public double Quantity { get; set; }
         public double Total { get; set; }
         public string Unit { get; set; }
+        public bool Markup { get; set; }
     }
 }
