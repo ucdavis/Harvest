@@ -174,6 +174,7 @@ namespace Harvest.Core.Domain
             public const string Active = "Active";
             public const string ChangeRequested = "ChangeRequested";
             public const string Completed = "Completed";
+            public const string AwaitingCloseout = "AwaitingCloseout";
 
             public static List<string> TypeList = new List<string>
             {
@@ -184,6 +185,7 @@ namespace Harvest.Core.Domain
                 Active,
                 ChangeRequested,
                 Completed,
+                AwaitingCloseout
             }.ToList();
         }
 
