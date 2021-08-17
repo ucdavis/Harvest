@@ -25,11 +25,13 @@ namespace Harvest.Core.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly IProjectHistoryService _historyService;
+        private readonly IEmailService _emailService;
 
-        public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService)
+        public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService, IEmailService emailService)
         {
             _dbContext = dbContext;
             _historyService = historyService;
+            _emailService = emailService;
         }
         public async Task<Result<int>> CreateInvoice(int projectId, bool manualOverride = false)
         {
@@ -63,6 +65,20 @@ namespace Harvest.Core.Services
                     return Result.Error("Project has not yet started");
                 }
 
+                //Acreage fees are ignored for manually created invoices
+                await CreateMonthlyAcreageExpense(project);
+
+                //Don't exceed quoted amount
+                var allExpenses = await _dbContext.Expenses.Where(e => e.Approved && e.ProjectId == projectId).ToArrayAsync();
+                if (allExpenses.Sum(e => e.Total) > project.QuoteTotal)
+                {
+                    var billedTotal = allExpenses.Where(e => e.InvoiceId != null).Sum(e => e.Total);
+                    var invoiceAmount = allExpenses.Where(e => e.InvoiceId == null).Sum(e => e.Total);
+                    var quoteRemaining = project.QuoteTotal - billedTotal;
+                    await _emailService.InvoiceExceedsQuote(project, invoiceAmount, quoteRemaining);
+                    return Result.Error("Project expenses exceed quote: {projectId}, invoiceAmount: {invoiceAmount}, quoteRemaining: {quoteRemaining}",
+                        projectId, invoiceAmount, quoteRemaining);
+                }
             }
 
             //TODO: Review this later
@@ -70,12 +86,6 @@ namespace Harvest.Core.Services
             {
                 //Ok, so the project has ended, we should probably create the last invoice, and close it out. Setting the project to completed.
                 project.Status = Project.Statuses.Completed;
-            }
-
-            if (!manualOverride)
-            {
-                //Acreage fees are ignored for manually created invoices
-                await CreateMonthlyAcreageExpense(project);
             }
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
@@ -143,7 +153,9 @@ namespace Harvest.Core.Services
 
         public async Task<int> CreateInvoices(bool manualOverride = false)
         {
-            var activeProjects = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Accounts.Any())
+            var activeProjects = await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Accounts.Any())
                 .ToListAsync();
             var counter = 0;
             foreach (var activeProject in activeProjects)
