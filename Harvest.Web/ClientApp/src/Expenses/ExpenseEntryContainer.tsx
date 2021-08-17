@@ -50,6 +50,8 @@ export const ExpenseEntryContainer = () => {
   const [notification, setNotification] = usePromiseNotification();
 
   useEffect(() => {
+    let isMounted = true;
+
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await fetch("/Rate/Active");
@@ -62,8 +64,14 @@ export const ExpenseEntryContainer = () => {
         // create default activity
       }
     };
+    
+    if (isMounted){
+      cb();
+    }
 
-    cb();
+    // This runs useEffect's cleanup function where isMounted is set to false
+    // That way, no API calls can be made when the component unmounts
+    return () => { isMounted = false }; 
   }, []);
 
   const changeProject = (projectId: number) => {
