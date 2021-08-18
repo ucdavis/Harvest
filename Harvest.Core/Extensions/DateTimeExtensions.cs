@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Harvest.Core.Extensions
@@ -16,6 +17,29 @@ namespace Harvest.Core.Extensions
             {
                 return TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
             }
+        }
+
+        public static bool IsBusinessDay(this DateTime dateTime)
+        {
+            return dateTime.ToPacificTime().DayOfWeek switch
+            {
+                DayOfWeek.Saturday => false,
+                DayOfWeek.Sunday => false,
+                _ => true
+            };
+        }
+
+        public static bool IsFirstBusinessDayOfMonth(this DateTime dateTime)
+        {
+            var pacificTime = dateTime.ToPacificTime();
+            var day = pacificTime.DayOfWeek;
+            return day switch
+            {
+                DayOfWeek.Saturday => false,
+                DayOfWeek.Sunday => false,
+                DayOfWeek.Monday => pacificTime.Day <= 3,
+                _ => pacificTime.Day == 1
+            };
         }
 
         public static DateTime? ToPacificTime(this DateTime? dateTime)
