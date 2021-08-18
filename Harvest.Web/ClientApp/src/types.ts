@@ -13,7 +13,8 @@ export type ProjectStatus =
   | "QuoteRejected"
   | "Active"
   | "ChangeRequested"
-  | "Completed";
+  | "Completed"
+  | "AwaitingCloseout";
 
 export interface Project {
   id: number;

@@ -9,7 +9,6 @@ using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Core.Utilities;
-using Harvest.Email.Services;
 using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
 using Harvest.Web.Models;
@@ -35,8 +34,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
-using EmailBodyService = Harvest.Email.Services.EmailBodyService;
-using IEmailBodyService = Harvest.Email.Services.IEmailBodyService;
 
 namespace Harvest.Web
 {
@@ -152,7 +149,6 @@ namespace Harvest.Web
             services.AddSingleton<IFileProvider>(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddScoped<IEmailBodyService, EmailBodyService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped(provder => JsonOptions.Standard);
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();

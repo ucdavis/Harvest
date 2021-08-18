@@ -9,10 +9,10 @@ using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
 using Harvest.Email.Models.Ticket;
-using Harvest.Email.Services;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Razor.Templating.Core;
 
 namespace Harvest.Web.Controllers
 {
@@ -22,16 +22,14 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
-        private readonly IEmailBodyService _emailBodyService;
         private readonly IEmailService _emailService;
 
         public TestController(AppDbContext dbContext, IUserService userService,
-            INotificationService notificationService, IEmailBodyService emailBodyService, IEmailService emailService)
+            INotificationService notificationService, IEmailService emailService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _notificationService = notificationService;
-            _emailBodyService = emailBodyService;
             _emailService = emailService;
         }
         public async Task<IActionResult> TestBody()
@@ -42,7 +40,7 @@ namespace Harvest.Web.Controllers
 
 
 
-            var results = await _emailBodyService.RenderBody("/Views/Emails/Ticket/TicketClosed_mjml.cshtml", model);
+            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/TicketClosed_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -61,7 +59,7 @@ namespace Harvest.Web.Controllers
             
 
 
-            var emailBody = await _emailBodyService.RenderBody("/Views/Emails/ExpiringProjects.cshtml", model);
+            var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ExpiringProjects.cshtml", model);
             await _notificationService.SendNotification(new string[] { user.Email }, null, emailBody, "EXPIRE", "EXPIRE");
 
             return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");

@@ -16,6 +16,7 @@ namespace Harvest.Jobs.Invoice
     class Program : JobBase
     {
         private static ILogger _log;
+
         static void Main(string[] args)
         {
             Configure();
@@ -56,16 +57,18 @@ namespace Harvest.Jobs.Invoice
 
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
+            services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
 
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IUserService, UserService>();
-            //services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
             services.AddSingleton(provder => JsonOptions.Standard);
             services.AddSingleton<IHttpContextAccessor, NullHttpContextAccessor>();
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             return services.BuildServiceProvider();
         }
