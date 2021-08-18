@@ -51,9 +51,7 @@ namespace Harvest.Core.Services
 
             if (!manualOverride)
             {
-                //Make sure we are running on a business day
-                var day = now.ToPacificTime().DayOfWeek;
-                if (day == DayOfWeek.Saturday || day == DayOfWeek.Sunday)
+                if (!now.IsBusinessDay())
                 {
                     return Result.Error("Invoices can only be created Monday through Friday: {projectId}", projectId);
                 }
@@ -87,7 +85,11 @@ namespace Harvest.Core.Services
                     var billedTotal = allExpenses.Where(e => e.InvoiceId != null).Sum(e => e.Total);
                     var invoiceAmount = allExpenses.Where(e => e.InvoiceId == null).Sum(e => e.Total);
                     var quoteRemaining = project.QuoteTotal - billedTotal;
-                    await _emailService.InvoiceExceedsQuote(project, invoiceAmount, quoteRemaining);
+                    //Only send notification if it is first business day of month
+                    if (now.IsFirstBusinessDayOfMonth())
+                    {
+                        await _emailService.InvoiceExceedsQuote(project, invoiceAmount, quoteRemaining);
+                    }
                     return Result.Error("Project expenses exceed quote: {projectId}, invoiceAmount: {invoiceAmount}, quoteRemaining: {quoteRemaining}",
                         projectId, invoiceAmount, quoteRemaining);
                 }
