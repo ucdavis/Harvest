@@ -13,6 +13,7 @@ export const ProjectHeader = (props: Props) => {
       <div className="quote-info row">
         <div className="col-md-6">
           <h2 id="request-title">{title}</h2>
+          <h3>{project.name}</h3>
           <p className="lede">PI: {project.principalInvestigator.name}</p>
           <p>
             Created {new Date(project.createdOn).toDateString()} by{" "}
