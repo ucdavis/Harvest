@@ -126,8 +126,6 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     setErrors({} as Record<TKey, string>);
   }
 
-  // console.log(errors)
-
   return {
     valueChanged,
     onChange,
