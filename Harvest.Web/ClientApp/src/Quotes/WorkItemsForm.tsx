@@ -79,6 +79,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         rate: 0,
         unit: "",
         description: "",
+        quantity: 0,
         total: 0,
       });
     }
@@ -95,6 +96,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         <FormGroup>
           <Typeahead
             id={`typeahead-${props.category}`}
+            clearButton
             className={getClassName("rateId")}
             placeholder={`-- Select ${props.category} --`}
             labelKey="description"
@@ -102,6 +104,17 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             onChange={(selected) => {
               if (selected && selected.length === 1) {
                 onChangeTypeahead("id", selected[0], rateItemChanged);
+              } else {
+                // When clearButton is called it calls the onChange function
+                props.updateWorkItems({
+                  ...workItem,
+                  rateId: 0,
+                  rate: 0,
+                  unit: "",
+                  description: "",
+                  quantity: 0,
+                  total: 0,
+                });
               }
             }}
             onBlur={(e) => {
