@@ -119,7 +119,8 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             }}
             onBlur={(e) => {
               const target = (e.target as HTMLInputElement)
-              onBlurTypeahead("id", target)
+              const rate = props.rates.find((r) => r.description === target.value);
+              onBlurTypeahead("id", rate?.id)
             }}
           />
           <InputErrorMessage name="rateId" />

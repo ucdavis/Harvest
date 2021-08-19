@@ -2,7 +2,7 @@
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
-import { ValidationContext, ValidationContextState, useOrCreateValidationContext } from "./ValidationProvider";
+import { ValidationContext, useOrCreateValidationContext } from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
 export function useInputValidator<T>(schema: AnyObjectSchema) {
@@ -83,10 +83,9 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   // we have to create an onChnage function that handles that
   const onChangeTypeahead = (name: TKey, selectedItem: any, handler: (selected: any) => void) => {
     handler && handler(selectedItem);
-    console.log(name, selectedItem)
     // If T[TKey] is a number, this doesn't actually convert the string to a number.
     // But yup doesn'tx seem to mind, and that's what counts.
-    valueChanged(name, selectedItem as unknown as T[TKey]);
+    valueChanged(name, selectedItem[name] as unknown as T[TKey]);
     setFormIsDirty(true);
     if (!dirtyFields.some(f => f === name)) {
       setDirtyFields([...dirtyFields, name]);
@@ -101,12 +100,12 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     validateField(name, e.target.value as unknown as T[TKey]);
   };
 
-  const onBlurTypeahead = (name: TKey, target: HTMLInputElement) => {
+  const onBlurTypeahead = (name: TKey, target: number | undefined) => {
     setFormIsTouched(true);
     if (!touchedFields.some(f => f === name)) {
       setTouchedFields([...touchedFields, name]);
     }
-    validateField(name, target.value as unknown as T[TKey]);
+    validateField(name, target as unknown as T[TKey]);
   };
 
   const fieldIsTouched = (name: TKey) => touchedFields.some(f => f === name);
@@ -126,6 +125,8 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     setFormErrorCount(formErrorCount - errorCount);
     setErrors({} as Record<TKey, string>);
   }
+
+  // console.log(errors)
 
   return {
     valueChanged,
