@@ -83,6 +83,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   // we have to create an onChnage function that handles that
   const onChangeTypeahead = (name: TKey, selectedItem: any, handler: (selected: any) => void) => {
     handler && handler(selectedItem);
+    console.log(name, selectedItem)
     // If T[TKey] is a number, this doesn't actually convert the string to a number.
     // But yup doesn'tx seem to mind, and that's what counts.
     valueChanged(name, selectedItem as unknown as T[TKey]);
