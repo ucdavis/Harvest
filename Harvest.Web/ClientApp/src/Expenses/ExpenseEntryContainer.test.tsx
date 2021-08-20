@@ -69,37 +69,40 @@ describe("Expense Entry Container", () => {
       );
     });
 
-    // console.log(document.querySelector("div")?.innerHTML)
-    const dropDown = container.querySelector(".rbt-input-main.form-control.rbt-input")  as HTMLInputElement;
-    const price = container.querySelector(".col-sm-2.offset-sm-1.col");
-    Simulate.change(dropDown, { target: { value: "3" }});
+    const dropDown = document.querySelector(".rbt-input-main.form-control.rbt-input") as HTMLInputElement;
+    Simulate.click(dropDown);
+    const link = document.querySelector("#typeahead-Labor-item-0") as HTMLElement;
+    Simulate.click(link);
+    const price = container.querySelector(".col-sm-2.offset-sm-1.col") as HTMLElement;
 
     expect(price?.textContent).toContain("$60.00");
   });
 
-  // it("Total Value", async () => {
-  //   await act(async () => {
-  //     global.fetch = jest
-  //       .fn()
-  //       .mockImplementationOnce(() => Promise.resolve(rateResponse));
+  it("Total Value", async () => {
+    await act(async () => {
+      global.fetch = jest
+        .fn()
+        .mockImplementationOnce(() => Promise.resolve(rateResponse));
       
-  //     render(
-  //       <MemoryRouter initialEntries={["/expense/entry/3"]}>
-  //         <Route path="/expense/entry/:projectId">
-  //           <ExpenseEntryContainer />
-  //         </Route>
-  //       </MemoryRouter>,
-  //       container
-  //     );
-  //   });
+      render(
+        <MemoryRouter initialEntries={["/expense/entry/3"]}>
+          <Route path="/expense/entry/:projectId">
+            <ExpenseEntryContainer />
+          </Route>
+        </MemoryRouter>,
+        container
+      );
+    });
 
-  //   const dropDown = container.querySelector("select");
-  //   Simulate.change(dropDown, { target: { value: "3" }});
+    const dropDown = document.querySelector(".rbt-input-main.form-control.rbt-input") as HTMLInputElement;
+    Simulate.click(dropDown);
+    const link = document.querySelector("#typeahead-Labor-item-0") as HTMLElement;
+    Simulate.click(link);
 
-  //   const unitsInput = container.querySelector("#units");
-  //   Simulate.change(unitsInput, { target: { value: "3" }});
-  //   const total = container.querySelector(".col-1");
+    const unitsInput = container.querySelector("#units") as HTMLElement;
+    Simulate.change(unitsInput, { target: { value: "3" }});
+    const total = container.querySelector(".col-1");
 
-  //   expect(total?.textContent).toContain("$180.00");
-  // });
+    expect(total?.textContent).toContain("$180.00");
+  });
 });
