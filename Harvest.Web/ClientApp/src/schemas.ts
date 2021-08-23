@@ -67,7 +67,7 @@ export const activitySchema: SchemaOf<Activity> = yup.object().shape({
   total: yup.number().required("Activity total is required"),
   id: yup.number().required(),
   name: yup.string().required(ErrorMessages.ActivityNameRequired),
-  year: yup.number().required(ErrorMessages.ActivityNameRequired),
+  year: yup.number().required(ErrorMessages.ActivityYearRequired),
   adjustment: yup.number().required("Activity adjustment is required"),
   workItems: yup.array().of(workItemSchema).required()
 });
