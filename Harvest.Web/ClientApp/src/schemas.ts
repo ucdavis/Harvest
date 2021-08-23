@@ -52,7 +52,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   quantity: yup.number().required().typeError(ErrorMessages.WorkItemUnit).positive(ErrorMessages.WorkItemUnit)
   .test(
     "maxDigitsAfterDecimal",
-    "number field must have 2 digits after decimal or less",
+    ErrorMessages.WorkItemQuantityDecimalPlaces,
     (number) => Number.isInteger((number || 0) * (10 ** 2))
   ),
   unit: yup.string().defined(),
