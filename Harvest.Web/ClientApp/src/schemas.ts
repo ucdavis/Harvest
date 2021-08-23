@@ -49,7 +49,12 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   rateId: yup.number().required().default(0),
   rate: yup.number().required().typeError(ErrorMessages.WorkItemRate).positive(ErrorMessages.WorkItemRate),
   description: yup.string().defined(),
-  quantity: yup.number().required().typeError(ErrorMessages.WorkItemUnit).positive(ErrorMessages.WorkItemUnit),
+  quantity: yup.number().required().typeError(ErrorMessages.WorkItemUnit).positive(ErrorMessages.WorkItemUnit)
+  .test(
+    "maxDigitsAfterDecimal",
+    ErrorMessages.WorkItemQuantityDecimalPlaces,
+    (number) => Number.isInteger((number || 0) * (10 ** 2))
+  ),
   unit: yup.string().defined(),
   markup: yup.boolean().defined(),
   total: yup.number().required().typeError(ErrorMessages.WorkItemTotal).positive(ErrorMessages.WorkItemTotal),
