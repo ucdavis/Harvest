@@ -1,6 +1,7 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
 import { BlobFile, RequestInput, User, TicketInput, WorkItem, Activity } from "./types";
+import { ErrorMessages } from "./errorMessages";
 
 export const investigatorSchema: SchemaOf<User> = yup
   .object()
@@ -46,12 +47,12 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   activityId: yup.number().required().integer(),
   type: yup.mixed().required().oneOf(["Acreage", "Equipment", "Other", "Labor"]),
   rateId: yup.number().required().default(0),
-  rate: yup.number().required().positive("Work item rate must be a positive number"),
+  rate: yup.number().required().typeError(ErrorMessages.WorkItemRate).positive(ErrorMessages.WorkItemRate),
   description: yup.string().defined(),
-  quantity: yup.number().required().positive("Work item time/unit must be a positive number"),
+  quantity: yup.number().required().typeError(ErrorMessages.WorkItemUnit).positive(ErrorMessages.WorkItemUnit),
   unit: yup.string().defined(),
   markup: yup.boolean().defined(),
-  total: yup.number().required().positive("Work item total must be positive")
+  total: yup.number().required().typeError(ErrorMessages.WorkItemTotal).positive(ErrorMessages.WorkItemTotal),
 });
 
 export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
@@ -65,15 +66,15 @@ export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
 export const activitySchema: SchemaOf<Activity> = yup.object().shape({
   total: yup.number().required("Activity total is required"),
   id: yup.number().required(),
-  name: yup.string().required("Activity name is required"),
-  year: yup.number().required("Activity year is required"),
+  name: yup.string().required(ErrorMessages.ActivityNameRequired),
+  year: yup.number().required(ErrorMessages.ActivityYearRequired),
   adjustment: yup.number().required("Activity adjustment is required"),
   workItems: yup.array().of(workItemSchema).required()
 });
 
 export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shape({
   projectName: yup.string().required("Project name is required"),
-  acres: yup.number().min(0, "Number of acres cannot be negative").required("Number of acres is required"),
+  acres: yup.number().typeError("Number of acres must be a number").min(0, "Number of acres cannot be negative").required("Number of acres is required"),
   acreageRate: yup.number().required("Acreage rate is required"),
   acreageRateId: yup.number().required(),
   acreageRateDescription: yup.string().defined(),

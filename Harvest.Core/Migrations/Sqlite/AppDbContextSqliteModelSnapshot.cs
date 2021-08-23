@@ -101,9 +101,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Approved")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(true);
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CreatedById")
                         .HasColumnType("INTEGER");
@@ -123,12 +121,14 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("RateId")
