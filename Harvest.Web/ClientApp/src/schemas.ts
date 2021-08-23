@@ -46,12 +46,12 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   activityId: yup.number().required().integer(),
   type: yup.mixed().required().oneOf(["Acreage", "Equipment", "Other", "Labor"]),
   rateId: yup.number().required().default(0),
-  rate: yup.number().required().positive("Work item rate must be a positive number"),
+  rate: yup.number().required().typeError("Work item rate must be a positive number").positive("Work item rate must be a positive number"),
   description: yup.string().defined(),
-  quantity: yup.number().required().positive("Work item time/unit must be a positive number"),
+  quantity: yup.number().required().typeError('Work item time/unit must be a positive number').positive("Work item time/unit must be a positive number"),
   unit: yup.string().defined(),
   markup: yup.boolean().defined(),
-  total: yup.number().required().positive("Work item total must be positive")
+  total: yup.number().required().typeError("Work item total must be positive").positive("Work item total must be positive")
 });
 
 export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
@@ -73,7 +73,7 @@ export const activitySchema: SchemaOf<Activity> = yup.object().shape({
 
 export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shape({
   projectName: yup.string().required("Project name is required"),
-  acres: yup.number().min(0, "Number of acres cannot be negative").required("Number of acres is required"),
+  acres: yup.number().typeError("Number of acres must be a number").min(0, "Number of acres cannot be negative").required("Number of acres is required"),
   acreageRate: yup.number().required("Acreage rate is required"),
   acreageRateId: yup.number().required(),
   acreageRateDescription: yup.string().defined(),
