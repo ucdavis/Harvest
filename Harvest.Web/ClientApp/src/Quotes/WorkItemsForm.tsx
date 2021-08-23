@@ -90,6 +90,10 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     return props.category === "Other" && unit === "Unit";
   };
 
+  const selectedRate = props.rates.filter(
+    (rate) => rate.id === props.workItem.rateId
+  );
+
   return (
     <Row className="activity-line-item">
       <Col xs={props.category === "Other" ? 4 : 5}>
@@ -101,6 +105,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             placeholder={`-- Select ${props.category} --`}
             labelKey="description"
             options={props.rates}
+            selected={selectedRate}
             onChange={(selected) => {
               if (selected && selected.length === 1) {
                 onChangeTypeahead("id", selected[0], rateItemChanged);
@@ -118,9 +123,11 @@ const WorkItemForm = (props: WorkItemFormProps) => {
               }
             }}
             onBlur={(e) => {
-              const target = (e.target as HTMLInputElement)
-              const rate = props.rates.find((r) => r.description === target.value);
-              onBlurTypeahead("id", rate?.id)
+              const target = e.target as HTMLInputElement;
+              const rate = props.rates.find(
+                (r) => r.description === target.value
+              );
+              onBlurTypeahead("id", rate?.id);
             }}
           />
           <InputErrorMessage name="rateId" />
