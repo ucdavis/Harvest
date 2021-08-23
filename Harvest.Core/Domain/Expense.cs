@@ -20,7 +20,7 @@ namespace Harvest.Core.Domain
         [StringLength(250)]
         public string Description { get; set; }
 
-        [Display(Name = "Rate")] 
+        [Display(Name = "Rate")]
         [Range(0.01, Double.MaxValue, ErrorMessage = "Rate must be greater than 0.01")]
         public decimal Price { get; set; }
 
@@ -62,9 +62,9 @@ namespace Harvest.Core.Domain
         {
             modelBuilder.Entity<Expense>().HasIndex(a => a.ProjectId);
 
+            modelBuilder.Entity<Expense>().Property(a => a.Price).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.Total).HasPrecision(18, 2);
-
-            modelBuilder.Entity<Expense>().Property(a => a.Approved).HasDefaultValue(true);
+            modelBuilder.Entity<Expense>().Property(a => a.Quantity).HasPrecision(18, 2);
         }
     }
 }
