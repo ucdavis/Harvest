@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Harvest.Jobs.CloseoutNotification": {
+    "Harvest.Jobs.Notifications": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "development"

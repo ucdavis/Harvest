@@ -83,7 +83,7 @@ stages:
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/app_data/jobs/triggered'
 
     - task: DotNetCoreCLI@2
-      displayName: 'Publish Harvest Jobs: CloseoutNotification'
+      displayName: 'Publish Harvest Jobs: Notifications'
       inputs:
         command: 'publish'
         publishWebProjects: false
