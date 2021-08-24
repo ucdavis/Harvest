@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Button,
   Col,
@@ -11,6 +11,7 @@ import {
   Row,
   UncontrolledTooltip,
 } from "reactstrap";
+import { Typeahead } from "react-bootstrap-typeahead";
 
 import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -45,14 +46,16 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
   const {
     onChange,
+    onChangeTypeahead,
     InputErrorMessage,
     getClassName,
     onBlur,
+    onBlurTypeahead,
     resetLocalFields,
   } = useInputValidator<WorkItem>(workItemSchema);
 
-  const rateItemChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rateId = parseInt(e.target.value);
+  const rateItemChanged = (selected: Rate) => {
+    const rateId = selected.id;
     const rate = props.rates.find((r) => r.id === rateId);
 
     // rate can be undefinied if they select the default option
@@ -76,6 +79,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         rate: 0,
         unit: "",
         description: "",
+        quantity: 0,
         total: 0,
       });
     }
@@ -86,25 +90,66 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     return props.category === "Other" && unit === "Unit";
   };
 
+  const typeaheadRef = useRef<any>(null);
+  const selectedRate = props.rates.filter(
+    (rate) => rate.id === props.workItem.rateId
+  );
+
+  const typeaheadChange = (selected: Rate[]) => {
+    if (selected && selected.length === 1) {
+      onChangeTypeahead("id", selected[0], rateItemChanged);
+    } else {
+      // When clearButton is called it calls the onChange function
+      props.updateWorkItems({
+        ...workItem,
+        rateId: 0,
+        rate: 0,
+        unit: "",
+        description: "",
+        quantity: 0,
+        total: 0,
+      });
+    }
+  }
+
+  const typeaheadBlur = (e: Event) => {
+    if (selectedRate.length === 0) {
+      typeaheadRef.current.clear();
+      
+      props.updateWorkItems({
+        ...workItem,
+        rateId: 0,
+        rate: 0,
+        unit: "",
+        description: "",
+        quantity: 0,
+        total: 0,
+      });
+    }
+
+    const target = e.target as HTMLInputElement;
+    const rate = props.rates.find(
+      (r) => r.description === target.value
+    );
+    onBlurTypeahead("id", rate?.id);
+  }
+
   return (
     <Row className="activity-line-item">
       <Col xs={props.category === "Other" ? 4 : 5}>
         <FormGroup>
-          <Input
+          <Typeahead
+            id={`typeahead-${props.category}`}
+            clearButton
+            ref={typeaheadRef}
             className={getClassName("rateId")}
-            type="select"
-            name="select"
-            defaultValue={workItem.rateId}
-            onChange={onChange("rateId", rateItemChanged)}
-            onBlur={onBlur("rateId")}
-          >
-            <option value="0">-- Select {props.category} --</option>
-            {props.rates.map((r) => (
-              <option key={`rate-${r.type}-${r.id}`} value={r.id}>
-                {r.description}
-              </option>
-            ))}
-          </Input>
+            placeholder={`-- Select ${props.category} --`}
+            labelKey="description"
+            options={props.rates}
+            selected={selectedRate}
+            onChange={(selected) => typeaheadChange(selected)}
+            onBlur={(e) => typeaheadBlur(e)}
+          />
           <InputErrorMessage name="rateId" />
           {requiresCustomDescription(workItem.unit) && (
             <>
@@ -204,10 +249,7 @@ export const WorkItemsForm = (props: WorkItemsFormProps) => {
             </Col>
             <Col xs="1">
               <label id="markupLabel">Markup</label>
-              <UncontrolledTooltip
-                placement="right"
-                target="markupLabel"
-              >
+              <UncontrolledTooltip placement="right" target="markupLabel">
                 Adds a 20% parts markup to the total price
               </UncontrolledTooltip>
             </Col>

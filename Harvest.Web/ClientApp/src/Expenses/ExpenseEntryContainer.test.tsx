@@ -69,9 +69,11 @@ describe("Expense Entry Container", () => {
       );
     });
 
-    const dropDown = container.querySelector("select");
-    const price = container.querySelector(".col-sm-2.offset-sm-1.col");
-    Simulate.change(dropDown, { target: { value: "3" }});
+    const dropDown = document.querySelector(".rbt-input-main.form-control.rbt-input") as HTMLInputElement;
+    Simulate.click(dropDown);
+    const link = document.querySelector("#typeahead-Labor-item-0") as HTMLElement;
+    Simulate.click(link);
+    const price = container.querySelector(".col-sm-2.offset-sm-1.col") as HTMLElement;
 
     expect(price?.textContent).toContain("$60.00");
   });
@@ -92,10 +94,12 @@ describe("Expense Entry Container", () => {
       );
     });
 
-    const dropDown = container.querySelector("select");
-    Simulate.change(dropDown, { target: { value: "3" }});
+    const dropDown = document.querySelector(".rbt-input-main.form-control.rbt-input") as HTMLInputElement;
+    Simulate.click(dropDown);
+    const link = document.querySelector("#typeahead-Labor-item-0") as HTMLElement;
+    Simulate.click(link);
 
-    const unitsInput = container.querySelector("#units");
+    const unitsInput = container.querySelector("#units") as HTMLElement;
     Simulate.change(unitsInput, { target: { value: "3" }});
     const total = container.querySelector(".col-1");
 
