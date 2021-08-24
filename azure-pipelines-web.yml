@@ -62,6 +62,11 @@ stages:
       inputs:
         packageType: 'sdk'
         version: '5.x'
+    
+    - task: CmdLine@2
+      displayName: 'Print current dotnet version'
+      inputs:
+        script: 'dotnet --version'
 
     - task: DotNetCoreCLI@2
       displayName: 'Publish Harvest.Web'
