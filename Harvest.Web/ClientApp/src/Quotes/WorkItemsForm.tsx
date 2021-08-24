@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Button,
   Col,
@@ -90,6 +90,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     return props.category === "Other" && unit === "Unit";
   };
 
+  const typeaheadRef = useRef<any>(null);
   const selectedRate = props.rates.filter(
     (rate) => rate.id === props.workItem.rateId
   );
@@ -101,6 +102,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
           <Typeahead
             id={`typeahead-${props.category}`}
             clearButton
+            ref={typeaheadRef}
             className={getClassName("rateId")}
             placeholder={`-- Select ${props.category} --`}
             labelKey="description"
@@ -123,6 +125,20 @@ const WorkItemForm = (props: WorkItemFormProps) => {
               }
             }}
             onBlur={(e) => {
+              if (selectedRate.length === 0) {
+                typeaheadRef.current.clear();
+                
+                props.updateWorkItems({
+                  ...workItem,
+                  rateId: 0,
+                  rate: 0,
+                  unit: "",
+                  description: "",
+                  quantity: 0,
+                  total: 0,
+                });
+              }
+
               const target = e.target as HTMLInputElement;
               const rate = props.rates.find(
                 (r) => r.description === target.value
