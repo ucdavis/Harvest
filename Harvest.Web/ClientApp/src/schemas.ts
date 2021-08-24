@@ -37,8 +37,8 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
 });
 
 export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
-  name: yup.string().required('Subject is required'),
-  requirements: yup.string().required('Ticket details are required'),
+  name: yup.string().required(ErrorMessages.TicketSubjectRequired),
+  requirements: yup.string().required(ErrorMessages.TicketDetailsRequired),
   attachments: yup.array().of(fileSchema)
 }); 
 
@@ -69,22 +69,22 @@ export const fieldSchema/*: SchemaOf<Field>*/ = yup.object().shape({
 });
 
 export const activitySchema: SchemaOf<Activity> = yup.object().shape({
-  total: yup.number().required("Activity total is required"),
+  total: yup.number().required(ErrorMessages.ActivityTotalRequired),
   id: yup.number().required(),
   name: yup.string().required(ErrorMessages.ActivityNameRequired),
   year: yup.number().required(ErrorMessages.ActivityYearRequired),
-  adjustment: yup.number().required("Activity adjustment is required"),
+  adjustment: yup.number().required(ErrorMessages.ActivityAdjustmentRequired),
   workItems: yup.array().of(workItemSchema).required()
 });
 
 export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shape({
-  projectName: yup.string().required("Project name is required"),
-  acres: yup.number().typeError("Number of acres must be a number").min(0, "Number of acres cannot be negative").required("Number of acres is required"),
-  acreageRate: yup.number().required("Acreage rate is required"),
+  projectName: yup.string().required(ErrorMessages.ProjectNameRequired),
+  acres: yup.number().typeError(ErrorMessages.NumberAcresType).min(0, ErrorMessages.NumberAcresNegative).required(ErrorMessages.NumberAcresRequired),
+  acreageRate: yup.number().required(ErrorMessages.AcreageRateRequired),
   acreageRateId: yup.number().required(),
   acreageRateDescription: yup.string().defined(),
   activities: yup.array().of(activitySchema).required(),
-  years: yup.number().integer().min(0, "Years cannot be negative").required(),
+  years: yup.number().integer().min(0, ErrorMessages.YearsNegative).required(),
   acreageTotal: yup.number().required(),
   activitiesTotal: yup.number().required(),
   laborTotal: yup.number().required(),
