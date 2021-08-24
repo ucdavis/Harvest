@@ -95,6 +95,45 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     (rate) => rate.id === props.workItem.rateId
   );
 
+  const typeaheadChange = (selected: Rate[]) => {
+    if (selected && selected.length === 1) {
+      onChangeTypeahead("id", selected[0], rateItemChanged);
+    } else {
+      // When clearButton is called it calls the onChange function
+      props.updateWorkItems({
+        ...workItem,
+        rateId: 0,
+        rate: 0,
+        unit: "",
+        description: "",
+        quantity: 0,
+        total: 0,
+      });
+    }
+  }
+
+  const typeaheadBlur = (e: Event) => {
+    if (selectedRate.length === 0) {
+      typeaheadRef.current.clear();
+      
+      props.updateWorkItems({
+        ...workItem,
+        rateId: 0,
+        rate: 0,
+        unit: "",
+        description: "",
+        quantity: 0,
+        total: 0,
+      });
+    }
+
+    const target = e.target as HTMLInputElement;
+    const rate = props.rates.find(
+      (r) => r.description === target.value
+    );
+    onBlurTypeahead("id", rate?.id);
+  }
+
   return (
     <Row className="activity-line-item">
       <Col xs={props.category === "Other" ? 4 : 5}>
@@ -108,43 +147,8 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             labelKey="description"
             options={props.rates}
             selected={selectedRate}
-            onChange={(selected) => {
-              if (selected && selected.length === 1) {
-                onChangeTypeahead("id", selected[0], rateItemChanged);
-              } else {
-                // When clearButton is called it calls the onChange function
-                props.updateWorkItems({
-                  ...workItem,
-                  rateId: 0,
-                  rate: 0,
-                  unit: "",
-                  description: "",
-                  quantity: 0,
-                  total: 0,
-                });
-              }
-            }}
-            onBlur={(e) => {
-              if (selectedRate.length === 0) {
-                typeaheadRef.current.clear();
-                
-                props.updateWorkItems({
-                  ...workItem,
-                  rateId: 0,
-                  rate: 0,
-                  unit: "",
-                  description: "",
-                  quantity: 0,
-                  total: 0,
-                });
-              }
-
-              const target = e.target as HTMLInputElement;
-              const rate = props.rates.find(
-                (r) => r.description === target.value
-              );
-              onBlurTypeahead("id", rate?.id);
-            }}
+            onChange={(selected) => typeaheadChange(selected)}
+            onBlur={(e) => typeaheadBlur(e)}
           />
           <InputErrorMessage name="rateId" />
           {requiresCustomDescription(workItem.unit) && (
