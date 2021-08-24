@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Core", "Harves
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Invoice", "Harvest.Jobs.Invoice\Harvest.Jobs.Invoice.csproj", "{2C3D598F-7188-4D44-B9CD-932C7F574696}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harvest.Jobs.CloseoutNotification", "Harvest.Jobs.CloseoutNotification\Harvest.Jobs.CloseoutNotification.csproj", "{A3F964CE-C9C1-46F1-951F-365CECFE9035}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Notifications", "Harvest.Jobs.CloseoutNotification\Harvest.Jobs.Notifications.csproj", "{A3F964CE-C9C1-46F1-951F-365CECFE9035}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
