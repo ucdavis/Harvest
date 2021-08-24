@@ -82,6 +82,15 @@ stages:
         projects: './Harvest.Jobs.Invoice/Harvest.Jobs.Invoice.csproj'
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/app_data/jobs/triggered'
 
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish Harvest Jobs: CloseoutNotification'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        zipAfterPublish: false
+        projects: './Harvest.Jobs.CloseoutNotification/Harvest.Jobs.CloseoutNotification.csproj'
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/app_data/jobs/triggered'
+
     - task: PublishBuildArtifacts@1
       condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
       displayName: 'Publish Build Artifacts for main branch builds'
