@@ -11,7 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace Harvest.Jobs.CloseoutNotification
+namespace Harvest.Jobs.Notifications
 {
     class Program : JobBase
     {
