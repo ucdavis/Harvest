@@ -175,6 +175,7 @@ namespace Harvest.Core.Domain
             public const string ChangeRequested = "ChangeRequested";
             public const string Completed = "Completed";
             public const string AwaitingCloseout = "AwaitingCloseout";
+            public const string FinalInvoicePending = "FinalInvoicePending";
 
             public static List<string> TypeList = new List<string>
             {

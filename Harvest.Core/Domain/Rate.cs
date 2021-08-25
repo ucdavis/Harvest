@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -56,6 +57,7 @@ namespace Harvest.Core.Domain
         public DateTime UpdatedOn { get; set; }
 
         // projects using this rate
+        [JsonIgnore]
         public List<Project> Projects { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)

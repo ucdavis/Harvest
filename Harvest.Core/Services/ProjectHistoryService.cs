@@ -22,6 +22,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> AcreageExpenseCreated(int projectId, Expense expense);
         Task<ProjectHistory> ExpensesCreated(int projectId, IEnumerable<Expense> expenses);
         Task<ProjectHistory> ExpenseDeleted(int projectId, Expense expense);
+        Task<ProjectHistory> FinalInvoicePending(int projectId, Invoice invoice);
         Task<ProjectHistory> InvoiceCancelled(int projectId, Invoice invoice);
         Task<ProjectHistory> InvoiceCompleted(int projectId, Invoice invoice);
         Task<ProjectHistory> InvoiceCreated(int projectId, Invoice invoice);
@@ -61,6 +62,8 @@ namespace Harvest.Core.Services
             MakeHistory(projectId, nameof(ExpensesCreated), expenses.Select(e => new ExpenseModel(e)));
         public Task<ProjectHistory> ExpenseDeleted(int projectId, Expense expense) =>
             MakeHistory(projectId, nameof(ExpenseDeleted), new ExpenseModel(expense));
+        public Task<ProjectHistory> FinalInvoicePending(int projectId, Invoice invoice) =>
+            MakeHistory(projectId, nameof(FinalInvoicePending), new InvoiceModel(invoice));
         public Task<ProjectHistory> InvoiceCancelled(int projectId, Invoice invoice) =>
             MakeHistory(projectId, nameof(InvoiceCancelled), new InvoiceModel(invoice));
         public Task<ProjectHistory> InvoiceCompleted(int projectId, Invoice invoice) =>

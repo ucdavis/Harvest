@@ -229,6 +229,28 @@ $nchild-wide: 24%;
     margin-right: 6px;
   }
 }
+.project-status-AwaitingCloseout {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $poppy;
+    margin-right: 6px;
+  }
+}
+.project-status-FinalInvoicePending {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $poppy;
+    margin-right: 6px;
+  }
+}
 .react-date-picker__inputGroup__input:invalid {
   background-color: rgba(38, 96, 65, 0.1);
 }

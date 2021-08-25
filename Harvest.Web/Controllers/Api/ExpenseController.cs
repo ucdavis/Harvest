@@ -19,12 +19,14 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IProjectHistoryService _historyService;
+        private readonly IExpenseService _expenseService;
 
-        public ExpenseController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService)
+        public ExpenseController(AppDbContext dbContext, IUserService userService, IProjectHistoryService historyService, IExpenseService expenseService)
         {
-            this._dbContext = dbContext;
-            this._userService = userService;
-            this._historyService = historyService;
+            _dbContext = dbContext;
+            _userService = userService;
+            _historyService = historyService;
+            _expenseService = expenseService;
         }
 
         public ActionResult Entry()
@@ -61,6 +63,16 @@ namespace Harvest.Web.Controllers
             await _dbContext.SaveChangesAsync();
 
             return Ok(expenses);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Consumes(MediaTypeNames.Application.Json)]
+        public async Task<ActionResult> CreateAcreage(int projectId, [FromQuery] decimal amount)
+        {
+            await _expenseService.CreateAcreageExpense(projectId, amount);
+
+            return Ok();
         }
 
         [HttpPost]

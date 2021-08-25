@@ -22,6 +22,7 @@ import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
+import { CloseoutContainer } from "./Closeout/CloseoutContainer";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -59,6 +60,11 @@ function App() {
         roles={["FieldManager", "Supervisor"]}
         path="/quote/create/:projectId"
         component={QuoteContainer}
+      />
+      <ConditionalRoute
+        roles={["FieldManager", "Supervisor"]}
+        path="/project/closeout/:projectId"
+        component={CloseoutContainer}
       />
       <ConditionalRoute
         exact

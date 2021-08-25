@@ -51,7 +51,7 @@ namespace Harvest.Web.Controllers
 
             if (result.IsError)
             {
-                Message = result.ErrorMessage;
+                Message = result.Message;
                 return RedirectToAction("Index", new { projectId = projectId });
             }
 

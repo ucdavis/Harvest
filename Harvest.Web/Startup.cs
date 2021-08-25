@@ -153,6 +153,7 @@ namespace Harvest.Web
             services.AddScoped(provder => JsonOptions.Standard);
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IExpenseService, ExpenseService>();
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
         }
 

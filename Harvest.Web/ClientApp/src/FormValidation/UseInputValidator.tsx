@@ -24,7 +24,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     if (errorCount !== previousErrorCount) {
       setFormErrorCount(formErrorCount + errorCount - previousErrorCount);
     }
-  }, [errors]);
+  }, [errors, formErrorCount, setFormErrorCount, previousErrors]);
 
   useEffect(() => {
     if (contextIsReset) {
@@ -32,7 +32,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
       setDirtyFields([]);
       setErrors({} as Record<TKey, string>);
     }
-  }, [contextIsReset]);
+  }, [contextIsReset, setTouchedFields, setDirtyFields, setErrors]);
 
   const validateField = useDebounceCallback(async (name: TKey, value: T[TKey]) => {
     const tempObject = { [name]: value } as unknown as T;

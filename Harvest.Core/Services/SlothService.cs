@@ -285,6 +285,11 @@ namespace Harvest.Core.Services
 
                             invoice.Status = Invoice.Statuses.Completed;
                             await _historyService.InvoiceCompleted(invoice.ProjectId, invoice);
+                            if (invoice.Project.Status == Project.Statuses.FinalInvoicePending)
+                            {
+                                invoice.Project.Status = Project.Statuses.Completed;
+                                await _historyService.ProjectCompleted(invoice.ProjectId, invoice.Project);
+                            }
                             await _dbContext.SaveChangesAsync();
                             break;
                         case SlothStatuses.Cancelled:

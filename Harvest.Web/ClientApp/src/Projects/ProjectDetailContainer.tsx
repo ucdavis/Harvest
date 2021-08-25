@@ -14,6 +14,8 @@ import { BlobFile, Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
 import { usePromiseNotification } from "../Util/Notifications";
+import { millisecondsPerDay } from "../Util/Calculations";
+import { ProjectProgress } from "./ProjectProgress";
 
 interface RouteParams {
   projectId?: string;
@@ -25,6 +27,7 @@ export const ProjectDetailContainer = () => {
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
 
   const [notification, setNotification] = usePromiseNotification();
+  const [beyondCloseoutDisplayDate, setBeyondCloseoutDisplayDate] = useState(false);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -32,7 +35,11 @@ export const ProjectDetailContainer = () => {
       const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
-        setProject(await response.json());
+        const project = await response.json() as Project;
+        setProject(project);
+
+        //show Closeout link if we are in last week of or beyond project end 
+        setBeyondCloseoutDisplayDate(new Date(project.end).getTime() - (new Date().getTime()) >= (7 * millisecondsPerDay));
       }
     };
 
@@ -80,7 +87,10 @@ export const ProjectDetailContainer = () => {
             <div className="col-md-7">
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
-                condition={project.status === "Active"}
+                condition={
+                  project.status === "Active" ||
+                  project.status === "AwaitingCloseout"
+                }
               >
                 <Link
                   className="btn btn-primary btn-small mr-4"
@@ -102,6 +112,17 @@ export const ProjectDetailContainer = () => {
                   to={`/quote/create/${project.id}`}
                 >
                   Edit Quote
+                </Link>
+              </ShowFor>
+              <ShowFor
+                roles={["Supervisor", "FieldManager"]}
+                condition={project.status === "AwaitingCloseout" || (project.status === "Active" && beyondCloseoutDisplayDate)}
+              >
+                <Link
+                  className="btn btn-primary btn-small mr-4"
+                  to={`/project/closeout/${project.id}`}
+                >
+                  Close Out Project
                 </Link>
               </ShowFor>
 
@@ -142,28 +163,7 @@ export const ProjectDetailContainer = () => {
       </div>
       <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
-          <div className="row justify-content-between">
-            <div className="col">
-              <h1>Project Progress</h1>
-              <div className="row justify-content-between">
-                <div className="col">
-                  <p className="mb-1">
-                    ${formatCurrency(project.chargedTotal)} Billed
-                  </p>
-                </div>
-                <div className="col text-right">
-                  <p className="mb-1">
-                    ${formatCurrency(project.quoteTotal - project.chargedTotal)}{" "}
-                    Remaining
-                  </p>
-                </div>
-              </div>
-              <Progress
-                style={{ width: "100%", height: "20px" }}
-                value={(project.chargedTotal / project.quoteTotal) * 100}
-              />
-            </div>
-          </div>
+          <ProjectProgress project={project} />
         </div>
       </div>
       <div>

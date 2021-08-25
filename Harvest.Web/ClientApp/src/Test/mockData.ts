@@ -73,6 +73,14 @@ export const fakeProject: Project = {
   accounts: [],
   quotes: null,
   attachments: fakeAttachments,
+  acres: 1,
+  acreageRate: {
+    id: 1,
+    price: 0,
+    unit: "",
+    type: "Acreage",
+    description: "",
+  }
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -103,6 +111,14 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
     accounts: [],
     quotes: null,
     attachments: [],
+    acres: 1,
+    acreageRate: {
+      id: 1,
+      price: 0,
+      unit: "",
+      type: "Acreage",
+      description: "",
+    }
   },
   quote: null,
 };

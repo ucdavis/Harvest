@@ -1,6 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { PromiseStatus } from "../types";
+import { isFunction } from "./TypeChecks";
 
 // just re-export the whole module so we don't take direct dependencies all over
 export * from "react-hot-toast";
@@ -28,7 +29,7 @@ export const usePromiseNotification = (): [
   (
     promise: Promise<any>,
     loadingMessage: string,
-    successMessage: string
+    successMessage: string | (() => string)
   ) => void
 ] => {
   const [pending, setPending] = useState(false);
@@ -52,6 +53,9 @@ export const usePromiseNotification = (): [
         success: () => {
           setSuccess(true);
           setPending(false);
+          if (isFunction(successMessage)) {
+            return successMessage();
+          }
           return successMessage;
         },
         error: () => {

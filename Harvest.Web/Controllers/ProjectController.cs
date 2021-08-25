@@ -20,16 +20,19 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IProjectHistoryService _historyService;
-        private readonly StorageSettings storageSettings;
-        private readonly IFileService fileService;
+        private readonly StorageSettings _storageSettings;
+        private readonly IFileService _fileService;
+        private readonly IInvoiceService _invoiceService;
+
         public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
-            IFileService fileService, IProjectHistoryService historyService)
+            IFileService fileService, IProjectHistoryService historyService, IInvoiceService invoiceService)
         {
-            this._dbContext = dbContext;
-            this._userService = userService;
-            this.storageSettings = storageSettings.Value;
-            this.fileService = fileService;
-            this._historyService = historyService;
+            _dbContext = dbContext;
+            _userService = userService;
+            _storageSettings = storageSettings.Value;
+            _fileService = fileService;
+            _historyService = historyService;
+            _invoiceService = invoiceService;
         }
 
         public ActionResult Index()
@@ -126,6 +129,21 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public ActionResult Closeout(int projectId)
+        {
+            // TODO: move routes so react handles this natively and place API stuff in own controller
+            return View("React");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> DoCloseout(int projectId)
+        {
+            var result = await _invoiceService.CreateInvoice(projectId, true);
+            return Ok(result);
+        }
+
         // Returns JSON info of the project
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Get(int projectId)
@@ -136,6 +154,7 @@ namespace Harvest.Web.Controllers
                 .Include(p => p.Accounts)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
+                .Include(p => p.AcreageRate)
                 .SingleOrDefaultAsync(p => p.Id == projectId);
 
             if (project == null)
@@ -146,7 +165,7 @@ namespace Harvest.Web.Controllers
 
             foreach (var file in project.Attachments)
             {
-                file.SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, file.Identifier).AbsoluteUri;
+                file.SasLink = _fileService.GetDownloadUrl(_storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
             return Ok(project);
