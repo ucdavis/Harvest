@@ -31,7 +31,7 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
   end: yup.string().required(),
   crop: yup.string().required(),
   cropType: yup.string().required(),
-  requirements: yup.string(),
+  requirements: yup.string().required(),
   principalInvestigator: investigatorSchema,
   files: yup.array().of(fileSchema)
 });
