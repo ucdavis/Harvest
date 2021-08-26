@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { Label, Input, Button, UncontrolledTooltip } from "reactstrap";
 import * as yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,6 +13,8 @@ import { ProjectProgress } from "../Projects/ProjectProgress";
 import { useInputValidator } from "../FormValidation";
 import { roundToTwo } from "../Util/Calculations"
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
+import { millisecondsPerDay } from "../Util/Calculations";
+import { ShowFor } from "../Shared/ShowFor";
 
 
 interface RouteParams {
@@ -34,8 +36,10 @@ export const CloseoutContainer = () => {
   const [project, setProject] = useState<Project | undefined>();
   const [newExpenseCount, setNewExpenseCount] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
-  const [finalAcreageExpense, setFinalAcreageExpense] = useState<FinalAcreageExpense>({} as FinalAcreageExpense);
+  const [finalAcreageExpense, setFinalAcreageExpense] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const { getConfirmation } = useConfirmationDialog();
+  const history = useHistory();
+  const [beyondCloseoutDisplayDate, setBeyondCloseoutDisplayDate] = useState(false);
 
   const {
     onChange,
@@ -51,6 +55,7 @@ export const CloseoutContainer = () => {
       if (response.ok) {
         const proj: Project = await response.json();
         setProject(proj);
+        setBeyondCloseoutDisplayDate(new Date().getTime() - new Date(proj.end).getTime() >= (7 * millisecondsPerDay));
       }
     };
 
@@ -91,18 +96,25 @@ export const CloseoutContainer = () => {
     const request = fetch(`/Invoice/DoCloseout/${projectId}`, {
       method: "POST"
     });
-    let result = { message: "Closed Out Project" } as Result<number>;
 
+    let success = false;
     setNotification(request, "Closing Out Project", async (response: Response) => {
-      result = await response.json() as Result<number>;
+      const result = await response.json() as Result<number>;
+      success = true;
       return result.message;
     });
 
+    if (success) {
+      history.push(`/project/details/${projectId}`);
+    }
   }
 
   if (project === undefined) {
     return <div>Loading ...</div>;
   }
+
+  const canCloseout = project.status === "AwaitingCloseout" ||
+    (project.status === "Active" && beyondCloseoutDisplayDate);
 
   return (
     <div className="card-wrapper">
@@ -152,13 +164,15 @@ export const CloseoutContainer = () => {
       <div className="card-content card-green-bg">
         <div className="row">
           <div className="col text-right">
-            <Button id="CloseoutButton" color="primary" disabled={notification.pending} onClick={closeoutProject}>
+            <Button id="CloseoutButton" color="primary" disabled={!canCloseout || notification.pending} onClick={closeoutProject}>
               Closeout Project <FontAwesomeIcon icon={faCheck} />
             </Button>
-            <UncontrolledTooltip target="CloseoutButton" >
-              Generates a final invoice if there are any unbilled expenses. Sets project status to either
-              Completed or CloseoutPending based on whether there are any pending invoices.
-            </UncontrolledTooltip>
+            <ShowFor condition={!canCloseout}>
+              {/* Not sure if there's a better way to handle indicators as to why something is disabled */}
+              <UncontrolledTooltip target="CloseoutButton" >
+                Project is not awaiting closeout, and it doesn't have an end date that falls within the last seven days or later.
+              </UncontrolledTooltip>
+            </ShowFor>
 
           </div>
         </div>

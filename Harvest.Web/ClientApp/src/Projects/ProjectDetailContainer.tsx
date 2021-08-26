@@ -39,7 +39,7 @@ export const ProjectDetailContainer = () => {
         setProject(project);
 
         //show Closeout link if we are in last week of or beyond project end 
-        setBeyondCloseoutDisplayDate(new Date(project.end).getTime() - (new Date().getTime()) >= (7 * millisecondsPerDay));
+        setBeyondCloseoutDisplayDate(new Date().getTime() - new Date(project.end).getTime() >= (7 * millisecondsPerDay));
       }
     };
 
