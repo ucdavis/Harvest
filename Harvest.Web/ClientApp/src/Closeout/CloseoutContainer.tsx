@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Label, Input, Button, UncontrolledTooltip } from "reactstrap";
 import * as yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,6 +12,7 @@ import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "../Projects/ProjectProgress";
 import { useInputValidator } from "../FormValidation";
 import { roundToTwo } from "../Util/Calculations"
+import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 
 
 interface RouteParams {
@@ -32,10 +33,9 @@ export const CloseoutContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [newExpenseCount, setNewExpenseCount] = useState(0);
-  const history = useHistory();
-
   const [notification, setNotification] = usePromiseNotification();
   const [finalAcreageExpense, setFinalAcreageExpense] = useState<FinalAcreageExpense>({} as FinalAcreageExpense);
+  const { getConfirmation } = useConfirmationDialog();
 
   const {
     onChange,
@@ -79,6 +79,15 @@ export const CloseoutContainer = () => {
   };
 
   const closeoutProject = async () => {
+    if (!await getConfirmation(
+      "Closeout Project",
+      <ul>
+        <li>Generates a final invoice if there are any unbilled expenses</li>
+        <li>Sets project status to either Completed or CloseoutPending based on whether there are any pending invoices</li>
+      </ul>)) {
+      return;
+    }
+
     const request = fetch(`/Invoice/DoCloseout/${projectId}`, {
       method: "POST"
     });
