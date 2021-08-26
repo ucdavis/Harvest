@@ -136,14 +136,6 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
-        [HttpPost]
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> DoCloseout(int projectId)
-        {
-            var result = await _invoiceService.CreateInvoice(projectId, true);
-            return Ok(result);
-        }
-
         // Returns JSON info of the project
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Get(int projectId)

@@ -22,11 +22,13 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IInvoiceService _invoiceService;
 
-        public InvoiceController(AppDbContext dbContext, IUserService userService)
+        public InvoiceController(AppDbContext dbContext, IUserService userService, IInvoiceService invoiceService)
         {
             this._dbContext = dbContext;
             this._userService = userService;
+            this._invoiceService = invoiceService;
         }
 
         // Get info on the project as well as invoice
@@ -53,6 +55,14 @@ namespace Harvest.Web.Controllers
         public ActionResult Details(int id)
         {
             return View("React");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> DoCloseout(int id)
+        {
+            var result = await _invoiceService.CreateInvoice(id, true);
+            return Ok(result);
         }
     }
 }

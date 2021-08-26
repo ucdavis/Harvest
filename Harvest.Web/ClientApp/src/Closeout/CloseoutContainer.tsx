@@ -5,7 +5,7 @@ import * as yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faCheck } from "@fortawesome/free-solid-svg-icons";
 
-import { Project, Expense, User } from "../types";
+import { Project, Result } from "../types";
 import { UnbilledExpensesContainer } from "../Expenses/UnbilledExpensesContainer";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -79,22 +79,16 @@ export const CloseoutContainer = () => {
   };
 
   const closeoutProject = async () => {
-    const request = fetch(`/Project/DoCloseout/${projectId}`, {
+    const request = fetch(`/Invoice/DoCloseout/${projectId}`, {
       method: "POST"
     });
-    let successMessage = "Closed Out Project";
+    let result = { message: "Closed Out Project" } as Result<number>;
 
-    setNotification(request, "Closing Out Project", getSuccessMessage);
+    setNotification(request, "Closing Out Project", async (response: Response) => {
+      result = await response.json() as Result<number>;
+      return result.message;
+    });
 
-    // Hack to be able to pass a synchronous function that returns the message, since there doesn't
-    // appear to be a way to have the notification's toast.promise "success" argument take a promise.
-    const response = await request;
-    if (response.ok) {
-      successMessage = await response.json() as string;
-    }
-    function getSuccessMessage() {
-      return successMessage;
-    }
   }
 
   if (project === undefined) {

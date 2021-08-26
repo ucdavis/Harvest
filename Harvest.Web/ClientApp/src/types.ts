@@ -325,3 +325,9 @@ export interface PromiseStatus {
   pending: boolean;
   success: boolean;
 }
+
+export interface Result<T> {
+  value: T;
+  isError: boolean;
+  message: string;
+}
