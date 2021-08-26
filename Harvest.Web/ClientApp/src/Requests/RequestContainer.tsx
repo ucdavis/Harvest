@@ -129,8 +129,8 @@ export const RequestContainer = () => {
   };
 
   var isFilledIn = useMemo(() => {
-    return project.start && project.end && project.crop;
-  }, [project.crop, project.start, project.end]);
+      return project.start && project.end && project.crop && project.requirements;
+  }, [project.start, project.end, project.crop, project.requirements]);
 
   if (projectId !== undefined && project.id === 0) {
     // if we have a project id but it hasn't loaded yet, wait
