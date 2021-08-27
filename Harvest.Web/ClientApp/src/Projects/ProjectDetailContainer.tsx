@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Progress } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -11,7 +10,6 @@ import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
-import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
 import { usePromiseNotification } from "../Util/Notifications";
 import { millisecondsPerDay } from "../Util/Calculations";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { PromiseStatus } from "../types";
-import { isFunction, isPromise, isString } from "./TypeChecks";
+import { isPromise, isString } from "./TypeChecks";
 
 // just re-export the whole module so we don't take direct dependencies all over
 export * from "react-hot-toast";

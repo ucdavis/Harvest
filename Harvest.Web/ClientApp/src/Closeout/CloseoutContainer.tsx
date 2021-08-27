@@ -40,6 +40,7 @@ export const CloseoutContainer = () => {
   const { getConfirmation } = useConfirmationDialog();
   const history = useHistory();
   const [beyondCloseoutDisplayDate, setBeyondCloseoutDisplayDate] = useState(false);
+  const [closeoutRequested, setCloseoutRequested] = useState(false);
 
   const {
     onChange,
@@ -67,10 +68,16 @@ export const CloseoutContainer = () => {
       return;
     }
 
-    if (finalAcreageExpense.amount === undefined) {
+    if (finalAcreageExpense.amount === 0) {
       setFinalAcreageExpense({ amount: roundToTwo(project.acres * (project.acreageRate.price / 12)) });
     }
   }, [project, finalAcreageExpense, setFinalAcreageExpense]);
+
+  useEffect(() => {
+    if (closeoutRequested) {
+      history.push(`/project/details/${projectId}`);
+    }
+  }, [closeoutRequested, history, projectId]);
 
   const addAcreageExpense = async () => {
     const request = fetch(`/Expense/CreateAcreage/${projectId}?amount=${finalAcreageExpense.amount}`, {
@@ -97,16 +104,11 @@ export const CloseoutContainer = () => {
       method: "POST"
     });
 
-    let success = false;
     setNotification(request, "Closing Out Project", async (response: Response) => {
       const result = await response.json() as Result<number>;
-      success = true;
+      setCloseoutRequested(true);
       return result.message;
     });
-
-    if (success) {
-      history.push(`/project/details/${projectId}`);
-    }
   }
 
   if (project === undefined) {

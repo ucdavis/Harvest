@@ -1,5 +1,4 @@
-﻿import React from "react";
-import 'url-search-params-polyfill';
+﻿import 'url-search-params-polyfill';
 import { useLocation } from "react-router-dom";
 
 export function useQuery() {
