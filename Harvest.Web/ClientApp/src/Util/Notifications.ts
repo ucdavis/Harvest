@@ -42,8 +42,8 @@ export const usePromiseNotification = (): [
   (
     promise: Promise<any>,
     loadingMessage: string,
-    successMessage: MessageOrCallback,
-    errorMessage?: MessageOrCallback
+    successMessageOrHandler: MessageOrCallback,
+    errorMessageOrHandler?: MessageOrCallback
   ) => void
 ] => {
   const [pending, setPending] = useState(false);
@@ -57,8 +57,8 @@ export const usePromiseNotification = (): [
     (
       promise,
       loadingMessage,
-      successMessage,
-      errorMessage = genericErrorMessage
+      successMessageOrHandler,
+      errorMessageOrHandler = genericErrorMessage
     ) => {
       setPending(true);
 
@@ -68,11 +68,11 @@ export const usePromiseNotification = (): [
         try {
           toastLoadingId = toast.loading(loadingMessage);
           const result = await fetchWithFailOnNotOk(promise);
-          toast.success(await getMessage(successMessage, result));
+          toast.success(await getMessage(successMessageOrHandler, result));
           setSuccess(true);
           setPending(false);
         } catch (error) {
-          toast.error(await getMessage(errorMessage, error));
+          toast.error(await getMessage(errorMessageOrHandler, error));
           setSuccess(false);
           setPending(false);
         } finally {
