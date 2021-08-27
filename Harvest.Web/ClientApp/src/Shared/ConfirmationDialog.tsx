@@ -1,45 +1,16 @@
 ﻿import React from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 
-interface DialogProps {
-  title?: React.ReactNode;
-  message?: React.ReactNode;
-  open: boolean;
-  onConfirm: () => void;
-  onDismiss: () => void;
-}
-
 interface DialogConfig {
   title?: React.ReactNode;
   message?: React.ReactNode;
   actionCallback: ((isConfirmed: boolean) => void);
+  canConfirm: boolean;
 }
 
 interface DialogContextState {
   openDialog: (config: DialogConfig) => void;
 }
-
-const ConfirmationDialog = ({ open, title, message, onConfirm, onDismiss }: DialogProps) => {
-  return (
-    <Modal isOpen={open}>
-      <ModalHeader>{title}</ModalHeader>
-      <ModalBody>
-        {message}
-      </ModalBody>
-      <ModalFooter>
-        <Button
-          color="primary"
-          onClick={onConfirm}
-        >
-          Confirm
-        </Button>{" "}
-        <Button color="link" onClick={onDismiss}>
-          Cancel
-        </Button>
-      </ModalFooter>
-    </Modal>
-  );
-};
 
 const ConfirmationDialogContext = React.createContext({} as DialogContextState);
 
@@ -47,9 +18,9 @@ export const ConfirmationDialogProvider: React.FC = ({ children }) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [dialogConfig, setDialogConfig] = React.useState({} as DialogConfig);
 
-  const openDialog = ({ title, message, actionCallback }: DialogConfig) => {
+  const openDialog = (config: DialogConfig) => {
     setDialogOpen(true);
-    setDialogConfig({ title, message, actionCallback });
+    setDialogConfig(config);
   };
 
   const resetDialog = () => {
@@ -69,13 +40,24 @@ export const ConfirmationDialogProvider: React.FC = ({ children }) => {
 
   return (
     <ConfirmationDialogContext.Provider value={{ openDialog }}>
-      <ConfirmationDialog
-        open={dialogOpen}
-        title={dialogConfig?.title}
-        message={dialogConfig?.message}
-        onConfirm={onConfirm}
-        onDismiss={onDismiss}
-      />
+      <Modal isOpen={dialogOpen}>
+        <ModalHeader>{dialogConfig?.title}</ModalHeader>
+        <ModalBody>
+          {dialogConfig?.message}
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            color="primary"
+            onClick={onConfirm}
+            enabled={dialogConfig?.canConfirm}
+          >
+            Confirm
+          </Button>{" "}
+          <Button color="link" onClick={onDismiss}>
+            Cancel
+          </Button>
+        </ModalFooter>
+      </Modal>
       {children}
     </ConfirmationDialogContext.Provider>
   );
@@ -84,9 +66,9 @@ export const ConfirmationDialogProvider: React.FC = ({ children }) => {
 export const useConfirmationDialog = () => {
   const { openDialog } = React.useContext(ConfirmationDialogContext);
 
-  const getConfirmation = (title: React.ReactNode, message: React.ReactNode) =>
+  const getConfirmation = (title: React.ReactNode, message: React.ReactNode, canConfirm: boolean = true) =>
     new Promise<boolean>((res) => {
-      openDialog({ actionCallback: res, title, message });
+      openDialog({ actionCallback: res, title, message, canConfirm });
     });
 
   return { getConfirmation };
