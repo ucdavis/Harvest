@@ -74,7 +74,7 @@ export const ExpenseTable = (props: Props) => {
         ),
       },
     ],
-    [deleteExpense]
+    [deleteExpense, canDeleteExpense]
   );
 
   const initialState: Partial<TableState<any>> = {

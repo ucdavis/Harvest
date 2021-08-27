@@ -1,75 +1,61 @@
-﻿import React from "react";
+﻿import React, { ReactNode, useRef, useState, Dispatch, SetStateAction } from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
+import { useModal } from "react-modal-hook";
 
-interface DialogConfig {
-  title?: React.ReactNode;
-  message?: React.ReactNode;
-  actionCallback: ((isConfirmed: boolean) => void);
-  canConfirm: boolean;
+interface Props {
+  title: ReactNode;
+  message: ReactNode;
+  canConfirm?: boolean;
 }
 
-interface DialogContextState {
-  openDialog: (config: DialogConfig) => void;
-}
+export const useConfirmationDialog = (props: Props, dependencies: any[] = []) => {
+  const promiseRef = useRef<Promise<boolean>>();
+  const resolveRef = useRef<(value: boolean) => void>();
 
-const ConfirmationDialogContext = React.createContext({} as DialogContextState);
-
-export const ConfirmationDialogProvider: React.FC = ({ children }) => {
-  const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [dialogConfig, setDialogConfig] = React.useState({} as DialogConfig);
-
-  const openDialog = (config: DialogConfig) => {
-    setDialogOpen(true);
-    setDialogConfig(config);
+  const confirm = () => {
+    resolveRef.current && resolveRef.current(true);
+    promiseRef.current = undefined;
+    resolveRef.current = undefined;
   };
 
-  const resetDialog = () => {
-    setDialogOpen(false);
-    setDialogConfig({} as DialogConfig);
-  };
+  const dismiss = () => {
+    resolveRef.current && resolveRef.current(false);
+    promiseRef.current = undefined;
+    resolveRef.current = undefined;
+  }
 
-  const onConfirm = () => {
-    resetDialog();
-    dialogConfig.actionCallback(true);
-  };
+  const [showModal, hideModal] = useModal(() => (
+    <Modal isOpen={true}>
+      <ModalHeader>{props.title}</ModalHeader>
+      <ModalBody>
+        {props.message}
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          color="primary"
+          onClick={() => { confirm(); hideModal(); }}
+          disabled={props.canConfirm === undefined ? false : !props.canConfirm}
+        >
+          Confirm
+        </Button>{" "}
+        <Button color="link" onClick={() => { dismiss(); hideModal(); }}>
+          Cancel
+        </Button>
+      </ModalFooter>
+    </Modal>
+  ), dependencies);
 
-  const onDismiss = () => {
-    resetDialog();
-    dialogConfig.actionCallback(false);
-  };
 
-  return (
-    <ConfirmationDialogContext.Provider value={{ openDialog }}>
-      <Modal isOpen={dialogOpen}>
-        <ModalHeader>{dialogConfig?.title}</ModalHeader>
-        <ModalBody>
-          {dialogConfig?.message}
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            color="primary"
-            onClick={onConfirm}
-            enabled={dialogConfig?.canConfirm}
-          >
-            Confirm
-          </Button>{" "}
-          <Button color="link" onClick={onDismiss}>
-            Cancel
-          </Button>
-        </ModalFooter>
-      </Modal>
-      {children}
-    </ConfirmationDialogContext.Provider>
-  );
-};
-
-export const useConfirmationDialog = () => {
-  const { openDialog } = React.useContext(ConfirmationDialogContext);
-
-  const getConfirmation = (title: React.ReactNode, message: React.ReactNode, canConfirm: boolean = true) =>
-    new Promise<boolean>((res) => {
-      openDialog({ actionCallback: res, title, message, canConfirm });
+  const getConfirmation = () => {
+    let promise = promiseRef.current || new Promise<boolean>((resolve) => {
+      resolveRef.current = resolve;
+      showModal();
     });
+    if (promiseRef.current === undefined) {
+      promiseRef.current = promise;
+    }
+    return promise;
+  };
 
-  return { getConfirmation };
+  return [getConfirmation];
 };

@@ -37,7 +37,6 @@ export const CloseoutContainer = () => {
   const [newExpenseCount, setNewExpenseCount] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
   const [finalAcreageExpense, setFinalAcreageExpense] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
-  const { getConfirmation } = useConfirmationDialog();
   const history = useHistory();
   const [beyondCloseoutDisplayDate, setBeyondCloseoutDisplayDate] = useState(false);
   const [closeoutRequested, setCloseoutRequested] = useState(false);
@@ -90,13 +89,17 @@ export const CloseoutContainer = () => {
     }
   };
 
-  const closeoutProject = async () => {
-    if (!await getConfirmation(
-      "Closeout Project",
+  const [getConfirmation] = useConfirmationDialog({
+    title: "Closeout Project",
+    message: (
       <ul>
         <li>Generates a final invoice if there are any unbilled expenses</li>
         <li>Sets project status to either Completed or CloseoutPending based on whether there are any pending invoices</li>
-      </ul>)) {
+      </ul>)
+  });
+
+  const closeoutProject = async () => {
+    if (!await getConfirmation()) {
       return;
     }
 

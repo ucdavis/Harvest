@@ -23,8 +23,11 @@ export const UnbilledExpensesContainer = (props: Props) => {
   const { projectId } = useParams<RouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [total, setTotal] = useState(0);
-  const { getConfirmation } = useConfirmationDialog();
   const [notification, setNotification] = usePromiseNotification();
+  const [confirmRemoveExpense] = useConfirmationDialog({
+    title: "Remove Expense",
+    message: "Are you sure you want to remove this unbilled expense?"
+  });
 
   useEffect(() => {
     // get unbilled expenses for the project
@@ -44,9 +47,8 @@ export const UnbilledExpensesContainer = (props: Props) => {
     cb();
   }, [projectId, props.newExpenseCount]);
 
-  // This function closes the modal and deletes the entry from the db
   const deleteExpense = async (expense: Expense) => {
-    if (! await getConfirmation("Remove Expense", "Are you sure you want to remove this unbilled expense?")) {
+    if (! await confirmRemoveExpense()) {
       return;
     }
 

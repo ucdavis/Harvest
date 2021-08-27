@@ -2,6 +2,7 @@ import React from "react";
 
 import { Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { ModalProvider } from "react-modal-hook";
 
 import AppContext from "./Shared/AppContext";
 import { AppContextShape } from "./types";
@@ -23,7 +24,6 @@ import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { CloseoutContainer } from "./Closeout/CloseoutContainer";
-import { ConfirmationDialogProvider } from "./Shared/ConfirmationDialog"
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -31,7 +31,7 @@ declare var Harvest: AppContextShape;
 function App() {
   return (
     <AppContext.Provider value={Harvest}>
-      <ConfirmationDialogProvider>
+      <ModalProvider>
         <Toaster />
         <Route exact path="/" component={HomeContainer} />
         <Route
@@ -114,7 +114,7 @@ function App() {
           path="/project/map"
           component={ProjectFields}
         />
-      </ConfirmationDialogProvider>
+      </ModalProvider>
     </AppContext.Provider>
   );
 }
