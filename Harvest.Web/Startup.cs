@@ -150,7 +150,7 @@ namespace Harvest.Web
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped(provder => JsonOptions.Standard);
+            services.AddScoped(provider => JsonOptions.Standard);
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
