@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Label, Input, Button, UncontrolledTooltip } from "reactstrap";
-import * as yup from "yup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -13,9 +12,8 @@ import { ProjectProgress } from "../Projects/ProjectProgress";
 import { useInputValidator } from "../FormValidation";
 import { roundToTwo } from "../Util/Calculations"
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
-import { millisecondsPerDay } from "../Util/Calculations";
 import { ShowFor } from "../Shared/ShowFor";
-
+import { finalAcreageExpenseSchema } from "../schemas";
 
 interface RouteParams {
   projectId?: string;
@@ -25,12 +23,6 @@ interface FinalAcreageExpense {
   amount: number;
 }
 
-const finalAcreageExpenseSchema = yup.object().shape({
-  amount: yup.number().required().default(0)
-    .typeError("Acreage Expense must be a number")
-    .positive("Acreage Expense must be positive")
-});
-
 export const CloseoutContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
@@ -38,7 +30,6 @@ export const CloseoutContainer = () => {
   const [notification, setNotification] = usePromiseNotification();
   const [finalAcreageExpense, setFinalAcreageExpense] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
-  const [beyondCloseoutDisplayDate, setBeyondCloseoutDisplayDate] = useState(false);
   const [closeoutRequested, setCloseoutRequested] = useState(false);
 
   const {
@@ -50,16 +41,18 @@ export const CloseoutContainer = () => {
   } = useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
 
   useEffect(() => {
+    let isMounted = true;
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
-      if (response.ok) {
+      if (isMounted && response.ok) {
         const proj: Project = await response.json();
-        setProject(proj);
-        setBeyondCloseoutDisplayDate(new Date().getTime() - new Date(proj.end).getTime() >= (7 * millisecondsPerDay));
+        isMounted && setProject(proj);
       }
     };
 
     cb();
+
+    return () => { isMounted = false };
   }, [projectId]);
 
   useEffect(() => {
@@ -118,8 +111,7 @@ export const CloseoutContainer = () => {
     return <div>Loading ...</div>;
   }
 
-  const canCloseout = project.status === "AwaitingCloseout" ||
-    (project.status === "Active" && beyondCloseoutDisplayDate);
+  const canCloseout = project.status === "AwaitingCloseout" || project.status === "Active";
 
   return (
     <div className="card-wrapper">

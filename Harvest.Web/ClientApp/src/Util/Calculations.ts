@@ -18,4 +18,8 @@ export const roundToTwo = (num: number) => {
 }
 
 // milliseconds per second per minute per hour per day (what about DST, leap year/second? Pft!)
-export const millisecondsPerDay = 1000 * 60 * 60 * 24;
+export const millisecondsPerHour = 1000 * 60 * 60;
+export const millisecondsPerDay = millisecondsPerHour * 24;
+
+export const getDaysDiff = (date1: Date, date2: Date) => (date1.getTime() - date2.getTime()) / millisecondsPerDay;
+export const getHoursDiff = (date1: Date, date2: Date) => (date1.getTime() - date2.getTime()) / millisecondsPerHour;

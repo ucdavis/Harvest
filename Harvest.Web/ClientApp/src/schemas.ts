@@ -93,3 +93,9 @@ export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup.object().shap
   grandTotal: yup.number().required(),
   fields: yup.array().of(fieldSchema).required()
 });
+
+export const finalAcreageExpenseSchema = yup.object().shape({
+  amount: yup.number().required().default(0)
+    .typeError("Acreage Expense must be a number")
+    .positive("Acreage Expense must be positive")
+});

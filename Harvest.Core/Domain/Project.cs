@@ -173,9 +173,9 @@ namespace Harvest.Core.Domain
             public const string PendingAccountApproval = "PendingAccountApproval";
             public const string Active = "Active";
             public const string ChangeRequested = "ChangeRequested";
-            public const string Completed = "Completed";
             public const string AwaitingCloseout = "AwaitingCloseout";
             public const string FinalInvoicePending = "FinalInvoicePending";
+            public const string Completed = "Completed";
 
             public static List<string> TypeList = new List<string>
             {
@@ -185,8 +185,9 @@ namespace Harvest.Core.Domain
                 PendingAccountApproval,
                 Active,
                 ChangeRequested,
+                AwaitingCloseout,
+                FinalInvoicePending,
                 Completed,
-                AwaitingCloseout
             }.ToList();
         }
 

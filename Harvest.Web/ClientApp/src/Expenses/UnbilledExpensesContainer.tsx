@@ -26,7 +26,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
   const [notification, setNotification] = usePromiseNotification();
   const [confirmRemoveExpense] = useConfirmationDialog({
     title: "Remove Expense",
-    message: "Are you sure you want to remove this unbilled expense?"
+    message: "Are you sure you want to remove this unbilled expense?",
   });
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
   }, [projectId, props.newExpenseCount]);
 
   const deleteExpense = async (expense: Expense) => {
-    if (! await confirmRemoveExpense()) {
+    if (!(await confirmRemoveExpense())) {
       return;
     }
 
