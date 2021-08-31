@@ -23,16 +23,26 @@
                               <div class="form-control">@Model.Name</div>
                           </div>
 
-                          <div class="editor-label">Check Roles to delete</div>
-                          @foreach (var permission in Model.Permissions.Where(a => a.Role.Name != Role.Codes.System))
-                          {
-                              <input id="@permission.Role.Id" type="checkbox" value="@permission.Role.Id" name="roles"/>
-                              <label for="@permission.Role.Id">@permission.Role.Name</label>
-                              <br/>
-                              <br/>
-                          }
-
-                          <input class="btn btn-primary" type="submit" value="Remove role(s)"/>
+                  <div class="editor-label">Check Roles to delete</div>
+                  @if (ViewBag.ShowSystem == true)
+                  {
+                      foreach (var permission in Model.Permissions)
+                      {
+                          <input id="@permission.Role.Id" type="checkbox" value="@permission.Role.Id" name="roles"/>
+                          <label for="@permission.Role.Id">@permission.Role.Name</label>
+                          <br/>
+                          <br/>
+                      }
+                  }else{
+                      foreach (var permission in Model.Permissions.Where(a => a.Role.Name != Role.Codes.System))
+                      {
+                          <input id="@permission.Role.Id" type="checkbox" value="@permission.Role.Id" name="roles"/>
+                          <label for="@permission.Role.Id">@permission.Role.Name</label>
+                          <br/>
+                          <br/>
+                      }
+                  }
+                  <input class="btn btn-primary" type="submit" value="Remove role(s)"/>
 
 
               </form>

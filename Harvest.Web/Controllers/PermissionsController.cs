@@ -6,32 +6,41 @@ using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Services;
 using Harvest.Web.Models;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.SystemAccess)]
+    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
     public class PermissionsController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
+        private readonly IUserService _userService;
 
-        public PermissionsController(AppDbContext dbContext, IIdentityService identityService)
+        public PermissionsController(AppDbContext dbContext, IIdentityService identityService, IUserService userService)
         {
             _dbContext = dbContext;
             _identityService = identityService;
+            _userService = userService;
         }
         public async Task<IActionResult> Index()
         {
-            //TODO: Filter out Role.Codes.System roles?
-            var permissions = await _dbContext.Permissions
+            IQueryable<Permission> permissionsQuery = _dbContext.Permissions
                 .Include(a => a.User)
-                .Include(a => a.Role)
-                .Where(a=> a.Role.Name != Role.Codes.System)
-                .ToListAsync();
+                .Include(a => a.Role);
+            
+            //If you have System, show system.
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            {
+                permissionsQuery = permissionsQuery.Where(a => a.Role.Name != Role.Codes.System);
+            }
+            
+            var permissions = await permissionsQuery.ToListAsync();
 
             var viewModel = new UserPermissionsListModel();
             foreach (var permission in permissions)
@@ -52,20 +61,33 @@ namespace Harvest.Web.Controllers
 
         public async Task<IActionResult> Create()
         {
+            IQueryable<Role> rolesQuery = _dbContext.Roles;
+
+            //If you have System, show system.
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            {
+                rolesQuery = rolesQuery.Where(a => a.Name != Role.Codes.System);
+            }
             var viewModel = new AddUserRolesModel
             {
-                Roles = await _dbContext.Roles.Where(a => a.Name != Role.Codes.System).ToListAsync()
+                Roles = await rolesQuery.ToListAsync()
             };
-
             return View(viewModel);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(AddUserRolesModel model)
         {
+            IQueryable<Role> rolesQuery = _dbContext.Roles;
+
+            //If you have System, show system.
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            {
+                rolesQuery = rolesQuery.Where(a => a.Name != Role.Codes.System);
+            }
             var viewModel = new AddUserRolesModel
             {
-                Roles = await _dbContext.Roles.Where(a => a.Name != Role.Codes.System).ToListAsync(),
+                Roles = await rolesQuery.ToListAsync(),
                 UserEmail = model.UserEmail
             };
             if (model.RoleId == 0)
@@ -87,13 +109,24 @@ namespace Harvest.Web.Controllers
             {
                 user = users.First();
             }
-            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId && r.Name != Role.Codes.System);
-
-            if (role == null || role.Name == Role.Codes.System)
+            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId);
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
             {
-                ModelState.AddModelError("RoleId", "Role not found!");
-                return View(viewModel);
+                if (role == null || role.Name == Role.Codes.System)
+                {
+                    ModelState.AddModelError("RoleId", "Role not found!");
+                    return View(viewModel);
+                }
             }
+            else
+            {
+                if (role == null)
+                {
+                    ModelState.AddModelError("RoleId", "Role not found!");
+                    return View(viewModel);
+                }
+            }
+
 
             var addUser = false;
             if (user == null)
@@ -152,7 +185,17 @@ namespace Harvest.Web.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            var viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync();
+
+            User viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync(); 
+            if (await _userService.HasAccess(AccessCodes.SystemAccess))
+            {
+                ViewBag.ShowSystem = true;
+            }
+            else
+            {
+                ViewBag.ShowSystem = false;
+            }
+            
             return View(viewModel);
         }
 
@@ -161,10 +204,13 @@ namespace Harvest.Web.Controllers
         {
             //TODO: Make sure you don't remove your own roles?
             var user = await _dbContext.Users.Where(a => a.Id == userId).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync();
-            if(await _dbContext.Roles.AnyAsync(a => a.Name == Role.Codes.System && roles.Contains(a.Id)))
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
             {
-                ErrorMessage = "Unknown Role selected";
-                return RedirectToAction("Index");
+                if (await _dbContext.Roles.AnyAsync(a => a.Name == Role.Codes.System && roles.Contains(a.Id)))
+                {
+                    ErrorMessage = "Unknown Role selected";
+                    return RedirectToAction("Index");
+                }
             }
 
             if(roles.Length <= 0)
