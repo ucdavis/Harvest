@@ -58,6 +58,7 @@ namespace Harvest.Jobs.Invoice
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
             services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
+            services.Configure<DevSettings>(Configuration.GetSection("Dev"));
 
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
@@ -76,7 +77,7 @@ namespace Harvest.Jobs.Invoice
 
         private static async Task ProcessInvoices(IInvoiceService invoiceService, ISlothService slothService)
         {
-           var invoiceCount = await invoiceService.CreateInvoices();
+            var invoiceCount = await invoiceService.CreateInvoices();
             _log.Information("Harvest Invoices Created: {invoiceCount}", invoiceCount);
 
             var slothMoneyMoveCount = 0;
@@ -92,7 +93,7 @@ namespace Harvest.Jobs.Invoice
                         slothMoneyMoveCount++;
                     }
                 }
-                _log.Information("Successfully requested money movement for {processedInvoiceCount} out of {createdInvoiceCount}", 
+                _log.Information("Successfully requested money movement for {processedInvoiceCount} out of {createdInvoiceCount}",
                     slothMoneyMoveCount, createdInvoices.Count);
             }
 

@@ -140,7 +140,8 @@ namespace Harvest.Web
             services.Configure<SparkpostSettings>(Configuration.GetSection("SparkPost"));
             services.Configure<StorageSettings>(Configuration.GetSection("Storage"));
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
-            
+            services.Configure<DevSettings>(Configuration.GetSection("Dev"));
+
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<RewriteError404>();
             services.AddScoped<IFinancialService, FinancialService>();
@@ -201,7 +202,7 @@ namespace Harvest.Web
 
             app.UseMiddleware<LogUserNameMiddleware>();
             app.UseSerilogRequestLogging();
-            
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
@@ -216,7 +217,8 @@ namespace Harvest.Web
                     pattern: "{controller=Home}/{action=Index}/{projectId?}");
 
                 // Handle 404 errors, but only in production.  In dev we want to let some requests fallthrough for webpack.
-                if (!env.IsDevelopment()) {
+                if (!env.IsDevelopment())
+                {
                     //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
                     endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
                 }

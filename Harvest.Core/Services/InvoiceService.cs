@@ -9,7 +9,9 @@ using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.InvoiceModels;
+using Harvest.Core.Models.Settings;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace Harvest.Core.Services
@@ -27,13 +29,16 @@ namespace Harvest.Core.Services
         private readonly IProjectHistoryService _historyService;
         private readonly IEmailService _emailService;
         private readonly IExpenseService _expenseService;
+        private readonly DevSettings _devSettings;
 
-        public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService, IEmailService emailService, IExpenseService expenseService)
+        public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService,
+            IEmailService emailService, IExpenseService expenseService, IOptions<DevSettings> devSettings)
         {
             _dbContext = dbContext;
             _historyService = historyService;
             _emailService = emailService;
             _expenseService = expenseService;
+            _devSettings = devSettings.Value;
         }
         public async Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false)
         {
@@ -51,7 +56,7 @@ namespace Harvest.Core.Services
                 return Result.Error("No active project found for given projectId: {projectId}", projectId);
             }
 
-            if (!isCloseout)
+            if (!isCloseout && !_devSettings.NightlyInvoices)
             {
                 if (!now.IsBusinessDay())
                 {
@@ -114,7 +119,7 @@ namespace Harvest.Core.Services
 
             var newInvoice = new Invoice
             {
-                CreatedOn = DateTime.UtcNow, 
+                CreatedOn = DateTime.UtcNow,
                 ProjectId = projectId,
                 // empty invoice won't be processed by SlothService
                 Status = unbilledExpenses.Length > 0 ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
