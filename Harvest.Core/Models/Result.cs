@@ -16,11 +16,15 @@ namespace Harvest.Core.Models
     {
         public T Value { get; }
         public bool IsError { get; private set; }
-        public string ErrorMessage { get; private set; }
+        public string Message { get; private set; }
 
-        public Result(T value) => Value = value;
+        public Result(T value, string message = "")
+        {
+            Value = value;
+            Message = message;
+        }
 
-        public static implicit operator Result<T>(Result.ResultError error) => new Result<T>(default) { ErrorMessage = error.ErrorMessage, IsError = true };
+        public static implicit operator Result<T>(Result.ResultError error) => new Result<T>(default) { Message = error.ErrorMessage, IsError = true };
     }
 
     // It turned out VS caused some auto-fill headaches when mistyping/fatfingering "Result<int>.Error(...". And it's kind of verbose having to always type
@@ -71,7 +75,7 @@ namespace Harvest.Core.Models
             return new ResultError(messageTemplate.FormatTemplate(prop0));
         }
 
-        public static Result<T> Value<T>(T value) => new Result<T>(value);
+        public static Result<T> Value<T>(T value, string message = "") => new Result<T>(value, message);
 
         public class ResultError
         {

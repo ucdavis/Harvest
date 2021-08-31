@@ -60,6 +60,7 @@ namespace Harvest.Jobs.Invoice
             services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
 
             services.AddScoped<IInvoiceService, InvoiceService>();
+            services.AddScoped<IExpenseService, ExpenseService>();
             services.AddScoped<ISlothService, SlothService>();
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();

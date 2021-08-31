@@ -14,17 +14,17 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     setFormIsDirty, resetContext, contextIsReset } = context;
 
   const [errors, setErrors] = useState({} as Record<TKey, string>);
-  const previousErrors = usePrevious(errors) || {} as Record<TKey, string>;
+  const [previousErrors] = usePrevious(errors);
   const [touchedFields, setTouchedFields] = useState([] as TKey[]);
   const [dirtyFields, setDirtyFields] = useState([] as TKey[]);
 
   useEffect(() => {
     const errorCount = Object.values(errors).filter(notEmptyOrFalsey).length;
-    const previousErrorCount = Object.values(previousErrors).filter(notEmptyOrFalsey).length;
+    const previousErrorCount = Object.values(previousErrors || {} as Record<TKey, string>).filter(notEmptyOrFalsey).length;
     if (errorCount !== previousErrorCount) {
       setFormErrorCount(formErrorCount + errorCount - previousErrorCount);
     }
-  }, [errors]);
+  }, [errors, formErrorCount, setFormErrorCount, previousErrors]);
 
   useEffect(() => {
     if (contextIsReset) {
@@ -32,7 +32,7 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
       setDirtyFields([]);
       setErrors({} as Record<TKey, string>);
     }
-  }, [contextIsReset]);
+  }, [contextIsReset, setTouchedFields, setDirtyFields, setErrors]);
 
   const validateField = useDebounceCallback(async (name: TKey, value: T[TKey]) => {
     const tempObject = { [name]: value } as unknown as T;
@@ -147,9 +147,9 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
 }
 
 // provides previous value of given state
-function usePrevious<T>(value: T) {
+function usePrevious<T>(value: T): [T|undefined] {
   const ref = useRef<T>();
   useEffect(() => { ref.current = value; });
-  return ref.current;
+  return [ref.current];
 }
 

@@ -6,7 +6,7 @@ import { isBoolean, isFunction } from "../Util/TypeChecks";
 
 interface Props {
   children: any;
-  roles: RoleName[];
+  roles?: RoleName[];
   condition?: boolean | (() => boolean);
 }
 
@@ -20,13 +20,13 @@ export const ShowFor = (props: Props) => {
         ? props.condition()
         : true);
 
-  const anyMatchingRoles: boolean = useMemo(
-    () => userRoles.some((role) => roles.includes(role)),
+  const rolesSatisfied: boolean = useMemo(
+    () => userRoles.some((role) => roles ? roles.includes(role) : true),
     [roles, userRoles]
   );
 
   if (
-    conditionSatisfied && (userRoles.includes("System") || anyMatchingRoles)
+    conditionSatisfied && (userRoles.includes("System") || rolesSatisfied)
   ) {
     return <>{children}</>;
   }

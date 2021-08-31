@@ -9,13 +9,14 @@ import { ShowFor } from "../Shared/ShowFor";
 
 interface Props {
   expenses: Expense[];
-  setSelectedExpense: (expense: Expense) => void;
+  deleteExpense: (expense: Expense) => void;
+  canDeleteExpense: boolean;
 }
 
 export const ExpenseTable = (props: Props) => {
   const expenseData = useMemo(() => props.expenses, [props.expenses]);
 
-  const { setSelectedExpense } = props;
+  const { deleteExpense, canDeleteExpense } = props;
 
   const columns: Column<Expense>[] = useMemo(
     () => [
@@ -64,7 +65,8 @@ export const ExpenseTable = (props: Props) => {
           <ShowFor roles={["FieldManager", "Supervisor"]}>
             <Button
               color="link"
-              onClick={() => setSelectedExpense(data.row.original)}
+              onClick={() => deleteExpense(data.row.original)}
+              disabled={!canDeleteExpense}
             >
               Delete
             </Button>
@@ -72,7 +74,7 @@ export const ExpenseTable = (props: Props) => {
         ),
       },
     ],
-    [setSelectedExpense]
+    [deleteExpense, canDeleteExpense]
   );
 
   const initialState: Partial<TableState<any>> = {

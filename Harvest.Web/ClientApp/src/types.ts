@@ -14,7 +14,8 @@ export type ProjectStatus =
   | "Active"
   | "ChangeRequested"
   | "Completed"
-  | "AwaitingCloseout";
+  | "AwaitingCloseout"
+  | "FinalInvoicePending";
 
 export interface Project {
   id: number;
@@ -39,6 +40,8 @@ export interface Project {
   accounts: ProjectAccount[];
   quotes: null;
   attachments: BlobFile[];
+  acreageRate: Rate;
+  acres: number;
 }
 
 export interface BlobFile {
@@ -91,6 +94,10 @@ export interface Expense {
   total: number;
   createdOn?: Date;
   createdBy?: User;
+}
+
+export enum ExpenseQueryParams {
+  ReturnOnSubmit = "returnOnSubmit"
 }
 
 export interface Transfer {
@@ -317,4 +324,10 @@ export interface AppContextShape {
 export interface PromiseStatus {
   pending: boolean;
   success: boolean;
+}
+
+export interface Result<T> {
+  value: T;
+  isError: boolean;
+  message: string;
 }

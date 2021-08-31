@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Activity, Expense, Rate, WorkItemImpl } from "../types";
+import { Activity, Expense, Rate, WorkItemImpl, ExpenseQueryParams } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button } from "reactstrap";
@@ -14,6 +14,7 @@ import { useOrCreateValidationContext, ValidationProvider } from "../FormValidat
 import { workItemSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import * as yup from "yup";
+import { useQuery } from "../Shared/UseQuery";
 
 interface RouteParams {
   projectId?: string;
@@ -48,6 +49,8 @@ export const ExpenseEntryContainer = () => {
   const { roles } = useContext(AppContext).user;
 
   const [notification, setNotification] = usePromiseNotification();
+
+  const query = useQuery();
 
   useEffect(() => {
     let isMounted = true;
@@ -132,7 +135,11 @@ export const ExpenseEntryContainer = () => {
       if (roles.includes("Worker")) {
         history.push("/");
       } else {
-        history.push(`/project/details/${projectId}`);
+        if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
+          history.goBack();
+        } else {
+          history.push(`/project/details/${projectId}`);
+        }
       }
     }
   };

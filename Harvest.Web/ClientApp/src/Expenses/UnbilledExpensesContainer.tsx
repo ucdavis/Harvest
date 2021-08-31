@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Expense } from "../types";
+import { Expense, ExpenseQueryParams } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { ShowFor } from "../Shared/ShowFor";
+import { formatCurrency } from "../Util/NumberFormatting";
+import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
+import { usePromiseNotification } from "../Util/Notifications";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -13,10 +15,19 @@ interface RouteParams {
   projectId?: string;
 }
 
-export const UnbilledExpensesContainer = () => {
+interface Props {
+  newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
+}
+
+export const UnbilledExpensesContainer = (props: Props) => {
   const { projectId } = useParams<RouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [total, setTotal] = useState(0);
+  const [notification, setNotification] = usePromiseNotification();
+  const [confirmRemoveExpense] = useConfirmationDialog({
+    title: "Remove Expense",
+    message: "Are you sure you want to remove this unbilled expense?",
+  });
 
   useEffect(() => {
     // get unbilled expenses for the project
@@ -29,32 +40,36 @@ export const UnbilledExpensesContainer = () => {
         const expenses: Expense[] = await response.json();
 
         setExpenses(expenses);
+        setTotal(expenses.reduce((acc, cur) => acc + cur.total, 0));
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [projectId, props.newExpenseCount]);
 
-  // This function closes the modal and deletes the entry from the db
-  const confirmModal = async (expenseId: number) => {
-    const response = await fetch(`/Expense/Delete?expenseId=${expenseId}`, {
+  const deleteExpense = async (expense: Expense) => {
+    if (!(await confirmRemoveExpense())) {
+      return;
+    }
+
+    const request = fetch(`/Expense/Delete?expenseId=${expense.id}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
     });
-
-    if (response.ok) {
+    setNotification(request, "Removing Expense", () => {
       let expensesCopy = [...expenses];
       const index = expensesCopy.findIndex(
-        (element) => element.id === expenseId
+        (element) => element.id === expense.id
       );
       expensesCopy.splice(index, 1);
 
       setExpenses(expensesCopy);
-      setSelectedExpense(null);
-    }
+      setTotal(expensesCopy.reduce((acc, cur) => acc + cur.total, 0));
+      return "Expense Removed";
+    });
   };
 
   if (expenses.length === 0) {
@@ -65,45 +80,24 @@ export const UnbilledExpensesContainer = () => {
     <div>
       <div className="row justify-content-between mb-3">
         <div className="col">
-          <h1>Un-billed Expenses</h1>
+          <h1>Un-billed Expenses <small>(${formatCurrency(total)} total)</small></h1>
         </div>
         <div className="col text-right">
           <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
             <Link
-              to={`/expense/entry/${projectId}`}
+              to={`/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
               className="btn btn btn-primary "
             >
               Enter New <FontAwesomeIcon icon={faPlus} />
             </Link>
           </ShowFor>
         </div>
-
-        <Modal isOpen={selectedExpense !== null}>
-          <ModalHeader>Modal title</ModalHeader>
-          <ModalBody>
-            Are you sure you want to remove this unbilled expense?
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              color="success"
-              onClick={() =>
-                selectedExpense !== null
-                  ? confirmModal(selectedExpense.id)
-                  : null
-              }
-            >
-              Confirm
-            </Button>{" "}
-            <Button color="link" onClick={() => setSelectedExpense(null)}>
-              Cancel
-            </Button>
-          </ModalFooter>
-        </Modal>
       </div>
 
       <ExpenseTable
         expenses={expenses}
-        setSelectedExpense={setSelectedExpense}
+        deleteExpense={deleteExpense}
+        canDeleteExpense={!notification.pending}
       ></ExpenseTable>
     </div>
   );
