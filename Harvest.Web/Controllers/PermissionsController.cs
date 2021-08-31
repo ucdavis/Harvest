@@ -186,17 +186,26 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> Delete(int id)
         {
 
-            User viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync(); 
             if (await _userService.HasAccess(AccessCodes.SystemAccess))
             {
-                ViewBag.ShowSystem = true;
+                var viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions)
+                    .ThenInclude(a => a.Role).SingleAsync();
+                return View(viewModel);
             }
             else
             {
-                ViewBag.ShowSystem = false;
+                var viewModel = (await _dbContext.Users.Select(
+                    a => new {
+                        User = a,
+                        Permissions = a.Permissions.Where(b => b.Role.Name != Role.Codes.System),
+                        Roles = a.Permissions.Select(b => b.Role)
+                    }).SingleAsync(a => a.User.Id == id)).User;
+                return View(viewModel);
             }
-            
-            return View(viewModel);
+
+
+
+                
         }
 
         [HttpPost]
