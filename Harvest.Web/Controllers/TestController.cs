@@ -36,11 +36,11 @@ namespace Harvest.Web.Controllers
         {
 
 
-            var model = new TicketReplyModel();
+            var model = new NewFieldRequestModel();
 
 
 
-            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/TicketClosed_mjml.cshtml", model);
+            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
 
             return Content(results);
         }
