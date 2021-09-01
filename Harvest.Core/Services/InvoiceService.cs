@@ -130,7 +130,7 @@ namespace Harvest.Core.Services
 
             await _historyService.InvoiceCreated(project.Id, newInvoice);
 
-            var resultMessage = "Invlice Created";
+            var resultMessage = "Invoice Created";
 
             if (isCloseout)
             {
