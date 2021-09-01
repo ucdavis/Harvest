@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FormGroup, Input } from "reactstrap";
 
 import { Project } from "../types";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   selectedProject: (projectId: number) => void;
@@ -11,6 +12,7 @@ interface Props {
 export const ProjectSelection = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // get list of projects
     const cb = async () => {
@@ -19,12 +21,12 @@ export const ProjectSelection = (props: Props) => {
       if (response.ok) {
         const projects = await response.json();
 
-        setProjects(projects);
+        getIsMounted() && setProjects(projects);
       }
     };
 
     cb();
-  }, []);
+  }, [getIsMounted]);
 
   if (projects === undefined) {
     return <div>Loading...</div>;

@@ -15,12 +15,11 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
-import {
-  usePromiseNotification,
-} from "../Util/Notifications";
+import { usePromiseNotification } from "../Util/Notifications";
 import { useInputValidator, ValidationProvider } from "../FormValidation";
 import { quoteContentSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -32,7 +31,9 @@ export const QuoteContainer = () => {
   const [project, setProject] = useState<Project>();
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
-  const { formErrorCount, context } = useInputValidator<QuoteContent>(quoteContentSchema);
+  const { formErrorCount, context } = useInputValidator<QuoteContent>(
+    quoteContentSchema
+  );
 
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
@@ -43,6 +44,7 @@ export const QuoteContainer = () => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
@@ -51,45 +53,47 @@ export const QuoteContainer = () => {
       if (quoteResponse.ok && pricingResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
         const rateJson: Rate[] = await pricingResponse.json();
-        setProject(projectWithQuote.project);
-        setRates(rateJson);
-
-        if (
-          projectWithQuote.project.status !== "Requested" &&
-          projectWithQuote.project.status !== "ChangeRequested" &&
-          projectWithQuote.project.status !== "QuoteRejected"
-        ) {
-          // can only create quote for newly requests projects or change requests.
-          history.push(`/Project/Details/${projectId}`);
-        }
-
-        if (projectWithQuote.quote) {
-          // TODO: remove once we standardize on new quote format
-          setQuote({
-            ...projectWithQuote.quote,
-            fields: projectWithQuote.quote.fields ?? [],
-          });
+        if (getIsMounted()) {
+          setProject(projectWithQuote.project);
+          setRates(rateJson);
 
           if (
-            !projectWithQuote.quote.fields ||
-            projectWithQuote.quote.fields.length === 0
+            projectWithQuote.project.status !== "Requested" &&
+            projectWithQuote.project.status !== "ChangeRequested" &&
+            projectWithQuote.project.status !== "QuoteRejected"
           ) {
-            setEditFields(true);
+            // can only create quote for newly requests projects or change requests.
+            history.push(`/Project/Details/${projectId}`);
           }
-        } else {
-          const quoteToUse = new QuoteContentImpl();
-          quoteToUse.acreageRate =
-            rateJson.find((r) => r.type === "Acreage")?.price || 120;
 
-          // alwyas at least 1 year worth of acreage, but use max in case there is more
-          quoteToUse.years = Math.max(
-            1,
-            new Date(projectWithQuote.project.end).getFullYear() -
-            new Date(projectWithQuote.project.start).getFullYear()
-          );
+          if (projectWithQuote.quote) {
+            // TODO: remove once we standardize on new quote format
+            setQuote({
+              ...projectWithQuote.quote,
+              fields: projectWithQuote.quote.fields ?? [],
+            });
 
-          setQuote(quoteToUse);
-          setEditFields(true); // we have no existing quote, start with editing fields
+            if (
+              !projectWithQuote.quote.fields ||
+              projectWithQuote.quote.fields.length === 0
+            ) {
+              setEditFields(true);
+            }
+          } else {
+            const quoteToUse = new QuoteContentImpl();
+            quoteToUse.acreageRate =
+              rateJson.find((r) => r.type === "Acreage")?.price || 120;
+
+            // alwyas at least 1 year worth of acreage, but use max in case there is more
+            quoteToUse.years = Math.max(
+              1,
+              new Date(projectWithQuote.project.end).getFullYear() -
+                new Date(projectWithQuote.project.start).getFullYear()
+            );
+
+            setQuote(quoteToUse);
+            setEditFields(true); // we have no existing quote, start with editing fields
+          }
         }
       } else {
         !quoteResponse.ok && console.error(quoteResponse);
@@ -98,7 +102,7 @@ export const QuoteContainer = () => {
     };
 
     cb();
-  }, [history, projectId]);
+  }, [history, projectId, getIsMounted]);
 
   useEffect(() => {
     setQuote((q) => {
@@ -150,9 +154,9 @@ export const QuoteContainer = () => {
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>
-      (a.workItems = a.workItems.filter(
-        (w) => w.quantity !== 0 || w.total !== 0
-      ))
+        (a.workItems = a.workItems.filter(
+          (w) => w.quantity !== 0 || w.total !== 0
+        ))
     );
     quote.activities = quote.activities.filter((a) => a.workItems.length > 0);
 
@@ -280,12 +284,22 @@ export const QuoteContainer = () => {
               </ul>
             </div>
             <div className="row justify-content-center">
-              <button className="btn btn-link mt-4" onClick={() => save(false)} disabled={notification.pending || formErrorCount > 0}>
+              <button
+                className="btn btn-link mt-4"
+                onClick={() => save(false)}
+                disabled={notification.pending || formErrorCount > 0}
+              >
                 Save Quote
-            </button>
-              <button className="btn btn-primary mt-4" onClick={() => save(true)} disabled={notification.pending || !isValid() || formErrorCount > 0}>
+              </button>
+              <button
+                className="btn btn-primary mt-4"
+                onClick={() => save(true)}
+                disabled={
+                  notification.pending || !isValid() || formErrorCount > 0
+                }
+              >
                 Submit Quote
-            </button>
+              </button>
             </div>
           </div>
         </div>

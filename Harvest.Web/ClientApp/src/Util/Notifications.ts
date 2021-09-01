@@ -2,6 +2,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { PromiseStatus } from "../types";
 import { isPromise, isString } from "./TypeChecks";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 // just re-export the whole module so we don't take direct dependencies all over
 export * from "react-hot-toast";
@@ -19,10 +20,14 @@ export const fetchWithFailOnNotOk = (fetchPromise: Promise<any>) => {
   });
 };
 
-export const genericErrorMessage: string = "Something went wrong, please try again";
+export const genericErrorMessage: string =
+  "Something went wrong, please try again";
 
 // allows message to be static or determined by sync or async callback that takes result of promise
-type MessageOrCallback = string | ((result: any) => string) | ((result: any) => Promise<string>);
+type MessageOrCallback =
+  | string
+  | ((result: any) => string)
+  | ((result: any) => Promise<string>);
 const getMessage = async (value: MessageOrCallback, result: any) => {
   if (isString(value)) {
     return value;
@@ -33,7 +38,7 @@ const getMessage = async (value: MessageOrCallback, result: any) => {
     }
     return callbackValue;
   }
-}
+};
 
 // returns notification object and notification setter
 // call notification setter to initiate a loading notification
@@ -49,6 +54,10 @@ export const usePromiseNotification = (): [
   const [pending, setPending] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // Checking for isMounted is slightly more tricky here because we still want to process
+  // the toasts regardless of whether the component is still mounted.
+  const getIsMounted = useIsMounted();
+
   return [
     {
       pending,
@@ -60,7 +69,7 @@ export const usePromiseNotification = (): [
       successMessageOrHandler,
       errorMessageOrHandler = genericErrorMessage
     ) => {
-      setPending(true);
+      getIsMounted() && setPending(true);
 
       // not using toast.promise() because it doesn't allow getting a message based on result of promise
       (async () => {
@@ -69,12 +78,16 @@ export const usePromiseNotification = (): [
           toastLoadingId = toast.loading(loadingMessage);
           const result = await fetchWithFailOnNotOk(promise);
           toast.success(await getMessage(successMessageOrHandler, result));
-          setSuccess(true);
-          setPending(false);
+          if (getIsMounted()) {
+            setSuccess(true);
+            setPending(false);
+          }
         } catch (error) {
           toast.error(await getMessage(errorMessageOrHandler, error));
-          setSuccess(false);
-          setPending(false);
+          if (getIsMounted()) {
+            setSuccess(false);
+            setPending(false);
+          }
         } finally {
           toast.dismiss(toastLoadingId);
         }

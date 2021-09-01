@@ -7,6 +7,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -29,6 +30,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
     message: "Are you sure you want to remove this unbilled expense?",
   });
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // get unbilled expenses for the project
     if (projectId === undefined) return;
@@ -39,13 +41,15 @@ export const UnbilledExpensesContainer = (props: Props) => {
       if (response.ok) {
         const expenses: Expense[] = await response.json();
 
-        setExpenses(expenses);
-        setTotal(expenses.reduce((acc, cur) => acc + cur.total, 0));
+        if (getIsMounted()) {
+          setExpenses(expenses);
+          setTotal(expenses.reduce((acc, cur) => acc + cur.total, 0));
+        }
       }
     };
 
     cb();
-  }, [projectId, props.newExpenseCount]);
+  }, [projectId, props.newExpenseCount, getIsMounted]);
 
   const deleteExpense = async (expense: Expense) => {
     if (!(await confirmRemoveExpense())) {
@@ -60,14 +64,16 @@ export const UnbilledExpensesContainer = (props: Props) => {
       },
     });
     setNotification(request, "Removing Expense", () => {
-      let expensesCopy = [...expenses];
-      const index = expensesCopy.findIndex(
-        (element) => element.id === expense.id
-      );
-      expensesCopy.splice(index, 1);
+      if (getIsMounted()) {
+        let expensesCopy = [...expenses];
+        const index = expensesCopy.findIndex(
+          (element) => element.id === expense.id
+        );
+        expensesCopy.splice(index, 1);
 
-      setExpenses(expensesCopy);
-      setTotal(expensesCopy.reduce((acc, cur) => acc + cur.total, 0));
+        setExpenses(expensesCopy);
+        setTotal(expensesCopy.reduce((acc, cur) => acc + cur.total, 0));
+      }
       return "Expense Removed";
     });
   };
@@ -80,7 +86,9 @@ export const UnbilledExpensesContainer = (props: Props) => {
     <div>
       <div className="row justify-content-between mb-3">
         <div className="col">
-          <h1>Un-billed Expenses <small>(${formatCurrency(total)} total)</small></h1>
+          <h1>
+            Un-billed Expenses <small>(${formatCurrency(total)} total)</small>
+          </h1>
         </div>
         <div className="col text-right">
           <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   projectId: number;
@@ -9,6 +10,7 @@ interface Props {
 export const ProjectUnbilledButton = (props: Props) => {
   const [total, setTotal] = useState<number>();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
@@ -17,15 +19,19 @@ export const ProjectUnbilledButton = (props: Props) => {
       );
 
       if (response.ok) {
-        setTotal(Number.parseFloat(await response.text()));
+        getIsMounted() && setTotal(Number.parseFloat(await response.text()));
       }
     };
 
     cb();
-  }, [props.projectId]);
+  }, [props.projectId, getIsMounted]);
 
   if (total === 0) {
-    return <button className="btn btn-light" disabled>Unbilled Expenses - $0.00</button>;
+    return (
+      <button className="btn btn-light" disabled>
+        Unbilled Expenses - $0.00
+      </button>
+    );
   }
 
   return (

@@ -6,6 +6,7 @@ import { ProjectWithInvoice } from "../types";
 import { InvoicePDF } from "../Pdf/InvoicePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -21,6 +22,7 @@ export const InvoiceDetailContainer = () => {
     setProjectAndInvoice,
   ] = useState<ProjectWithInvoice>();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const invoiceResponse = await fetch(`/Invoice/Get/${invoiceId}`);
@@ -28,12 +30,12 @@ export const InvoiceDetailContainer = () => {
       if (invoiceResponse.ok) {
         const projectWithInvoice: ProjectWithInvoice = await invoiceResponse.json();
 
-        setProjectAndInvoice(projectWithInvoice);
+        getIsMounted() && setProjectAndInvoice(projectWithInvoice);
       }
     };
 
     cb();
-  }, [invoiceId]);
+  }, [invoiceId, getIsMounted]);
 
   if (projectAndInvoice === undefined) {
     return <div>Loading ...</div>;

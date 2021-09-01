@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   projectId?: string;
@@ -13,6 +14,7 @@ export const RecentTicketsContainer = (props: Props) => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const maxRows = 5;
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(
@@ -20,12 +22,12 @@ export const RecentTicketsContainer = (props: Props) => {
       );
 
       if (response.ok) {
-        setTickets(await response.json());
+        getIsMounted() && setTickets(await response.json());
       }
     };
 
     cb();
-  }, [props.projectId]);
+  }, [props.projectId, getIsMounted]);
 
   return (
     <div className="card-content">

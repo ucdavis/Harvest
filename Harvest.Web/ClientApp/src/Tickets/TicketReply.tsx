@@ -2,6 +2,7 @@
 import { Button, FormGroup, Input } from "reactstrap";
 import { TicketDetails, TicketMessage } from "../types";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   ticket: TicketDetails;
@@ -17,6 +18,7 @@ export const TicketReply = (props: Props) => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   const update = async () => {
     // TODO: validation
 
@@ -31,17 +33,19 @@ export const TicketReply = (props: Props) => {
         body: JSON.stringify(ticketMessage),
       }
     );
-    
+
     setNotification(request, "Saving Reply", "Reply Saved");
 
     const response = await request;
 
     if (response.ok) {
       const data = await response.json();
-      setTicket({ ...ticket, messages: [...ticket.messages, data] });
-      setTicketMessage({
-        message: "",
-      } as TicketMessage);
+      if (getIsMounted()) {
+        setTicket({ ...ticket, messages: [...ticket.messages, data] });
+        setTicketMessage({
+          message: "",
+        } as TicketMessage);
+      }
     }
   };
 

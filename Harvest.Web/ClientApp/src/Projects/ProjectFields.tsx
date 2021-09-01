@@ -4,6 +4,7 @@ import { GeoJSON, MapContainer, TileLayer, Popup } from "react-leaflet";
 import { Project } from "../types";
 import { getBoundingBox } from "../Util/Geography";
 import { LatLngBoundsExpression } from "leaflet";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface ProjectField {
   id: number;
@@ -18,6 +19,7 @@ interface ProjectField {
 export const ProjectFields = () => {
   const [fields, setFields] = useState<ProjectField[]>([]);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const getFields = async () => {
       const response = await fetch("/Project/GetFields");
@@ -25,12 +27,12 @@ export const ProjectFields = () => {
       if (response.ok) {
         const result = await response.json();
         console.log(result);
-        setFields(result);
+        getIsMounted() && setFields(result);
       }
     };
 
     getFields();
-  }, []);
+  }, [getIsMounted]);
 
   const bounds: LatLngBoundsExpression = useMemo(() => {
     const bounds = getBoundingBox(fields.map((f) => f.location));
@@ -60,8 +62,18 @@ export const ProjectFields = () => {
               <div className="tooltip-description">
                 <p>Crops: {field.crop}</p>
                 <p>{field.details}</p>
-                <p>Start Date: {new Intl.DateTimeFormat('en-US').format(new Date(field.project.start))}</p>
-                <p>End Date: {new Intl.DateTimeFormat('en-US').format(new Date(field.project.end))}</p>
+                <p>
+                  Start Date:{" "}
+                  {new Intl.DateTimeFormat("en-US").format(
+                    new Date(field.project.start)
+                  )}
+                </p>
+                <p>
+                  End Date:{" "}
+                  {new Intl.DateTimeFormat("en-US").format(
+                    new Date(field.project.end)
+                  )}
+                </p>
                 <Link to={`/project/details/${field.projectId}`}>
                   Project Details
                 </Link>

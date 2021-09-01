@@ -9,6 +9,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { ticketSchema } from "../schemas";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ValidationError } from "yup";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -26,25 +27,27 @@ export const TicketCreate = () => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
-        setProject(proj);
-        setTicket((t) => ({ ...t, projectId: proj.id }));
+        if (getIsMounted()) {
+          setProject(proj);
+          setTicket((t) => ({ ...t, projectId: proj.id }));
+        }
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
   }
 
-  
   const checkTicketValidity = async (inputs: any) => {
     try {
       await ticketSchema.validate(inputs, { abortEarly: false });
@@ -56,7 +59,6 @@ export const TicketCreate = () => {
   };
 
   const create = async () => {
-
     const ticketErrors = await checkTicketValidity(ticket);
 
     if (ticketErrors) {
@@ -165,17 +167,22 @@ export const TicketCreate = () => {
                 ></FileUpload>
               </FormGroup>
               <ul>
-            {inputErrors.map((error, i) => {
-              return (
-                <li className="text-danger" key={`error-${i}`}>
-                  {error}
-                </li>
-              );
-            })}
-            </ul>
+                {inputErrors.map((error, i) => {
+                  return (
+                    <li className="text-danger" key={`error-${i}`}>
+                      {error}
+                    </li>
+                  );
+                })}
+              </ul>
               <div className="row justify-content-center">
                 <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
-                  <Button className="btn-lg" color="primary" onClick={create} disabled={notification.pending}>
+                  <Button
+                    className="btn-lg"
+                    color="primary"
+                    onClick={create}
+                    disabled={notification.pending}
+                  >
                     Create New Ticket
                   </Button>
                 </ShowFor>

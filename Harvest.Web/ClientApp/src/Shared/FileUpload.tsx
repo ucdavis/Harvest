@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { BlobFile } from "../types";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   disabled?: boolean;
@@ -39,18 +40,20 @@ export const FileUpload = (props: Props) => {
   // TODO: pass uploaded files up to parent.  perhaps allow add/remove
   const [sasUrl, setSasUrl] = useState<string>();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // grab the sas token right away
     const cb = async () => {
       const response = await fetch(`/File/GetUploadDetails`);
 
       if (response.ok) {
-        setSasUrl(await response.text());
+        const url = await response.text();
+        getIsMounted() && setSasUrl(url);
       }
     };
 
     cb();
-  }, []);
+  }, [getIsMounted]);
 
   const filesChanged = (event: React.ChangeEvent<HTMLInputElement>) => {
     const addedFiles = event.target.files;

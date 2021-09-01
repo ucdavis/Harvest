@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Invoice } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
 import { ShowFor } from "../Shared/ShowFor";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   projectId?: string;
@@ -13,18 +14,19 @@ interface Props {
 export const RecentInvoicesContainer = (props: Props) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       // TODO: only fetch first 5 instead of chopping off client-side
       const response = await fetch(`/Project/Invoices/${props.projectId}`);
 
       if (response.ok) {
-        setInvoices(await response.json());
+        getIsMounted() && setInvoices(await response.json());
       }
     };
 
     cb();
-  }, [props.projectId]);
+  }, [props.projectId, getIsMounted]);
 
   return (
     <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>

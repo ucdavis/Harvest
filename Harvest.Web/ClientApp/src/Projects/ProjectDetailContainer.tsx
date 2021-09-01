@@ -12,8 +12,8 @@ import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { ShowFor } from "../Shared/ShowFor";
 import { usePromiseNotification } from "../Util/Notifications";
-import { millisecondsPerDay } from "../Util/Calculations";
 import { ProjectProgress } from "./ProjectProgress";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -25,26 +25,23 @@ export const ProjectDetailContainer = () => {
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
 
   const [notification, setNotification] = usePromiseNotification();
-  const [beyondCloseoutDisplayDate, setBeyondCloseoutDisplayDate] = useState(false);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
-        const project = await response.json() as Project;
-        setProject(project);
-
-        //show Closeout link if we are in last week of or beyond project end 
-        setBeyondCloseoutDisplayDate(new Date().getTime() - new Date(project.end).getTime() >= (7 * millisecondsPerDay));
+        const project = (await response.json()) as Project;
+        getIsMounted() && setProject(project);
       }
     };
 
     if (projectId) {
       cb();
     }
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
@@ -66,10 +63,11 @@ export const ProjectDetailContainer = () => {
 
     if (response.ok) {
       const files = await response.json();
-      setProject({
-        ...project,
-        attachments: [...project.attachments, ...files],
-      });
+      getIsMounted() &&
+        setProject({
+          ...project,
+          attachments: [...project.attachments, ...files],
+        });
     }
   };
 
@@ -114,7 +112,10 @@ export const ProjectDetailContainer = () => {
               </ShowFor>
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
-                condition={project.status === "AwaitingCloseout" || (project.status === "Active" && beyondCloseoutDisplayDate)}
+                condition={
+                  project.status === "AwaitingCloseout" ||
+                  project.status === "Active"
+                }
               >
                 <Link
                   className="btn btn-primary btn-small mr-4"
