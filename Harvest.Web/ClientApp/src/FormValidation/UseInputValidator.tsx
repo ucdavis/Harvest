@@ -1,8 +1,19 @@
-﻿import React, { useState, ChangeEventHandler, ChangeEvent, FocusEvent, useContext, useEffect, useRef } from "react";
-import { useDebounceCallback } from '@react-hook/debounce'
+﻿import React, {
+  useState,
+  ChangeEventHandler,
+  ChangeEvent,
+  FocusEvent,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
+import { useDebounceCallback } from "@react-hook/debounce";
 import { AnyObjectSchema, ValidationError } from "yup";
 
-import { ValidationContext, useOrCreateValidationContext } from "./ValidationProvider";
+import {
+  ValidationContext,
+  useOrCreateValidationContext,
+} from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
 export function useInputValidator<T>(schema: AnyObjectSchema) {
@@ -10,8 +21,16 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
 
   const context = useOrCreateValidationContext(useContext(ValidationContext));
 
-  const { formErrorCount, setFormErrorCount, formIsTouched, setFormIsTouched, formIsDirty,
-    setFormIsDirty, resetContext, contextIsReset } = context;
+  const {
+    formErrorCount,
+    setFormErrorCount,
+    formIsTouched,
+    setFormIsTouched,
+    formIsDirty,
+    setFormIsDirty,
+    resetContext,
+    contextIsReset,
+  } = context;
 
   const [errors, setErrors] = useState({} as Record<TKey, string>);
   const [previousErrors] = usePrevious(errors);
@@ -20,7 +39,9 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
 
   useEffect(() => {
     const errorCount = Object.values(errors).filter(notEmptyOrFalsey).length;
-    const previousErrorCount = Object.values(previousErrors || {} as Record<TKey, string>).filter(notEmptyOrFalsey).length;
+    const previousErrorCount = Object.values(
+      previousErrors || ({} as Record<TKey, string>)
+    ).filter(notEmptyOrFalsey).length;
     if (errorCount !== previousErrorCount) {
       setFormErrorCount(formErrorCount + errorCount - previousErrorCount);
     }
@@ -34,85 +55,92 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     }
   }, [contextIsReset, setTouchedFields, setDirtyFields, setErrors]);
 
-  const validateField = useDebounceCallback(async (name: TKey, value: T[TKey]) => {
-    const tempObject = { [name]: value } as unknown as T;
-    try {
-      await schema.validateAt(name as string, tempObject);
-      if (notEmptyOrFalsey(errors[name])) {
-        setErrors({ ...errors, [name]: "" });
+  const validateField = useDebounceCallback(
+    async (name: TKey, value: T[TKey]) => {
+      const tempObject = ({ [name]: value } as unknown) as T;
+      try {
+        await schema.validateAt(name as string, tempObject);
+        if (notEmptyOrFalsey(errors[name])) {
+          setErrors({ ...errors, [name]: "" });
+        }
+      } catch (e: unknown) {
+        if (typeof e === "string") {
+          setErrors({ ...errors, [name]: e });
+        } else if (e instanceof ValidationError) {
+          setErrors({ ...errors, [name]: e.errors.join(", ") });
+        }
       }
-    } catch (e: unknown) {
-      if (typeof e === "string") {
-        setErrors({ ...errors, [name]: e });
-      } else if (e instanceof ValidationError) {
-        setErrors({ ...errors, [name]: e.errors.join(", ") });
-      }
-    }
-  }, 250);
+    },
+    250
+  );
 
   const getClassName = (name: TKey, passThroughClassNames: string = "") => {
     return notEmptyOrFalsey(errors[name])
       ? `${passThroughClassNames} is-invalid`
       : passThroughClassNames;
-  }
+  };
 
   const InputErrorMessage = ({ name }: { name: TKey }) => {
     const message = errors[name];
 
-    return notEmptyOrFalsey(errors[name])
-      ? <p className="text-danger">{message}</p>
-      : null;
-  }
+    return notEmptyOrFalsey(errors[name]) ? (
+      <p className="text-danger">{message}</p>
+    ) : null;
+  };
 
   const valueChanged = (name: TKey, value: T[TKey]) => {
     validateField(name, value);
   };
 
-  const onChange = (name: TKey, handler: ChangeEventHandler<HTMLInputElement> | null = null) => (e: ChangeEvent<HTMLInputElement>) => {
+  const onChange = (
+    name: TKey,
+    handler: ChangeEventHandler<HTMLInputElement> | null = null
+  ) => (e: ChangeEvent<HTMLInputElement>) => {
     handler && handler(e);
     // If T[TKey] is a number, this doesn't actually convert the string to a number.
     // But yup doesn't seem to mind, and that's what counts.
-    valueChanged(name, e.target.value as unknown as T[TKey]);
+    valueChanged(name, (e.target.value as unknown) as T[TKey]);
     setFormIsDirty(true);
-    if (!dirtyFields.some(f => f === name)) {
+    if (!dirtyFields.some((f) => f === name)) {
       setDirtyFields([...dirtyFields, name]);
     }
   };
 
-  // Typeahead component returns the selected element in the onChange function so 
-  // we have to create an onChnage function that handles that
-  const onChangeTypeahead = (name: TKey, selectedItem: any, handler: (selected: any) => void) => {
-    handler && handler(selectedItem);
+  type InputReturnType = T[TKey] | undefined | string;
+
+  // Some components return the selected element in the onChange function so
+  // we have to create an onChange function that handles that
+  const onChangeValue = (
+    name: TKey,
+    handler: ((value: any) => void) | null = null
+  ) => (value: any) => {
+    handler && handler(value);
     // If T[TKey] is a number, this doesn't actually convert the string to a number.
     // But yup doesn'tx seem to mind, and that's what counts.
-    valueChanged(name, selectedItem[name] as unknown as T[TKey]);
+    valueChanged(name, value as T[TKey]);
     setFormIsDirty(true);
-    if (!dirtyFields.some(f => f === name)) {
+    if (!dirtyFields.some((f) => f === name)) {
       setDirtyFields([...dirtyFields, name]);
     }
   };
 
   const onBlur = (name: TKey) => (e: FocusEvent<HTMLInputElement>) => {
-    setFormIsTouched(true);
-    if (!touchedFields.some(f => f === name)) {
-      setTouchedFields([...touchedFields, name]);
-    }
-    validateField(name, e.target.value as unknown as T[TKey]);
+    onBlurValue(name, e.target.value);
   };
 
-  const onBlurTypeahead = (name: TKey, target: number | undefined) => {
+  const onBlurValue = (name: TKey, value: InputReturnType) => {
     setFormIsTouched(true);
-    if (!touchedFields.some(f => f === name)) {
+    if (!touchedFields.some((f) => f === name)) {
       setTouchedFields([...touchedFields, name]);
     }
-    validateField(name, target as unknown as T[TKey]);
+    validateField(name, value as T[TKey]);
   };
 
-  const fieldIsTouched = (name: TKey) => touchedFields.some(f => f === name);
-  const fieldIsDirty = (name: TKey) => dirtyFields.some(f => f === name);
+  const fieldIsTouched = (name: TKey) => touchedFields.some((f) => f === name);
+  const fieldIsDirty = (name: TKey) => dirtyFields.some((f) => f === name);
   const resetField = (name: TKey) => {
-    setTouchedFields(touchedFields.filter(f => f === name));
-    setDirtyFields(dirtyFields.filter(f => f === name));
+    setTouchedFields(touchedFields.filter((f) => f === name));
+    setDirtyFields(dirtyFields.filter((f) => f === name));
     if (notEmptyOrFalsey(errors[name])) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -124,14 +152,14 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     // update formErrorCount immediately instead of waiting for effect in case the owning component is about to be removed
     setFormErrorCount(formErrorCount - errorCount);
     setErrors({} as Record<TKey, string>);
-  }
+  };
 
   return {
     valueChanged,
     onChange,
-    onChangeTypeahead,
+    onChangeValue,
     onBlur,
-    onBlurTypeahead,
+    onBlurValue,
     InputErrorMessage,
     getClassName,
     formErrorCount,
@@ -142,14 +170,15 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     resetContext,
     resetField,
     resetLocalFields,
-    context
-  }
+    context,
+  };
 }
 
 // provides previous value of given state
-function usePrevious<T>(value: T): [T|undefined] {
+function usePrevious<T>(value: T): [T | undefined] {
   const ref = useRef<T>();
-  useEffect(() => { ref.current = value; });
+  useEffect(() => {
+    ref.current = value;
+  });
   return [ref.current];
 }
-

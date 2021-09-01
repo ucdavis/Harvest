@@ -97,7 +97,7 @@ export interface Expense {
 }
 
 export enum ExpenseQueryParams {
-  ReturnOnSubmit = "returnOnSubmit"
+  ReturnOnSubmit = "returnOnSubmit",
 }
 
 export interface Transfer {
@@ -265,7 +265,9 @@ export interface TicketInput {
   name: string;
   requirements: string;
   attachments: BlobFile[];
+  dueDate?: Date;
 }
+
 export interface TicketDetails {
   id: number;
   projectId: number;

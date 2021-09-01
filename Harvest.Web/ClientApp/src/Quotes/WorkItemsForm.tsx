@@ -46,11 +46,11 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
   const {
     onChange,
-    onChangeTypeahead,
+    onChangeValue,
     InputErrorMessage,
     getClassName,
     onBlur,
-    onBlurTypeahead,
+    onBlurValue,
     resetLocalFields,
   } = useInputValidator<WorkItem>(workItemSchema);
 
@@ -95,9 +95,10 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     (rate) => rate.id === props.workItem.rateId
   );
 
-  const typeaheadChange = (selected: Rate[]) => {
-    if (selected && selected.length === 1) {
-      onChangeTypeahead("id", selected[0], rateItemChanged);
+  const typeaheadChange = (selected: Rate) => {
+    if (selected) {
+      onChangeValue("rateId")(selected.id);
+      rateItemChanged(selected);
     } else {
       // When clearButton is called it calls the onChange function
       props.updateWorkItems({
@@ -110,12 +111,12 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         total: 0,
       });
     }
-  }
+  };
 
   const typeaheadBlur = (e: Event) => {
     if (selectedRate.length === 0) {
       typeaheadRef.current.clear();
-      
+
       props.updateWorkItems({
         ...workItem,
         rateId: 0,
@@ -128,11 +129,9 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     }
 
     const target = e.target as HTMLInputElement;
-    const rate = props.rates.find(
-      (r) => r.description === target.value
-    );
-    onBlurTypeahead("id", rate?.id);
-  }
+    const rate = props.rates.find((r) => r.description === target.value);
+    onBlurValue("rateId", rate?.id);
+  };
 
   return (
     <Row className="activity-line-item">
@@ -147,7 +146,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             labelKey="description"
             options={props.rates}
             selected={selectedRate}
-            onChange={(selected) => typeaheadChange(selected)}
+            onChange={(selected) => typeaheadChange(selected[0])}
             onBlur={(e) => typeaheadBlur(e)}
           />
           <InputErrorMessage name="rateId" />
