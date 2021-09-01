@@ -5,6 +5,7 @@ import { Project, ProjectAccount } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -19,6 +20,7 @@ export const AccountChangeContainer = () => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
@@ -26,12 +28,12 @@ export const AccountChangeContainer = () => {
       if (response.ok) {
         const proj: Project = await response.json();
 
-        setProject(proj);
+        getIsMounted() && setProject(proj);
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   if (project === undefined) {
     return <div>Loading ...</div>;

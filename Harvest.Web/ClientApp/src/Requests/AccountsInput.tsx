@@ -9,6 +9,7 @@ import { ProjectAccount } from "../types";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   accounts: ProjectAccount[];
@@ -27,6 +28,7 @@ export const AccountsInput = (props: Props) => {
 
   const { accounts, setAccounts } = props;
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     let total = 0;
     for (let i = 0; i < accounts.length; i++) {
@@ -43,11 +45,11 @@ export const AccountsInput = (props: Props) => {
 
     if (response.ok) {
       if (response.status === 204) {
-        setSearchResultAccounts([]); // no content
+        getIsMounted() && setSearchResultAccounts([]); // no content
       } else {
         const accountInfo: ProjectAccount = await response.json();
 
-        setSearchResultAccounts([accountInfo]);
+        getIsMounted() && setSearchResultAccounts([accountInfo]);
       }
     }
     setIsSearchLoading(false);
@@ -149,7 +151,7 @@ export const AccountsInput = (props: Props) => {
             <b>{account.number}</b>
             <br />
             <small>{account.name}</small>
-            <br/>
+            <br />
             Account Manager:{" "}
             <a href={`mailto:${account.accountManagerEmail}`}>
               {account.accountManagerName}

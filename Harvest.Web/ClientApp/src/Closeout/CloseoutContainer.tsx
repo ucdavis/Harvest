@@ -10,10 +10,11 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "../Projects/ProjectProgress";
 import { useInputValidator } from "../FormValidation";
-import { roundToTwo } from "../Util/Calculations"
+import { roundToTwo } from "../Util/Calculations";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
 import { finalAcreageExpenseSchema } from "../schemas";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -28,7 +29,10 @@ export const CloseoutContainer = () => {
   const [project, setProject] = useState<Project | undefined>();
   const [newExpenseCount, setNewExpenseCount] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
-  const [finalAcreageExpense, setFinalAcreageExpense] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
+  const [
+    finalAcreageExpense,
+    setFinalAcreageExpense,
+  ] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
   const [closeoutRequested, setCloseoutRequested] = useState(false);
 
@@ -40,20 +44,18 @@ export const CloseoutContainer = () => {
     formErrorCount,
   } = useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
-    let isMounted = true;
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
-      if (isMounted && response.ok) {
+      if (response.ok) {
         const proj: Project = await response.json();
-        isMounted && setProject(proj);
+        getIsMounted() && setProject(proj);
       }
     };
 
     cb();
-
-    return () => { isMounted = false };
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   useEffect(() => {
     if (!project) {
@@ -61,7 +63,9 @@ export const CloseoutContainer = () => {
     }
 
     if (finalAcreageExpense.amount === 0) {
-      setFinalAcreageExpense({ amount: roundToTwo(project.acres * (project.acreageRate.price / 12)) });
+      setFinalAcreageExpense({
+        amount: roundToTwo(project.acres * (project.acreageRate.price / 12)),
+      });
     }
   }, [project, finalAcreageExpense, setFinalAcreageExpense]);
 
@@ -72,13 +76,16 @@ export const CloseoutContainer = () => {
   }, [closeoutRequested, history, projectId]);
 
   const addAcreageExpense = async () => {
-    const request = fetch(`/Expense/CreateAcreage/${projectId}?amount=${finalAcreageExpense.amount}`, {
-      method: "POST"
-    });
+    const request = fetch(
+      `/Expense/CreateAcreage/${projectId}?amount=${finalAcreageExpense.amount}`,
+      {
+        method: "POST",
+      }
+    );
     setNotification(request, "Adding Acreage Expense", "Acreage Expense Added");
     const response = await request;
     if (response.ok) {
-      setNewExpenseCount(newExpenseCount + 1);
+      getIsMounted() && setNewExpenseCount(newExpenseCount + 1);
     }
   };
 
@@ -87,31 +94,40 @@ export const CloseoutContainer = () => {
     message: (
       <ul>
         <li>Generates a final invoice if there are any unbilled expenses</li>
-        <li>Sets project status to either Completed or CloseoutPending based on whether there are any pending invoices</li>
-      </ul>)
+        <li>
+          Sets project status to either Completed or CloseoutPending based on
+          whether there are any pending invoices
+        </li>
+      </ul>
+    ),
   });
 
   const closeoutProject = async () => {
-    if (!await getConfirmation()) {
+    if (!(await getConfirmation())) {
       return;
     }
 
     const request = fetch(`/Invoice/DoCloseout/${projectId}`, {
-      method: "POST"
+      method: "POST",
     });
 
-    setNotification(request, "Closing Out Project", async (response: Response) => {
-      const result = await response.json() as Result<number>;
-      setCloseoutRequested(true);
-      return result.message;
-    });
-  }
+    setNotification(
+      request,
+      "Closing Out Project",
+      async (response: Response) => {
+        const result = (await response.json()) as Result<number>;
+        getIsMounted() && setCloseoutRequested(true);
+        return result.message;
+      }
+    );
+  };
 
   if (project === undefined) {
     return <div>Loading ...</div>;
   }
 
-  const canCloseout = project.status === "AwaitingCloseout" || project.status === "Active";
+  const canCloseout =
+    project.status === "AwaitingCloseout" || project.status === "Active";
 
   return (
     <div className="card-wrapper">
@@ -126,23 +142,32 @@ export const CloseoutContainer = () => {
               <h2>Prepare final invoice for project closeout</h2>
               <div className="row">
                 <div className="col-md-8">
-                  <Label for="amount">Final Acreage Expense (defaults to monthly)</Label>
+                  <Label for="amount">
+                    Final Acreage Expense (defaults to monthly)
+                  </Label>
                   <Input
                     className={getClassName("amount")}
                     type="number"
                     id="amount"
                     value={finalAcreageExpense.amount}
-                    onChange={onChange("amount", (e) => setFinalAcreageExpense({ amount: parseFloat(e.target.value) }))}
+                    onChange={onChange("amount", (e) =>
+                      setFinalAcreageExpense({
+                        amount: parseFloat(e.target.value),
+                      })
+                    )}
                     onBlur={onBlur("amount")}
                   />
                   <InputErrorMessage name="amount" />
                 </div>
                 <div className="col-md-4">
-                  <Button color="primary" disabled={notification.pending || formErrorCount > 0} onClick={addAcreageExpense}>
+                  <Button
+                    color="primary"
+                    disabled={notification.pending || formErrorCount > 0}
+                    onClick={addAcreageExpense}
+                  >
                     Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
                   </Button>
                 </div>
-
               </div>
             </div>
             <div className="col-md-6">
@@ -161,16 +186,21 @@ export const CloseoutContainer = () => {
       <div className="card-content card-green-bg">
         <div className="row">
           <div className="col text-right">
-            <Button id="CloseoutButton" color="primary" disabled={!canCloseout || notification.pending} onClick={closeoutProject}>
+            <Button
+              id="CloseoutButton"
+              color="primary"
+              disabled={!canCloseout || notification.pending}
+              onClick={closeoutProject}
+            >
               Closeout Project <FontAwesomeIcon icon={faCheck} />
             </Button>
             <ShowFor condition={!canCloseout}>
               {/* Not sure if there's a better way to handle indicators as to why something is disabled */}
-              <UncontrolledTooltip target="CloseoutButton" >
-                Project is not awaiting closeout, and it doesn't have an end date that falls within the last seven days or later.
+              <UncontrolledTooltip target="CloseoutButton">
+                Project is not awaiting closeout, and it doesn't have an end
+                date that falls within the last seven days or later.
               </UncontrolledTooltip>
             </ShowFor>
-
           </div>
         </div>
       </div>

@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 
 import { Project } from "../types";
 import { ProjectTable } from "./ProjectTable";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
-  projectSource: string
+  projectSource: string;
 }
 
 const getListTitle = (projectSource: string) => {
@@ -18,23 +19,24 @@ const getListTitle = (projectSource: string) => {
     default:
       return "Projects";
   }
-}
+};
 
 export const ProjectListContainer = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>([]);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await fetch(props.projectSource);
 
       if (response.ok) {
-        setProjects(await response.json());
+        getIsMounted() && setProjects(await response.json());
       }
     };
 
     cb();
-  }, [props.projectSource]);
+  }, [props.projectSource, getIsMounted]);
 
   return (
     <div>

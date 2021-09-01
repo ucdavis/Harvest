@@ -2,20 +2,24 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Project } from "../types";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 export const SupervisorHome = () => {
   const [projects, setProjects] = useState<Project[]>();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // get info on projects requiring approval
     const getProjects = async () => {
       const response = await fetch("/project/RequiringManagerAttention");
-      const projects: Project[] = await response.json();
-      setProjects(projects);
+      if (getIsMounted()) {
+        const projects: Project[] = await response.json();
+        getIsMounted() && setProjects(projects);
+      }
     };
 
     getProjects();
-  }, []);
+  }, [getIsMounted]);
 
   return (
     <>

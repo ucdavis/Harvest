@@ -3,19 +3,23 @@ import { Link } from "react-router-dom";
 
 import { Project } from "../types";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 export const PIHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWaitingForMe = async () => {
       const response = await fetch("/project/RequiringPIAttention");
-      const projects: Project[] = await response.json();
-      setProjects(projects);
+      if (getIsMounted()) {
+        const projects: Project[] = await response.json();
+        getIsMounted() && setProjects(projects);
+      }
     };
 
     getProjectsWaitingForMe();
-  }, []);
+  }, [getIsMounted]);
 
   return (
     <>

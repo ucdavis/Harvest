@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { User } from "../types";
 
@@ -13,6 +14,7 @@ export const SearchPerson = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<User[]>([]);
 
+  const getIsMounted = useIsMounted();
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
@@ -20,14 +22,14 @@ export const SearchPerson = (props: Props) => {
 
     if (response.ok) {
       if (response.status === 204) {
-        setUsers([]); // no content means no match
+        getIsMounted() && setUsers([]); // no content means no match
       } else {
         const user: User = await response.json();
 
-        setUsers([user]);
+        getIsMounted() && setUsers([user]);
       }
     }
-    setIsSearchLoading(false);
+    getIsMounted() && setIsSearchLoading(false);
   };
 
   const onSelect = (selected: User[]) => {

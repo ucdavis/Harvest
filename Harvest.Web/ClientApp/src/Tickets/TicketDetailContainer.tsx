@@ -9,6 +9,7 @@ import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
 import { TicketReply } from "./TicketReply";
 import { Button } from "reactstrap";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId: string;
@@ -23,18 +24,19 @@ export const TicketDetailContainer = () => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
-        setProject(proj);
+        getIsMounted() && setProject(proj);
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   useEffect(() => {
     const cb = async () => {
@@ -42,12 +44,12 @@ export const TicketDetailContainer = () => {
 
       if (response.ok) {
         const tick: TicketDetails = await response.json();
-        setTicket(tick);
+        getIsMounted() && setTicket(tick);
       }
     };
 
     cb();
-  }, [ticketId, projectId]);
+  }, [ticketId, projectId, getIsMounted]);
 
   if (project === undefined || ticket === undefined) {
     return <div>Loading...</div>;
@@ -65,7 +67,7 @@ export const TicketDetailContainer = () => {
       }
     );
     setNotification(request, "Closing Ticket", "Ticket Closed");
- 
+
     const response = await request;
 
     if (response.ok) {
@@ -144,7 +146,9 @@ export const TicketDetailContainer = () => {
               <TicketAttachments
                 ticket={ticket}
                 projectId={projectId}
-                setTicket={(ticket: TicketDetails) => setTicket(ticket)}
+                setTicket={(ticket: TicketDetails) =>
+                  getIsMounted() && setTicket(ticket)
+                }
                 attachments={ticket.attachments}
               />
               <hr />
@@ -153,7 +157,9 @@ export const TicketDetailContainer = () => {
               <TicketReply
                 ticket={ticket}
                 projectId={projectId}
-                setTicket={(ticket: TicketDetails) => setTicket(ticket)}
+                setTicket={(ticket: TicketDetails) =>
+                  getIsMounted() && setTicket(ticket)
+                }
               />
             </div>
           </div>

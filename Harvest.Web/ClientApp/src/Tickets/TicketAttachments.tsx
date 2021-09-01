@@ -5,6 +5,7 @@ import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   ticket: TicketDetails;
@@ -25,6 +26,7 @@ export const TicketAttachments = (props: Props) => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = fetch(
       `/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
@@ -43,10 +45,11 @@ export const TicketAttachments = (props: Props) => {
 
     if (response.ok) {
       const data = (await response.json()) as TicketAttachment[];
+      if (getIsMounted()) {
+        setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
 
-      setTicket({ ...ticket, attachments: [...ticket.attachments, ...data] });
-
-      setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
+        setTicketLoc((ticket) => ({ ...ticket, newAttachments: [] }));
+      }
     }
   };
 

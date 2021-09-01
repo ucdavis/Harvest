@@ -2,19 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Project } from "../types";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 export const WorkerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
       const response = await fetch("/expense/GetRecentExpensedProjects");
-      const projects: Project[] = await response.json();
-      setProjects(projects);
+      if (getIsMounted()) {
+        const projects: Project[] = await response.json();
+        getIsMounted() && setProjects(projects);
+      }
     };
 
     getProjectsWithRecentExpenses();
-  }, []);
+  }, [getIsMounted]);
 
   return (
     <>

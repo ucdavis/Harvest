@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketTable } from "./TicketTable";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -13,30 +14,31 @@ export const TicketsContainer = () => {
   const [project, setProject] = useState<Project>();
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(`/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
-        setProject(proj);
+        getIsMounted() && setProject(proj);
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(`/Ticket/GetList?projectId=${projectId}`);
 
       if (response.ok) {
-        setTickets(await response.json());
+        getIsMounted() && setTickets(await response.json());
       }
     };
 
     cb();
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   if (project === undefined || tickets === undefined) {
     return <div>Loading...</div>;

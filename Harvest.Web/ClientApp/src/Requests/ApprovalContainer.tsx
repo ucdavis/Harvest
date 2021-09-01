@@ -13,6 +13,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -27,6 +28,7 @@ export const ApprovalContainer = () => {
 
   const [notification, setNotification] = usePromiseNotification();
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
@@ -34,7 +36,7 @@ export const ApprovalContainer = () => {
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
 
-        setProjectAndQuote(projectWithQuote);
+        getIsMounted() && setProjectAndQuote(projectWithQuote);
 
         // can only approve pendingApproval projects
         if (projectWithQuote.project.status !== "PendingApproval") {
@@ -44,7 +46,7 @@ export const ApprovalContainer = () => {
     };
 
     cb();
-  }, [history, projectId]);
+  }, [history, projectId, getIsMounted]);
 
   const approve = async () => {
     const model = { accounts };

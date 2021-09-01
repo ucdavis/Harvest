@@ -1,6 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Activity, Expense, Rate, WorkItemImpl, ExpenseQueryParams } from "../types";
+import {
+  Activity,
+  Expense,
+  Rate,
+  WorkItemImpl,
+  ExpenseQueryParams,
+} from "../types";
 import { ProjectSelection } from "./ProjectSelection";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button } from "reactstrap";
@@ -10,11 +16,15 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { usePromiseNotification } from "../Util/Notifications";
 import AppContext from "../Shared/AppContext";
 
-import { useOrCreateValidationContext, ValidationProvider } from "../FormValidation";
+import {
+  useOrCreateValidationContext,
+  ValidationProvider,
+} from "../FormValidation";
 import { workItemSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import * as yup from "yup";
 import { useQuery } from "../Shared/UseQuery";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -51,10 +61,9 @@ export const ExpenseEntryContainer = () => {
   const [notification, setNotification] = usePromiseNotification();
 
   const query = useQuery();
+  const getIsMounted = useIsMounted();
 
   useEffect(() => {
-    let isMounted = true;
-
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await fetch("/Rate/Active");
@@ -62,20 +71,14 @@ export const ExpenseEntryContainer = () => {
       if (response.ok) {
         const rates: Rate[] = await response.json();
 
-        setRates(rates);
+        getIsMounted() && setRates(rates);
 
         // create default activity
       }
     };
-    
-    if (isMounted){
-      cb();
-    }
 
-    // This runs useEffect's cleanup function where isMounted is set to false
-    // That way, no API calls can be made when the component unmounts
-    return () => { isMounted = false }; 
-  }, []);
+    cb();
+  }, [getIsMounted]);
 
   const changeProject = (projectId: number) => {
     // want to go to /expense/entry/[projectId]
@@ -86,11 +89,13 @@ export const ExpenseEntryContainer = () => {
     // TODO: some sort of full screen processing UI
 
     const workItems = activities.flatMap((activity) =>
-      activity.workItems.filter(w => w.rateId !== 0 && w.total > 0));
+      activity.workItems.filter((w) => w.rateId !== 0 && w.total > 0)
+    );
 
-    const errors = workItems.length === 0
-      ? ["No expenses were completed"]
-      : await checkValidity(workItems, yup.array().of(workItemSchema));
+    const errors =
+      workItems.length === 0
+        ? ["No expenses were completed"]
+        : await checkValidity(workItems, yup.array().of(workItemSchema));
     setInputErrors(errors);
     if (errors.length > 0) {
       return;
@@ -187,8 +192,12 @@ export const ExpenseEntryContainer = () => {
               <ActivityForm
                 key={`activity-${activity.id}`}
                 activity={activity}
-                updateActivity={(activity: Activity) => updateActivity(activity)}
-                deleteActivity={(activity: Activity) => deleteActivity(activity)}
+                updateActivity={(activity: Activity) =>
+                  updateActivity(activity)
+                }
+                deleteActivity={(activity: Activity) =>
+                  deleteActivity(activity)
+                }
                 rates={rates}
               />
             ))}
@@ -197,26 +206,30 @@ export const ExpenseEntryContainer = () => {
             Add Activity <FontAwesomeIcon icon={faPlus} />
           </Button>
         </div>
-        {inputErrors.length > 0 && <div className="card-content">
-          <ul>
-            {inputErrors.map((error, i) => {
-              return (
-                <li className="text-danger" key={`error-${i}`}>
-                  {error}
-                </li>
-              );
-            })}
-          </ul>
-        </div>}
+        {inputErrors.length > 0 && (
+          <div className="card-content">
+            <ul>
+              {inputErrors.map((error, i) => {
+                return (
+                  <li className="text-danger" key={`error-${i}`}>
+                    {error}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
         <div className="card-content">
           <div className="col">
             <button
               className="btn btn-primary btn-lg"
               onClick={submit}
-              disabled={notification.pending || !isValid() || context.formErrorCount > 0}
+              disabled={
+                notification.pending || !isValid() || context.formErrorCount > 0
+              }
             >
               Submit Expense
-          </button>
+            </button>
           </div>
         </div>
       </div>

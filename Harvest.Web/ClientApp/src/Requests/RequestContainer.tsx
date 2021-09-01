@@ -12,6 +12,7 @@ import { Project, CropType } from "../types";
 import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface RouteParams {
   projectId?: string;
@@ -41,6 +42,7 @@ export const RequestContainer = () => {
     }
   };
 
+  const getIsMounted = useIsMounted();
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
@@ -48,19 +50,20 @@ export const RequestContainer = () => {
 
       if (response.ok) {
         const proj: Project = await response.json();
-        setProject({
-          ...proj,
-          start: new Date(proj.start),
-          end: new Date(proj.end),
-          requirements: `Original: ${proj.requirements}`,
-        });
+        getIsMounted() &&
+          setProject({
+            ...proj,
+            start: new Date(proj.start),
+            end: new Date(proj.end),
+            requirements: `Original: ${proj.requirements}`,
+          });
       }
     };
 
     if (projectId !== undefined) {
       cb();
     }
-  }, [projectId]);
+  }, [projectId, getIsMounted]);
 
   const create = async () => {
     // TODO: validation, loading spinner
@@ -97,12 +100,15 @@ export const RequestContainer = () => {
       body: JSON.stringify(project),
     });
 
-      if (project.principalInvestigator.iam !== userDetail.iam) {
-          setNotification(request, `Creating Request For ${project.principalInvestigator.name}`, `Request Created For ${project.principalInvestigator.name}`);
-      } else {
-          setNotification(request, "Creating Request", "Request Created");
-      }
-    
+    if (project.principalInvestigator.iam !== userDetail.iam) {
+      setNotification(
+        request,
+        `Creating Request For ${project.principalInvestigator.name}`,
+        `Request Created For ${project.principalInvestigator.name}`
+      );
+    } else {
+      setNotification(request, "Creating Request", "Request Created");
+    }
 
     const response = await request;
 
@@ -114,13 +120,12 @@ export const RequestContainer = () => {
       ) {
         userRoles.push("PI");
       }
-        const data = await response.json();
-        if (data.principalInvestigator.id !== data.createdBy.id) {
-            
-            history.push('/');
-        } else {
-            history.push(`/Project/Details/${data.id}`);
-        }
+      const data = await response.json();
+      if (data.principalInvestigator.id !== data.createdBy.id) {
+        history.push("/");
+      } else {
+        history.push(`/Project/Details/${data.id}`);
+      }
     }
   };
 
@@ -129,7 +134,7 @@ export const RequestContainer = () => {
   };
 
   var isFilledIn = useMemo(() => {
-      return project.start && project.end && project.crop && project.requirements;
+    return project.start && project.end && project.crop && project.requirements;
   }, [project.start, project.end, project.crop, project.requirements]);
 
   if (projectId !== undefined && project.id === 0) {

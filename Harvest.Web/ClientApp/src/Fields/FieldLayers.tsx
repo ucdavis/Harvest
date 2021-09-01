@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { LayersControl, GeoJSON, Popup, LayerGroup } from "react-leaflet";
 import { Field, Project } from "../types";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   project: Project;
@@ -8,6 +9,7 @@ interface Props {
 
 export const FieldLayers = (props: Props) => {
   const [fields, setFields] = useState<Field[]>([]);
+  const getIsMounted = useIsMounted();
 
   // load fields for active projects
   useEffect(() => {
@@ -21,12 +23,12 @@ export const FieldLayers = (props: Props) => {
 
       if (activeFieldResponse.ok) {
         const activeFields: Field[] = await activeFieldResponse.json();
-        setFields(activeFields);
+        getIsMounted() && setFields(activeFields);
       }
     };
 
     cb();
-  }, [props.project.end, props.project.start]);
+  }, [props.project.end, props.project.start, getIsMounted]);
 
   if (fields.length === 0) {
     return null;
