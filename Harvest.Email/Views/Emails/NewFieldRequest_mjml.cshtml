@@ -3,28 +3,67 @@
 
 @{
     ViewData["EmailTitle"] = "Testing";
-    Layout = "_EmailLayout_mjml";
+    Layout = "_EmailLayout_mjml_new";
 }
 
 
-<mj-section>
-    <mj-column>
-        <mj-text align="center">
-            <h1>New Field Request</h1>
-
-            <p><strong>PI: </strong>@@Model.PI</p>
-            <p><strong>Request: </strong>@@Model.ProjectName</p>
-            <p><strong>Project Start: </strong>@@Model.ProjectStart</p>
-            <p><strong>Project End: </strong>@@Model.ProjectEnd</p>
-            <p><strong>Crop Type: </strong>@@Model.CropType</p>
-            <p><strong>Crops: </strong>@@Model.Crops</p>
-            <h3>Requirements</h3>
-            <p>@@Model.Requirements</p>
+<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="100%" vertical-align="top">
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
+            <p>New Field Request</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="24px" color="rgba(31,31,31,0.8)">
+            @@Model.PI
         </mj-text>
 
     </mj-column>
 </mj-section>
 
+@await Html.PartialAsync("_EmailButton_mjml", new EmailButtonModel("Click Here to go to the Project", "@Model.ButtonUrl"))
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>@@Model.ProjectName</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
+            <p><b>Project Start</b></p>
+            <p>@@Model.ProjectStart</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
+            <p><b>Project End</b></p>
+            <p>@@Model.ProjectEnd</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
+            <p><b>Crop Type</b></p>
+            <p>@@Model.CropType</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
+            <p><b>Crops</b></p>
+            <p>@@Model.Crops</p>
+        </mj-text>
+    </mj-column>
+
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>Requirements</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
+            <p>@@Model.Requirements</p>
+        </mj-text>
+
+    </mj-column>
+
+</mj-section>
 
 
-@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to go to the Project", "@Model.ButtonUrl"))
+
+
+
