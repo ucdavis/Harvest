@@ -34,8 +34,6 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-
-
             var model = new NewFieldRequestModel();
 
 
