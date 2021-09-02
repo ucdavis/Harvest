@@ -10,12 +10,12 @@ export const TicketMessages = (props: Props) => {
 
   return (
     <div>
-        <h2>Conversation</h2>
-        {ticketMessages === undefined || ticketMessages.length === 0 ? (
-        <p> No Messages Yet!!!</p>
+      <h2>Conversation</h2>
+      {ticketMessages === undefined || ticketMessages.length === 0 ? (
+        <p> No Messages Yet</p>
       ) : null}
-        {ticketMessages.map((ticketMessage) => (
-            <p key={`message-${ticketMessage.id}`}>
+      {ticketMessages.map((ticketMessage) => (
+        <p key={`message-${ticketMessage.id}`}>
           {ticketMessage.message} from {ticketMessage.createdBy?.name}
         </p>
       ))}
