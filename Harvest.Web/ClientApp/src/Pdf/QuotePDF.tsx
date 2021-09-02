@@ -51,7 +51,8 @@ export const QuotePDF = (props: Props) => (
         <Text style={styles.acerage}>
           {" "}
           {props.quote.acreageRateDescription}: {props.quote.acres} @{" "}
-          {formatCurrency(props.quote.acreageRate)} = $
+          {formatCurrency(props.quote.acreageRate)} * {props.quote.years}{" "}
+          {props.quote.years > 1 ? "years" : "year"} = $
           {formatCurrency(props.quote.acreageTotal)}
         </Text>
       </View>
