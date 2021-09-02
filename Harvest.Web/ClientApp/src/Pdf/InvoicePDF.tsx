@@ -99,7 +99,7 @@ export const InvoicePDF = (props: Props) => {
         <TotalSection
           acreageTotal={acreageTotal}
           laborTotal={laborTotal}
-          equipmentTotal={laborTotal}
+          equipmentTotal={equipmentTotal}
           otherTotal={otherTotal}
           grandTotal={grandTotal}
         />
