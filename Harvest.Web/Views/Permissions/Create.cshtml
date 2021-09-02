@@ -3,15 +3,10 @@
 @{
     ViewBag.Title = "Add User Roles";
 }
-
-<div class="card">
-    <div class="card-header-primary">
-        <div class="card-head">
-            <h2>Add Member to Role</h2>
-        </div>
-    </div>
-    <div class="card-content col-lg-4">
-        <form asp-action="Create">
+<div class="card-wrapper col-md-6">
+    <div class="card-content">
+        <h2>Add Member to Role</h2>
+            <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="RoleId" class="control-label"></label>
@@ -29,6 +24,7 @@
         </form>
     </div>
 </div>
+
 
 @section Scripts
 { 

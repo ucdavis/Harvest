@@ -1,3 +1,19 @@
+.alert-info {
+  background-color: #ebf1ee;
+  color: $primary-color;
+  border-color: transparentize($primary-color, 0.5);
+  i {
+    color: $primary-color;
+  }
+}
+.alert-danger {
+  background-color: transparentize($secondary-color, 0.88);
+  color: $secondary-color;
+  border-color: transparentize($secondary-color, 0.5);
+  i {
+    color: $secondary-color;
+  }
+}
 .btn {
   font-family: $sans-bold;
   font-size: 1.2rem;

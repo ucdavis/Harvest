@@ -37,6 +37,7 @@ export const ProjectSelection = (props: Props) => {
   return (
     <div className="card-wrapper">
       <div className="card-content">
+        <h2>Choose a project to view it's expenses</h2>
         <FormGroup>
           <Input
             type="select"
