@@ -35,9 +35,6 @@
             @Html.DisplayNameFor(model => model.Price)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EffectiveOn)
-        </th>
-        <th>
             @Html.DisplayNameFor(model => model.CreatedOn)
         </th>
         <th>
@@ -66,9 +63,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @item.EffectiveOn.ToPacificTime().Format("d")
             </td>
             <td>
                 @item.CreatedOn.ToPacificTime().Format("d")
