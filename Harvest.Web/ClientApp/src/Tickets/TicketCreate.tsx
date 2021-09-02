@@ -34,6 +34,7 @@ export const TicketCreate = () => {
     onBlur,
     onBlurValue,
     formErrorCount,
+    formIsTouched
   } = useInputValidator(ticketSchema, ticket);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -135,7 +136,7 @@ export const TicketCreate = () => {
                   name="text"
                   id="requirements"
                   value={ticket.requirements}
-                  className={getClassName("name")}
+                  className={getClassName("requirements")}
                   onChange={onChange("requirements", (e) =>
                     setTicket({ ...ticket, requirements: e.target.value })
                   )}
@@ -189,22 +190,13 @@ export const TicketCreate = () => {
                   }
                 ></FileUpload>
               </FormGroup>
-              <ul>
-                {inputErrors.map((error, i) => {
-                  return (
-                    <li className="text-danger" key={`error-${i}`}>
-                      {error}
-                    </li>
-                  );
-                })}
-              </ul>
               <div className="row justify-content-center">
                 <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
                   <Button
                     className="btn-lg"
                     color="primary"
                     onClick={create}
-                    disabled={notification.pending || formErrorCount > 0}
+                    disabled={notification.pending || formErrorCount > 0 || !formIsTouched}
                   >
                     Create New Ticket
                   </Button>
