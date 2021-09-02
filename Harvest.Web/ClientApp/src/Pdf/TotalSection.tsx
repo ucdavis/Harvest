@@ -54,7 +54,7 @@ export const TotalSection = (props: Props) => (
         <Text style={styles.col}>${formatCurrency(props.laborTotal)}</Text>
       </View>
     )}
-    {props.otherTotal > 0 && (
+    {props.equipmentTotal > 0 && (
       <View style={styles.row}>
         <Text style={styles.col}>Equipment</Text>
         <Text style={styles.col}>${formatCurrency(props.equipmentTotal)}</Text>
