@@ -52,7 +52,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     onBlur,
     onBlurValue,
     resetLocalFields,
-  } = useInputValidator<WorkItem>(workItemSchema);
+  } = useInputValidator(workItemSchema, props.workItem);
 
   const rateItemChanged = (selected: Rate) => {
     const rateId = selected.id;

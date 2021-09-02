@@ -31,14 +31,15 @@ export const QuoteContainer = () => {
   const [project, setProject] = useState<Project>();
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
-  const { formErrorCount, context } = useInputValidator<QuoteContent>(
-    quoteContentSchema
-  );
-
   // TODO: set with in-progress quote details if they exist
   // For now, we just always initialize an empty quote
   const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
   const [rates, setRates] = useState<Rate[]>([]);
+
+  const { formErrorCount, context } = useInputValidator(
+    quoteContentSchema,
+    quote
+  );
 
   const [editFields, setEditFields] = useState(false);
 

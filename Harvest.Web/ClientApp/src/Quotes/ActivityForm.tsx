@@ -39,7 +39,7 @@ export const ActivityForm = (props: Props) => {
     getClassName,
     onBlur,
     resetLocalFields,
-  } = useInputValidator<Activity>(activitySchema);
+  } = useInputValidator(activitySchema, props.activity);
 
   const updateWorkItems = (workItem: WorkItem) => {
     // TODO: can we get away without needing to spread copy?  do we need to totally splice/replace?
@@ -92,7 +92,7 @@ export const ActivityForm = (props: Props) => {
   };
 
   return (
-    <div className="card-wrapper mb-4 no-green" style={{overflow: "visible"}}>
+    <div className="card-wrapper mb-4 no-green" style={{ overflow: "visible" }}>
       <div className="card-content">
         <div className="row justify-content-between align-items-end">
           <div className="col-md-12">

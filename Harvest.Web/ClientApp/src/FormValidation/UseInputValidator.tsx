@@ -16,8 +16,17 @@ import {
 } from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
-export function useInputValidator<T>(schema: AnyObjectSchema) {
+export function useInputValidator<T>(
+  schema: AnyObjectSchema,
+  obj: T | null = null
+) {
   type TKey = keyof T;
+
+  // maintain an internal copy of obj so that compex property validations have access to other properties
+  const [values, setValues] = useState(obj ? { ...obj } : ({} as T));
+  useEffect(() => {
+    setValues(obj ? { ...obj } : ({} as T));
+  }, [obj, setValues]);
 
   const context = useOrCreateValidationContext(useContext(ValidationContext));
 
@@ -57,9 +66,10 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
 
   const validateField = useDebounceCallback(
     async (name: TKey, value: T[TKey]) => {
-      const tempObject = ({ [name]: value } as unknown) as T;
+      const newValues = ({ ...values, [name]: value } as unknown) as T;
+      setValues(newValues);
       try {
-        await schema.validateAt(name as string, tempObject);
+        await schema.validateAt(name as string, newValues);
         if (notEmptyOrFalsey(errors[name])) {
           setErrors({ ...errors, [name]: "" });
         }

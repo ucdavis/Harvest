@@ -34,7 +34,7 @@ export const TicketCreate = () => {
     onBlur,
     onBlurValue,
     formErrorCount,
-  } = useInputValidator<TicketInput>(ticketSchema);
+  } = useInputValidator(ticketSchema, ticket);
 
   const [notification, setNotification] = usePromiseNotification();
 
