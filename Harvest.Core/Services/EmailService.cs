@@ -201,9 +201,10 @@ namespace Harvest.Core.Services
         {
             return await QuoteDecision(project, reason, false);
         }
-
+        [Obsolete("This was not implemented. If it is, the email has to be updated with new style.")]
         public async Task<bool> ApproveAccounts(Project project, string[] emails)
         {
+            throw new NotImplementedException();
             var url = $"{_emailSettings.BaseUrl}/Project/AccountApproval/";
 
             var model = new AccountPendingApprovalModel()
