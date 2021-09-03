@@ -25,7 +25,7 @@ const fakeAttachments: BlobFile[] = [
     fileSize: 22,
     contentType: "application/pdf",
     uploaded: true,
-    sasLink: "link1"
+    sasLink: "link1",
   },
   {
     identifier: "1",
@@ -33,9 +33,9 @@ const fakeAttachments: BlobFile[] = [
     fileSize: 22,
     contentType: "application/pdf",
     uploaded: true,
-    sasLink: "link2"
+    sasLink: "link2",
   },
-]
+];
 
 export const fakeAppContext: AppContextShape = {
   user: {
@@ -80,7 +80,7 @@ export const fakeProject: Project = {
     unit: "",
     type: "Acreage",
     description: "",
-  }
+  },
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -118,7 +118,7 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       unit: "",
       type: "Acreage",
       description: "",
-    }
+    },
   },
   quote: null,
 };
@@ -163,7 +163,7 @@ export const fakeTickets: Ticket[] = [
     updatedOn: new Date("2021-04-15T00:00:00"),
     attachments: [],
     status: "Requested",
-    createdOn: new Date("2021-01-15T00:00:00")
+    createdOn: new Date("2021-01-15T00:00:00"),
   },
   {
     id: 2,
@@ -174,7 +174,7 @@ export const fakeTickets: Ticket[] = [
     updatedOn: new Date("2021-04-15T00:00:00"),
     attachments: [],
     status: "Requested",
-    createdOn: new Date("2021-01-15T00:00:00")
+    createdOn: new Date("2021-01-15T00:00:00"),
   },
   {
     id: 3,
@@ -185,8 +185,8 @@ export const fakeTickets: Ticket[] = [
     updatedOn: new Date("2021-04-15T00:00:00"),
     attachments: [],
     status: "Requested",
-    createdOn: new Date("2021-01-15T00:00:00")
-  }
+    createdOn: new Date("2021-01-15T00:00:00"),
+  },
 ];
 
 export const sampleRates: Rate[] = [

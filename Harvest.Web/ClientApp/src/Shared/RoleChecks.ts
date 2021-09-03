@@ -12,12 +12,14 @@ export const useRoleChecks = () => {
   );
 
   const hasAccessForRoles = useCallback(
-    (roles: RoleName[]) => userRoles.some((role) => roles.includes(role)) || userRoles.includes("System"),
+    (roles: RoleName[]) =>
+      userRoles.some((role) => roles.includes(role)) ||
+      userRoles.includes("System"),
     [userRoles]
   );
 
   return {
     anyMatchingRoles,
-    hasAccessForRoles
+    hasAccessForRoles,
   };
-}
+};

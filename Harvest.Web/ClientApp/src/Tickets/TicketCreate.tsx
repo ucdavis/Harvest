@@ -34,7 +34,7 @@ export const TicketCreate = () => {
     onBlur,
     onBlurValue,
     formErrorCount,
-    formIsTouched
+    formIsTouched,
   } = useInputValidator(ticketSchema, ticket);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -196,7 +196,11 @@ export const TicketCreate = () => {
                     className="btn-lg"
                     color="primary"
                     onClick={create}
-                    disabled={notification.pending || formErrorCount > 0 || !formIsTouched}
+                    disabled={
+                      notification.pending ||
+                      formErrorCount > 0 ||
+                      !formIsTouched
+                    }
                   >
                     Create New Ticket
                   </Button>

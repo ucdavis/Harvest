@@ -51,7 +51,9 @@ export const ActivitiesContainer = (props: Props) => {
         <ActivityForm
           key={`activity-${activity.id}`}
           activity={activity}
-          duplicateActivity={(activity: Activity) => duplicateActivity(activity)}
+          duplicateActivity={(activity: Activity) =>
+            duplicateActivity(activity)
+          }
           updateActivity={(activity: Activity) => updateActivity(activity)}
           deleteActivity={(activity: Activity) => deleteActivity(activity)}
           rates={props.rates}

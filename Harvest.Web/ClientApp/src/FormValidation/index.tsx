@@ -1,3 +1,2 @@
 ﻿export * from "./ValidationProvider";
-export * from "./UseInputValidator"
-
+export * from "./UseInputValidator";

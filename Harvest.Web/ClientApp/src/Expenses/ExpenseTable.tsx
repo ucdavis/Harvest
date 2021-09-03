@@ -34,7 +34,8 @@ export const ExpenseTable = (props: Props) => {
       },
       {
         Header: "Markup",
-        accessor: (row) => row.type === "Other" ? (row.markup ? "Yes" : "No") : "N/A",
+        accessor: (row) =>
+          row.type === "Other" ? (row.markup ? "Yes" : "No") : "N/A",
       },
       {
         Header: "Quantity",

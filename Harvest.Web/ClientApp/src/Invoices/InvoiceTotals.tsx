@@ -10,10 +10,18 @@ interface Props {
 
 export const InvoiceTotals = (props: Props) => {
   const { invoice } = props;
-  const acreageTotal = invoice.expenses.filter((expense) => expense.type === "Acreage").reduce((a, b) => a + b.total, 0);
-  const laborTotal = invoice.expenses.filter((expense) => expense.type === "Labor").reduce((a, b) => a + b.total, 0);
-  const equipmentTotal = invoice.expenses.filter((expense) => expense.type === "Equipment").reduce((a, b) => a + b.total, 0);
-  const otherTotal = invoice.expenses.filter((expense) => expense.type === "Other").reduce((a, b) => a + b.total, 0);
+  const acreageTotal = invoice.expenses
+    .filter((expense) => expense.type === "Acreage")
+    .reduce((a, b) => a + b.total, 0);
+  const laborTotal = invoice.expenses
+    .filter((expense) => expense.type === "Labor")
+    .reduce((a, b) => a + b.total, 0);
+  const equipmentTotal = invoice.expenses
+    .filter((expense) => expense.type === "Equipment")
+    .reduce((a, b) => a + b.total, 0);
+  const otherTotal = invoice.expenses
+    .filter((expense) => expense.type === "Other")
+    .reduce((a, b) => a + b.total, 0);
   const grandTotal = acreageTotal + laborTotal + equipmentTotal + otherTotal;
 
   return (

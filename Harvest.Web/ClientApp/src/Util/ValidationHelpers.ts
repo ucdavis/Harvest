@@ -8,7 +8,11 @@ export interface ValidateOptions {
   context?: object;
 }
 
-export async function checkValidity<T extends object>(value: T, schema: AnySchema, options?: ValidateOptions): Promise<string[]> {
+export async function checkValidity<T extends object>(
+  value: T,
+  schema: AnySchema,
+  options?: ValidateOptions
+): Promise<string[]> {
   try {
     await schema.validate(value, options || { abortEarly: false });
   } catch (err) {
@@ -17,4 +21,4 @@ export async function checkValidity<T extends object>(value: T, schema: AnySchem
     }
   }
   return [];
-};
+}

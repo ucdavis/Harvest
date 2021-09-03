@@ -7,7 +7,7 @@ interface Bounds {
   yMax: number;
 }
 export const getBoundingBox = (polygons: GeoJSON.Polygon[]) => {
-  const bounds: Bounds = { } as Bounds;
+  const bounds: Bounds = {} as Bounds;
 
   for (let i = 0; i < polygons.length; i++) {
     const coordinates = polygons[i].coordinates;

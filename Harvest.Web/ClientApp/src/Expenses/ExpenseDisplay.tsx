@@ -27,7 +27,12 @@ export const ExpenseDisplay = (props: Props) => {
                 <tr key={`item-${expense.id}`}>
                   <td>{expense.description}</td>
                   <td>{expense.quantity}</td>
-                  <td>{expense.rate && `(${expense.rate.unit}) $${formatCurrency(expense.rate.price)}`} </td>
+                  <td>
+                    {expense.rate &&
+                      `(${expense.rate.unit}) $${formatCurrency(
+                        expense.rate.price
+                      )}`}{" "}
+                  </td>
                   <td>${formatCurrency(expense.total)}</td>
                 </tr>
               ))}

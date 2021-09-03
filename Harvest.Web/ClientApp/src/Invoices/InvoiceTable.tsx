@@ -16,7 +16,7 @@ export const InvoiceTable = (props: Props) => {
       {
         Cell: (data: Cell<Invoice>) => (
           <div>
-                  <a href={`/invoice/details/${data.row.original.id}`}>
+            <a href={`/invoice/details/${data.row.original.id}`}>
               #{data.row.original.id}
             </a>
           </div>
@@ -26,11 +26,11 @@ export const InvoiceTable = (props: Props) => {
       },
       {
         Header: "Status",
-          accessor: (row) => row.status,
+        accessor: (row) => row.status,
       },
-        {
+      {
         Header: "Created",
-            accessor: (row) => new Date(row.createdOn).toLocaleDateString(),
+        accessor: (row) => new Date(row.createdOn).toLocaleDateString(),
       },
       {
         Header: "Total",
@@ -45,7 +45,7 @@ export const InvoiceTable = (props: Props) => {
   );
 
   const initialState: Partial<TableState<any>> = {
-      sortBy: [{ id: "name" }],
+    sortBy: [{ id: "name" }],
     pageSize: ReactTableUtil.getPageSize(),
   };
 
