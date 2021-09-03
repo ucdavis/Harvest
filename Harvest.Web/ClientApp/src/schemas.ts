@@ -42,7 +42,10 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
 });
 
 export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
-  name: yup.string().required(ErrorMessages.TicketSubjectRequired).max(50, ErrorMessages.TicketSubjectMaxLength),
+  name: yup
+    .string()
+    .required(ErrorMessages.TicketSubjectRequired)
+    .max(50, ErrorMessages.TicketSubjectMaxLength),
   requirements: yup.string().required(ErrorMessages.TicketDetailsRequired),
   attachments: yup.array().of(fileSchema),
   dueDate: yup.date().optional(),
