@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Project, ProjectAccount } from "../types";
 import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
 
@@ -10,12 +10,12 @@ interface Props {
 export const ProjectHeader = (props: Props) => {
   const { project, title } = props;
   const [modal, setModal] = useState<boolean>(false);
-  const toggleModal = () => setModal(!modal);
+  const toggleModal = () => setModal((modal) => !modal);
 
   // Function to show a truncated version of project.requirements if the
   // character count is above 256
-  const projectReqs = (requirements: string) => {
-    if (requirements.length > 256) {
+  const projectReqs = useMemo(() => {
+    if (project.requirements.length > 256) {
       return (
         <p>
           {`${project.requirements.substring(0, 256)} ...`}
@@ -25,9 +25,9 @@ export const ProjectHeader = (props: Props) => {
         </p>
       );
     } else {
-      return <p>{requirements}</p>;
+      return <p>{project.requirements}</p>;
     }
-  };
+  }, [project.requirements]);
 
   return (
     <div className="card-content project-header">
@@ -48,7 +48,7 @@ export const ProjectHeader = (props: Props) => {
             </div>
           ))}
           <p className="lede">Requirements</p>
-          {projectReqs(project.requirements)}
+          {projectReqs}
           <Modal isOpen={modal} toggle={toggleModal}>
             <ModalBody>{project.requirements}</ModalBody>
             <ModalFooter>
