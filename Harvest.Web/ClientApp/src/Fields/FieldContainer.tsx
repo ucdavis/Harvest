@@ -5,7 +5,7 @@ import {
   TileLayer,
   Popup,
   GeoJSON,
-  FeatureGroup
+  FeatureGroup,
 } from "react-leaflet";
 
 // TODO: if we need to customize leaflet directly
