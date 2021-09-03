@@ -6,28 +6,62 @@
     Layout = "_EmailLayout_mjml";
 }
 
-
-<mj-section>
-    <mj-column>
-        <mj-text align="center">
-            <h1>Project @@Model.ProjectName</h1>
-            <h2>New Ticket</h2>
-
-            <p><strong>PI: </strong>@@Model.PI</p>
-            <p><strong>Created On: </strong>@@Model.CreatedOn</p>
-            <p><strong>Subject: </strong>@@Model.Subject</p>
-            <p><strong>DueDate: </strong>@@Model.DueDate</p>
-            <h3>Requirements</h3>
-            <p>@@Model.Requirements</p>
+<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="100%" vertical-align="top">
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
+            <p>New Ticket</p>
         </mj-text>
-
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="24px" color="rgba(31,31,31,0.8)">
+            @@Model.PI
+        </mj-text>
     </mj-column>
 </mj-section>
 
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#EBF1EE" border-top="1px solid #DEEEFF" border-bottom="1px solid #DEEEFF" padding-bottom="0px" padding-top="0px">
+    <mj-column width="50%" vertical-align="top">
+        <mj-text align="center" font-size="18px" line-height="1.5" color="#000000" padding-right="25px" padding-bottom="0px" padding-top="0">
 
-<mj-section background-color="#b2c72c" padding-bottom="20px" padding-top="20px">
-    <mj-column>
-        <mj-button background-color="#352CC7" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="@@Model.ButtonUrlForTicket" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">Click Here to go to the Ticket</mj-button>
-        <mj-button background-color="#352CC7" color="#FFF" font-size="14px" align="center" font-weight="bold" border="none" padding="15px 30px" border-radius="10px" href="@@Model.ButtonUrlForProject" font-family="Helvetica" padding-left="25px" padding-right="25px" padding-bottom="12px">Click Here to go to the Project</mj-button>
+        </mj-text>
+        <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle" border="none" padding="15px 30px" border-radius="3px" href="@@Model.ButtonUrlForTicket" padding-left="25px" padding-right="25px" padding-bottom="10px">@@Model.ButtonTicketText</mj-button>
+    </mj-column>
+    <mj-column width="50%" vertical-align="top">
+        <mj-text align="center" font-size="18px" line-height="1.5" color="#000000" padding-right="25px" padding-bottom="0px" padding-top="0">
+
+        </mj-text>
+        <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle" border="none" padding="15px 30px" border-radius="3px" href="@@Model.ButtonUrlForProject" padding-left="25px" padding-right="25px" padding-bottom="10px">@@Model.ButtonProjectText</mj-button>
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="10px" padding-top="5px">
+    <mj-column width="90%" vertical-align="top" border-bottom="1px solid #c7c8cc">
+        <mj-text padding-top="20px" padding-left="0px" padding-bottom="0px">
+            <h4>Notification Details</h4>
+        </mj-text>
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>@@Model.ProjectName</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Created On", "@Model.CreatedOn"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Subject", "@Model.Subject"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("DueDate", "@Model.DueDate"))
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>Requirements</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
+            <p>@@Model.Requirements</p>
+        </mj-text>
     </mj-column>
 </mj-section>

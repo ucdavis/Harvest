@@ -1,20 +1,21 @@
-import * as React from 'react';
-import { Row, HeaderGroup } from 'react-table';
+import * as React from "react";
+import { Row, HeaderGroup } from "react-table";
 
 // Define a default UI for filtering
 export const GlobalFilter = ({
   preGlobalFilteredRows,
   globalFilter,
-  setGlobalFilter
+  setGlobalFilter,
 }: any) => {
   const count = preGlobalFilteredRows.length;
 
   return (
     <span>
-      Search:{' '}
-      <input className="form-control"
-        value={globalFilter || ''}
-        onChange={e => {
+      Search:{" "}
+      <input
+        className="form-control"
+        value={globalFilter || ""}
+        onChange={(e) => {
           setGlobalFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
         }}
         placeholder={`${count} records...`}
@@ -27,21 +28,21 @@ export const GlobalFilter = ({
 export const DefaultColumnFilter = ({
   column: { filterValue, preFilteredRows, setFilter },
 }: any) => {
-
   return (
-    <input className="form-control"
-      value={filterValue || ''}
-      onChange={e => {
-        setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
+    <input
+      className="form-control"
+      value={filterValue || ""}
+      onChange={(e) => {
+        setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
       }}
     />
-  )
-}
+  );
+};
 
 // This is a custom filter UI for selecting
 // a unique option from a list
 export const SelectColumnFilter = ({
-  column: { filterValue, setFilter, preFilteredRows, id }
+  column: { filterValue, setFilter, preFilteredRows, id },
 }: any) => {
   // Calculate the options for filtering
   // using the preFilteredRows
@@ -55,13 +56,14 @@ export const SelectColumnFilter = ({
 
   // Render a multi-select box
   return (
-    <select className="form-control"
+    <select
+      className="form-control"
       value={filterValue}
-      onChange={e => {
+      onChange={(e) => {
         setFilter(e.target.value || undefined);
       }}
     >
-      <option value=''>All</option>
+      <option value="">All</option>
       {options.map((option: any, i: number) => (
         <option key={i} value={option}>
           {option}
@@ -74,14 +76,14 @@ export const SelectColumnFilter = ({
 export const ColumnFilterHeaders = ({ headerGroups }: any) => {
   return headerGroups.map(
     (headerGroup: HeaderGroup) =>
-      !!headerGroup.headers.some(header => !!header.Filter) && (
+      !!headerGroup.headers.some((header) => !!header.Filter) && (
         <tr {...headerGroup.getHeaderGroupProps()}>
-          {headerGroup.headers.map(column => (
+          {headerGroup.headers.map((column) => (
             <th {...column.getHeaderProps()}>
               {/* Render the columns filter UI */}
               <div>
                 {column.canFilter && !!column.Filter
-                  ? column.render('Filter')
+                  ? column.render("Filter")
                   : null}
               </div>
             </th>

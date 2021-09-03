@@ -18,6 +18,8 @@ namespace Harvest.Email.Models
         public string Requirements { get; set; }
         public string ButtonUrlForQuote { get; set; }
         public string ButtonUrlForProject { get; set; }
-        
+        public string ButtonProjectText { get; set; } = "View Project";
+        public string ButtonQuoteText { get; set; } = "View Quote";
+
     }
 }
