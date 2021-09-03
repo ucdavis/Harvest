@@ -1,12 +1,21 @@
-﻿import React, { useState, ChangeEventHandler, ChangeEvent, FocusEvent, useContext, useEffect, useRef } from "react";
+﻿﻿import React, { useState, ChangeEventHandler, ChangeEvent, FocusEvent, useContext, useEffect, useRef } from "react";
 import { useDebounceCallback } from '@react-hook/debounce'
 import { AnyObjectSchema, ValidationError } from "yup";
 
 import { ValidationContext, useOrCreateValidationContext } from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
-export function useInputValidator<T>(schema: AnyObjectSchema) {
+export function useInputValidator<T>(
+  schema: AnyObjectSchema,
+  obj: T | null = null
+) {
   type TKey = keyof T;
+
+  // maintain an internal copy of obj so that compex property validations have access to other properties
+  const [values, setValues] = useState(obj ? { ...obj } : ({} as T));
+  useEffect(() => {
+    setValues(obj ? { ...obj } : ({} as T));
+  }, [obj, setValues]);
 
   const context = useOrCreateValidationContext(useContext(ValidationContext));
 
@@ -35,9 +44,10 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   }, [contextIsReset, setTouchedFields, setDirtyFields, setErrors]);
 
   const validateField = useDebounceCallback(async (name: TKey, value: T[TKey]) => {
-    const tempObject = { [name]: value } as unknown as T;
+    const newValues = ({ ...values, [name]: value } as unknown) as T;
+    setValues(newValues);
     try {
-      await schema.validateAt(name as string, tempObject);
+      await schema.validateAt(name as string, newValues);
       if (notEmptyOrFalsey(errors[name])) {
         setErrors({ ...errors, [name]: "" });
       }
@@ -79,33 +89,32 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
     }
   };
 
-  // Typeahead component returns the selected element in the onChange function so 
-  // we have to create an onChnage function that handles that
-  const onChangeTypeahead = (name: TKey, selectedItem: any, handler: (selected: any) => void) => {
-    handler && handler(selectedItem);
+  // Some components return the selected element in the onChange function so
+  // we have to create an onChange function that handles that
+  const onChangeValue = (
+    name: TKey,
+    handler: ((value: any) => void) | null = null
+  ) => (value: any) => {
+    handler && handler(value);
     // If T[TKey] is a number, this doesn't actually convert the string to a number.
     // But yup doesn'tx seem to mind, and that's what counts.
-    valueChanged(name, selectedItem[name] as unknown as T[TKey]);
+    valueChanged(name, value as T[TKey]);
     setFormIsDirty(true);
-    if (!dirtyFields.some(f => f === name)) {
+    if (!dirtyFields.some((f) => f === name)) {
       setDirtyFields([...dirtyFields, name]);
     }
   };
 
   const onBlur = (name: TKey) => (e: FocusEvent<HTMLInputElement>) => {
-    setFormIsTouched(true);
-    if (!touchedFields.some(f => f === name)) {
-      setTouchedFields([...touchedFields, name]);
-    }
-    validateField(name, e.target.value as unknown as T[TKey]);
+    onBlurValue(name, e.target.value);
   };
 
-  const onBlurTypeahead = (name: TKey, target: number | undefined) => {
+  const onBlurValue = (name: TKey, value: T[TKey] | undefined | string) => {
     setFormIsTouched(true);
-    if (!touchedFields.some(f => f === name)) {
+    if (!touchedFields.some((f) => f === name)) {
       setTouchedFields([...touchedFields, name]);
     }
-    validateField(name, target as unknown as T[TKey]);
+    validateField(name, value as T[TKey]);
   };
 
   const fieldIsTouched = (name: TKey) => touchedFields.some(f => f === name);
@@ -129,9 +138,9 @@ export function useInputValidator<T>(schema: AnyObjectSchema) {
   return {
     valueChanged,
     onChange,
-    onChangeTypeahead,
+    onChangeValue,
     onBlur,
-    onBlurTypeahead,
+    onBlurValue,
     InputErrorMessage,
     getClassName,
     formErrorCount,
@@ -152,4 +161,3 @@ function usePrevious<T>(value: T): [T|undefined] {
   useEffect(() => { ref.current = value; });
   return [ref.current];
 }
-

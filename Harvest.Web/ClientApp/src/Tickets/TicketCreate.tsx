@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Project, Ticket } from "../types";
+import { Project, Ticket, TicketInput } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -10,6 +10,7 @@ import { ticketSchema } from "../schemas";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ValidationError } from "yup";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { useInputValidator } from "../FormValidation/UseInputValidator";
 
 interface RouteParams {
   projectId?: string;
@@ -24,6 +25,17 @@ export const TicketCreate = () => {
     name: "",
   } as Ticket);
   const history = useHistory();
+
+  const {
+    onChange,
+    onChangeValue,
+    InputErrorMessage,
+    getClassName,
+    onBlur,
+    onBlurValue,
+    formErrorCount,
+    formIsTouched
+  } = useInputValidator(ticketSchema, ticket);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -107,11 +119,14 @@ export const TicketCreate = () => {
                   name="name"
                   id="name"
                   value={ticket.name}
-                  onChange={(e) =>
+                  className={getClassName("name")}
+                  onChange={onChange("name", (e) =>
                     setTicket({ ...ticket, name: e.target.value })
-                  }
+                  )}
+                  onBlur={onBlur("name")}
                   placeholder="Enter a short description for this request"
                 />
+                <InputErrorMessage name="name" />
               </FormGroup>
 
               <FormGroup>
@@ -121,27 +136,36 @@ export const TicketCreate = () => {
                   name="text"
                   id="requirements"
                   value={ticket.requirements}
-                  onChange={(e) =>
+                  className={getClassName("requirements")}
+                  onChange={onChange("requirements", (e) =>
                     setTicket({ ...ticket, requirements: e.target.value })
-                  }
+                  )}
+                  onBlur={onBlur("requirements")}
                   placeholder="Enter a full description of your requirements"
                 />
+                <InputErrorMessage name="requirements" />
               </FormGroup>
               <div className="row">
                 <div className="col-md-6">
                   <div className="form-group">
                     <Label>Due Date?</Label>
-                    <div className="input-group" style={{ zIndex: 9000 }}>
+                    <div
+                      className="input-group"
+                      style={{ zIndex: 9000 }}
+                      //DatePicker doesn't expose an onBlur property, so placing this on parent element
+                      onBlur={() => onBlurValue("dueDate", ticket.dueDate)}
+                    >
                       <DatePicker
                         format="MM/dd/yyyy"
                         required={false}
                         clearIcon={null}
                         value={ticket.dueDate}
-                        onChange={(date) =>
+                        onChange={onChangeValue("dueDate", (date) =>
                           setTicket({ ...ticket, dueDate: date as Date })
-                        }
+                        )}
                       />
                     </div>
+                    <InputErrorMessage name="dueDate" />
                   </div>
                 </div>
               </div>
@@ -166,22 +190,13 @@ export const TicketCreate = () => {
                   }
                 ></FileUpload>
               </FormGroup>
-              <ul>
-                {inputErrors.map((error, i) => {
-                  return (
-                    <li className="text-danger" key={`error-${i}`}>
-                      {error}
-                    </li>
-                  );
-                })}
-              </ul>
               <div className="row justify-content-center">
                 <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
                   <Button
                     className="btn-lg"
                     color="primary"
                     onClick={create}
-                    disabled={notification.pending}
+                    disabled={notification.pending || formErrorCount > 0 || !formIsTouched}
                   >
                     Create New Ticket
                   </Button>

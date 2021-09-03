@@ -22,7 +22,7 @@ export const ProjectDetail = (props: Props) => {
     InputErrorMessage,
     getClassName,
     onBlur,
-  } = useInputValidator<QuoteContent>(quoteContentSchema);
+  } = useInputValidator(quoteContentSchema, props.quote);
 
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {

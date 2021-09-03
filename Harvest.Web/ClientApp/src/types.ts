@@ -265,6 +265,7 @@ export interface TicketInput {
   name: string;
   requirements: string;
   attachments: BlobFile[];
+  dueDate?: Date;
 }
 export interface TicketDetails {
   id: number;
@@ -330,4 +331,4 @@ export interface Result<T> {
   value: T;
   isError: boolean;
   message: string;
-}
+} 

@@ -39,8 +39,9 @@ export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
 export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
   name: yup.string().required(ErrorMessages.TicketSubjectRequired),
   requirements: yup.string().required(ErrorMessages.TicketDetailsRequired),
-  attachments: yup.array().of(fileSchema)
-}); 
+  attachments: yup.array().of(fileSchema),
+  dueDate: yup.date().optional(),
+});
 
 export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   id: yup.number().required().default(0),
