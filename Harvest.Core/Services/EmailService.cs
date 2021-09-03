@@ -399,6 +399,7 @@ namespace Harvest.Core.Services
                     Subject = ticket.Name,
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
                     ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
+                    From = closedBy.NameAndEmail,
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/TicketClosed.cshtml", model);
                 var textVersion = "Ticket Has been closed.";
