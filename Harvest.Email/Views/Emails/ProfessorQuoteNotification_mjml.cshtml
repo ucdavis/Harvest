@@ -12,12 +12,12 @@
             <p>Quote ready for review</p>
         </mj-text>
         <mj-text padding-top="0px" padding-bottom="0px" font-size="24px" color="rgba(31,31,31,0.8)">
-            Hello @@Model.ProfName
+            Hello @@Model.ProfName 
         </mj-text>
     </mj-column>
 </mj-section>
 
-@await Html.PartialAsync("_EmailButton_mjml", new EmailButtonModel("Click Here to go to the Quote", "@Model.ButtonUrl"))
+@await Html.PartialAsync("_EmailButton_mjml", new EmailButtonModel("@Model.ButtonQuoteText", "@Model.ButtonUrl"))
 
 <mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="10px" padding-top="5px">
     <mj-column width="90%" vertical-align="top" border-bottom="1px solid #c7c8cc">
