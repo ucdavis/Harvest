@@ -42,31 +42,33 @@ export const TotalSection = (props: Props) => (
   // This section displays the project total
   <View style={styles.projectTotal}>
     <Text style={styles.projectTotalTitle}>Project Totals</Text>
-    <View style={styles.row}>
-      <Text style={styles.col}>Acreage Fees</Text>
-      <Text style={styles.col}>
-        ${formatCurrency(props.acreageTotal)}
-      </Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.col}>Labor</Text>
-      <Text style={styles.col}>${formatCurrency(props.laborTotal)}</Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.col}>Equipment</Text>
-      <Text style={styles.col}>
-        ${formatCurrency(props.equipmentTotal)}
-      </Text>
-    </View>
-    <View style={styles.row}>
-      <Text style={styles.col}>Materials / Other</Text>
-      <Text style={styles.col}>${formatCurrency(props.otherTotal)}</Text>
-    </View>
+    {props.acreageTotal > 0 && (
+      <View style={styles.row}>
+        <Text style={styles.col}>Acreage Fees</Text>
+        <Text style={styles.col}>${formatCurrency(props.acreageTotal)}</Text>
+      </View>
+    )}
+    {props.laborTotal > 0 && (
+      <View style={styles.row}>
+        <Text style={styles.col}>Labor</Text>
+        <Text style={styles.col}>${formatCurrency(props.laborTotal)}</Text>
+      </View>
+    )}
+    {props.equipmentTotal > 0 && (
+      <View style={styles.row}>
+        <Text style={styles.col}>Equipment</Text>
+        <Text style={styles.col}>${formatCurrency(props.equipmentTotal)}</Text>
+      </View>
+    )}
+    {props.otherTotal > 0 && (
+      <View style={styles.row}>
+        <Text style={styles.col}>Materials / Other</Text>
+        <Text style={styles.col}>${formatCurrency(props.otherTotal)}</Text>
+      </View>
+    )}
     <View style={styles.row}>
       <Text style={styles.totalCost}>Total Cost</Text>
-      <Text style={styles.totalCost}>
-        ${formatCurrency(props.grandTotal)}
-      </Text>
+      <Text style={styles.totalCost}>${formatCurrency(props.grandTotal)}</Text>
     </View>
   </View>
 );

@@ -46,48 +46,52 @@ export const TableSection = (props: Props) => (
         data = props.tableItem.expenses.filter((w) => w.type === type);
       }
 
-      // Used react-pdf-table to display a table in the pdf
-      // Used the data attribute to display data in the DataTableCell instead
-      // of manually rendering it with map
-      return (
-        <Table key={`${type}-table`} data={data}>
-          <TableHeader>
-            <TableCell style={styles.tableHeader}>{type}</TableCell>
-            <TableCell style={styles.tableHeader}>Quantity</TableCell>
-            <TableCell style={styles.tableHeader}>Rate</TableCell>
-            <TableCell style={styles.tableHeader}>Total</TableCell>
-          </TableHeader>
-          <TableBody>
-            <DataTableCell
-              style={styles.tableCell}
-              getContent={(workItem) => workItem.description}
-            />
-            <DataTableCell
-              style={styles.tableCell}
-              getContent={(workItem) => workItem.quantity}
-            />
-            <DataTableCell
-              style={styles.tableCell}
-              getContent={(workItem) => {
-                if ("workItems" in props.tableItem) {
-                  return workItem.rate;
-                } else {
-                  return (
-                    workItem.rate &&
-                    `(${workItem.rate.unit}) $${formatCurrency(
-                      workItem.rate.price
-                    )}`
-                  );
-                }
-              }}
-            />
-            <DataTableCell
-              style={styles.tableCell}
-              getContent={(workItem) => formatCurrency(workItem.total)}
-            />
-          </TableBody>
-        </Table>
-      );
+      if (data.length > 0) {
+        // Used react-pdf-table to display a table in the pdf
+        // Used the data attribute to display data in the DataTableCell instead
+        // of manually rendering it with map
+        return (
+          <Table key={`${type}-table`} data={data}>
+            <TableHeader>
+              <TableCell style={styles.tableHeader}>{type}</TableCell>
+              <TableCell style={styles.tableHeader}>Quantity</TableCell>
+              <TableCell style={styles.tableHeader}>Rate</TableCell>
+              <TableCell style={styles.tableHeader}>Total</TableCell>
+            </TableHeader>
+            <TableBody>
+              <DataTableCell
+                style={styles.tableCell}
+                getContent={(workItem) => workItem.description}
+              />
+              <DataTableCell
+                style={styles.tableCell}
+                getContent={(workItem) => workItem.quantity}
+              />
+              <DataTableCell
+                style={styles.tableCell}
+                getContent={(workItem) => {
+                  if ("workItems" in props.tableItem) {
+                    return workItem.rate;
+                  } else {
+                    return (
+                      workItem.rate &&
+                      `(${workItem.rate.unit}) $${formatCurrency(
+                        workItem.rate.price
+                      )}`
+                    );
+                  }
+                }}
+              />
+              <DataTableCell
+                style={styles.tableCell}
+                getContent={(workItem) => formatCurrency(workItem.total)}
+              />
+            </TableBody>
+          </Table>
+        );
+      } else {
+        return null;
+      }
     })}
   </View>
 );
