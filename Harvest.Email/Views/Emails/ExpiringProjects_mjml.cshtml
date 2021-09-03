@@ -6,14 +6,29 @@
     Layout = "_EmailLayout_mjml";
 }
 
-
-<mj-section>
-    <mj-column>
-        <mj-text align="center">
-            <h1>Expiring/Expired Projects to be closed out.</h1>
-            <p>Project(s) awaiting final billing review and ready to be closed out:</p>
-
+<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="100%" vertical-align="top">
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
+            <p>Expiring/Expired Projects to be closed out</p>
         </mj-text>
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="10px" padding-top="5px">
+    <mj-column width="90%" vertical-align="top" border-bottom="1px solid #c7c8cc">
+        <mj-text padding-top="20px" padding-left="0px" padding-bottom="0px">
+            <h4>Notification Details</h4>
+        </mj-text>
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>Project(s) awaiting final billing review:</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
         <mj-table>
             <tr style="border-bottom:1px solid #ecedee;text-align:left;padding:15px 0;">
                 <th style="padding: 0 15px 0 0;">Name</th>
@@ -23,8 +38,8 @@
             @@foreach (var item in Model)
             {
                 <tr>
-                <td style="padding: 0 15px 0 0;">@@item.Name</td>
-                <td style="padding: 0 15px;">@@item.EndDate</td>
+                    <td style="padding: 0 15px 0 0;">@@item.Name</td>
+                    <td style="padding: 0 15px;">@@item.EndDate</td>
                     <td style="padding: 0 0 0 15px;">
                         <a href="@@item.ProjectUrl">Project Details</a>
                     </td>
@@ -32,6 +47,8 @@
             }
         </mj-table>
     </mj-column>
+
 </mj-section>
+
 
 
