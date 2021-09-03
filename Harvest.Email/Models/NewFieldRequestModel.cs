@@ -17,5 +17,6 @@ namespace Harvest.Email.Models
         public string Crops { get; set; }
         public string Requirements { get; set; }
         public string ButtonUrl { get; set; }
+        public string ButtonProjectText { get; set; } = "View Project";
     }
 }
