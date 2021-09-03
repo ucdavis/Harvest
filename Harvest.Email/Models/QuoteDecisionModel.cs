@@ -19,6 +19,8 @@ namespace Harvest.Email.Models
 
         public string RejectReason { get; set; }
 
+        public string ButtonProjectText { get; set; } = "View Project";
+
         public class Colors
         {
             public const string Approved = "#266041";
