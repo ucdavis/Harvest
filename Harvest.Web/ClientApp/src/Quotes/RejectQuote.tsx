@@ -16,29 +16,32 @@ export const RejectQuote = (props: Props) => {
 
   const [notification, setNotification] = usePromiseNotification();
 
-  const [getConfirmation] = useConfirmationDialog({
-    title: "RejectQuote",
-    message: (
-      <div className="form-group">
-        <label htmlFor="fieldName">Reason</label>
-        <textarea
-          className="form-control"
-          id="fieldName"
-          rows={3}
-          required
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-        />
-        <small id="fieldNameHelp" className="form-text text-muted">
-          Let us know what issues you have with this quote.
-        </small>
-      </div>
-    ),
-    canConfirm: notEmptyOrFalsey(reason) && !notification.pending
-  }, [reason, setReason, notification.pending]);
+  const [getConfirmation] = useConfirmationDialog(
+    {
+      title: "RejectQuote",
+      message: (
+        <div className="form-group">
+          <label htmlFor="fieldName">Reason</label>
+          <textarea
+            className="form-control"
+            id="fieldName"
+            rows={3}
+            required
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+          <small id="fieldNameHelp" className="form-text text-muted">
+            Let us know what issues you have with this quote.
+          </small>
+        </div>
+      ),
+      canConfirm: notEmptyOrFalsey(reason) && !notification.pending,
+    },
+    [reason, setReason, notification.pending]
+  );
 
   const reject = async () => {
-    if (!await getConfirmation()) {
+    if (!(await getConfirmation())) {
       return;
     }
 

@@ -111,7 +111,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         total: 0,
       });
     }
-  }
+  };
 
   const typeaheadBlur = (e: Event) => {
     if (selectedRate.length === 0) {
@@ -129,9 +129,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     }
 
     const target = e.target as HTMLInputElement;
-    const rate = props.rates.find(
-      (r) => r.description === target.value
-    );
+    const rate = props.rates.find((r) => r.description === target.value);
     onBlurValue("rateId", rate?.id);
   };
 

@@ -97,7 +97,7 @@ export interface Expense {
 }
 
 export enum ExpenseQueryParams {
-  ReturnOnSubmit = "returnOnSubmit"
+  ReturnOnSubmit = "returnOnSubmit",
 }
 
 export interface Transfer {
@@ -331,4 +331,4 @@ export interface Result<T> {
   value: T;
   isError: boolean;
   message: string;
-} 
+}
