@@ -92,7 +92,7 @@ export const ActivityForm = (props: Props) => {
   };
 
   return (
-    <div className="card-wrapper mb-4 no-green" style={{ overflow: "visible" }}>
+    <div className="card-wrapper mb-4 no-green" style={{overflow: "visible"}}>
       <div className="card-content">
         <div className="row justify-content-between align-items-end">
           <div className="col-md-12">
