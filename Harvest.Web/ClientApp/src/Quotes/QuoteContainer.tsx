@@ -20,6 +20,7 @@ import { useInputValidator, ValidationProvider } from "../FormValidation";
 import { quoteContentSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { ShowFor } from "../Shared/ShowFor";
 
 interface RouteParams {
   projectId?: string;
@@ -285,22 +286,34 @@ export const QuoteContainer = () => {
               </ul>
             </div>
             <div className="row justify-content-center">
-              <button
-                className="btn btn-link mt-4"
-                onClick={() => save(false)}
-                disabled={notification.pending || formErrorCount > 0}
-              >
-                Save Quote
-              </button>
-              <button
-                className="btn btn-primary mt-4"
-                onClick={() => save(true)}
-                disabled={
-                  notification.pending || !isValid() || formErrorCount > 0
-                }
-              >
-                Submit Quote
-              </button>
+              {/* Supervisor can only see save option, so it becomes a primary button.  FM can do both save and submit */}
+              <ShowFor roles={["Supervisor"]}>
+                <button
+                  className="btn btn-primary mt-4"
+                  onClick={() => save(false)}
+                  disabled={notification.pending || formErrorCount > 0}
+                >
+                  Save Quote
+                </button>
+              </ShowFor>
+              <ShowFor roles={["FieldManager"]}>
+                <button
+                  className="btn btn-link mt-4"
+                  onClick={() => save(false)}
+                  disabled={notification.pending || formErrorCount > 0}
+                >
+                  Save Quote
+                </button>
+                <button
+                  className="btn btn-primary mt-4"
+                  onClick={() => save(true)}
+                  disabled={
+                    notification.pending || !isValid() || formErrorCount > 0
+                  }
+                >
+                  Submit Quote
+                </button>
+              </ShowFor>
             </div>
           </div>
         </div>

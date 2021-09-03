@@ -50,9 +50,13 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
         [HttpPost]
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
         {
+            // only FM is allowed to submit a quote, anyone with access can save
+            if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess)) { return Unauthorized(); }
+
             // Use existing quote if it exists, otherwise create new one
             var quote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).SingleOrDefaultAsync();
 
