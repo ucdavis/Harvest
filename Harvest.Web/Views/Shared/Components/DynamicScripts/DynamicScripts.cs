@@ -47,10 +47,13 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
                 }
             }
 
+            // Get all the chunk files
+            var chunks = files.Where(f => Regex.IsMatch(f.Name, "^[0-9]*\\..*\\.chunk\\.js$")).Select(f => f.Name);
+
             var scripts = new List<string>();
 
-            // read the 2.*.chunk.js files (maybe there is always just one?)
-            scripts.AddRange(files.Where(f => Regex.IsMatch(f.Name, "^.*2\\..*\\.chunk\\.js$")).Select(f => f.Name));
+            // read the 3.*.chunk.js files (maybe there is always just one?)
+            scripts.AddRange(chunks.Where(c => c.StartsWith("3")));
 
             // now add in main.*.chunk.js
             scripts.AddRange(files.Where(f => Regex.IsMatch(f.Name, "^.*main\\..*\\.chunk\\.js$")).Select(f => f.Name));
