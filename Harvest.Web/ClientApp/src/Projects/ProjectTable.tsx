@@ -7,6 +7,7 @@ import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { convertCamelCase } from "../Util/ConvertCamelCase";
 
 interface Props {
   projects: Project[];
@@ -73,13 +74,7 @@ export const ProjectTable = (props: Props) => {
         accessor: "status",
         Cell: (data: Cell<Project>) => (
           <span className={`project-status-${data.row.original.status}`}>
-            {data.row.original.status
-              // Regex to insert a space before all caps
-              .replace(/([A-Z])/g, " $1")
-              // Regex to uppercase the first word
-              .replace(/^./, (str) => {
-                return str.toUpperCase();
-              })}
+            {convertCamelCase(data.row.original.status)}
           </span>
         ),
       },
