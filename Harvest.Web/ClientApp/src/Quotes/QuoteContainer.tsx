@@ -179,7 +179,7 @@ export const QuoteContainer = () => {
       body: JSON.stringify(quote),
     });
 
-    setNotification(request, "Saving Quote", "Quote Saved");
+    setNotification(request, "Submitting Quote", "Quote Saved");
 
     // TODO: add progress and hide info while saving
     const saveResponse = await request;
