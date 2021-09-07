@@ -7,7 +7,7 @@ import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { convertCamelCase } from "../Util/ConvertCamelCase";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 interface Props {
   projects: Project[];

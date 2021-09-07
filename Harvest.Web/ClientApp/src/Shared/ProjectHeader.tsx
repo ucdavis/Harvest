@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Project, ProjectAccount } from "../types";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
-import { convertCamelCase } from "../Util/ConvertCamelCase";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 interface Props {
   project: Project;
