@@ -27,13 +27,11 @@ export const HomeContainer = () => {
     <div className="row mt-3">
       <div className="col">
         <h1>Welcome to Harvest, {userInfo.user.detail.name}</h1>
-        <p>
-          You have the following roles: {userInfo.user.roles.join(", ")}. Lorem
-          ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-          tempor incididunt ut labore et dolore magna aliqua.
-        </p>
+        <p>You have the following roles: {userInfo.user.roles.join(", ")}.</p>
         <hr />
-        {ShowCustomActions(userInfo.user.roles)}
+        <div className="quick-actions-wrapper">
+          {ShowCustomActions(userInfo.user.roles)}
+        </div>
       </div>
       <div className="col text-center">
         <img

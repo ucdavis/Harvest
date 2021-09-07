@@ -1,5 +1,5 @@
 .alert-info {
-  background-color: #ebf1ee;
+  background-color: $primary-light;
   color: $primary-color;
   border-color: transparentize($primary-color, 0.5);
   i {
@@ -13,6 +13,11 @@
   i {
     color: $secondary-color;
   }
+}
+.badge-primary {
+  background-color: $primary-light;
+  color: $primary-color;
+  border-color: transparentize($primary-color, 0.5);
 }
 .btn {
   font-family: $sans-bold;
@@ -284,4 +289,21 @@ input[type="radio" i] {
   padding: 4px;
   border: 1px solid $borders;
   border-radius: 1px;
+}
+.react-date-picker__wrapper {
+  border-color: $borders;
+  border-radius: 2px;
+  &.is-invalid {
+    border-color: $error-color;
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+  }
+}
+.react-date-picker__calendar-button {
+  background-color: transparentize($primary-color, 0.85);
+  border-left: 1px solid $borders;
+}
+.react-date-picker__button svg {
+  stroke: $primary-color;
 }
