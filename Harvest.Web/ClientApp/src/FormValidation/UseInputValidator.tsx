@@ -6,6 +6,7 @@
   useContext,
   useEffect,
   useRef,
+  useCallback,
 } from "react";
 import { useDebounceCallback } from "@react-hook/debounce";
 import { AnyObjectSchema, ValidationError } from "yup";
@@ -41,18 +42,24 @@ export function useInputValidator<T>(
     contextIsReset,
   } = context;
 
-  const [errors, setErrors] = useState({} as Record<TKey, string>);
+  const [errors, setErrors] = useState([] as ValidationError[]);
   const [previousErrors] = usePrevious(errors);
   const [touchedFields, setTouchedFields] = useState([] as TKey[]);
   const [dirtyFields, setDirtyFields] = useState([] as TKey[]);
 
+  const propertyHasErrors = useCallback(
+    (name: TKey) => errors.some((e) => e.path === name),
+    [errors]
+  );
+
   useEffect(() => {
-    const errorCount = Object.values(errors).filter(notEmptyOrFalsey).length;
-    const previousErrorCount = Object.values(
-      previousErrors || ({} as Record<TKey, string>)
-    ).filter(notEmptyOrFalsey).length;
+    const errorCount = errors.flatMap((e) => e.errors).length;
+    const previousErrorCount = (previousErrors || []).flatMap((e) => e.errors)
+      .length;
     if (errorCount !== previousErrorCount) {
-      setFormErrorCount(formErrorCount + errorCount - previousErrorCount);
+      setFormErrorCount(
+        (formErrorCount) => formErrorCount + errorCount - previousErrorCount
+      );
     }
   }, [errors, formErrorCount, setFormErrorCount, previousErrors]);
 
@@ -60,7 +67,7 @@ export function useInputValidator<T>(
     if (contextIsReset) {
       setTouchedFields([]);
       setDirtyFields([]);
-      setErrors({} as Record<TKey, string>);
+      setErrors([]);
     }
   }, [contextIsReset, setTouchedFields, setDirtyFields, setErrors]);
 
@@ -70,14 +77,15 @@ export function useInputValidator<T>(
       setValues(newValues);
       try {
         await schema.validateAt(name as string, newValues);
-        if (notEmptyOrFalsey(errors[name])) {
-          setErrors({ ...errors, [name]: "" });
+        if (propertyHasErrors(name)) {
+          setErrors((e) => e.filter((e) => e.path !== name));
         }
       } catch (e: unknown) {
-        if (typeof e === "string") {
-          setErrors({ ...errors, [name]: e });
-        } else if (e instanceof ValidationError) {
-          setErrors({ ...errors, [name]: e.errors.join(", ") });
+        if (e instanceof ValidationError) {
+          setErrors((errors) => [
+            ...errors.filter((e) => e.path !== name),
+            e as ValidationError,
+          ]);
         }
       }
     },
@@ -85,16 +93,24 @@ export function useInputValidator<T>(
   );
 
   const getClassName = (name: TKey, passThroughClassNames: string = "") => {
-    return notEmptyOrFalsey(errors[name])
+    return propertyHasErrors(name)
       ? `${passThroughClassNames} is-invalid`
       : passThroughClassNames;
   };
 
   const InputErrorMessage = ({ name }: { name: TKey }) => {
-    const message = errors[name];
+    const messages = errors
+      .filter((e) => e.path === name)
+      .flatMap((e) => e.errors);
 
-    return notEmptyOrFalsey(errors[name]) ? (
-      <p className="text-danger">{message}</p>
+    return propertyHasErrors(name) ? (
+      <>
+        {messages.map((m, i) => (
+          <p className="text-danger" key={i}>
+            {m}
+          </p>
+        ))}
+      </>
     ) : null;
   };
 
@@ -149,17 +165,17 @@ export function useInputValidator<T>(
   const resetField = (name: TKey) => {
     setTouchedFields(touchedFields.filter((f) => f === name));
     setDirtyFields(dirtyFields.filter((f) => f === name));
-    if (notEmptyOrFalsey(errors[name])) {
-      setErrors({ ...errors, [name]: "" });
+    if (propertyHasErrors(name)) {
+      setErrors((errors) => errors.filter((e) => e.path !== name));
     }
   };
   const resetLocalFields = () => {
     setTouchedFields([]);
     setDirtyFields([]);
-    const errorCount = Object.values(errors).filter(notEmptyOrFalsey).length;
+    const errorCount = errors.flatMap((e) => e.errors).length;
     // update formErrorCount immediately instead of waiting for effect in case the owning component is about to be removed
-    setFormErrorCount(formErrorCount - errorCount);
-    setErrors({} as Record<TKey, string>);
+    setFormErrorCount((formErrorCount) => formErrorCount - errorCount);
+    setErrors([]);
   };
 
   return {
