@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { Project, ProjectAccount } from "../types";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 interface Props {
   project: Project;
@@ -28,6 +29,8 @@ export const ProjectHeader = (props: Props) => {
       return <p>{project.requirements}</p>;
     }
   }, [project.requirements]);
+
+  const crops = project.crop.split(",").join(", ");
 
   return (
     <div className="card-content project-header">
@@ -64,7 +67,7 @@ export const ProjectHeader = (props: Props) => {
             <div className="col">
               <p className="lede">Status</p>
               <p className={`project-status-${project.status}`}>
-                {project.status}
+                {convertCamelCase(project.status)}
               </p>
               <p className="lede">Type</p>
               <p>{project.cropType}</p>
@@ -76,7 +79,7 @@ export const ProjectHeader = (props: Props) => {
                 {new Date(project.end).toLocaleDateString()}
               </p>
               <p className="lede">Crops</p>
-              <p>{project.crop}</p>
+              <p>{crops}</p>
             </div>
           </div>
         </div>
