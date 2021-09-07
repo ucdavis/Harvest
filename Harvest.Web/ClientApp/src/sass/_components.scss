@@ -18,6 +18,9 @@
   background-color: $primary-light;
   color: $primary-color;
   border-color: transparentize($primary-color, 0.5);
+  &:hover {
+    text-decoration: none;
+  }
 }
 .btn {
   font-family: $sans-bold;

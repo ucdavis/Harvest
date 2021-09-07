@@ -1,9 +1,17 @@
 // home
 
 .quick-actions-wrapper {
+  .list-group-item {
+    &:hover {
+      background-color: $primary-light;
+    }
+  }
   a {
     display: flex;
     justify-content: space-between;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 
