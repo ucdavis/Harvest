@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Project, ProjectAccount } from "../types";
-import { Button, Modal, ModalBody, ModalFooter } from "reactstrap";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 interface Props {
   project: Project;
@@ -50,6 +50,7 @@ export const ProjectHeader = (props: Props) => {
           <p className="lede">Requirements</p>
           {projectReqs}
           <Modal isOpen={modal} toggle={toggleModal}>
+            <ModalHeader toggle={toggleModal}>Project Requirements</ModalHeader>
             <ModalBody>{project.requirements}</ModalBody>
             <ModalFooter>
               <Button color="danger" onClick={toggleModal}>
