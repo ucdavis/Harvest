@@ -73,7 +73,13 @@ export const ProjectTable = (props: Props) => {
         accessor: "status",
         Cell: (data: Cell<Project>) => (
           <span className={`project-status-${data.row.original.status}`}>
-            {data.row.original.status}
+            {data.row.original.status
+              // Regex to insert a space before all caps
+              .replace(/([A-Z])/g, " $1")
+              // Regex to uppercase the first word
+              .replace(/^./, (str) => {
+                return str.toUpperCase();
+              })}
           </span>
         ),
       },

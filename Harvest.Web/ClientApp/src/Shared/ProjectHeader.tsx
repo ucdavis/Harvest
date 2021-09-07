@@ -66,7 +66,13 @@ export const ProjectHeader = (props: Props) => {
             <div className="col">
               <p className="lede">Status</p>
               <p className={`project-status-${project.status}`}>
-                {project.status}
+                {project.status
+                  // Regex to insert a space before all caps
+                  .replace(/([A-Z])/g, " $1")
+                  // Regex to uppercase the first word
+                  .replace(/^./, (str) => {
+                    return str.toUpperCase();
+                  })}
               </p>
               <p className="lede">Type</p>
               <p>{project.cropType}</p>
