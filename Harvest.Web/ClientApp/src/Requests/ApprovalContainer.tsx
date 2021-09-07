@@ -93,7 +93,7 @@ export const ApprovalContainer = () => {
       <div className="card-green-bg">
         <div className="card-content">
           <QuoteDisplay quote={projectAndQuote.quote} />
-          <div className="row">
+          <div className="row mt-4">
             <div className="col-md-6">
               <h2 className="primary-font bold-font">
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
@@ -102,7 +102,7 @@ export const ApprovalContainer = () => {
                 document={<QuotePDF quote={projectAndQuote.quote} />}
                 fileName="Quote.pdf"
               >
-                <button className="btn btn-link btn-sm">
+                <button className="btn btn-link btn-sm pl-0">
                   Download PDF <FontAwesomeIcon icon={faDownload} />
                 </button>
               </PDFDownloadLink>

@@ -1,3 +1,27 @@
+.alert-info {
+  background-color: $primary-light;
+  color: $primary-color;
+  border-color: transparentize($primary-color, 0.5);
+  i {
+    color: $primary-color;
+  }
+}
+.alert-danger {
+  background-color: transparentize($secondary-color, 0.88);
+  color: $secondary-color;
+  border-color: transparentize($secondary-color, 0.5);
+  i {
+    color: $secondary-color;
+  }
+}
+.badge-primary {
+  background-color: $primary-light;
+  color: $primary-color;
+  border-color: transparentize($primary-color, 0.5);
+  &:hover {
+    text-decoration: none;
+  }
+}
 .btn {
   font-family: $sans-bold;
   font-size: 1.2rem;
@@ -268,4 +292,18 @@ input[type="radio" i] {
   padding: 4px;
   border: 1px solid $borders;
   border-radius: 1px;
+}
+.react-date-picker__wrapper {
+  border-color: $borders;
+  border-radius: 2px;
+  &.is-invalid {
+    border-color: $error-color;
+  }
+}
+.react-date-picker__calendar-button {
+  background-color: transparentize($primary-color, 0.85);
+  border-left: 1px solid $borders;
+}
+.react-date-picker__button svg {
+  stroke: $primary-color;
 }

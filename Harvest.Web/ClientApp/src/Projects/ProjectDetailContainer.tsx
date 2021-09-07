@@ -80,7 +80,7 @@ export const ProjectDetailContainer = () => {
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
-            <div className="col-md-7">
+            <div className="col-md-12">
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
                 condition={
@@ -89,7 +89,7 @@ export const ProjectDetailContainer = () => {
                 }
               >
                 <Link
-                  className="btn btn-primary btn-small mr-4"
+                  className="btn btn-primary btn-sm mr-4"
                   to={`/expense/entry/${project.id}`}
                 >
                   Enter Expenses
@@ -104,7 +104,7 @@ export const ProjectDetailContainer = () => {
                 }
               >
                 <Link
-                  className="btn btn-primary btn-small mr-4"
+                  className="btn btn-primary btn-sm mr-4"
                   to={`/quote/create/${project.id}`}
                 >
                   Edit Quote
@@ -118,7 +118,7 @@ export const ProjectDetailContainer = () => {
                 }
               >
                 <Link
-                  className="btn btn-primary btn-small mr-4"
+                  className="btn btn-primary btn-sm mr-4"
                   to={`/project/closeout/${project.id}`}
                 >
                   Close Out Project
@@ -130,7 +130,7 @@ export const ProjectDetailContainer = () => {
                 condition={project.status === "PendingApproval"}
               >
                 <Link
-                  className="btn btn-primary btn-small mr-4"
+                  className="btn btn-primary btn-sm mr-4"
                   to={`/request/approve/${project.id}`}
                 >
                   Approve Quote
@@ -139,7 +139,7 @@ export const ProjectDetailContainer = () => {
 
               <ShowFor roles={["PI"]} condition={project.status === "Active"}>
                 <Link
-                  className="btn btn-primary btn-small mr-4"
+                  className="btn btn-primary btn-sm mr-4"
                   to={`/request/changeAccount/${project.id}`}
                 >
                   Change Accounts
@@ -147,15 +147,12 @@ export const ProjectDetailContainer = () => {
               </ShowFor>
               <ShowFor roles={["PI"]} condition={project.status === "Active"}>
                 <Link
-                  className="btn btn-primary btn-small mr-4"
+                  className="btn btn-primary btn-sm mr-4"
                   to={`/request/create/${project.id}`}
                 >
                   Change Requirements
                 </Link>
               </ShowFor>
-            </div>
-            <div className="col-md-5 text-right">
-              <ProjectUnbilledButton projectId={project.id} />
             </div>
           </div>
         </div>
@@ -163,6 +160,7 @@ export const ProjectDetailContainer = () => {
       <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
           <ProjectProgress project={project} />
+          <ProjectUnbilledButton projectId={project.id} />
         </div>
       </div>
       <div>

@@ -28,14 +28,17 @@ export const ProjectUnbilledButton = (props: Props) => {
 
   if (total === 0) {
     return (
-      <button className="btn btn-light" disabled>
+      <button className="btn btn-sm btn-light mt-3" disabled>
         Unbilled Expenses - $0.00
       </button>
     );
   }
 
   return (
-    <Link to={`/expense/unbilled/${props.projectId}`} className="btn btn-light">
+    <Link
+      to={`/expense/unbilled/${props.projectId}`}
+      className="btn btn-sm btn-light mt-3"
+    >
       View Unbilled Expenses - $
       {total === undefined ? "xx.xx" : formatCurrency(total)}
     </Link>

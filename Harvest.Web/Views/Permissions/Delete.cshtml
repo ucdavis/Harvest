@@ -4,40 +4,30 @@
     ViewData["Title"] = "Role Assigned Members ";
 }
 
-  <div class="card">
-    <div class="card-header-primary">
-      <div class="card-head">
-  <h2>Remove roles for user</h2>
-      </div>
-    </div>
+  <div class="card-wrapper col-md-6">
     <div class="card-content">
+      <h2>Remove roles for user</h2>
+          <form asp-action="Delete">
+          <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+          <input type="hidden" name="userId" value="@Model.Id"/>
 
-      <div class="row">
-          <div class="col-md-4">
-              <form asp-action="Delete">
-                  <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                  <input type="hidden" name="userId" value="@Model.Id"/>
+                  <div class="form-group">
+                      <div class="control-label">Name</div>
+                      <div class="form-control">@Model.Name</div>
+                  </div>
 
-                          <div class="form-group">
-                              <div class="control-label">Name</div>
-                              <div class="form-control">@Model.Name</div>
-                          </div>
-
-                  <div class="editor-label">Check Roles to delete</div>
-                  @foreach (var permission in Model.Permissions)
-                  {
-                      <input id="@permission.Role.Id" type="checkbox" value="@permission.Role.Id" name="roles"/>
-                      <label for="@permission.Role.Id">@permission.Role.Name</label>
-                      <br/>
-                      <br/>
-                  }
-                  
-                  <input class="btn btn-primary" type="submit" value="Remove role(s)"/>
+          <div class="editor-label">Check Roles to delete</div>
+          @foreach (var permission in Model.Permissions)
+          {
+              <input id="@permission.Role.Id" type="checkbox" value="@permission.Role.Id" name="roles"/>
+              <label for="@permission.Role.Id">@permission.Role.Name</label>
+              <br/>
+              <br/>
+          }
+          
+          <input class="btn btn-primary" type="submit" value="Remove role(s)"/>
 
 
-              </form>
-          </div>
-      </div>
-
+        </form>
     </div>
   </div>

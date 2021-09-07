@@ -164,16 +164,16 @@ export const TicketDetailContainer = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="row justify-content-center">
-        <Button
-          className="btn-lg"
-          color="primary"
-          onClick={closeTicket}
-          disabled={ticket.completed || notification.pending}
-        >
-          Close Ticket FOREVER!!!!
-        </Button>
+        <div className="row justify-content-center pb-4">
+          <Button
+            className="btn-lg"
+            color="secondary"
+            onClick={closeTicket}
+            disabled={ticket.completed || notification.pending}
+          >
+            Close Ticket
+          </Button>
+        </div>
       </div>
     </div>
   );
