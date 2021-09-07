@@ -287,7 +287,7 @@ export const QuoteContainer = () => {
             </div>
             <div className="row justify-content-center">
               {/* Supervisor can only see save option, so it becomes a primary button.  FM can do both save and submit */}
-              <ShowFor roles={["Supervisor"]}>
+              <ShowFor roles={["Supervisor", "FieldManager"]}>
                 <button
                   className="btn btn-primary mt-4"
                   onClick={() => save(false)}
@@ -297,14 +297,7 @@ export const QuoteContainer = () => {
                 </button>
               </ShowFor>
               <ShowFor roles={["FieldManager"]}>
-                <button
-                  className="btn btn-link mt-4"
-                  onClick={() => save(false)}
-                  disabled={notification.pending || formErrorCount > 0}
-                >
-                  Save Quote
-                </button>
-                <button
+                  <button
                   className="btn btn-primary mt-4"
                   onClick={() => save(true)}
                   disabled={
