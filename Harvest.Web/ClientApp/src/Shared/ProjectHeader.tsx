@@ -29,6 +29,8 @@ export const ProjectHeader = (props: Props) => {
     }
   }, [project.requirements]);
 
+  const crops = project.crop.split(",").join(", ");
+
   return (
     <div className="card-content project-header">
       <div className="quote-info row">
@@ -76,7 +78,7 @@ export const ProjectHeader = (props: Props) => {
                 {new Date(project.end).toLocaleDateString()}
               </p>
               <p className="lede">Crops</p>
-              <p>{project.crop}</p>
+              <p>{crops}</p>
             </div>
           </div>
         </div>
