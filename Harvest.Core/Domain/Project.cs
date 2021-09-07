@@ -30,6 +30,7 @@ namespace Harvest.Core.Domain
         public string CropType { get; set; }
 
         [MaxLength]
+        [Required]
         public string Requirements { get; set; }
 
         public double Acres { get; set; }
@@ -107,6 +108,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Project>().HasIndex(a => a.PrincipalInvestigatorId);
             modelBuilder.Entity<Project>().HasIndex(a => a.QuoteId);
+
+            modelBuilder.Entity<Project>().Property(a => a.Requirements).HasDefaultValue("N/A");
 
             modelBuilder.Entity<Project>().Property(a => a.ChargedTotal).HasPrecision(18, 2);
             modelBuilder.Entity<Project>().Property(a => a.QuoteTotal).HasPrecision(18, 2);

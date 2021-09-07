@@ -337,7 +337,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Requirements")
-                        .HasColumnType("TEXT");
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("N/A");
 
                     b.Property<DateTime>("Start")
                         .HasColumnType("TEXT");
