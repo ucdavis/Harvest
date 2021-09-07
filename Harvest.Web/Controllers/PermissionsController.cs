@@ -166,6 +166,26 @@ namespace Harvest.Web.Controllers
                 return View(viewModel);
             }
 
+            if (role.Name == Role.Codes.FieldManager)
+            {
+                if (await _dbContext.Permissions.AnyAsync(a =>
+                    a.UserId == user.Id && a.Role.Name == Role.Codes.Supervisor))
+                {
+                    ModelState.AddModelError(string.Empty, "Remove Supervisor Role before adding Field Manager role!");
+                    return View(viewModel);
+                }
+            }
+
+            if (role.Name == Role.Codes.Supervisor)
+            {
+                if (await _dbContext.Permissions.AnyAsync(a =>
+                    a.UserId == user.Id && a.Role.Name == Role.Codes.FieldManager))
+                {
+                    ModelState.AddModelError(string.Empty, "User already has Field Manager role. Supervisor Role not needed.");
+                    return View(viewModel);
+                }
+            }
+
 
 
             if (ModelState.IsValid)
