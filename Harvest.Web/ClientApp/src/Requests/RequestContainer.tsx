@@ -28,6 +28,7 @@ export const RequestContainer = () => {
     cropType: "Row" as CropType,
     principalInvestigator: userDetail,
   } as Project);
+  const [originalProject, setOriginalProject] = useState<Project>();
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -50,13 +51,16 @@ export const RequestContainer = () => {
 
       if (response.ok) {
         const proj: Project = await response.json();
-        getIsMounted() &&
+
+        if (getIsMounted()) {
           setProject({
             ...proj,
             start: new Date(proj.start),
             end: new Date(proj.end),
             requirements: `Original: ${proj.requirements}`,
           });
+          setOriginalProject(proj);
+        }
       }
     };
 
@@ -144,10 +148,10 @@ export const RequestContainer = () => {
 
   return (
     <div className="card-wrapper">
-      {projectId !== undefined && (
+      {originalProject !== undefined && (
         <ProjectHeader
-          project={project}
-          title={"Original Field Request #" + (project?.id || "")}
+          project={originalProject}
+          title={"Original Field Request #" + (originalProject?.id || "")}
         />
       )}
       <div className="card-green-bg">
