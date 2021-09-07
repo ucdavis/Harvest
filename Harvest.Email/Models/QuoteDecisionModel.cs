@@ -15,13 +15,15 @@ namespace Harvest.Email.Models
         public string ProjectStart { get; set; }
         public string Decision { get; set; }
         public string ButtonUrl { get; set; }
-        public string DecisionColor { get; set; } = "#7aeb34";
+        public string DecisionColor { get; set; } = "#266041";
 
         public string RejectReason { get; set; }
 
+        public string ButtonProjectText { get; set; } = "View Project";
+
         public class Colors
         {
-            public const string Approved = "#7aeb34";
+            public const string Approved = "#266041";
             public const string Denied = "#cf3c3c";
 
         }

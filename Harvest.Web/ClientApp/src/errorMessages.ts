@@ -9,6 +9,7 @@ export const ErrorMessages = {
   WorkItemQuantityDecimalPlaces:
     "Work item time/unit maximum 2 decimal places.",
   TicketSubjectRequired: "Ticket subject is required.",
+  TicketSubjectMaxLength: "Ticket subject cannot exceed 50 characters.",
   TicketDetailsRequired: "Ticket details are required.",
   ProjectNameRequired: "Project name is required.",
   NumberAcresType: "Number of acres must be a number.",

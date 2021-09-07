@@ -6,21 +6,38 @@
     Layout = "_EmailLayout_mjml";
 }
 
-
-<mj-section>
-    <mj-column>
-        <mj-text align="center">
-            <h1>Hello @@Model.ProfName</h1>
-            <h3>Your quote for project @@Model.ProjectName</h3>
-            <h3>Is ready for your review and approval.</h3>
-            <br/>
-            <p>Project Start: @@Model.ProjectStart</p>
-            <p>Project End: @@Model.ProjectEnd</p>
-            <p>Quote amount: @@Model.QuoteAmount</p>
+<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="100%" vertical-align="top">
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
+            <p>Quote ready for review</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="24px" color="rgba(31,31,31,0.8)">
+            Hello @@Model.ProfName 
         </mj-text>
     </mj-column>
 </mj-section>
 
+@await Html.PartialAsync("_EmailButton_mjml", new EmailButtonModel("@Model.ButtonQuoteText", "@Model.ButtonUrl"))
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="10px" padding-top="5px">
+    <mj-column width="90%" vertical-align="top" border-bottom="1px solid #c7c8cc">
+        <mj-text padding-top="20px" padding-left="0px" padding-bottom="0px">
+            <h4>Notification Details</h4>
+        </mj-text>
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>@@Model.ProjectName</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Project Start", "@Model.ProjectStart"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Project End", "@Model.ProjectEnd"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Quote Amount", "@Model.QuoteAmount"))
+    </mj-column>
+</mj-section>
 
 
-@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to go to the Quote", "@Model.ButtonUrl"))

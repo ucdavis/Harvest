@@ -17,5 +17,7 @@ namespace Harvest.Email.Models
         public string ProjectStart { get; set; }
         public string ProjectEnd { get; set; }
         public string QuoteAmount { get; set; }
+
+        public string ButtonQuoteText { get; set; } = "View Quote";
     }
 }

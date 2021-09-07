@@ -6,29 +6,53 @@
     Layout = "_EmailLayout_mjml";
 }
 
+<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="100%" vertical-align="top">
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
+            <p>Quote Decision</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="24px" color="rgba(31,31,31,0.8)">
+            @@Model.PI
+        </mj-text>
+    </mj-column>
+</mj-section>
 
-<mj-section >
-    <mj-column background-color="@@Model.DecisionColor">
-        <mj-text align="center">
-            <p>Quote has been</p>
+@await Html.PartialAsync("_EmailButton_mjml", new EmailButtonModel("@Model.ButtonProjectText", "@Model.ButtonUrl"))
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="10px" padding-top="5px">
+    <mj-column width="90%" vertical-align="top" border-bottom="1px solid #c7c8cc">
+        <mj-text padding-top="20px" padding-left="0px" padding-bottom="0px">
+            <h4>Notification Details</h4>
+        </mj-text>
+    </mj-column>
+</mj-section>
+
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>Quote has been</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid @@Model.DecisionColor" padding-left="10px">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
             <h1>@@Model.Decision</h1>
             @@if(!string.IsNullOrWhiteSpace(Model.RejectReason))
             {
-            <h2>@@Model.RejectReason</h2>
+                @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Reject Reason", "@Model.RejectReason"))
             }
         </mj-text>
     </mj-column>
 </mj-section>
-<mj-section >
-    <mj-column>
-        <mj-text align="center">
-            <p><strong>PI: </strong>@@Model.PI</p>
-            <p><strong>Request: </strong>@@Model.ProjectName</p>
-            <p><strong>Project Start: </strong>@@Model.ProjectStart</p>
-            <p><strong>Project End: </strong>@@Model.ProjectEnd</p>
-        </mj-text>
 
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+    <mj-column width="90%" vertical-align="top">
+        <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
+            <h2>@@Model.ProjectName</h2>
+        </mj-text>
+    </mj-column>
+    <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Project Start", "@Model.ProjectStart"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Project End", "@Model.ProjectEnd"))
     </mj-column>
 </mj-section>
 
-@await Html.PartialAsync("EmailButton", new EmailButtonModel("Click Here to open Project", "@Model.ButtonUrl"))

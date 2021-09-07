@@ -278,6 +278,7 @@ namespace Harvest.Web.Controllers
         public async Task<ActionResult> Create([FromBody] Project project)
         {
             var currentUser = await _userService.GetCurrentUser();
+            var changeRequest = false;
 
             var newProject = new Project
             {
@@ -296,6 +297,7 @@ namespace Harvest.Web.Controllers
             if (project.Id > 0)
             {
                 // this project already exists, so we are requesting a change
+                changeRequest = true;
                 newProject.Status = Project.Statuses.ChangeRequested;
                 newProject.OriginalProjectId = project.Id;
 
@@ -351,7 +353,15 @@ namespace Harvest.Web.Controllers
             await _historyService.RequestCreated(newProject);
             await _dbContext.SaveChangesAsync();
 
-            await _emailService.NewFieldRequest(newProject);
+            if (changeRequest)
+            {
+                await _emailService.ChangeRequest(newProject);
+            }
+            else
+            {
+                await _emailService.NewFieldRequest(newProject);
+            }
+            
 
             return Ok(newProject);
         }
