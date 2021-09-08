@@ -12,8 +12,16 @@ $theme-colors: (
 
 $bg-primary: #f7f7f7;
 $bg-secondary: #f7fafc;
-$error-color: #dc3545;
+$danger: $merlot;
+$error-color: $danger;
 
 $borders-secondary: #e5eaef;
 
 $primary-light: #ebf1ee;
+
+@media (min-width: 576px) {
+  .modal-dialog {
+    max-width: 700px;
+    margin: 1.75rem auto;
+  }
+}

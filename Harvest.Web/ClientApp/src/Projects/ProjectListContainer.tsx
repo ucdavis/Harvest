@@ -45,7 +45,7 @@ export const ProjectListContainer = (props: Props) => {
           <h1>{getListTitle(props.projectSource)}</h1>
         </div>
         <div className="col text-right">
-          <Link to="/request/create" className="btn btn btn-primary ">
+          <Link to="/request/create" className="btn btn-sm btn-primary ">
             Create New <FontAwesomeIcon icon={faPlus} />
           </Link>
         </div>
