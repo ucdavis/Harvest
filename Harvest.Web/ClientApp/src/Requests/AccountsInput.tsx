@@ -10,6 +10,7 @@ import { ProjectAccount } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { array } from "yup";
 
 interface Props {
   accounts: ProjectAccount[];
@@ -35,7 +36,12 @@ export const AccountsInput = (props: Props) => {
       total += accounts[i].percentage;
     }
 
-    total === 100 ? props.setDisabled(false) : props.setDisabled(true);
+    // some will return true if there is an instance that satifies the function given
+    const hasZeroPercent = accounts.some((account) => account.percentage === 0);
+
+    total === 100 && !hasZeroPercent
+      ? props.setDisabled(false)
+      : props.setDisabled(true);
   }, [accounts, props]);
 
   const onSearch = async (query: string) => {
@@ -71,6 +77,12 @@ export const AccountsInput = (props: Props) => {
         chosenAccount.percentage = 100.0;
       }
 
+      if (chosenAccount.percentage === 0) {
+        setError("All accounts must be above 0%");
+      } else {
+        setError(undefined);
+      }
+
       setAccounts([...accounts, chosenAccount]);
 
       // once we have made our selection reset the box so we can start over if desired
@@ -103,6 +115,8 @@ export const AccountsInput = (props: Props) => {
 
     if (accounts.reduce((prev, curr) => prev + curr.percentage, 0) !== 100.0) {
       setError("Total percentage must equal 100%");
+    } else if (accounts.some((account) => account.percentage === 0)) {
+      setError("All accounts must be above 0%");
     } else {
       setError(undefined);
     }
@@ -185,7 +199,7 @@ export const AccountsInput = (props: Props) => {
         <Row>
           <Col className="col-md-4 offset-md-6">
             <b>
-              Totat Percent:{" "}
+              Total Percent:{" "}
               {accounts.reduce((prev, curr) => prev + curr.percentage, 0)}%
             </b>
           </Col>
