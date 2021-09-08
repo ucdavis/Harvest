@@ -14,6 +14,7 @@ import { AnyObjectSchema, ValidationError } from "yup";
 import {
   ValidationContext,
   useOrCreateValidationContext,
+  ValidatorCallbacks,
 } from "./ValidationProvider";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
@@ -29,7 +30,8 @@ export function useInputValidator<T>(
     setValues(obj ? { ...obj } : ({} as T));
   }, [obj, setValues]);
 
-  const context = useOrCreateValidationContext(useContext(ValidationContext));
+  const existingContext = useContext(ValidationContext);
+  const context = useOrCreateValidationContext(existingContext);
 
   const {
     formErrorCount,
@@ -38,8 +40,8 @@ export function useInputValidator<T>(
     setFormIsTouched,
     formIsDirty,
     setFormIsDirty,
-    resetContext,
-    contextIsReset,
+
+    callbacks,
   } = context;
 
   const [errors, setErrors] = useState([] as ValidationError[]);
@@ -63,34 +65,82 @@ export function useInputValidator<T>(
     }
   }, [errors, formErrorCount, setFormErrorCount, previousErrors]);
 
-  useEffect(() => {
-    if (contextIsReset) {
-      setTouchedFields([]);
-      setDirtyFields([]);
-      setErrors([]);
-    }
-  }, [contextIsReset, setTouchedFields, setDirtyFields, setErrors]);
-
-  const validateField = useDebounceCallback(
-    async (name: TKey, value: T[TKey]) => {
-      const newValues = ({ ...values, [name]: value } as unknown) as T;
-      setValues(newValues);
-      try {
-        await schema.validateAt(name as string, newValues);
-        if (propertyHasErrors(name)) {
-          setErrors((e) => e.filter((e) => e.path !== name));
-        }
-      } catch (e: unknown) {
-        if (e instanceof ValidationError) {
-          setErrors((errors) => [
-            ...errors.filter((e) => e.path !== name),
-            e as ValidationError,
-          ]);
-        }
+  const validateFieldImpl = async (name: TKey, value: T[TKey]) => {
+    const newValues = ({ ...values, [name]: value } as unknown) as T;
+    setValues(newValues);
+    try {
+      await schema.validateAt(name as string, newValues);
+      if (propertyHasErrors(name)) {
+        setErrors((e) => e.filter((e) => e.path !== name));
       }
-    },
-    250
+    } catch (e: unknown) {
+      if (e instanceof ValidationError) {
+        setErrors((errors) => [
+          ...errors.filter((e) => e.path !== name),
+          e as ValidationError,
+        ]);
+        return e;
+      }
+    }
+  };
+
+  const validateField = useDebounceCallback(validateFieldImpl, 250);
+
+  const registeredNames = useRef<TKey[]>([]);
+  const validatorCallbacks = useRef<ValidatorCallbacks>(
+    {} as ValidatorCallbacks
   );
+
+  useEffect(() => {
+    const cb = validatorCallbacks;
+    callbacks.push(cb);
+
+    return () => {
+      callbacks.splice(callbacks.indexOf(cb), 1);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const reset = useCallback(() => {
+    setTouchedFields([]);
+    setDirtyFields([]);
+    setErrors([]);
+  }, [setTouchedFields, setDirtyFields, setErrors]);
+
+  const validate = useCallback(async () => {
+    const errors = [] as ValidationError[];
+    for (const name of registeredNames.current) {
+      const error = await validateFieldImpl(name, values[name]);
+      if (error) {
+        errors.push(error);
+      }
+    }
+    return errors;
+  }, [validateFieldImpl]);
+
+  useEffect(() => {
+    validatorCallbacks.current.reset = reset;
+    validatorCallbacks.current.validate = validate;
+  }, [reset, validate]);
+
+  const resetContext = () => {
+    setFormErrorCount(0);
+    setFormIsTouched(false);
+    setFormIsDirty(false);
+    callbacks.forEach((cb) => {
+      const reset = cb.current?.reset;
+      reset && reset();
+    });
+  };
+
+  const validateAll = async () => {
+    let errors = [] as ValidationError[];
+    for (const cb of callbacks) {
+      const validate = cb.current?.validate;
+      validate && (errors = [...errors, ...(await validate())]);
+    }
+    return errors;
+  };
 
   const getClassName = (name: TKey, passThroughClassNames: string = "") => {
     return propertyHasErrors(name)
@@ -99,6 +149,11 @@ export function useInputValidator<T>(
   };
 
   const InputErrorMessage = ({ name }: { name: TKey }) => {
+    // keep track of what properties are being validated
+    if (!registeredNames.current.includes(name)) {
+      registeredNames.current.push(name);
+    }
+
     const messages = errors
       .filter((e) => e.path === name)
       .flatMap((e) => e.errors);
@@ -195,6 +250,7 @@ export function useInputValidator<T>(
     resetField,
     resetLocalFields,
     context,
+    validateAll,
   };
 }
 

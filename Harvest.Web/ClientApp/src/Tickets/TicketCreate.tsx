@@ -156,6 +156,10 @@ export const TicketCreate = () => {
                       onBlur={() => onBlurValue("dueDate", ticket.dueDate)}
                     >
                       <DatePicker
+                        className={getClassName(
+                          "dueDate",
+                          "react-date-picker__wrapper"
+                        )}
                         format="MM/dd/yyyy"
                         required={false}
                         clearIcon={null}
