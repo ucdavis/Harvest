@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Project, Ticket, TicketInput } from "../types";
+import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import DatePicker from "react-date-picker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -8,7 +8,6 @@ import { FileUpload } from "../Shared/FileUpload";
 import { ShowFor } from "../Shared/ShowFor";
 import { ticketSchema } from "../schemas";
 import { usePromiseNotification } from "../Util/Notifications";
-import { ValidationError } from "yup";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useInputValidator } from "../FormValidation/UseInputValidator";
 
@@ -18,7 +17,6 @@ interface RouteParams {
 
 export const TicketCreate = () => {
   const { projectId } = useParams<RouteParams>();
-  const [inputErrors, setInputErrors] = useState<string[]>([]);
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<Ticket>({
     requirements: "",
@@ -35,6 +33,7 @@ export const TicketCreate = () => {
     onBlurValue,
     formErrorCount,
     formIsTouched,
+    validateAll,
   } = useInputValidator(ticketSchema, ticket);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -60,26 +59,11 @@ export const TicketCreate = () => {
     return <div>Loading...</div>;
   }
 
-  const checkTicketValidity = async (inputs: any) => {
-    try {
-      await ticketSchema.validate(inputs, { abortEarly: false });
-    } catch (err) {
-      if (err instanceof ValidationError) {
-        return err.errors;
-      }
-    }
-  };
-
   const create = async () => {
-    const ticketErrors = await checkTicketValidity(ticket);
+    const ticketErrors = await validateAll();
 
-    if (ticketErrors) {
-      if (ticketErrors.length > 0) {
-        setInputErrors(ticketErrors);
-        return;
-      } else {
-        setInputErrors([]);
-      }
+    if (ticketErrors.length > 0) {
+      return;
     }
 
     const request = fetch(`/Ticket/Create?projectId=${projectId}`, {
