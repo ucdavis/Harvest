@@ -9,6 +9,7 @@ import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { convertCamelCase } from "../Util/StringFormatting";
 
+
 interface Props {
   projects: Project[];
 }
@@ -20,15 +21,12 @@ export const ProjectTable = (props: Props) => {
       {
         Cell: (data: Cell<Project>) => (
           <div>
-            <Link to={`/project/details/${data.row.original.id}`}>
-              #{data.row.original.id}
-            </Link>
-            <p>{data.row.original.name}</p>
+              <p><Link to={`/project/details/${data.row.original.id}`}>#{data.row.original.id} {data.row.original.name}</Link></p>
           </div>
         ),
         Header: "Name",
         maxWidth: 150,
-        accessor: "id",
+        accessor: (row: any)=> `#${row.id} ${row.name}`,
       },
       {
         id: "pi",
