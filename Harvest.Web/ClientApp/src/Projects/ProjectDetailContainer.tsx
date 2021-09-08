@@ -133,7 +133,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/approve/${project.id}`}
                 >
-                  Approve Quote
+                  View Quote
                 </Link>
               </ShowFor>
 

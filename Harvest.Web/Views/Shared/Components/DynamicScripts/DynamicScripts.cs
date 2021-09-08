@@ -23,15 +23,16 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
             var files = _fileProvider.GetDirectoryContents("ClientApp/build/static/js");
 
             /* 
-             * Get all JS files in the static build folder
+             * Get the important JS files in the static build folder
              * Should include the following files:
+             * - 3.[hash].chunk.js (determined from the generated index.html by CRA)
              * - main.*.js
-             * - 2.[hash].chunk.js
              * - runtime-main.*.js
-             * - [number].[hash].chunk.js (for each additional chunk)
+
+             * Other chunks do not need to be included here, since they will be dynamically requested only when needed
 
              =======
-             We would like to inline the runtime-main file, then load 2.*.chunk.js, and then main.*.chunk.js
+             We would like to inline the runtime-main file, then load 3.*.chunk.js, and then main.*.chunk.js
             */
 
             var model = new DynamicScriptModel();
@@ -47,10 +48,13 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
                 }
             }
 
+            // Get all the chunk files
+            var chunks = files.Where(f => Regex.IsMatch(f.Name, "^[0-9]*\\..*\\.chunk\\.js$")).Select(f => f.Name);
+
             var scripts = new List<string>();
 
-            // read the 2.*.chunk.js files (maybe there is always just one?)
-            scripts.AddRange(files.Where(f => Regex.IsMatch(f.Name, "^.*2\\..*\\.chunk\\.js$")).Select(f => f.Name));
+            // read the 3.*.chunk.js files (There is probably only one, but doesn't hurt to be careful)
+            scripts.AddRange(chunks.Where(c => c.StartsWith("3")));
 
             // now add in main.*.chunk.js
             scripts.AddRange(files.Where(f => Regex.IsMatch(f.Name, "^.*main\\..*\\.chunk\\.js$")).Select(f => f.Name));
