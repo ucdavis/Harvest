@@ -5,6 +5,9 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -50,7 +53,13 @@ export const TicketsContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-
+      <div className="card-green-bg green-bg-border">
+        <div className="card-content">
+          <a href="#" className="btn btn-sm btn-link">
+            Back to project details <FontAwesomeIcon icon={faArrowLeft} />
+          </a>
+        </div>
+      </div>
       <div className="card-content">
         <div className="row justify-content-between">
           <h3>List of all tickets for your project</h3>
