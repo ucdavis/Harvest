@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { Project, ProjectAccount, ProjectWithQuote } from "../types";
 import { AccountsInput } from "./AccountsInput";
-import { QuotePDF } from "../Pdf/QuotePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { RejectQuote } from "../Quotes/RejectQuote";
 import { formatCurrency } from "../Util/NumberFormatting";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
+
+// Lazy load quote pdf link since it's a large JS file and causes a console warning
+const QuotePDFLink = React.lazy(() => import("../Pdf/QuotePDFLink"));
 
 interface RouteParams {
   projectId?: string;
@@ -98,14 +97,12 @@ export const ApprovalContainer = () => {
               <h2 className="primary-font bold-font">
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
-              <PDFDownloadLink
-                document={<QuotePDF quote={projectAndQuote.quote} />}
-                fileName="Quote.pdf"
-              >
-                <button className="btn btn-link btn-sm pl-0">
-                  Download PDF <FontAwesomeIcon icon={faDownload} />
-                </button>
-              </PDFDownloadLink>
+              <Suspense fallback={<div>Generating PDF...</div>}>
+                <QuotePDFLink
+                  quote={projectAndQuote.quote}
+                  fileName="Quote.pdf"
+                ></QuotePDFLink>
+              </Suspense>
               <AccountsInput
                 accounts={accounts}
                 setAccounts={setAccounts}
