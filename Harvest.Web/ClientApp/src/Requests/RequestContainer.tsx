@@ -171,8 +171,8 @@ export const RequestContainer = () => {
                         required={false}
                         clearIcon={null}
                         value={project.start}
-                        onChange={(date) =>
-                          setProject({ ...project, start: date as Date })
+                        onChange={(date: Date) =>
+                          setProject({ ...project, start: date })
                         }
                       />
                     </div>
@@ -187,8 +187,8 @@ export const RequestContainer = () => {
                         required={false}
                         clearIcon={null}
                         value={project.end}
-                        onChange={(date) =>
-                          setProject({ ...project, end: date as Date })
+                        onChange={(date: Date) =>
+                          setProject({ ...project, end: date })
                         }
                       />
                     </div>
