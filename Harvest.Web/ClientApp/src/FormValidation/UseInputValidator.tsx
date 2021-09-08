@@ -16,7 +16,6 @@ import {
   useOrCreateValidationContext,
   ValidatorCallbacks,
 } from "./ValidationProvider";
-import { notEmptyOrFalsey } from "../Util/ValueChecks";
 
 export function useInputValidator<T>(
   schema: AnyObjectSchema,
@@ -65,24 +64,27 @@ export function useInputValidator<T>(
     }
   }, [errors, formErrorCount, setFormErrorCount, previousErrors]);
 
-  const validateFieldImpl = async (name: TKey, value: T[TKey]) => {
-    const newValues = ({ ...values, [name]: value } as unknown) as T;
-    setValues(newValues);
-    try {
-      await schema.validateAt(name as string, newValues);
-      if (propertyHasErrors(name)) {
-        setErrors((e) => e.filter((e) => e.path !== name));
+  const validateFieldImpl = useCallback(
+    async (name: TKey, value: T[TKey]) => {
+      const newValues = ({ ...values, [name]: value } as unknown) as T;
+      setValues(newValues);
+      try {
+        await schema.validateAt(name as string, newValues);
+        if (propertyHasErrors(name)) {
+          setErrors((e) => e.filter((e) => e.path !== name));
+        }
+      } catch (e: unknown) {
+        if (e instanceof ValidationError) {
+          setErrors((errors) => [
+            ...errors.filter((e) => e.path !== name),
+            e as ValidationError,
+          ]);
+          return e;
+        }
       }
-    } catch (e: unknown) {
-      if (e instanceof ValidationError) {
-        setErrors((errors) => [
-          ...errors.filter((e) => e.path !== name),
-          e as ValidationError,
-        ]);
-        return e;
-      }
-    }
-  };
+    },
+    [schema, setValues, setErrors, propertyHasErrors, values]
+  );
 
   const validateField = useDebounceCallback(validateFieldImpl, 250);
 
@@ -116,7 +118,7 @@ export function useInputValidator<T>(
       }
     }
     return errors;
-  }, [validateFieldImpl]);
+  }, [validateFieldImpl, values]);
 
   useEffect(() => {
     validatorCallbacks.current.reset = reset;

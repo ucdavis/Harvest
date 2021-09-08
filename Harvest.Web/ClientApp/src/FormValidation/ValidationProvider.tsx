@@ -1,6 +1,5 @@
 ﻿import React, {
   useState,
-  useEffect,
   Dispatch,
   MutableRefObject,
   SetStateAction,
@@ -34,25 +33,6 @@ export const useOrCreateValidationContext = (
   const [formErrorCount, setFormErrorCount] = useState(0);
   const [formIsTouched, setFormIsTouched] = useState(false);
   const [formIsDirty, setFormIsDirty] = useState(false);
-  const [contextIsReset, setcontextIsReset] = useState(false);
-  const resetContext = () => {
-    setFormErrorCount(0);
-    setFormIsTouched(false);
-    setFormIsDirty(false);
-    setcontextIsReset(true);
-  };
-
-  useEffect(() => {
-    if ((formErrorCount || formIsTouched || formIsDirty) && contextIsReset) {
-      setcontextIsReset(false);
-    }
-  }, [
-    formErrorCount,
-    formIsTouched,
-    formIsDirty,
-    contextIsReset,
-    setcontextIsReset,
-  ]);
 
   // a ref of array of refs
   // this is the only way to ensure the array does not get replaced on rerenders
