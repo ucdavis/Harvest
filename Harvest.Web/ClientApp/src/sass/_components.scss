@@ -14,6 +14,10 @@
     color: $secondary-color;
   }
 }
+.alert-link {
+  font-weight: bold;
+  text-decoration: underline;
+}
 .badge-primary {
   background-color: $primary-light;
   color: $primary-color;
