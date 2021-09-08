@@ -10,7 +10,6 @@ import { ProjectAccount } from "../types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { array } from "yup";
 
 interface Props {
   accounts: ProjectAccount[];
@@ -38,6 +37,13 @@ export const AccountsInput = (props: Props) => {
 
     // some will return true if there is an instance that satifies the function given
     const hasZeroPercent = accounts.some((account) => account.percentage === 0);
+
+    if (total === 100 && !hasZeroPercent) {
+      props.setDisabled(false);
+      setError(undefined);
+    } else {
+      props.setDisabled(true);
+    }
 
     total === 100 && !hasZeroPercent
       ? props.setDisabled(false)
@@ -77,7 +83,13 @@ export const AccountsInput = (props: Props) => {
         chosenAccount.percentage = 100.0;
       }
 
-      if (chosenAccount.percentage === 0) {
+      const total =
+        accounts.reduce((prev, curr) => prev + curr.percentage, 0) +
+        chosenAccount.percentage;
+
+      if (total !== 100.0) {
+        setError("Total percentage must equal 100%");
+      } else if (chosenAccount.percentage === 0) {
         setError("All accounts must be above 0%");
       } else {
         setError(undefined);
