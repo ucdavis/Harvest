@@ -113,7 +113,11 @@
   border-bottom: 1px solid $borders;
   padding: 2% 0 3% 0;
 }
-
+.project-actions {
+  .btn {
+    margin-top: 6px;
+  }
+}
 .project-header {
   border-bottom: 1px solid $borders;
 }

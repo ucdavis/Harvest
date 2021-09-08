@@ -80,7 +80,7 @@ export const ProjectDetailContainer = () => {
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
-            <div className="col-md-12">
+            <div className="col-md-12 project-actions">
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
                 condition={

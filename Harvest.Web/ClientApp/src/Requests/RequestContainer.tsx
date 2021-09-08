@@ -156,7 +156,7 @@ export const RequestContainer = () => {
       )}
       <div className="card-green-bg">
         <div className="row justify-content-center">
-          <div className="col-md-6 card-wrapper no-green mt-4 mb-4">
+          <div className="col-lg-6 col-md-8 col-11 card-wrapper no-green mt-4 mb-4">
             <div className="card-content">
               <h2>
                 {projectId ? "Create Change Request" : "Create Field Request"}
@@ -165,7 +165,7 @@ export const RequestContainer = () => {
                 <div className="col-md-6">
                   <div className="form-group">
                     <Label>When to Start?</Label>
-                    <div className="input-group" style={{ zIndex: 9000 }}>
+                    <div className="input-group" style={{ zIndex: 999 }}>
                       <DatePicker
                         format="MM/dd/yyyy"
                         required={false}
@@ -181,7 +181,7 @@ export const RequestContainer = () => {
                 <div className="col-md-6">
                   <FormGroup>
                     <Label>When to Finish?</Label>
-                    <div className="input-group" style={{ zIndex: 9000 }}>
+                    <div className="input-group" style={{ zIndex: 999 }}>
                       <DatePicker
                         format="MM/dd/yyyy"
                         required={false}
