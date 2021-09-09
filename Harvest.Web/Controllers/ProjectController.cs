@@ -55,6 +55,11 @@ namespace Harvest.Web.Controllers
             return View("React");
         }
 
+        public ActionResult Invoices()
+        {
+            return View("React");
+        }
+
         [Authorize(Policy = AccessCodes.WorkerAccess)]
         public async Task<ActionResult> All()
         {
@@ -113,7 +118,7 @@ namespace Harvest.Web.Controllers
                 .ToArrayAsync());
         }
 
-        public async Task<ActionResult> Invoices(int projectId)
+        public async Task<ActionResult> InvoiceList(int projectId)
         {
             var user = await _userService.GetCurrentUser();
             var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);

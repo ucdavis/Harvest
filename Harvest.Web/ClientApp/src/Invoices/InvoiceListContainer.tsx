@@ -17,7 +17,7 @@ export const InvoiceListContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(`/Project/Invoices/${projectId}`);
+      const response = await fetch(`/Project/InvoiceList/${projectId}`);
 
       if (response.ok) {
         getIsMounted() && setInvoices(await response.json());
