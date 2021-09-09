@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import { Link } from "react-router-dom";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
@@ -147,166 +148,178 @@ export const RequestContainer = () => {
   }
 
   return (
-    <div className={originalProject && "card-wrapper"}>
+    <div>
       {originalProject !== undefined && (
-        <ProjectHeader
-          project={originalProject}
-          title={"Original Field Request #" + (originalProject?.id || "")}
-        />
+        <div className="alert alert-info">
+          You are making a change request for {project.name}{" "}
+          <Link className="alert-link" to={`/project/details/${project.id}`}>
+            Click here to go back to the project details page
+          </Link>
+        </div>
       )}
-      <div className={originalProject && "card-green-bg"}>
-        <div className="row justify-content-center">
-          <div className="col-lg-6 col-md-8 col-11 card-wrapper no-green mt-4 mb-4">
-            <div className="card-content">
-              <h2>
-                {projectId ? "Create Change Request" : "Create Field Request"}
-              </h2>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="form-group">
-                    <Label>When to Start?</Label>
-                    <div className="input-group" style={{ zIndex: 999 }}>
-                      <DatePicker
-                        format="MM/dd/yyyy"
-                        required={false}
-                        clearIcon={null}
-                        value={project.start}
-                        onChange={(date: Date) =>
-                          setProject({ ...project, start: date })
-                        }
-                      />
+      <div className={originalProject && "card-wrapper"}>
+        {originalProject !== undefined && (
+          <ProjectHeader
+            project={originalProject}
+            title={"Original Field Request #" + (originalProject?.id || "")}
+          />
+        )}
+        <div className={originalProject && "card-green-bg"}>
+          <div className="row justify-content-center">
+            <div className="col-md-6 card-wrapper no-green mt-4 mb-4">
+              <div className="card-content">
+                <h2>
+                  {projectId ? "Create Change Request" : "Create Field Request"}
+                </h2>
+                <div className="row">
+                  <div className="col-md-6">
+                    <div className="form-group">
+                      <Label>When to Start?</Label>
+                      <div className="input-group" style={{ zIndex: 9000 }}>
+                        <DatePicker
+                          format="MM/dd/yyyy"
+                          required={false}
+                          clearIcon={null}
+                          value={project.start}
+                          onChange={(date: Date) =>
+                            setProject({ ...project, start: date })
+                          }
+                        />
+                      </div>
                     </div>
                   </div>
+                  <div className="col-md-6">
+                    <FormGroup>
+                      <Label>When to Finish?</Label>
+                      <div className="input-group" style={{ zIndex: 9000 }}>
+                        <DatePicker
+                          format="MM/dd/yyyy"
+                          required={false}
+                          clearIcon={null}
+                          value={project.end}
+                          onChange={(date: Date) =>
+                            setProject({ ...project, end: date })
+                          }
+                        />
+                      </div>
+                    </FormGroup>
+                  </div>
                 </div>
-                <div className="col-md-6">
-                  <FormGroup>
-                    <Label>When to Finish?</Label>
-                    <div className="input-group" style={{ zIndex: 999 }}>
-                      <DatePicker
-                        format="MM/dd/yyyy"
-                        required={false}
-                        clearIcon={null}
-                        value={project.end}
-                        onChange={(date: Date) =>
-                          setProject({ ...project, end: date })
-                        }
-                      />
-                    </div>
-                  </FormGroup>
-                </div>
-              </div>
-              <FormGroup>
-                <Label>Which type of crop will we grow?</Label>
-                <div className="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    id="rowCropInput"
-                    name="rowCropInput"
-                    className="custom-control-input"
-                    style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
-                    value="Row"
-                    checked={project.cropType === "Row"}
-                    onChange={handleCropTypeChange}
+                <FormGroup>
+                  <Label>Which type of crop will we grow?</Label>
+                  <div className="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      id="rowCropInput"
+                      name="rowCropInput"
+                      className="custom-control-input"
+                      style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                      value="Row"
+                      checked={project.cropType === "Row"}
+                      onChange={handleCropTypeChange}
+                    />
+                    <label
+                      className="custom-control-label"
+                      htmlFor="rowCropInput"
+                    >
+                      Row Crops
+                    </label>
+                  </div>
+                  <div className="custom-control custom-radio">
+                    <input
+                      type="radio"
+                      id="treeCropInput"
+                      name="treeCropInput"
+                      className="custom-control-input"
+                      style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                      value="Tree"
+                      checked={project.cropType === "Tree"}
+                      onChange={handleCropTypeChange}
+                    />
+                    <label
+                      className="custom-control-label"
+                      htmlFor="treeCropInput"
+                    >
+                      Tree Crops
+                    </label>
+                  </div>
+                </FormGroup>
+
+                <FormGroup tag="fieldset">
+                  <Label>What crop(s) will we grow?</Label>
+                  <Crops
+                    crops={project.crop}
+                    setCrops={(c) => setProject({ ...project, crop: c })}
+                    cropType={project.cropType}
                   />
-                  <label
-                    className="custom-control-label"
-                    htmlFor="rowCropInput"
-                  >
-                    Row Crops
-                  </label>
-                </div>
-                <div className="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    id="treeCropInput"
-                    name="treeCropInput"
-                    className="custom-control-input"
-                    style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
-                    value="Tree"
-                    checked={project.cropType === "Tree"}
-                    onChange={handleCropTypeChange}
+                </FormGroup>
+
+                <FormGroup>
+                  <Label>Who will be the PI?</Label>
+                  <SearchPerson
+                    user={project.principalInvestigator}
+                    setUser={(u) =>
+                      setProject({ ...project, principalInvestigator: u })
+                    }
                   />
-                  <label
-                    className="custom-control-label"
-                    htmlFor="treeCropInput"
+                </FormGroup>
+
+                <FormGroup>
+                  <Label>Want to attach any files?</Label>
+                  <FileUpload
+                    files={project.attachments || []}
+                    setFiles={(f) =>
+                      setProject({ ...project, attachments: [...f] })
+                    }
+                    updateFile={(f) =>
+                      setProject((proj) => {
+                        // update just one specific file from project p
+                        proj.attachments[
+                          proj.attachments.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+
+                        return { ...proj, attachments: [...proj.attachments] };
+                      })
+                    }
+                  />
+                </FormGroup>
+
+                <FormGroup>
+                  <Label>What are the requirements?</Label>
+                  <Input
+                    type="textarea"
+                    name="text"
+                    id="requirements"
+                    value={project.requirements}
+                    onChange={(e) =>
+                      setProject({ ...project, requirements: e.target.value })
+                    }
+                    placeholder="Enter a full description of your requirements"
+                  />
+                </FormGroup>
+                <ul>
+                  {inputErrors.map((error, i) => {
+                    return (
+                      <li style={{ color: "red" }} key={`error-${i}`}>
+                        {error}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="row justify-content-center">
+                  <Button
+                    className="btn-lg"
+                    color="primary"
+                    onClick={create}
+                    disabled={!isFilledIn || notification.pending}
                   >
-                    Tree Crops
-                  </label>
+                    {projectId
+                      ? "Create Change Request"
+                      : "Create Field Request"}
+                  </Button>
                 </div>
-              </FormGroup>
-
-              <FormGroup tag="fieldset">
-                <Label>What crop(s) will we grow?</Label>
-                <Crops
-                  crops={project.crop}
-                  setCrops={(c) => setProject({ ...project, crop: c })}
-                  cropType={project.cropType}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Who will be the PI?</Label>
-                <SearchPerson
-                  user={project.principalInvestigator}
-                  setUser={(u) =>
-                    setProject({ ...project, principalInvestigator: u })
-                  }
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <Label>Want to attach any files?</Label>
-                <FileUpload
-                  files={project.attachments || []}
-                  setFiles={(f) =>
-                    setProject({ ...project, attachments: [...f] })
-                  }
-                  updateFile={(f) =>
-                    setProject((proj) => {
-                      // update just one specific file from project p
-                      proj.attachments[
-                        proj.attachments.findIndex(
-                          (file) => file.identifier === f.identifier
-                        )
-                      ] = { ...f };
-
-                      return { ...proj, attachments: [...proj.attachments] };
-                    })
-                  }
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <Label>What are the requirements?</Label>
-                <Input
-                  type="textarea"
-                  name="text"
-                  id="requirements"
-                  value={project.requirements}
-                  onChange={(e) =>
-                    setProject({ ...project, requirements: e.target.value })
-                  }
-                  placeholder="Enter a full description of your requirements"
-                />
-              </FormGroup>
-              <ul>
-                {inputErrors.map((error, i) => {
-                  return (
-                    <li style={{ color: "red" }} key={`error-${i}`}>
-                      {error}
-                    </li>
-                  );
-                })}
-              </ul>
-              <div className="row justify-content-center">
-                <Button
-                  className="btn-lg"
-                  color="primary"
-                  onClick={create}
-                  disabled={!isFilledIn || notification.pending}
-                >
-                  {projectId ? "Create Change Request" : "Create Field Request"}
-                </Button>
               </div>
             </div>
           </div>

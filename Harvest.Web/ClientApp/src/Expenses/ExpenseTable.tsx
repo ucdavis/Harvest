@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Column, TableState } from "react-table";
+import { Cell, Column, TableState } from "react-table";
 import { Button } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
@@ -56,9 +56,13 @@ export const ExpenseTable = (props: Props) => {
       {
         Header: "Entered on",
         accessor: (row) =>
-          row.createdOn === undefined
-            ? "N/A"
-            : new Date(row.createdOn).toLocaleDateString(),
+          `${row.createdOn} ${
+            row.createdOn ? new Date(row.createdOn).toLocaleDateString() : ""
+          }`, //This can't be null in the db
+        Cell: (data: Cell<Expense>) =>
+          data.row.original.createdOn
+            ? new Date(data.row.original.createdOn).toLocaleDateString()
+            : "N/A",
       },
       {
         Header: "Delete",

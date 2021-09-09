@@ -35,7 +35,22 @@ export const AccountsInput = (props: Props) => {
       total += accounts[i].percentage;
     }
 
-    total === 100 ? props.setDisabled(false) : props.setDisabled(true);
+    // some will return true if there is an instance that satifies the function given
+    const hasZeroPercent = accounts.some((account) => account.percentage === 0);
+
+    if (total === 100 && !hasZeroPercent) {
+      props.setDisabled(false);
+      setError(undefined);
+    } else {
+      if (total !== 100.0 && accounts.length > 0) {
+        setError("Total percentage must equal 100%");
+      } else if (hasZeroPercent) {
+        setError("All accounts must be above 0%");
+      } else {
+        setError(undefined);
+      }
+      props.setDisabled(true);
+    }
   }, [accounts, props]);
 
   const onSearch = async (query: string) => {
@@ -100,12 +115,6 @@ export const AccountsInput = (props: Props) => {
     }
 
     setAccounts([...accounts]);
-
-    if (accounts.reduce((prev, curr) => prev + curr.percentage, 0) !== 100.0) {
-      setError("Total percentage must equal 100%");
-    } else {
-      setError(undefined);
-    }
   };
 
   return (
@@ -185,7 +194,7 @@ export const AccountsInput = (props: Props) => {
         <Row>
           <Col className="col-md-4 offset-md-6">
             <b>
-              Totat Percent:{" "}
+              Total Percent:{" "}
               {accounts.reduce((prev, curr) => prev + curr.percentage, 0)}%
             </b>
           </Col>
