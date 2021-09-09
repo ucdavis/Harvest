@@ -51,7 +51,7 @@ export const ProjectListContainer = (props: Props) => {
         </div>
       </div>
 
-      <ProjectTable projects={projects}></ProjectTable>
+      {projects.length > 0 ? <ProjectTable projects={projects}></ProjectTable> : <div className="alert alert-info">No projects found</div>}
     </div>
   );
 };
