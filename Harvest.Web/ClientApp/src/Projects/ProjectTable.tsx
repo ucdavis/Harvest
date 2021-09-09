@@ -70,7 +70,7 @@ export const ProjectTable = (props: Props) => {
         accessor: (row) =>
           `${row.end} ${new Date(row.end).toLocaleDateString()}`,
         Cell: (data: Cell<Project>) =>
-          new Date(data.value).toLocaleDateString(),
+          new Date(data.row.original.end).toLocaleDateString(),
       },
       {
         Header: "Status",
