@@ -18,7 +18,9 @@ export const RecentInvoicesContainer = (props: Props) => {
   useEffect(() => {
     const cb = async () => {
       // TODO: only fetch first 5 instead of chopping off client-side
-      const response = await fetch(`/Project/Invoices/${props.projectId}`);
+      const response = await fetch(
+        `/Invoice/List/?projectId=${props.projectId}`
+      );
 
       if (response.ok) {
         getIsMounted() && setInvoices(await response.json());

@@ -49,6 +49,16 @@ namespace Harvest.Web.Controllers
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
+        [HttpGet]
+        public async Task<ActionResult> List(int projectId)
+        {
+            var user = await _userService.GetCurrentUser();
+            var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
+            return Ok(await _dbContext.Invoices.Where(a =>
+                    a.ProjectId == projectId
+                    && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
+                .ToArrayAsync());
+        }
 
         // Get react view, whose router should choose InvoiceDetailContainer
         [HttpGet]
