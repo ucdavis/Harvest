@@ -118,15 +118,7 @@ namespace Harvest.Web.Controllers
                 .ToArrayAsync());
         }
 
-        public async Task<ActionResult> InvoiceList(int projectId)
-        {
-            var user = await _userService.GetCurrentUser();
-            var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
-            return Ok(await _dbContext.Invoices.Where(a =>
-                a.ProjectId == projectId
-                && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
-                .ToArrayAsync());
-        }
+
 
         public ActionResult Details(int projectId)
         {
