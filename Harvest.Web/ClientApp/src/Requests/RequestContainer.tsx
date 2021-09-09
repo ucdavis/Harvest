@@ -147,14 +147,14 @@ export const RequestContainer = () => {
   }
 
   return (
-    <div className="card-wrapper">
+    <div className={originalProject && "card-wrapper"}>
       {originalProject !== undefined && (
         <ProjectHeader
           project={originalProject}
           title={"Original Field Request #" + (originalProject?.id || "")}
         />
       )}
-      <div className="card-green-bg">
+      <div className={originalProject && "card-green-bg"}>
         <div className="row justify-content-center">
           <div className="col-md-6 card-wrapper no-green mt-4 mb-4">
             <div className="card-content">
@@ -171,8 +171,8 @@ export const RequestContainer = () => {
                         required={false}
                         clearIcon={null}
                         value={project.start}
-                        onChange={(date) =>
-                          setProject({ ...project, start: date as Date })
+                        onChange={(date: Date) =>
+                          setProject({ ...project, start: date })
                         }
                       />
                     </div>
@@ -187,8 +187,8 @@ export const RequestContainer = () => {
                         required={false}
                         clearIcon={null}
                         value={project.end}
-                        onChange={(date) =>
-                          setProject({ ...project, end: date as Date })
+                        onChange={(date: Date) =>
+                          setProject({ ...project, end: date })
                         }
                       />
                     </div>
