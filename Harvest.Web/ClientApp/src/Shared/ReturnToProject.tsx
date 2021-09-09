@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
-  projectId: string;
+  projectId: number;
 }
 
 export const ReturnToProject = (props: Props) => (
