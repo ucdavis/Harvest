@@ -149,12 +149,14 @@ export const RequestContainer = () => {
 
   return (
     <div>
-      <div className="alert alert-info">
-        You are making a change request for {project.name}{" "}
-        <Link className="alert-link" to={`/project/details/${project.id}`}>
-          Click here to go back to the project details page
-        </Link>
-      </div>
+      {projectId && (
+        <div className="alert alert-info">
+          You are making a change request for {project.name}{" "}
+          <Link className="alert-link" to={`/project/details/${project.id}`}>
+            Click here to go back to the project details page
+          </Link>
+        </div>
+      )}
       <div className={originalProject && "card-wrapper"}>
         {originalProject !== undefined && (
           <ProjectHeader
