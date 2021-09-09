@@ -30,7 +30,10 @@ export const InvoiceTable = (props: Props) => {
       },
       {
         Header: "Created",
-        accessor: (row) => new Date(row.createdOn).toLocaleDateString(),
+        accessor: (row) =>
+          `${row.createdOn} ${new Date(row.createdOn).toLocaleDateString()}`,
+        Cell: (data: Cell<Invoice>) =>
+          new Date(data.row.original.createdOn).toLocaleDateString(),
       },
       {
         Header: "Total",
