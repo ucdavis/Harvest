@@ -15,10 +15,8 @@ interface RouteParams {
 
 export const InvoiceDetailContainer = () => {
   const { invoiceId } = useParams<RouteParams>();
-  const [
-    projectAndInvoice,
-    setProjectAndInvoice,
-  ] = useState<ProjectWithInvoice>();
+  const [projectAndInvoice, setProjectAndInvoice] =
+    useState<ProjectWithInvoice>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -26,7 +24,8 @@ export const InvoiceDetailContainer = () => {
       const invoiceResponse = await fetch(`/Invoice/Get/${invoiceId}`);
 
       if (invoiceResponse.ok) {
-        const projectWithInvoice: ProjectWithInvoice = await invoiceResponse.json();
+        const projectWithInvoice: ProjectWithInvoice =
+          await invoiceResponse.json();
 
         getIsMounted() && setProjectAndInvoice(projectWithInvoice);
       }
