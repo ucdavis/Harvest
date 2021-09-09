@@ -5,6 +5,8 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
+import { ReturnToProject } from "../Shared/ReturnToProject";
+
 interface RouteParams {
   projectId?: string;
 }
@@ -50,6 +52,7 @@ export const TicketsContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
+      <ReturnToProject projectId={projectId} />
       <div className="card-content">
         <div className="row justify-content-between">
           <h3>List of all tickets for your project</h3>
