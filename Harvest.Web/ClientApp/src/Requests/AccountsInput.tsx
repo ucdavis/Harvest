@@ -42,12 +42,15 @@ export const AccountsInput = (props: Props) => {
       props.setDisabled(false);
       setError(undefined);
     } else {
+      if (total !== 100.0 && accounts.length > 0) {
+        setError("Total percentage must equal 100%");
+      } else if (hasZeroPercent) {
+        setError("All accounts must be above 0%");
+      } else {
+        setError(undefined);
+      }
       props.setDisabled(true);
     }
-
-    total === 100 && !hasZeroPercent
-      ? props.setDisabled(false)
-      : props.setDisabled(true);
   }, [accounts, props]);
 
   const onSearch = async (query: string) => {
@@ -83,18 +86,6 @@ export const AccountsInput = (props: Props) => {
         chosenAccount.percentage = 100.0;
       }
 
-      const total =
-        accounts.reduce((prev, curr) => prev + curr.percentage, 0) +
-        chosenAccount.percentage;
-
-      if (total !== 100.0) {
-        setError("Total percentage must equal 100%");
-      } else if (chosenAccount.percentage === 0) {
-        setError("All accounts must be above 0%");
-      } else {
-        setError(undefined);
-      }
-
       setAccounts([...accounts, chosenAccount]);
 
       // once we have made our selection reset the box so we can start over if desired
@@ -124,14 +115,6 @@ export const AccountsInput = (props: Props) => {
     }
 
     setAccounts([...accounts]);
-
-    if (accounts.reduce((prev, curr) => prev + curr.percentage, 0) !== 100.0) {
-      setError("Total percentage must equal 100%");
-    } else if (accounts.some((account) => account.percentage === 0)) {
-      setError("All accounts must be above 0%");
-    } else {
-      setError(undefined);
-    }
   };
 
   return (
