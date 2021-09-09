@@ -33,19 +33,32 @@ export const TicketTable = (props: Props) => {
       },
       {
         Header: "Created",
-        accessor: (row) => new Date(row.createdOn).toLocaleDateString(),
+        accessor: (row) =>
+          `${row.createdOn} ${new Date(row.createdOn).toLocaleDateString()}`,
+        Cell: (data: Cell<Ticket>) =>
+          new Date(data.row.original.createdOn).toLocaleDateString(),
       },
       {
         Header: "Updated",
-        accessor: "updatedOn",
+        accessor: (row) =>
+          `${row.updatedOn} ${
+            row.updatedOn ? new Date(row.updatedOn).toLocaleDateString() : ""
+          }`,
         Cell: (data: Cell<Ticket>) =>
-          data.value ? new Date(data.value).toLocaleDateString() : "",
+          data.row.original.updatedOn
+            ? new Date(data.row.original.updatedOn).toLocaleDateString()
+            : "",
       },
       {
         Header: "Due",
-        accessor: "dueDate",
+        accessor: (row) =>
+          `${row.dueDate} ${
+            row.dueDate ? new Date(row.dueDate).toLocaleDateString() : ""
+          }`,
         Cell: (data: Cell<Ticket>) =>
-          data.value ? new Date(data.value).toLocaleDateString() : "",
+          data.row.original.dueDate
+            ? new Date(data.row.original.dueDate).toLocaleDateString()
+            : "",
       },
       {
         Header: "Subject",
