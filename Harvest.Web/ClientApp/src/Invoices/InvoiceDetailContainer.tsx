@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { ProjectWithInvoice } from "../types";
-import { InvoicePDF } from "../Pdf/InvoicePDF";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+// Lazy load quote pdf link since it's a large JS file and causes a console warning
+const InvoicePDFLink = React.lazy(() => import("../Pdf/InvoicePDFLink"));
 
 interface RouteParams {
   invoiceId?: string;
@@ -59,15 +57,12 @@ export const InvoiceDetailContainer = () => {
         <div className="card-content">
           <InvoiceDisplay invoice={projectAndInvoice.invoice}></InvoiceDisplay>
         </div>
-
-        <PDFDownloadLink
-          document={<InvoicePDF invoice={projectAndInvoice.invoice} />}
-          fileName={`Invoice-${invoiceId}-Project-${projectAndInvoice.project.name}.pdf`}
-        >
-          <button className="btn btn-link btn-sm">
-            Download PDF <FontAwesomeIcon icon={faDownload} />
-          </button>
-        </PDFDownloadLink>
+        <Suspense fallback={<div>Generating PDF ...</div>}>
+          <InvoicePDFLink
+            invoice={projectAndInvoice.invoice}
+            fileName={`Invoice-${invoiceId}-Project-${projectAndInvoice.project.name}.pdf`}
+          ></InvoicePDFLink>
+        </Suspense>
       </div>
     </div>
   );
