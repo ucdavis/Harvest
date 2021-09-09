@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
+import { Link } from "react-router-dom";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
@@ -150,9 +151,9 @@ export const RequestContainer = () => {
     <div>
       <div className="alert alert-info">
         You are making a change request for {project.name}{" "}
-        <a href={`/project/details/${project.id}`} className="alert-link">
+        <Link className="alert-link" to={`/project/details/${project.id}`}>
           Click here to go back to the project details page
-        </a>
+        </Link>
       </div>
       <div className={originalProject && "card-wrapper"}>
         {originalProject !== undefined && (
