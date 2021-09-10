@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 
-import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
+import {
+  AsyncTypeahead,
+  Highlighter,
+  TypeaheadProps,
+} from "react-bootstrap-typeahead";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { User } from "../types";
 
-interface Props {
+interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
   user?: User;
-  setUser: (user: User) => void;
+  onChange: (user: User | undefined) => void;
 }
 
 export const SearchPerson = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, onChanges] = useState<User[]>([]);
 
   const getIsMounted = useIsMounted();
   const onSearch = async (query: string) => {
@@ -22,21 +26,22 @@ export const SearchPerson = (props: Props) => {
 
     if (response.ok) {
       if (response.status === 204) {
-        getIsMounted() && setUsers([]); // no content means no match
+        getIsMounted() && onChanges([]); // no content means no match
       } else {
         const user: User = await response.json();
 
-        getIsMounted() && setUsers([user]);
+        getIsMounted() && onChanges([user]);
       }
     }
     getIsMounted() && setIsSearchLoading(false);
   };
 
   const onSelect = (selected: User[]) => {
-    // TODO: need a way to clear out selected user -- perhaps we allow null/undefined to be passed up the line?
     if (selected && selected.length === 1) {
       // found our match
-      props.setUser(selected[0]);
+      props.onChange(selected[0]);
+    } else {
+      props.onChange(undefined);
     }
   };
 
@@ -67,6 +72,7 @@ export const SearchPerson = (props: Props) => {
       onSearch={onSearch}
       onChange={onSelect}
       options={users}
+      onBlur={props.onBlur}
     />
   );
 };

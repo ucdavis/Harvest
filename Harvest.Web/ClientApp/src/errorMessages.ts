@@ -17,4 +17,6 @@ export const ErrorMessages = {
   NumberAcresRequired: "Number of acres is required.",
   AcreageRateRequired: "Acreage rate is required.",
   YearsNegative: "Years cannot be negative.",
+  EndDateAfterStartDate: "End date must come after start date.",
+  PIRequired: "Prinipal investigator is required",
 };

@@ -148,8 +148,8 @@ export const TicketCreate = () => {
                         required={false}
                         clearIcon={null}
                         value={ticket.dueDate}
-                        onChange={onChangeValue("dueDate", (date) =>
-                          setTicket({ ...ticket, dueDate: date as Date })
+                        onChange={onChangeValue("dueDate", (date: Date) =>
+                          setTicket({ ...ticket, dueDate: date })
                         )}
                       />
                     </div>

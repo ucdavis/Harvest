@@ -209,12 +209,12 @@ export function useInputValidator<T>(
     onBlurValue(name, e.target.value);
   };
 
-  const onBlurValue = (name: TKey, value: T[TKey] | undefined | string) => {
+  const onBlurValue = (name: TKey, value?: T[TKey] | string) => {
     setFormIsTouched(true);
     if (!touchedFields.some((f) => f === name)) {
       setTouchedFields([...touchedFields, name]);
     }
-    validateField(name, value as T[TKey]);
+    validateField(name, (value || values[name]) as T[TKey]);
   };
 
   const fieldIsTouched = (name: TKey) => touchedFields.some((f) => f === name);
