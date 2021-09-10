@@ -1,13 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import {
-  BlobFile,
-  RequestInput,
-  User,
-  TicketInput,
-  WorkItem,
-  Activity,
-} from "./types";
+import { BlobFile, User, TicketInput, WorkItem, Activity } from "./types";
 import { ErrorMessages } from "./errorMessages";
 import { addDays } from "./Util/Calculations";
 

@@ -55,8 +55,9 @@ export function useInputValidator<T>(
 
   useEffect(() => {
     const errorCount = errors.flatMap((e) => e.errors).length;
-    const previousErrorCount = (previousErrors || []).flatMap((e) => e.errors)
-      .length;
+    const previousErrorCount = (previousErrors || []).flatMap(
+      (e) => e.errors
+    ).length;
     if (errorCount !== previousErrorCount) {
       setFormErrorCount(
         (formErrorCount) => formErrorCount + errorCount - previousErrorCount
@@ -66,7 +67,7 @@ export function useInputValidator<T>(
 
   const validateFieldImpl = useCallback(
     async (name: TKey, value: T[TKey]) => {
-      const newValues = ({ ...values, [name]: value } as unknown) as T;
+      const newValues = { ...values, [name]: value } as unknown as T;
       setValues(newValues);
       try {
         await schema.validateAt(name as string, newValues);
@@ -88,10 +89,8 @@ export function useInputValidator<T>(
 
   const validateField = useDebounceCallback(validateFieldImpl, 250);
 
-  const registeredNames = useRef<TKey[]>([]);
-  const validatorCallbacks = useRef<ValidatorCallbacks>(
-    {} as ValidatorCallbacks
-  );
+  const registeredNames = useRef([] as TKey[]);
+  const validatorCallbacks = useRef({} as ValidatorCallbacks);
 
   useEffect(() => {
     const cb = validatorCallbacks;
@@ -175,35 +174,33 @@ export function useInputValidator<T>(
     validateField(name, value);
   };
 
-  const onChange = (
-    name: TKey,
-    handler: ChangeEventHandler<HTMLInputElement> | null = null
-  ) => (e: ChangeEvent<HTMLInputElement>) => {
-    handler && handler(e);
-    // If T[TKey] is a number, this doesn't actually convert the string to a number.
-    // But yup doesn't seem to mind, and that's what counts.
-    valueChanged(name, (e.target.value as unknown) as T[TKey]);
-    setFormIsDirty(true);
-    if (!dirtyFields.some((f) => f === name)) {
-      setDirtyFields([...dirtyFields, name]);
-    }
-  };
+  const onChange =
+    (name: TKey, handler: ChangeEventHandler<HTMLInputElement> | null = null) =>
+    (e: ChangeEvent<HTMLInputElement>) => {
+      handler && handler(e);
+      // If T[TKey] is a number, this doesn't actually convert the string to a number.
+      // But yup doesn't seem to mind, and that's what counts.
+      valueChanged(name, e.target.value as unknown as T[TKey]);
+      setFormIsDirty(true);
+      if (!dirtyFields.some((f) => f === name)) {
+        setDirtyFields([...dirtyFields, name]);
+      }
+    };
 
   // Some components return the selected element in the onChange function so
   // we have to create an onChange function that handles that
-  const onChangeValue = (
-    name: TKey,
-    handler: ((value: any) => void) | null = null
-  ) => (value: any) => {
-    handler && handler(value);
-    // If T[TKey] is a number, this doesn't actually convert the string to a number.
-    // But yup doesn'tx seem to mind, and that's what counts.
-    valueChanged(name, value as T[TKey]);
-    setFormIsDirty(true);
-    if (!dirtyFields.some((f) => f === name)) {
-      setDirtyFields([...dirtyFields, name]);
-    }
-  };
+  const onChangeValue =
+    (name: TKey, handler: ((value: any) => void) | null = null) =>
+    (value: any) => {
+      handler && handler(value);
+      // If T[TKey] is a number, this doesn't actually convert the string to a number.
+      // But yup doesn'tx seem to mind, and that's what counts.
+      valueChanged(name, value as T[TKey]);
+      setFormIsDirty(true);
+      if (!dirtyFields.some((f) => f === name)) {
+        setDirtyFields([...dirtyFields, name]);
+      }
+    };
 
   const onBlur = (name: TKey) => (e: FocusEvent<HTMLInputElement>) => {
     onBlurValue(name, e.target.value);

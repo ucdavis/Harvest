@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Button, FormGroup, Input, Label } from "reactstrap";
-import { ValidationError } from "yup";
 import DatePicker from "react-date-picker";
 
 import { FileUpload } from "../Shared/FileUpload";
@@ -152,10 +151,7 @@ export const RequestContainer = () => {
           )}
           <div className={originalProject && "card-green-bg"}>
             <div className="row justify-content-center">
-              <div
-                className="col-md-6 card-wrapper no-green mt-4 mb-4"
-                style={{ overflow: "visible" }}
-              >
+              <div className="col-md-6 card-wrapper no-green mt-4 mb-4">
                 <div className="card-content">
                   <h2>
                     {projectId
