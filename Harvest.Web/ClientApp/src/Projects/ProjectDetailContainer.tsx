@@ -71,6 +71,24 @@ export const ProjectDetailContainer = () => {
     }
   };
 
+  //cancel the project
+  const cancelProject = async () => {
+    const request = fetch(`/Request/Cancel/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    const response = await request;
+    if (response.ok) {
+      //redirect to home
+      window.location.href = "/";
+    } else {
+      alert("Error cancelling project");
+    }
+  };
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
@@ -109,6 +127,21 @@ export const ProjectDetailContainer = () => {
                 >
                   Edit Quote
                 </Link>
+              </ShowFor>
+              <ShowFor
+                roles={["FieldManager"]}
+                condition={
+                  project.status === "Requested" ||
+                  project.status === "ChangeRequested" ||
+                  project.status === "QuoteRejected"
+                }
+              >
+                <button
+                  className="btn btn-primary mt-4"
+                  onClick={() => cancelProject()}
+                >
+                  Cancel Request
+                </button>
               </ShowFor>
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
