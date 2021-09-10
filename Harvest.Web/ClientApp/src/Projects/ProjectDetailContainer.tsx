@@ -14,6 +14,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { useHistory } from "react-router-dom";
 
 interface RouteParams {
   projectId?: string;
@@ -23,6 +24,7 @@ export const ProjectDetailContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
+  const history = useHistory();
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -80,12 +82,11 @@ export const ProjectDetailContainer = () => {
         "Content-Type": "application/json",
       },
     });
+    setNotification(request, "Canceling", "Project Request Canceled");
     const response = await request;
     if (response.ok) {
       //redirect to home
-      window.location.href = "/";
-    } else {
-      alert("Error cancelling project");
+      history.push("/");
     }
   };
 
