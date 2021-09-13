@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { Link, useHistory, useParams } from "react-router-dom";
 import {
   Activity,
   Expense,
@@ -185,7 +185,12 @@ export const ExpenseEntryContainer = () => {
     <ValidationProvider context={context}>
       <div className="card-wrapper">
         <div className="card-content">
-          <h1>Add Expenses for Project #{projectId}</h1>
+          <h1>
+            Add Expenses for{" "}
+            <Link to={`/project/details/${projectId}`}>
+              Project {projectId}
+            </Link>
+          </h1>
           <br />
           <div>
             {activities.map((activity) => (

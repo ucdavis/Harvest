@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { Invoice } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
@@ -35,7 +35,10 @@ export const InvoiceListContainer = () => {
   return (
     <div className="">
       <div className="card-content">
-        <h3>Invoices</h3>
+        <h3>
+          Invoices for{" "}
+          <Link to={`/project/details/${projectId}`}>Project {projectId}</Link>
+        </h3>
         <InvoiceTable invoices={invoices}></InvoiceTable>
       </div>
     </div>
