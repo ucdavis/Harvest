@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Harvest.Core.Data;
+﻿using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers
 {
@@ -29,21 +27,15 @@ namespace Harvest.Web.Controllers
             return View(crops);
         }
 
-        // GET: CropController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
         // GET: CropController/Create
         public ActionResult Create()
         {
-            return View();
+            var model = new Crop {Type = Project.CropTypes.Row};
+            return View(model);
         }
 
         // POST: CropController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(Crop model)
         {
             if (!ModelState.IsValid)
@@ -74,42 +66,66 @@ namespace Harvest.Web.Controllers
             }
             catch
             {
-                ErrorMessage = "There was an error trying to create this rate.";
+                ErrorMessage = "There was an error trying to create this crop.";
                 return View(modelToCreate);
             }
 
         }
 
         // GET: CropController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            var model = await _dbContext.Crops.SingleAsync(a => a.Id == id);
+            return View(model);
         }
 
         // POST: CropController/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async  Task<ActionResult> Edit(int id, Crop model)
         {
+            if (!ModelState.IsValid)
+            {
+                ErrorMessage = "There are validation errors, please correct them and try again.";
+                return View(model);
+            }
+            if (!Project.CropTypes.TypeList.Contains(model.Type))
+            {
+                ErrorMessage = $"Type must be {Project.CropTypes.Tree} or {Project.CropTypes.Row}";
+                return View(model);
+            }
+
+            if (await _dbContext.Crops.AnyAsync(a => a.Id != id && a.Type == model.Type && a.Name == model.Name.Trim()))
+            {
+                Message = "Crop you are changing that to already exists";
+                return View(model);
+            }
+
+            var modelToUpdate = await _dbContext.Crops.SingleAsync(a => a.Id == id);
+            modelToUpdate.Type = model.Type;
+            modelToUpdate.Name = model.Name.Trim().Humanize(LetterCasing.Title);
+
             try
             {
+                await _dbContext.SaveChangesAsync();
+                Message = $"{modelToUpdate.Name} Edited";
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ErrorMessage = "There was an error trying to edit this crop.";
+                return View(modelToUpdate);
             }
         }
 
         // GET: CropController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            return View();
+            var model = await _dbContext.Crops.SingleAsync(a => a.Id == id);
+            return View(model);
         }
 
         // POST: CropController/Delete/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
             try

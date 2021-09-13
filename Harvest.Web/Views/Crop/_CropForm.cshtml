@@ -1,0 +1,25 @@
+﻿@model Harvest.Core.Domain.Crop
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="form-group">
+    <label for="Type">Type</label>
+    <div class="radio">
+        <label>
+            <input type="radio" name="Type" id="TypeRow" value="@Project.CropTypes.Row" @(Model.Type == Project.CropTypes.Row ? "checked='checked'" : "") />
+            @Project.CropTypes.Row
+        </label>
+    </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="Type" id="TypeTree" value="@Project.CropTypes.Tree" @(Model.Type == Project.CropTypes.Tree ? "checked='checked'" : "")/>
+            @Project.CropTypes.Tree
+        </label>
+    </div>
+</div>
+
+<div class="form-group">
+    <label asp-for="Name" class="control-label"></label>
+    <input asp-for="Name" class="form-control" placeholder="Enter a crop"/>
+    <span asp-validation-for="Name" class="text-danger"></span>
+</div>
