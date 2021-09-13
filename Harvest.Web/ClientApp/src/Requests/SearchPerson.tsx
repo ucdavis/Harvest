@@ -16,7 +16,7 @@ interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
 
 export const SearchPerson = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
-  const [users, onChanges] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
   const getIsMounted = useIsMounted();
   const onSearch = async (query: string) => {
@@ -26,11 +26,11 @@ export const SearchPerson = (props: Props) => {
 
     if (response.ok) {
       if (response.status === 204) {
-        getIsMounted() && onChanges([]); // no content means no match
+        getIsMounted() && setUsers([]); // no content means no match
       } else {
         const user: User = await response.json();
 
-        getIsMounted() && onChanges([user]);
+        getIsMounted() && setUsers([user]);
       }
     }
     getIsMounted() && setIsSearchLoading(false);
