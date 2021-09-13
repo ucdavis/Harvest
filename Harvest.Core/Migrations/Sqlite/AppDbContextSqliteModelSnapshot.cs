@@ -355,6 +355,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasIndex("CreatedById");
 
+                    b.HasIndex("IsActive");
+
                     b.HasIndex("Name");
 
                     b.HasIndex("OriginalProjectId");
