@@ -5,6 +5,7 @@ import { Progress } from "reactstrap";
 
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
+import { SelectColumnFilter } from "../Shared/Filtering";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { convertCamelCase } from "../Util/StringFormatting";
@@ -12,6 +13,9 @@ import { convertCamelCase } from "../Util/StringFormatting";
 interface Props {
   projects: Project[];
 }
+// TODO
+// Use Filter field from React-Table to create custom filter select
+// Use filter method prop to create a custom filter
 
 export const ProjectTable = (props: Props) => {
   const projectData = useMemo(() => props.projects, [props.projects]);
@@ -55,6 +59,7 @@ export const ProjectTable = (props: Props) => {
       {
         Header: "Crop Type",
         accessor: "cropType",
+        Filter: SelectColumnFilter,
       },
       {
         id: "startDate",
@@ -80,6 +85,7 @@ export const ProjectTable = (props: Props) => {
             {convertCamelCase(data.row.original.status)}
           </span>
         ),
+        Filter: SelectColumnFilter,
       },
     ],
     []
