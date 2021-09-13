@@ -8,9 +8,9 @@
     <div class="card-content">
         <h2>Edit Crop Lookup</h2>
         <form asp-action="Edit">
-            @await Html.PartialAsync("_CropForm")
+            @await Html.PartialAsync("_CropForm", Model)
             <div class="form-group">
-                <input type="submit" value="Edit" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary"/>
             </div>
         </form>
     </div>

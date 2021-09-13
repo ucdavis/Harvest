@@ -209,7 +209,7 @@ namespace Harvest.Web
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(invoice|rate|permissions)" }
+                    constraints: new { controller = "(invoice|rate|permissions|crop)" }
                 );
 
                 endpoints.MapControllerRoute(
