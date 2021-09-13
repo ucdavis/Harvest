@@ -126,10 +126,15 @@ namespace Harvest.Web.Controllers
 
         // POST: CropController/Delete/5
         [HttpPost]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<ActionResult> Delete(int id, Crop model)
         {
+            var cropToDelete = await _dbContext.Crops.SingleAsync(a => a.Id == id);
+            var saveName = cropToDelete.Name;
             try
             {
+                _dbContext.Crops.Remove(cropToDelete);
+                await _dbContext.SaveChangesAsync();
+                Message = $"Crop {saveName} Deleted";
                 return RedirectToAction(nameof(Index));
             }
             catch
