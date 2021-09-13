@@ -108,6 +108,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Project>().HasIndex(a => a.PrincipalInvestigatorId);
             modelBuilder.Entity<Project>().HasIndex(a => a.QuoteId);
+            modelBuilder.Entity<Project>().HasIndex(a => a.IsActive);
 
             modelBuilder.Entity<Project>().Property(a => a.Requirements).HasDefaultValue("N/A");
 
