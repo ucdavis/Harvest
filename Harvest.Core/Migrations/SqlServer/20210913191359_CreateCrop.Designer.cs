@@ -11,8 +11,8 @@ using NetTopologySuite.Geometries;
 namespace Harvest.Core.Migrations.SqlServer
 {
     [DbContext(typeof(AppDbContextSqlServer))]
-    [Migration("20210913180821_CreateCrops")]
-    partial class CreateCrops
+    [Migration("20210913191359_CreateCrop")]
+    partial class CreateCrop
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

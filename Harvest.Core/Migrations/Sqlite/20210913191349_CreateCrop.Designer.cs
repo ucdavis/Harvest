@@ -10,8 +10,8 @@ using NetTopologySuite.Geometries;
 namespace Harvest.Core.Migrations.Sqlite
 {
     [DbContext(typeof(AppDbContextSqlite))]
-    [Migration("20210913180806_CreateCrops")]
-    partial class CreateCrops
+    [Migration("20210913191349_CreateCrop")]
+    partial class CreateCrop
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

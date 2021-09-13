@@ -96,7 +96,7 @@ namespace Harvest.Core.Data
                 return;
             }
 
-            var cropLookup = new  Crop { Name = "Corn", Type = Project.CropTypes.Row};
+            var cropLookup = new Crop { Name = "Corn", Type = Project.CropTypes.Row };
             await _dbContext.Crops.AddAsync(cropLookup);
 
             cropLookup = new Crop { Name = "Cabbage", Type = Project.CropTypes.Row };
