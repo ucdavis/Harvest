@@ -48,6 +48,7 @@ namespace Harvest.Core.Data
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<TicketMessage> TicketMessages { get; set; }
         public DbSet<TicketAttachment> TicketAttachments { get; set; }
+        public DbSet<CropLookup> CropLookups { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -70,6 +71,7 @@ namespace Harvest.Core.Data
             Ticket.OnModelCreating(modelBuilder);
             TicketMessage.OnModelCreating(modelBuilder);
             TicketAttachment.OnModelCreating(modelBuilder);
+            CropLookup.OnModelCreating(modelBuilder);
         }
     }
 }
