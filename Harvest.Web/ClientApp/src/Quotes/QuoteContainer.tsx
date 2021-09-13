@@ -37,7 +37,7 @@ export const QuoteContainer = () => {
   const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
   const [rates, setRates] = useState<Rate[]>([]);
 
-  const { formErrorCount, context } = useInputValidator(
+  const { formErrorCount, context, validateAll } = useInputValidator(
     quoteContentSchema,
     quote
   );
@@ -153,6 +153,10 @@ export const QuoteContainer = () => {
   ]);
 
   const save = async (submit: boolean) => {
+    const errors = await validateAll();
+    if (errors.length > 0) {
+      return;
+    }
     // remove unused workitems and empty activities and apply to state only after successfully saving
     quote.activities.forEach(
       (a) =>

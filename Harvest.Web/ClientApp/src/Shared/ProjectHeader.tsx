@@ -20,9 +20,13 @@ export const ProjectHeader = (props: Props) => {
       return (
         <p>
           {`${project.requirements.substring(0, 256)} ...`}
-          <a href="#" onClick={toggleModal}>
+          <Button
+            className="btn-link btn-sm"
+            color="link"
+            onClick={toggleModal}
+          >
             See More
-          </a>
+          </Button>
         </p>
       );
     } else {

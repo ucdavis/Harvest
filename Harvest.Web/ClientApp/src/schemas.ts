@@ -1,14 +1,11 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import {
-  BlobFile,
-  RequestInput,
-  User,
-  TicketInput,
-  WorkItem,
-  Activity,
-} from "./types";
+import { BlobFile, User, TicketInput, WorkItem, Activity } from "./types";
 import { ErrorMessages } from "./errorMessages";
+import { addDays } from "./Util/Calculations";
+
+// @ts-ignore - override correct yup type
+export const requiredDateSchema: yup.SchemaOf<Date> = yup.date().required();
 
 export const investigatorSchema: SchemaOf<User> = yup.object().shape({
   id: yup.number().required(),
@@ -30,14 +27,19 @@ export const fileSchema: SchemaOf<BlobFile> = yup.object().shape({
   sasLink: yup.string(),
 });
 
-export const requestSchema: SchemaOf<RequestInput> = yup.object().shape({
+export const requestSchema = yup.object().shape({
   id: yup.number().required(),
-  start: yup.string().required(),
-  end: yup.string().required(),
+  start: requiredDateSchema,
+  end: requiredDateSchema.when("start", (start, yup) =>
+    yup.min(addDays(start, 1), ErrorMessages.EndDateAfterStartDate)
+  ),
   crop: yup.string().required(),
   cropType: yup.string().required(),
   requirements: yup.string().required(),
-  principalInvestigator: investigatorSchema,
+  principalInvestigator: yup.lazy((value) =>
+    // investigatorSchema.required() didn't work, but this seems to do the trick
+    value ? investigatorSchema : yup.object().required(ErrorMessages.PIRequired)
+  ),
   files: yup.array().of(fileSchema),
 });
 
@@ -68,12 +70,19 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   quantity: yup
     .number()
     .required()
-    .typeError(ErrorMessages.WorkItemUnit)
-    .positive(ErrorMessages.WorkItemUnit)
-    .test(
-      "maxDigitsAfterDecimal",
-      ErrorMessages.WorkItemQuantityDecimalPlaces,
-      (number) => Number.isInteger((number || 0) * 10 ** 2)
+    .when(
+      // only validate when user has selected a labor/equipment/other option
+      "rateId",
+      (rateId, yup) =>
+        rateId &&
+        yup
+          .typeError(ErrorMessages.WorkItemUnit)
+          .positive(ErrorMessages.WorkItemUnit)
+          .test(
+            "maxDigitsAfterDecimal",
+            ErrorMessages.WorkItemQuantityDecimalPlaces,
+            (number: number) => Number.isInteger((number || 0) * 10 ** 2)
+          )
     ),
   unit: yup.string().defined(),
   markup: yup.boolean().defined(),
