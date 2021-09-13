@@ -13,9 +13,6 @@ import { convertCamelCase } from "../Util/StringFormatting";
 interface Props {
   projects: Project[];
 }
-// TODO
-// Use Filter field from React-Table to create custom filter select
-// Use filter method prop to create a custom filter
 
 export const ProjectTable = (props: Props) => {
   const projectData = useMemo(() => props.projects, [props.projects]);
@@ -86,6 +83,7 @@ export const ProjectTable = (props: Props) => {
           </span>
         ),
         Filter: SelectColumnFilter,
+        filter:"equals"
       },
     ],
     []
@@ -95,6 +93,8 @@ export const ProjectTable = (props: Props) => {
     sortBy: [{ id: "name" }],
     pageSize: ReactTableUtil.getPageSize(),
   };
+
+  console.log(projectData)
 
   return (
     <ReactTable
