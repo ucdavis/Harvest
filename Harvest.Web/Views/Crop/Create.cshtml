@@ -1,0 +1,50 @@
+﻿@model Harvest.Core.Domain.CropLookup
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Crop Lookup</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label for="Type">Type</label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="Type" id="Type" value="@Project.CropTypes.Row" checked="checked" />
+                        @Project.CropTypes.Row
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="Type" id="Type" value="@Project.CropTypes.Tree" />
+                        @Project.CropTypes.Tree
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Crop" class="control-label"></label>
+                <input asp-for="Crop" class="form-control" />
+                <span asp-validation-for="Crop" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
