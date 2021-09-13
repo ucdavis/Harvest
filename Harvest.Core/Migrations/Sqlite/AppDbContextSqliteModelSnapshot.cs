@@ -57,6 +57,31 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Accounts");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Crop", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("Crops");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
                 {
                     b.Property<int>("Id")
@@ -354,6 +379,8 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.HasIndex("AcreageRateId");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("IsActive");
 
                     b.HasIndex("Name");
 

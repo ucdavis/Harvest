@@ -82,7 +82,41 @@ namespace Harvest.Core.Data
 
             await CheckCreateSampleRates();
             await _dbContext.SaveChangesAsync();
+
+            await CheckCreateCropLookups();
+            await _dbContext.SaveChangesAsync();
+
             return;
+        }
+
+        private async Task CheckCreateCropLookups()
+        {
+            if (await _dbContext.Crops.AnyAsync())
+            {
+                return;
+            }
+
+            var cropLookup = new Crop { Name = "Corn", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
+            cropLookup = new Crop { Name = "Cabbage", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
+            cropLookup = new Crop { Name = "Celery", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
+            cropLookup = new Crop { Name = "Potato", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
+            cropLookup = new Crop { Name = "Almond", Type = Project.CropTypes.Tree };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
+            cropLookup = new Crop { Name = "Orange", Type = Project.CropTypes.Tree };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
+            cropLookup = new Crop { Name = "Lemon", Type = Project.CropTypes.Tree };
+            await _dbContext.Crops.AddAsync(cropLookup);
+
         }
 
         private async Task CheckCreateSampleRates()
