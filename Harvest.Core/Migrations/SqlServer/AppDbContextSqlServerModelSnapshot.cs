@@ -61,14 +61,14 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("Harvest.Core.Domain.CropLookup", b =>
+            modelBuilder.Entity("Harvest.Core.Domain.Crop", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<string>("Crop")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -80,11 +80,11 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Crop");
+                    b.HasIndex("Name");
 
                     b.HasIndex("Type");
 
-                    b.ToTable("CropLookups");
+                    b.ToTable("Crops");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>

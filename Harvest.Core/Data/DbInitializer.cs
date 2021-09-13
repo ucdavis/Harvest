@@ -91,31 +91,31 @@ namespace Harvest.Core.Data
 
         private async Task CheckCreateCropLookups()
         {
-            if (await _dbContext.CropLookups.AnyAsync())
+            if (await _dbContext.Crops.AnyAsync())
             {
                 return;
             }
 
-            var cropLookup = new CropLookup {Crop = "Corn", Type = Project.CropTypes.Row};
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            var cropLookup = new Crop { Name = "Corn", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
-            cropLookup = new CropLookup { Crop = "Cabbage", Type = Project.CropTypes.Row };
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            cropLookup = new Crop { Name = "Cabbage", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
-            cropLookup = new CropLookup { Crop = "Celery", Type = Project.CropTypes.Row };
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            cropLookup = new Crop { Name = "Celery", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
-            cropLookup = new CropLookup { Crop = "Potato", Type = Project.CropTypes.Row };
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            cropLookup = new Crop { Name = "Potato", Type = Project.CropTypes.Row };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
-            cropLookup = new CropLookup { Crop = "Almond", Type = Project.CropTypes.Tree };
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            cropLookup = new Crop { Name = "Almond", Type = Project.CropTypes.Tree };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
-            cropLookup = new CropLookup { Crop = "Orange", Type = Project.CropTypes.Tree };
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            cropLookup = new Crop { Name = "Orange", Type = Project.CropTypes.Tree };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
-            cropLookup = new CropLookup { Crop = "Lemon", Type = Project.CropTypes.Tree };
-            await _dbContext.CropLookups.AddAsync(cropLookup);
+            cropLookup = new Crop { Name = "Lemon", Type = Project.CropTypes.Tree };
+            await _dbContext.Crops.AddAsync(cropLookup);
 
         }
 

@@ -8,19 +8,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
 {
-    public class CropLookup
+    public class Crop
     {
         [Key] public int Id { get; set; }
         /// <summary>
         /// From Project.CropTypes
         /// </summary>
         [Required] [StringLength(50)] public string Type { get; set; }
-        [Required] [StringLength(50)] public string Crop { get; set; }
+        [Required] [StringLength(50)] public string Name { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<CropLookup>().HasIndex(a => a.Type);
-            modelBuilder.Entity<CropLookup>().HasIndex(a => a.Crop);
+            modelBuilder.Entity<Crop>().HasIndex(a => a.Type);
+            modelBuilder.Entity<Crop>().HasIndex(a => a.Name);
         }
     }
 

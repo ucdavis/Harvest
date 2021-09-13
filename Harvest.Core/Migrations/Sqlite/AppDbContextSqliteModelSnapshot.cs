@@ -57,13 +57,13 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Accounts");
                 });
 
-            modelBuilder.Entity("Harvest.Core.Domain.CropLookup", b =>
+            modelBuilder.Entity("Harvest.Core.Domain.Crop", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Crop")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
@@ -75,11 +75,11 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Crop");
+                    b.HasIndex("Name");
 
                     b.HasIndex("Type");
 
-                    b.ToTable("CropLookups");
+                    b.ToTable("Crops");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
