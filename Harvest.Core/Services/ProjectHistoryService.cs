@@ -28,6 +28,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> InvoiceCreated(int projectId, Invoice invoice);
         Task<ProjectHistory> MoveMoneyRequested(int projectId, Invoice invoice);
         Task<ProjectHistory> ProjectCompleted(int projectId, Project project);
+        Task<ProjectHistory> ProjectRequestCanceled(int projectId, Project project);
         Task<ProjectHistory> ProjectFilesAttached(int projectId, IEnumerable<ProjectAttachment> attachments);
         Task<ProjectHistory> ProjectTotalRefreshed(int projectId, Project project);
         Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts);
@@ -74,6 +75,8 @@ namespace Harvest.Core.Services
             MakeHistory(projectId, nameof(MoveMoneyRequested), new InvoiceModel(invoice));
         public Task<ProjectHistory> ProjectCompleted(int projectId, Project project) => 
             MakeHistory(projectId, nameof(ProjectCompleted), new ProjectHistoryModel(project));
+        public Task<ProjectHistory> ProjectRequestCanceled(int projectId, Project project) =>
+            MakeHistory(projectId, nameof(ProjectRequestCanceled), new ProjectHistoryModel(project));
         public Task<ProjectHistory> ProjectFilesAttached(int projectId, IEnumerable<ProjectAttachment> attachments) =>
             MakeHistory(projectId, nameof(ProjectFilesAttached), attachments.Select(a => new FileHistoryModel(a)));
         public Task<ProjectHistory> ProjectTotalRefreshed(int projectId, Project project) =>
