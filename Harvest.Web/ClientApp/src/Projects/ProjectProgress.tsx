@@ -13,7 +13,7 @@ export const ProjectProgress = (props: Props) => {
   return (
     <div className="row justify-content-between">
       <div className="col">
-        <h1>Project Progress</h1>
+        <h2>Project Progress</h2>
         <div className="row justify-content-between">
           <div className="col">
             <p className="mb-1">

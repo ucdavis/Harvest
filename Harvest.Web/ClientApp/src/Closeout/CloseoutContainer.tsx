@@ -135,57 +135,48 @@ export const CloseoutContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-      <div className="card-green-bg">
-        <div className="card-content">
-          <div className="row">
-            <div className="col-md-6">
-              <h2>Prepare final invoice for project closeout</h2>
-              <div className="row">
-                <div className="col-md-8">
-                  <Label for="amount">
-                    Final Acreage Expense (defaults to monthly)
-                  </Label>
-                  <Input
-                    className={getClassName("amount")}
-                    type="number"
-                    id="amount"
-                    value={finalAcreageExpense.amount}
-                    onChange={onChange("amount", (e) =>
-                      setFinalAcreageExpense({
-                        amount: parseFloat(e.target.value),
-                      })
-                    )}
-                    onBlur={onBlur("amount")}
-                  />
-                  <InputErrorMessage name="amount" />
-                </div>
-                <div className="col-md-4">
-                  <Button
-                    color="primary"
-                    disabled={notification.pending || formErrorCount > 0}
-                    onClick={addAcreageExpense}
-                  >
-                    Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-6">
-              <ProjectProgress project={project} />
-            </div>
+      <div className="card-content">
+        <div className="row">
+          <div className="col-md-8">
+            <h2>Prepare final invoice for project closeout</h2>
+
+            <Label for="amount">
+              Final Acreage Expense (defaults to monthly)
+            </Label>
+            <Input
+              className={getClassName("amount")}
+              type="number"
+              id="amount"
+              value={finalAcreageExpense.amount}
+              onChange={onChange("amount", (e) =>
+                setFinalAcreageExpense({
+                  amount: parseFloat(e.target.value),
+                })
+              )}
+              onBlur={onBlur("amount")}
+            />
+            <InputErrorMessage name="amount" />
+
+            <Button
+              color="link btn-sm"
+              disabled={notification.pending || formErrorCount > 0}
+              onClick={addAcreageExpense}
+            >
+              Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
+            </Button>
+          </div>
+
+          <div className="col-md-8 mt-4">
+            <ProjectProgress project={project} />
           </div>
         </div>
       </div>
+
       <div className="card-content">
         <div className="row">
           <div className="col-md-12">
             <UnbilledExpensesContainer newExpenseCount={newExpenseCount} />
-          </div>
-        </div>
-      </div>
-      <div className="card-content card-green-bg">
-        <div className="row">
-          <div className="col text-right">
+            <br />
             <Button
               id="CloseoutButton"
               color="primary"
@@ -202,6 +193,11 @@ export const CloseoutContainer = () => {
               </UncontrolledTooltip>
             </ShowFor>
           </div>
+        </div>
+      </div>
+      <div className="card-content">
+        <div className="row">
+          <div className="col text-right"></div>
         </div>
       </div>
     </div>

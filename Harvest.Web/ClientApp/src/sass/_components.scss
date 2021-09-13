@@ -35,9 +35,19 @@
     text-decoration: none;
   }
 }
+.btn-primary {
+  &:hover {
+    background-color: lighten($primary-color, 7);
+    border-color: lighten($primary-color, 7);
+  }
+}
 .btn-danger {
   background-color: $danger;
   border-color: $danger;
+  &:hover {
+    background-color: lighten($danger, 7);
+    border-color: lighten($danger, 7);
+  }
 }
 .btn-sm {
   font-size: 1rem;

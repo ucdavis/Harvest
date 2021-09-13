@@ -86,9 +86,9 @@ export const UnbilledExpensesContainer = (props: Props) => {
     <div>
       <div className="row justify-content-between mb-3">
         <div className="col">
-          <h1>
+          <h2>
             Un-billed Expenses <small>(${formatCurrency(total)} total)</small>
-          </h1>
+          </h2>
         </div>
         <div className="col text-right">
           <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
