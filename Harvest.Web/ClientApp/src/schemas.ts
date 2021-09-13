@@ -70,12 +70,19 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   quantity: yup
     .number()
     .required()
-    .typeError(ErrorMessages.WorkItemUnit)
-    .positive(ErrorMessages.WorkItemUnit)
-    .test(
-      "maxDigitsAfterDecimal",
-      ErrorMessages.WorkItemQuantityDecimalPlaces,
-      (number) => Number.isInteger((number || 0) * 10 ** 2)
+    .when(
+      // only validate when user has selected a labor/equipment/other option
+      "rateId",
+      (rateId, yup) =>
+        rateId &&
+        yup
+          .typeError(ErrorMessages.WorkItemUnit)
+          .positive(ErrorMessages.WorkItemUnit)
+          .test(
+            "maxDigitsAfterDecimal",
+            ErrorMessages.WorkItemQuantityDecimalPlaces,
+            (number: number) => Number.isInteger((number || 0) * 10 ** 2)
+          )
     ),
   unit: yup.string().defined(),
   markup: yup.boolean().defined(),
