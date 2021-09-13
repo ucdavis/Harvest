@@ -14,6 +14,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { useHistory } from "react-router-dom";
 
 interface RouteParams {
   projectId?: string;
@@ -23,6 +24,7 @@ export const ProjectDetailContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
+  const history = useHistory();
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -71,6 +73,23 @@ export const ProjectDetailContainer = () => {
     }
   };
 
+  //cancel the project
+  const cancelProject = async () => {
+    const request = fetch(`/Request/Cancel/${projectId}`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    setNotification(request, "Canceling", "Project Request Canceled");
+    const response = await request;
+    if (response.ok) {
+      //redirect to home
+      history.push("/");
+    }
+  };
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
@@ -109,6 +128,21 @@ export const ProjectDetailContainer = () => {
                 >
                   Edit Quote
                 </Link>
+              </ShowFor>
+              <ShowFor
+                roles={["FieldManager"]}
+                condition={
+                  project.status === "Requested" ||
+                  project.status === "ChangeRequested" ||
+                  project.status === "QuoteRejected"
+                }
+              >
+                <button
+                  className="btn btn-danger btn-sm mr-4"
+                  onClick={() => cancelProject()}
+                >
+                  Cancel Request
+                </button>
               </ShowFor>
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}

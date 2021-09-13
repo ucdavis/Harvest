@@ -60,6 +60,23 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> Cancel(int projectId)
+        {
+            var statuses = new string[]
+                {Project.Statuses.ChangeRequested, Project.Statuses.Requested, Project.Statuses.QuoteRejected};
+            var project = await _dbContext.Projects.SingleAsync(a => a.IsActive && statuses.Contains(a.Status));
+            project.IsActive = false;
+            project.Status = Project.Statuses.Canceled;
+
+            //TODO: History? Email?
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(project);
+        }
+
+        [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
@@ -174,6 +191,10 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> RejectQuote(int projectId, [FromBody] QuoteRejectionModel model)
         {
+            if (string.IsNullOrWhiteSpace(model.Reason))
+            {
+                return BadRequest();
+            }
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
             var currentUser = await _userService.GetCurrentUser();

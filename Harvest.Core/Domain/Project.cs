@@ -179,6 +179,7 @@ namespace Harvest.Core.Domain
             public const string AwaitingCloseout = "AwaitingCloseout";
             public const string FinalInvoicePending = "FinalInvoicePending";
             public const string Completed = "Completed";
+            public const string Canceled = "Canceled";
 
             public static List<string> TypeList = new List<string>
             {
@@ -191,6 +192,7 @@ namespace Harvest.Core.Domain
                 AwaitingCloseout,
                 FinalInvoicePending,
                 Completed,
+                Canceled,
             }.ToList();
         }
 
