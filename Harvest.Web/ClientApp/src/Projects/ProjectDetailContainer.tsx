@@ -95,6 +95,7 @@ export const ProjectDetailContainer = () => {
       <ProjectHeader
         project={project}
         title={"Field Request #" + (project?.id || "")}
+        hideBack={true}
       />
       <div className="card-green-bg">
         <div className="card-content">

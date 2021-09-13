@@ -7,6 +7,7 @@ import { ReturnToProject } from "../Shared/ReturnToProject";
 interface Props {
   project: Project;
   title: string;
+  hideBack?: boolean; // show return to project button
 }
 
 export const ProjectHeader = (props: Props) => {
@@ -21,9 +22,9 @@ export const ProjectHeader = (props: Props) => {
       return (
         <p>
           {`${project.requirements.substring(0, 256)} ...`}
-          <a href="#" onClick={toggleModal}>
+          <button className="btn btn-link" onClick={toggleModal}>
             See More
-          </a>
+          </button>
         </p>
       );
     } else {
@@ -89,7 +90,7 @@ export const ProjectHeader = (props: Props) => {
           </div>
         </div>
       </div>
-      <ReturnToProject projectId={project.id} />
+      {!props.hideBack && <ReturnToProject projectId={project.id} />}
     </div>
   );
 };
