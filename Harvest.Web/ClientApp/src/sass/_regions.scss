@@ -25,6 +25,7 @@
   .quote-info-box {
     border: 1px solid $borders;
     padding: 24px;
+    max-height: 200px;
   }
 }
 .card-project-totals {
@@ -113,7 +114,11 @@
   border-bottom: 1px solid $borders;
   padding: 2% 0 3% 0;
 }
-
+.project-actions {
+  .btn {
+    margin-top: 6px;
+  }
+}
 .project-header {
   border-bottom: 1px solid $borders;
 }

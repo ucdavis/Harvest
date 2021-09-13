@@ -95,11 +95,12 @@ export const ProjectDetailContainer = () => {
       <ProjectHeader
         project={project}
         title={"Field Request #" + (project?.id || "")}
+        hideBack={true}
       />
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
-            <div className="col-md-12">
+            <div className="col-md-12 project-actions">
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
                 condition={

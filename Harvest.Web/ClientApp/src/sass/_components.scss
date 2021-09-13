@@ -29,10 +29,24 @@
 .btn {
   font-family: $sans-bold;
   font-size: 1.2rem;
-  padding: 8px 26px;
+  padding: 8px 20px;
   text-decoration: none;
   &:hover {
     text-decoration: none;
+  }
+}
+.btn-primary {
+  &:hover {
+    background-color: lighten($primary-color, 7);
+    border-color: lighten($primary-color, 7);
+  }
+}
+.btn-danger {
+  background-color: $danger;
+  border-color: $danger;
+  &:hover {
+    background-color: lighten($danger, 7);
+    border-color: lighten($danger, 7);
   }
 }
 .btn-sm {
@@ -188,7 +202,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $sunflower;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-PendingAccountApproval {
@@ -199,7 +213,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $sunflower;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-Requested {
@@ -210,7 +224,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $poppy;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-QuoteRejected {
@@ -221,7 +235,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $poppy;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-Active {
@@ -232,7 +246,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $quad;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-ChangeRequested {
@@ -243,7 +257,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $poppy;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-Completed {
@@ -254,7 +268,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $tahoe;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-AwaitingCloseout {
@@ -265,7 +279,7 @@ $nchild-wide: 24%;
     height: 10px;
     border-radius: 5px;
     background-color: $poppy;
-    margin-right: 6px;
+    margin-right: 2px;
   }
 }
 .project-status-FinalInvoicePending {

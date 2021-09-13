@@ -68,7 +68,7 @@ export const ProjectDetail = (props: Props) => {
   return (
     <Row className="align-items-baseline">
       {/* Left Details */}
-      <Col md="6">
+      <Col lg="6" md="8">
         <Label for="projectName">Project Name</Label>
         <Input
           className={getClassName("projectName")}
@@ -160,7 +160,7 @@ export const ProjectDetail = (props: Props) => {
       </Col>
 
       {/* Right Details */}
-      <Col md="6">
+      <Col md="4" lg="6">
         <Row>
           <Col>
             <Label for="projectLocation">Project Location</Label>
