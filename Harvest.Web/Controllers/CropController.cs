@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +25,7 @@ namespace Harvest.Web.Controllers
         // GET: CropController
         public async Task<ActionResult> Index()
         {
-            var crops = await _dbContext.CropLookups.OrderBy(a => a.Type).ThenBy(a => a.Crop).ToListAsync();
+            var crops = await _dbContext.Crops.OrderBy(a => a.Type).ThenBy(a => a.Name).ToListAsync();
             return View(crops);
         }
 
@@ -42,16 +44,40 @@ namespace Harvest.Web.Controllers
         // POST: CropController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(Crop model)
         {
+            if (!ModelState.IsValid)
+            {
+                ErrorMessage = "There are validation errors, please correct them and try again.";
+                return View(model);
+            }
+            if (!Project.CropTypes.TypeList.Contains(model.Type))
+            {
+                ErrorMessage = $"Type must be {Project.CropTypes.Tree} or {Project.CropTypes.Row}";
+                return View(model);
+            }
+
+            if (await _dbContext.Crops.AnyAsync(a => a.Type == model.Type && a.Name == model.Name.Trim()))
+            {
+                Message = "Crop already exists";
+                return View(model);
+            }
+
+            var modelToCreate = new Crop {Type = model.Type, Name = model.Name.Trim().Humanize(LetterCasing.Title)};
+            
             try
             {
+                await _dbContext.Crops.AddAsync(modelToCreate);
+                await _dbContext.SaveChangesAsync();
+                Message = $"{modelToCreate.Name} Created";
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                ErrorMessage = "There was an error trying to create this rate.";
+                return View(modelToCreate);
             }
+
         }
 
         // GET: CropController/Edit/5
