@@ -301,8 +301,8 @@ export interface TicketMessage {
 
 export interface RequestInput {
   id: number;
-  start: string;
-  end: string;
+  start: Date;
+  end: Date;
   crop: string;
   cropType: string;
   requirements?: string;

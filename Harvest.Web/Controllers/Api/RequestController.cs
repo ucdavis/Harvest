@@ -69,7 +69,7 @@ namespace Harvest.Web.Controllers
             project.IsActive = false;
             project.Status = Project.Statuses.Canceled;
 
-            //TODO: History? Email?
+            await _historyService.ProjectRequestCanceled(projectId, project);
 
             await _dbContext.SaveChangesAsync();
 

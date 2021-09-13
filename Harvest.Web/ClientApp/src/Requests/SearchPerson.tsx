@@ -1,13 +1,17 @@
 import React, { useState } from "react";
 
-import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
+import {
+  AsyncTypeahead,
+  Highlighter,
+  TypeaheadProps,
+} from "react-bootstrap-typeahead";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { User } from "../types";
 
-interface Props {
+interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
   user?: User;
-  setUser: (user: User) => void;
+  onChange: (user: User | undefined) => void;
 }
 
 export const SearchPerson = (props: Props) => {
@@ -33,10 +37,11 @@ export const SearchPerson = (props: Props) => {
   };
 
   const onSelect = (selected: User[]) => {
-    // TODO: need a way to clear out selected user -- perhaps we allow null/undefined to be passed up the line?
     if (selected && selected.length === 1) {
       // found our match
-      props.setUser(selected[0]);
+      props.onChange(selected[0]);
+    } else {
+      props.onChange(undefined);
     }
   };
 
@@ -67,6 +72,7 @@ export const SearchPerson = (props: Props) => {
       onSearch={onSearch}
       onChange={onSelect}
       options={users}
+      onBlur={props.onBlur}
     />
   );
 };

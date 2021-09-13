@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from "react";
 
-import { Typeahead } from "react-bootstrap-typeahead";
+import { Typeahead, TypeaheadProps } from "react-bootstrap-typeahead";
 import { CropType } from "../types";
 
-interface Props {
+interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
   crops: string;
-  setCrops: (crops: string) => void;
+  onChange: (crops: string) => void;
   cropType: CropType;
 }
 
 const splitCrops = (crop: string) => (crop ? crop.split(",") : []);
 
 export const Crops = (props: Props) => {
-  const [crops, setCrops] = useState<string[]>(splitCrops(props.crops));
+  const [crops, onChange] = useState<string[]>(splitCrops(props.crops));
   const [options, setOptions] = useState<string[]>([]);
 
   useEffect(() => {
     if (!props.crops) {
-      setCrops([]);
+      onChange([]);
     } else {
-      setCrops(splitCrops(props.crops));
+      onChange(splitCrops(props.crops));
     }
   }, [props.crops]);
 
@@ -34,9 +34,9 @@ export const Crops = (props: Props) => {
         typeof s === "string" ? s : s.label
       );
 
-      props.setCrops(selectedStrings.join(","));
+      props.onChange(selectedStrings.join(","));
     } else {
-      props.setCrops(""); //If it is cleared out...
+      props.onChange(""); //If it is cleared out...
     }
   };
 
@@ -49,6 +49,7 @@ export const Crops = (props: Props) => {
       options={options}
       placeholder="Search for common crops or add your own"
       onChange={onSelect}
+      onBlur={props.onBlur}
     />
   );
 };

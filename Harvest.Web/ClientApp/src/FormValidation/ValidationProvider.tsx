@@ -1,18 +1,29 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React, {
+  useState,
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+  createContext,
+  useRef,
+} from "react";
+import { ValidationError } from "yup";
 
 export interface ValidationContextState {
   formErrorCount: number;
-  setFormErrorCount: React.Dispatch<React.SetStateAction<number>>;
+  setFormErrorCount: Dispatch<SetStateAction<number>>;
   formIsTouched: boolean;
-  setFormIsTouched: React.Dispatch<React.SetStateAction<boolean>>;
+  setFormIsTouched: Dispatch<SetStateAction<boolean>>;
   formIsDirty: boolean;
-  setFormIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
-  resetContext: () => void;
-  // useFormValidator will use an effect triggered on contextIsReset to reset its internal state
-  contextIsReset: boolean;
+  setFormIsDirty: Dispatch<SetStateAction<boolean>>;
+  callbacks: MutableRefObject<ValidatorCallbacks>[];
 }
 
-export const ValidationContext = React.createContext<ValidationContextState | null>(
+export interface ValidatorCallbacks {
+  reset: () => void;
+  validate: () => Promise<ValidationError[]>;
+}
+
+export const ValidationContext = createContext<ValidationContextState | null>(
   null
 );
 
@@ -22,25 +33,10 @@ export const useOrCreateValidationContext = (
   const [formErrorCount, setFormErrorCount] = useState(0);
   const [formIsTouched, setFormIsTouched] = useState(false);
   const [formIsDirty, setFormIsDirty] = useState(false);
-  const [contextIsReset, setcontextIsReset] = useState(false);
-  const resetContext = () => {
-    setFormErrorCount(0);
-    setFormIsTouched(false);
-    setFormIsDirty(false);
-    setcontextIsReset(true);
-  };
 
-  useEffect(() => {
-    if ((formErrorCount || formIsTouched || formIsDirty) && contextIsReset) {
-      setcontextIsReset(false);
-    }
-  }, [
-    formErrorCount,
-    formIsTouched,
-    formIsDirty,
-    contextIsReset,
-    setcontextIsReset,
-  ]);
+  // a ref of array of refs
+  // this is the only way to ensure the array does not get replaced on rerenders
+  const callbacksRef = useRef<MutableRefObject<ValidatorCallbacks>[]>([]);
 
   if (context) {
     // wishing this early return could be earlier, but RULES of HOOKS
@@ -54,8 +50,7 @@ export const useOrCreateValidationContext = (
     setFormIsTouched,
     formIsDirty,
     setFormIsDirty,
-    resetContext,
-    contextIsReset,
+    callbacks: callbacksRef.current,
   };
 
   return newContext;

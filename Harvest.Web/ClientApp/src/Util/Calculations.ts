@@ -25,3 +25,5 @@ export const getDaysDiff = (date1: Date, date2: Date) =>
   (date1.getTime() - date2.getTime()) / millisecondsPerDay;
 export const getHoursDiff = (date1: Date, date2: Date) =>
   (date1.getTime() - date2.getTime()) / millisecondsPerHour;
+export const addDays = (date: Date, days: number) =>
+  new Date(date.getTime() + days * millisecondsPerDay);
