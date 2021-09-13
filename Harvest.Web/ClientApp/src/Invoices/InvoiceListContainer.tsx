@@ -35,10 +35,10 @@ export const InvoiceListContainer = () => {
   return (
     <div className="">
       <div className="card-content">
-        <h3>
+        <h1>
           Invoices for{" "}
           <Link to={`/project/details/${projectId}`}>Project {projectId}</Link>
-        </h3>
+        </h1>
         <InvoiceTable invoices={invoices}></InvoiceTable>
       </div>
     </div>
