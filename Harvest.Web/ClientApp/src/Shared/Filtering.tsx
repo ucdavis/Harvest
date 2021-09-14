@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Row, HeaderGroup } from "react-table";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 // Define a default UI for filtering
 export const GlobalFilter = ({
@@ -66,7 +67,7 @@ export const SelectColumnFilter = ({
       <option value="">All</option>
       {options.map((option: any, i: number) => (
         <option key={i} value={option}>
-          {option}
+          {convertCamelCase(option)}
         </option>
       ))}
     </select>
