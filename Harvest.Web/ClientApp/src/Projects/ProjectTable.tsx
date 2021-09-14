@@ -5,7 +5,11 @@ import { Progress } from "reactstrap";
 
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
-import { SelectColumnFilter } from "../Shared/Filtering";
+import {
+  SelectColumnFilter,
+  SelectColumnFilterRange,
+  progressFilter,
+} from "../Shared/Filtering";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { convertCamelCase } from "../Util/StringFormatting";
@@ -44,8 +48,10 @@ export const ProjectTable = (props: Props) => {
             data.row.original.chargedTotal / data.row.original.quoteTotal;
           return <Progress style={{ width: "10em" }} value={percent * 100} />;
         },
-        accessor: (row) => row.chargedTotal / row.quoteTotal,
+        accessor: (row) => (row.chargedTotal / row.quoteTotal) * 100,
         Header: "Progress",
+        Filter: SelectColumnFilterRange,
+        filter: "progress",
       },
       {
         id: "remaining",
@@ -83,7 +89,7 @@ export const ProjectTable = (props: Props) => {
           </span>
         ),
         Filter: SelectColumnFilter,
-        filter:"equals"
+        filter: "equals",
       },
     ],
     []
@@ -94,13 +100,12 @@ export const ProjectTable = (props: Props) => {
     pageSize: ReactTableUtil.getPageSize(),
   };
 
-  console.log(projectData)
-
   return (
     <ReactTable
       columns={columns}
       data={projectData}
       initialState={initialState}
+      filterTypes={{ progress: progressFilter }}
     />
   );
 };

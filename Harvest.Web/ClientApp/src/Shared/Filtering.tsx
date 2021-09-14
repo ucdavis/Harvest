@@ -73,6 +73,47 @@ export const SelectColumnFilter = ({
   );
 };
 
+export const SelectColumnFilterRange = ({
+  column: { filterValue, setFilter, preFilteredRows, id },
+}: any) => {
+  // Render a multi-select box
+  return (
+    <select
+      className="form-control"
+      value={filterValue}
+      onChange={(e) => setFilter(e.target.value || undefined)}
+    >
+      <option value="all">All</option>
+      <option value="rangeOne">{"<25%"}</option>
+      <option value="rangeTwo">25-50%</option>
+      <option value="rangeThree">50-75%</option>
+      <option value="rangeFour">{"<75%"}</option>
+    </select>
+  );
+};
+
+// Function to control which rows to showwhen filtering progresses
+export const progressFilter = (rows: any[], id: any, filterValue: any) => {
+  // Returns ranges of progresses depending on the chosen option
+  if (filterValue === "all") {
+    return rows;
+  } else if (filterValue === "rangeOne") {
+    return rows.filter((row) => row.values.progress < 25);
+  } else if (filterValue === "rangeTwo") {
+    return rows.filter(
+      (row) => row.values.progress > 25 && row.values.progress < 50
+    );
+  } else if (filterValue === "rangeThree") {
+    return rows.filter(
+      (row) => row.values.progress > 50 && row.values.progress > 75
+    );
+  } else if (filterValue === "rangeFour") {
+    return rows.filter((row) => row.values.progress > 75);
+  }
+
+  return rows;
+};
+
 export const ColumnFilterHeaders = ({ headerGroups }: any) => {
   return headerGroups.map(
     (headerGroup: HeaderGroup) =>
