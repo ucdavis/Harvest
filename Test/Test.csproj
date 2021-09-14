@@ -20,4 +20,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Harvest.Core\Harvest.Core.csproj" />
+  </ItemGroup>
+
 </Project>
