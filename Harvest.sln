@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Invoice", "Har
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Harvest.Jobs.Notifications", "Harvest.Jobs.Notifications\Harvest.Jobs.Notifications.csproj", "{B72C9F44-85CF-4CEC-A156-54A443F79B26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{04327318-A14E-49C5-B3BC-1DEF2AE89D18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,18 @@ Global
 		{B72C9F44-85CF-4CEC-A156-54A443F79B26}.Release|x64.Build.0 = Release|Any CPU
 		{B72C9F44-85CF-4CEC-A156-54A443F79B26}.Release|x86.ActiveCfg = Release|Any CPU
 		{B72C9F44-85CF-4CEC-A156-54A443F79B26}.Release|x86.Build.0 = Release|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Debug|x64.Build.0 = Debug|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Debug|x86.Build.0 = Debug|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Release|x64.ActiveCfg = Release|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Release|x64.Build.0 = Release|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Release|x86.ActiveCfg = Release|Any CPU
+		{04327318-A14E-49C5-B3BC-1DEF2AE89D18}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
