@@ -87,7 +87,7 @@ export const SelectColumnFilterRange = ({
       <option value="rangeOne">{"<25%"}</option>
       <option value="rangeTwo">25-50%</option>
       <option value="rangeThree">50-75%</option>
-      <option value="rangeFour">{"<75%"}</option>
+      <option value="rangeFour">{">75%"}</option>
     </select>
   );
 };
