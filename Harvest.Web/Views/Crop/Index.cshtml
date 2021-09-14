@@ -1,0 +1,70 @@
+﻿@using Harvest.Core.Extensions
+@model IEnumerable<Harvest.Core.Domain.Crop>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="row justify-content-between mb-3">
+    <div class="col">
+        <h1>Crops</h1>
+    </div>
+    <div class="col text-right">
+        <a class="btn btn-sm btn-primary" asp-action="Create">Create New <i class="fas fa-plus fa-xs"></i></a>
+    </div>
+</div>
+
+<table class="table harvest-table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new {id=item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new {id=item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section Styles
+{
+@{ await Html.RenderPartialAsync("_ReportStylesPartial");}
+@{ await Html.RenderPartialAsync("_FaStylesPartial");}
+}
+
+@section Scripts
+{
+@{ await Html.RenderPartialAsync("_ReportScriptsPartial");}
+
+<script type="text/javascript">
+    var table = $('.table').DataTable({
+        columnDefs: [
+            {
+                orderable: false,
+                targets: [-1]
+            },
+        ]
+    });
+</script>
+}

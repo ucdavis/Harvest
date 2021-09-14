@@ -81,6 +81,9 @@
                         <li class="nav-item">
                             <a asp-controller="Rate" asp-action="Index" class="nav-link">Rates</a>
                         </li>
+                        <li class="nav-item">
+                            <a asp-controller="Crop" asp-action="Index" class="nav-link">Crops</a>
+                        </li>
                     }
                     @if (await UserService.HasAccess(AccessCodes.WorkerAccess))
                     {
