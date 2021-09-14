@@ -105,7 +105,7 @@ export const progressFilter = (rows: any[], id: any, filterValue: any) => {
     );
   } else if (filterValue === "rangeThree") {
     return rows.filter(
-      (row) => row.values.progress > 50 && row.values.progress > 75
+      (row) => row.values.progress > 50 && row.values.progress < 75
     );
   } else if (filterValue === "rangeFour") {
     return rows.filter((row) => row.values.progress > 75);
