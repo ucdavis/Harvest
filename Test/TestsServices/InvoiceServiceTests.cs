@@ -59,15 +59,21 @@ namespace Test.TestsServices
             await invoiceServ.CreateInvoice(1);
 
         }
-        [Fact]
-        public async Task TestInactiveProject()
+
+
+        [Theory]
+        [InlineData(Project.Statuses.Active, false)]
+        [InlineData(Project.Statuses.Requested, false)]
+        [InlineData(Project.Statuses.Requested, true)]
+        public async Task ProjectsThatDoNotRun(string status, bool active)
         {
             SetupData();
-            Projects[1].IsActive = false;
+            Projects[1].IsActive = active;
+            Projects[1].Status = status;
             MockData();
 
-            Projects[1].IsActive.ShouldBeFalse();
-            Projects[1].Status.ShouldBe(Project.Statuses.Active);
+            Projects[1].IsActive.ShouldBe(active);
+            Projects[1].Status.ShouldBe(status);
 
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
                 MockExpenseService.Object, MockDevSettings.Object);
@@ -76,25 +82,7 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe($"No active project found for given projectId: {Projects[1].Id}");
         }
-
-        [Fact]
-        public async Task TestRequestedProject()
-        {
-            SetupData();
-            Projects[1].IsActive = true;
-            Projects[1].Status = Project.Statuses.Requested;
-            MockData();
-
-            Projects[1].IsActive.ShouldBeTrue();
-            Projects[1].Status.ShouldBe(Project.Statuses.Requested);
-
-            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object);
-            var rtValue = await invoiceServ.CreateInvoice(Projects[1].Id);
-            rtValue.ShouldNotBeNull();
-            rtValue.IsError.ShouldBeTrue();
-            rtValue.Message.ShouldBe($"No active project found for given projectId: {Projects[1].Id}");
-        }
+        
 
         private void SetupData()
         {
