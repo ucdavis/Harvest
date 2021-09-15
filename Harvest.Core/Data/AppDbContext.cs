@@ -30,25 +30,25 @@ namespace Harvest.Core.Data
         {
         }
 
-        public DbSet<Account> Accounts { get; set; }
-        public DbSet<Document> Documents { get; set; }
-        public DbSet<Expense> Expenses { get; set; }
-        public DbSet<Field> Fields { get; set; }
-        public DbSet<Invoice> Invoices { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<ProjectAttachment> ProjectAttachments { get; set; }
-        public DbSet<Project> Projects { get; set; }
-        public DbSet<ProjectHistory> ProjectHistory { get; set; }
-        public DbSet<Quote> Quotes { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Transfer> Transfers { get; set; }
-        public DbSet<Rate> Rates { get; set; }
-        public DbSet<Ticket> Tickets { get; set; }
-        public DbSet<TicketMessage> TicketMessages { get; set; }
-        public DbSet<TicketAttachment> TicketAttachments { get; set; }
-        public DbSet<Crop> Crops { get; set; }
+        public virtual DbSet<Account> Accounts { get; set; }
+        public virtual DbSet<Document> Documents { get; set; }
+        public virtual DbSet<Expense> Expenses { get; set; }
+        public virtual DbSet<Field> Fields { get; set; }
+        public virtual DbSet<Invoice> Invoices { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<Permission> Permissions { get; set; }
+        public virtual DbSet<ProjectAttachment> ProjectAttachments { get; set; }
+        public virtual DbSet<Project> Projects { get; set; }
+        public virtual DbSet<ProjectHistory> ProjectHistory { get; set; }
+        public virtual DbSet<Quote> Quotes { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<User> Users { get; set; }
+        public virtual DbSet<Transfer> Transfers { get; set; }
+        public virtual DbSet<Rate> Rates { get; set; }
+        public virtual DbSet<Ticket> Tickets { get; set; }
+        public virtual DbSet<TicketMessage> TicketMessages { get; set; }
+        public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
+        public virtual DbSet<Crop> Crops { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
