@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Moq;
 using Shouldly;
+using Test.Helpers;
+using TestHelpers.Helpers;
 using Xunit;
 
 namespace Test.TestsServices
@@ -36,13 +39,28 @@ namespace Test.TestsServices
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
         }
         [Fact]
-        public void TestSample()
+        public async Task TestSample()
         {
             var xxx = "1";
             xxx.ShouldBe("1");
 
+
+
+
+            var projects = new List<Project>();
+            for (int i = 0; i < 3; i++)
+            {
+                projects.Add(CreateValidEntities.Project(i));
+            }
+
+            MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
+            MockDbContext.Setup(a => a.Projects).Returns(projects.AsQueryable().MockDbSet().Object);
+
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
                 MockExpenseService.Object, MockDevSettings.Object);
+
+            await invoiceServ.Test();
+
         }
     }
 }

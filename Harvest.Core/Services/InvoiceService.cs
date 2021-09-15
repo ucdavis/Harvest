@@ -21,6 +21,7 @@ namespace Harvest.Core.Services
         Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false);
         Task<int> CreateInvoices(bool manualOverride = false);
         Task<List<int>> GetCreatedInvoiceIds();
+        Task Test();
     }
 
     public class InvoiceService : IInvoiceService
@@ -176,6 +177,13 @@ namespace Harvest.Core.Services
             //TODO: Check project status?
             return await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Created).Select(a => a.Id)
                 .ToListAsync();
+        }
+
+        public async Task Test()
+        {
+            var xxx = await _dbContext.Projects.Where(a => a.IsActive).ToListAsync();
+
+            var yyy = 1;
         }
     }
 }
