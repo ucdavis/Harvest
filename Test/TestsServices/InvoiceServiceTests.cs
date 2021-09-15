@@ -27,6 +27,9 @@ namespace Test.TestsServices
         public Mock<IExpenseService> MockExpenseService { get; set; }
         public Mock<IOptions<DevSettings>> MockDevSettings { get; set; }
 
+        public List<Project> Projects { get; set; }
+        public List<Expense> Expenses { get; set; }
+
         public InvoiceServiceTests()
         {
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
@@ -38,6 +41,7 @@ namespace Test.TestsServices
             var devSet = new DevSettings {RecreateDb = false, NightlyInvoices = true, UseSql = false};
 
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            
         }
         [Fact]
         public async Task TestSample()
@@ -46,29 +50,83 @@ namespace Test.TestsServices
             xxx.ShouldBe("1");
 
 
+            SetupData();
 
 
-            var projects = new List<Project>();
-            for (int i = 0; i < 3; i++)
-            {
-                projects.Add(CreateValidEntities.Project(i));
-            }
-
-            var projectData = projects.AsQueryable();
-            try { 
-            MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
-            MockDbContext.Setup(a => a.Projects).Returns(projects.AsQueryable().MockAsyncDbSet().Object);
-
-            }
-            catch(Exception e)
-            {
-                var uuu = e;
-            }
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
                 MockExpenseService.Object, MockDevSettings.Object);
 
-            await invoiceServ.Test();
+            await invoiceServ.CreateInvoice(1);
 
+        }
+        [Fact]
+        public async Task TestInactiveProject()
+        {
+            SetupData();
+            Projects[1].IsActive = false;
+            MockData();
+
+            Projects[1].IsActive.ShouldBeFalse();
+            Projects[1].Status.ShouldBe(Project.Statuses.Active);
+
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object);
+            var rtValue = await invoiceServ.CreateInvoice(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"No active project found for given projectId: {Projects[1].Id}");
+        }
+
+        [Fact]
+        public async Task TestRequestedProject()
+        {
+            SetupData();
+            Projects[1].IsActive = true;
+            Projects[1].Status = Project.Statuses.Requested;
+            MockData();
+
+            Projects[1].IsActive.ShouldBeTrue();
+            Projects[1].Status.ShouldBe(Project.Statuses.Requested);
+
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object);
+            var rtValue = await invoiceServ.CreateInvoice(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"No active project found for given projectId: {Projects[1].Id}");
+        }
+
+        private void SetupData()
+        {
+            Projects = new List<Project>();
+            for (int i = 0; i < 3; i++)
+            {
+                Projects.Add(CreateValidEntities.Project(i));
+            }
+            Projects[1].IsActive = false;
+
+            Expenses = new List<Expense>();
+            for (int i = 0; i < 2; i++)
+            {
+                Expenses.Add(CreateValidEntities.Expense(i, Projects[0].Id));
+                Expenses.Add(CreateValidEntities.Expense(i, Projects[1].Id));
+                Expenses.Add(CreateValidEntities.Expense(i, Projects[2].Id));
+            }
+
+        }
+
+        private void MockData()
+        {
+
+            try
+            {
+                MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
+                MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 }

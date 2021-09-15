@@ -107,5 +107,26 @@ namespace Test.Helpers
 
             return rtValue;
         }
+
+        public static Expense Expense(int? counter, int projectId)
+        {
+            var rtValue = new Expense();
+            rtValue.Id = counter ?? 99;
+            rtValue.ProjectId = projectId;
+            rtValue.Description = $"Description{counter}";
+            rtValue.Rate = Rate(3);
+            rtValue.RateId = 3;
+            rtValue.Rate.Account = "3-FRMRATE";
+            rtValue.Quantity = 2.00m;
+            rtValue.Total = rtValue.Quantity * rtValue.Rate.Price;
+            rtValue.Price = rtValue.Rate.Price;
+            rtValue.CreatedOn = DateTime.UtcNow.AddDays(-1);
+            rtValue.CreatedById = 1;
+            rtValue.CreatedBy = CreateValidEntities.User(1);
+            rtValue.Account = rtValue.Rate.Account;
+
+            return rtValue;       
+
+        }
     }
 }
