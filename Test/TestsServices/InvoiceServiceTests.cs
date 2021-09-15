@@ -9,6 +9,7 @@ using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic.CompilerServices;
 using Moq;
 using Shouldly;
 using Test.Helpers;
@@ -53,9 +54,16 @@ namespace Test.TestsServices
                 projects.Add(CreateValidEntities.Project(i));
             }
 
+            var projectData = projects.AsQueryable();
+            try { 
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
-            MockDbContext.Setup(a => a.Projects).Returns(projects.AsQueryable().MockDbSet().Object);
+            MockDbContext.Setup(a => a.Projects).Returns(projects.AsQueryable().MockAsyncDbSet().Object);
 
+            }
+            catch(Exception e)
+            {
+                var uuu = e;
+            }
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
                 MockExpenseService.Object, MockDevSettings.Object);
 

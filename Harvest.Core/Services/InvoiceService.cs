@@ -181,7 +181,16 @@ namespace Harvest.Core.Services
 
         public async Task Test()
         {
-            var xxx = await _dbContext.Projects.Where(a => a.IsActive).ToListAsync();
+            try
+            {
+                var xxx = await _dbContext.Projects.Where(a => a.IsActive).ToListAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
 
             var yyy = 1;
         }
