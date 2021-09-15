@@ -30,7 +30,7 @@ namespace Harvest.Web.Controllers
         // GET: CropController/Create
         public ActionResult Create()
         {
-            var model = new Crop {Type = Project.CropTypes.Row};
+            var model = new Crop { Type = Project.CropTypes.Row };
             return View(model);
         }
 
@@ -55,8 +55,8 @@ namespace Harvest.Web.Controllers
                 return View(model);
             }
 
-            var modelToCreate = new Crop {Type = model.Type, Name = model.Name.Trim().Humanize(LetterCasing.Title)};
-            
+            var modelToCreate = new Crop { Type = model.Type, Name = model.Name.Trim().Humanize(LetterCasing.Title) };
+
             try
             {
                 await _dbContext.Crops.AddAsync(modelToCreate);
@@ -81,7 +81,7 @@ namespace Harvest.Web.Controllers
 
         // POST: CropController/Edit/5
         [HttpPost]
-        public async  Task<ActionResult> Edit(int id, Crop model)
+        public async Task<ActionResult> Edit(int id, Crop model)
         {
             if (!ModelState.IsValid)
             {
@@ -141,6 +141,18 @@ namespace Harvest.Web.Controllers
             {
                 return View();
             }
+        }
+
+        // GET: CropController/Search?type=Row
+        public async Task<ActionResult> Search([FromQuery] string type, [FromQuery] string query = "")
+        {
+            var queryable = _dbContext.Crops.Where(c => c.Type == type);
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                queryable = queryable.Where(c => EF.Functions.Contains(c.Name, query));
+            }
+            var model = await queryable.ToArrayAsync();
+            return Ok(model);
         }
     }
 }

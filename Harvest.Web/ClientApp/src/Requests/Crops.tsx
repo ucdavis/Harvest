@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { Typeahead, TypeaheadProps } from "react-bootstrap-typeahead";
 import { CropType } from "../types";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
   crops: string;
@@ -14,6 +15,8 @@ const splitCrops = (crop: string) => (crop ? crop.split(",") : []);
 export const Crops = (props: Props) => {
   const [crops, onChange] = useState<string[]>(splitCrops(props.crops));
   const [options, setOptions] = useState<string[]>([]);
+  const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
+  const getIsMounted = useIsMounted();
 
   useEffect(() => {
     if (!props.crops) {
@@ -24,7 +27,7 @@ export const Crops = (props: Props) => {
   }, [props.crops]);
 
   useEffect(() => {
-    setOptions(CommonCrops[props.cropType]);
+    onSearch();
   }, [props.cropType]);
 
   const onSelect = (selected: (string | { label: string })[]) => {
@@ -40,8 +43,29 @@ export const Crops = (props: Props) => {
     }
   };
 
+  const onSearch = async (query?: string) => {
+    setIsSearchLoading(true);
+
+    const response = await fetch(
+      `/Crop/Search?type=${props.cropType}${(query && `&query=${query}`) || ""}`
+    );
+
+    if (response.ok) {
+      if (response.status === 204) {
+        getIsMounted() && setOptions([]); // no content means no match
+      } else {
+        const crops: string[] = (await response.json()).map(
+          (c: { name: string }) => c.name
+        );
+
+        getIsMounted() && setOptions(crops);
+      }
+    }
+    getIsMounted() && setIsSearchLoading(false);
+  };
+
   return (
-    <Typeahead
+    <Typeahead<string>
       id="crops" // for accessibility
       allowNew
       multiple
@@ -50,12 +74,7 @@ export const Crops = (props: Props) => {
       placeholder="Search for common crops or add your own"
       onChange={onSelect}
       onBlur={props.onBlur}
+      isLoading={isSearchLoading}
     />
   );
 };
-
-// TODO: where should we keep this list?  Worth querying every time?
-const CommonCrops = {
-  Row: ["corn", "cabbage", "celery"],
-  Tree: ["almond", "orange"],
-} as { [c: string]: string[] };
