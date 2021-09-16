@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize]
     public class CropController : SuperController
     {
         private readonly AppDbContext _dbContext;
@@ -20,7 +20,9 @@ namespace Harvest.Web.Controllers
         {
             _dbContext = dbContext;
         }
+
         // GET: CropController
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Index()
         {
             var crops = await _dbContext.Crops.OrderBy(a => a.Type).ThenBy(a => a.Name).ToListAsync();
@@ -28,13 +30,15 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: CropController/Create
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public ActionResult Create()
         {
-            var model = new Crop {Type = Project.CropTypes.Row};
+            var model = new Crop { Type = Project.CropTypes.Row };
             return View(model);
         }
 
         // POST: CropController/Create
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         [HttpPost]
         public async Task<ActionResult> Create(Crop model)
         {
@@ -55,8 +59,8 @@ namespace Harvest.Web.Controllers
                 return View(model);
             }
 
-            var modelToCreate = new Crop {Type = model.Type, Name = model.Name.Trim().Humanize(LetterCasing.Title)};
-            
+            var modelToCreate = new Crop { Type = model.Type, Name = model.Name.Trim().Humanize(LetterCasing.Title) };
+
             try
             {
                 await _dbContext.Crops.AddAsync(modelToCreate);
@@ -73,6 +77,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: CropController/Edit/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Edit(int id)
         {
             var model = await _dbContext.Crops.SingleAsync(a => a.Id == id);
@@ -80,8 +85,9 @@ namespace Harvest.Web.Controllers
         }
 
         // POST: CropController/Edit/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         [HttpPost]
-        public async  Task<ActionResult> Edit(int id, Crop model)
+        public async Task<ActionResult> Edit(int id, Crop model)
         {
             if (!ModelState.IsValid)
             {
@@ -117,6 +123,7 @@ namespace Harvest.Web.Controllers
             }
         }
 
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         // GET: CropController/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
@@ -125,6 +132,7 @@ namespace Harvest.Web.Controllers
         }
 
         // POST: CropController/Delete/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         [HttpPost]
         public async Task<ActionResult> Delete(int id, Crop model)
         {
@@ -141,6 +149,18 @@ namespace Harvest.Web.Controllers
             {
                 return View();
             }
+        }
+
+        // GET: CropController/Search?type=Row
+        public async Task<ActionResult> Search([FromQuery] string type, [FromQuery] string query = "")
+        {
+            var queryable = _dbContext.Crops.Where(c => c.Type == type);
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                queryable = queryable.Where(c => EF.Functions.Contains(c.Name, query));
+            }
+            var model = await queryable.ToArrayAsync();
+            return Ok(model);
         }
     }
 }

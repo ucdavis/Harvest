@@ -1,4 +1,10 @@
 export type CropType = "Row" | "Tree";
+export interface Crop {
+  id: number;
+  type: CropType;
+  name: string;
+}
+
 export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
 export type RoleName =
   | "System"

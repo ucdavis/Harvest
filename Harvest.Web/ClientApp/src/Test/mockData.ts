@@ -1,6 +1,7 @@
 import {
   AppContextShape,
   BlobFile,
+  Crop,
   Invoice,
   Project,
   ProjectWithQuote,
@@ -219,3 +220,41 @@ export const sampleRates: Rate[] = [
     id: 8,
   },
 ];
+
+export const fakeCrops = [
+  {
+    id: 1,
+    type: "Row",
+    name: "Corn",
+  },
+  {
+    id: 2,
+    type: "Row",
+    name: "Cabbage",
+  },
+  {
+    id: 3,
+    type: "Row",
+    name: "Celery",
+  },
+  {
+    id: 4,
+    type: "Row",
+    name: "Potato",
+  },
+  {
+    id: 5,
+    type: "Tree",
+    name: "Almond",
+  },
+  {
+    id: 6,
+    type: "Tree",
+    name: "Orange",
+  },
+  {
+    id: 7,
+    type: "Tree",
+    name: "Lemon",
+  },
+] as Crop[];
