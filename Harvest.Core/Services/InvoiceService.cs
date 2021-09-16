@@ -69,11 +69,12 @@ namespace Harvest.Core.Services
                     return Result.Error("An invoice already exists for current month: {projectId}", projectId);
                 }
 
-                if (project.Start.AddMonths(1) > now) //Start doing invoices 1 month after the project starts
+                var prjStartFirstOfMonth = new DateTime(project.Start.Year, project.Start.Month, 1).AddMonths(1).FromPacificTime();
+                if (prjStartFirstOfMonth > now) //Start doing invoices on the first month after the project starts
                 {
-                    return Result.Error("Project has not yet started: {projectId}", projectId);
+                    return Result.Error("Project has not yet started in following month: {projectId}", projectId);
                 }
-
+                
                 //Don't create an invoice for project past its end date, and just mark it as AwaitingCloseout
                 if (project.End < now)
                 {
