@@ -30,25 +30,18 @@ export const Crops = (props: Props) => {
     onSearch();
   }, [props.cropType]);
 
-  const onSelect = (selected: (string | { label: string })[]) => {
+  const onSelect = (selected: string[]) => {
     if (selected && selected.length > 0) {
-      // selections are either strings or an object with the string in a label prop for custom fields, so project them to just the strings we want
-      const selectedStrings = selected.map((s) =>
-        typeof s === "string" ? s : s.label
-      );
-
-      props.onChange(selectedStrings.join(","));
+      props.onChange(selected.join(","));
     } else {
       props.onChange(""); //If it is cleared out...
     }
   };
 
-  const onSearch = async (query?: string) => {
+  const onSearch = async () => {
     setIsSearchLoading(true);
 
-    const response = await fetch(
-      `/Crop/Search?type=${props.cropType}${(query && `&query=${query}`) || ""}`
-    );
+    const response = await fetch(`/Crop/Search?type=${props.cropType}`);
 
     if (response.ok) {
       if (response.status === 204) {
