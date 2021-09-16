@@ -32,6 +32,7 @@ namespace Test.TestsServices
         public List<Expense> Expenses { get; set; }
         private InvoiceService InvoiceServ { get; set; }
 
+
         public InvoiceServiceTests()
         {
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
@@ -193,6 +194,78 @@ namespace Test.TestsServices
             rtValue.Message.ShouldBe("Project has not yet started in following month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
+        [Fact]
+        public async Task GetsPastFollowingMonthAndSetesUpAwaitingCloseout()
+        {
+            //Kind of hacky. Setting the end date to 10 ish dates after the start so we can test that this runs in the first of the next month, but then we await closeout
+            var date = new DateTime(2020, 02, 03).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 20);
+                invoices.Add(invoice);
+            }
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Start = new DateTime(2020, 01, 01).Date.FromPacificTime();
+            Projects[0].End = new DateTime(2020, 02, 02).Date.FromPacificTime();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Can't create invoice for project past its end date: 1");
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            Projects[0].Status.ShouldBe(Project.Statuses.AwaitingCloseout);
+        }
+        [Fact]
+        public async Task CreateMonthlyAcreageExpenseCalledWhenFirstInvoiceOfTheMonth()
+        {
+            var date = new DateTime(2020, 02, 03).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 20);
+                invoices.Add(invoice);
+            }
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Start = new DateTime(2020, 01, 01).Date.FromPacificTime();
+            Projects[0].End = new DateTime(2021, 02, 02).Date.FromPacificTime();
+            Projects[0].QuoteTotal = 100.00m; //Just set it low so it will exit early.
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+            MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(Projects[0]), Times.Once); 
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Project expenses exceed quote: 1, invoiceAmount: 4600.0000, quoteRemaining: 100.00"); //Because I'm not testing further than this...
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
 
         [Theory]
         [InlineData(2020, 01, 01)]
@@ -214,6 +287,7 @@ namespace Test.TestsServices
                 invoice.CreatedOn = new DateTime(2020, 01, 01); //Invoice created on first of month
                 invoices.Add(invoice);
             }
+
             MockData();
             var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
