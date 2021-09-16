@@ -76,7 +76,7 @@ namespace Harvest.Core.Services
                 }
                 
                 //Don't create an invoice for project past its end date, and just mark it as AwaitingCloseout
-                if (project.End < now)
+                if (project.End.FromPacificTime() < now)
                 {
                     project.Status = Project.Statuses.AwaitingCloseout;
                     await _dbContext.SaveChangesAsync();
