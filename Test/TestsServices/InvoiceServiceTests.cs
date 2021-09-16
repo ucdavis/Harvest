@@ -124,6 +124,81 @@ namespace Test.TestsServices
         [InlineData(2020, 01, 01)]
         [InlineData(2020, 01, 02)]
         [InlineData(2020, 01, 03)]
+        [InlineData(2020, 01, 31)]
+        public async Task DoesNotCreateInvoiceUntilFollowingMonthJan1(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 01); 
+                invoices.Add(invoice);
+            }
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Start = new DateTime(2020, 01, 01).Date.FromPacificTime();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Project has not yet started: 1");
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(2020, 01, 01)]
+        [InlineData(2020, 01, 02)]
+        [InlineData(2020, 01, 03)]
+        [InlineData(2020, 01, 31)]
+        [InlineData(2020, 02, 03, Skip = "This one should fail with new logic")]
+        public async Task DoesNotCreateInvoiceUntilFollowingMonthJan20(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 20);
+                invoices.Add(invoice);
+            }
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Start = new DateTime(2020, 01, 01).Date.FromPacificTime();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Project has not yet started: 1");
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(2020, 01, 01)]
+        [InlineData(2020, 01, 02)]
+        [InlineData(2020, 01, 03)]
         [InlineData(2020, 01, 06)]
         [InlineData(2020, 01, 07)]
         [InlineData(2020, 01, 08)]
