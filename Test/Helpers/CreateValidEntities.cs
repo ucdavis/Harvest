@@ -128,5 +128,17 @@ namespace Test.Helpers
             return rtValue;       
 
         }
+
+        public static Invoice Invoice(int? counter, int projectId)
+        {
+            var rtValue = new Invoice();
+            rtValue.Id = counter ?? 99;
+            rtValue.ProjectId = projectId;
+            rtValue.Total = 1150.00m;
+            rtValue.CreatedOn = DateTime.UtcNow.AddDays(-1);
+            rtValue.Status = Harvest.Core.Domain.Invoice.Statuses.Pending;
+
+            return rtValue;
+        }
     }
 }

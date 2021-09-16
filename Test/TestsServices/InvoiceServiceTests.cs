@@ -88,43 +88,130 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
-        [Fact]
-        public async Task ProjectRunsOutOfMoney()
+        [Theory]
+        [InlineData(2020, 01, 04)]
+        [InlineData(2020, 01, 05)]
+        [InlineData(2020, 01, 11)]
+        [InlineData(2020, 01, 12)]
+        [InlineData(2020, 01, 18)]
+        [InlineData(2020, 01, 19)]
+        [InlineData(2020, 01, 25)]
+        [InlineData(2020, 01, 26)]
+        public async Task OnlyRunsWeekdays(int year, int month, int day)
         {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true);;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Invoices can only be created Monday through Friday: 1");
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(2020, 01, 01)]
+        [InlineData(2020, 01, 02)]
+        [InlineData(2020, 01, 03)]
+        [InlineData(2020, 01, 06)]
+        [InlineData(2020, 01, 07)]
+        [InlineData(2020, 01, 08)]
+        [InlineData(2020, 01, 30)]
+        [InlineData(2020, 01, 31)]
+        public async Task DoesNotRunIfInvoiceInMonthExists(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[i].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 01); //Invoice created on first of month
+                invoices.Add(invoice);
+            }
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+
+
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("An invoice already exists for current month: 1");
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 02, 04)]
+        [InlineData(2020, 02, 05)]
+        [InlineData(2020, 02, 06)]
+        public async Task ProjectRunsOutOfMoneyDoesNotSendEmail(int year, int month, int day)
+        {
+            //Feb 3, 2020 is the first business day of the month
+            var date = new DateTime(year, month, day).FromPacificTime();
             SetupData();
             Projects[0].QuoteTotal = Expenses.Where(a => a.ProjectId == Projects[0].Id).Sum(a => a.Total) - 10.00m;
             MockData();
             Projects[0].IsActive.ShouldBe(true);
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
-            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2020, 01, 04).FromPacificTime()); //Saturday
-            MockDateTimeService.Object.DateTimeUtcNow().DayOfWeek.ShouldBe(DayOfWeek.Saturday);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date); 
 
             var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id);
-            //TODO Check email sent if first day of month thing.
 
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe($"Project expenses exceed quote: {Projects[0].Id}, invoiceAmount: 4600.0000, quoteRemaining: 4590.0000");
             MockEmailService.Verify(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>()), Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
-        [Fact]
-        public async Task ProjectRunsOutOfMoneyOnFirstOfMonth()
+        [Theory]
+        [InlineData(2020, 01, 01)]
+        [InlineData(2020, 02, 03)]
+        [InlineData(2020, 03, 02)]
+        [InlineData(2020, 04, 01)]
+        [InlineData(2020, 05, 01)]
+        [InlineData(2020, 06, 01)]
+        [InlineData(2020, 08, 03)]
+        public async Task ProjectRunsOutOfMoneyOnFirstBusinessDayOfMonth(int year, int month, int day)
         {
+            var date = new DateTime(year, month, day).FromPacificTime();
             SetupData();
             Projects[0].QuoteTotal = Expenses.Where(a => a.ProjectId == Projects[0].Id).Sum(a => a.Total) - 10.00m;
             MockData();
             Projects[0].IsActive.ShouldBe(true);
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
-            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2020, 01, 01).FromPacificTime()); //Wednesday
-            MockDateTimeService.Object.DateTimeUtcNow().DayOfWeek.ShouldBe(DayOfWeek.Wednesday);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
 
             var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id);
-            //TODO Check email sent if first day of month thing.
 
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe($"Project expenses exceed quote: {Projects[0].Id}, invoiceAmount: 4600.0000, quoteRemaining: 4590.0000");
             MockEmailService.Verify(a => a.InvoiceExceedsQuote(Projects[0], 4600.00m, 4590.00m), Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
         [Fact]
