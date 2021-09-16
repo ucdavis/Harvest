@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+    [Authorize]
     public class CropController : SuperController
     {
         private readonly AppDbContext _dbContext;
@@ -20,7 +20,9 @@ namespace Harvest.Web.Controllers
         {
             _dbContext = dbContext;
         }
+
         // GET: CropController
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Index()
         {
             var crops = await _dbContext.Crops.OrderBy(a => a.Type).ThenBy(a => a.Name).ToListAsync();
@@ -28,6 +30,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: CropController/Create
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public ActionResult Create()
         {
             var model = new Crop { Type = Project.CropTypes.Row };
@@ -35,6 +38,7 @@ namespace Harvest.Web.Controllers
         }
 
         // POST: CropController/Create
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         [HttpPost]
         public async Task<ActionResult> Create(Crop model)
         {
@@ -73,6 +77,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: CropController/Edit/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Edit(int id)
         {
             var model = await _dbContext.Crops.SingleAsync(a => a.Id == id);
@@ -80,6 +85,7 @@ namespace Harvest.Web.Controllers
         }
 
         // POST: CropController/Edit/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         [HttpPost]
         public async Task<ActionResult> Edit(int id, Crop model)
         {
@@ -117,6 +123,7 @@ namespace Harvest.Web.Controllers
             }
         }
 
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         // GET: CropController/Delete/5
         public async Task<ActionResult> Delete(int id)
         {
@@ -125,6 +132,7 @@ namespace Harvest.Web.Controllers
         }
 
         // POST: CropController/Delete/5
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         [HttpPost]
         public async Task<ActionResult> Delete(int id, Crop model)
         {
