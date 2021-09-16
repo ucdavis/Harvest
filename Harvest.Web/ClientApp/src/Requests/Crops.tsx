@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { Typeahead, TypeaheadProps } from "react-bootstrap-typeahead";
-import { CropType } from "../types";
+import { Crop, CropType } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
@@ -55,7 +55,7 @@ export const Crops = (props: Props) => {
         getIsMounted() && setOptions([]); // no content means no match
       } else {
         const crops: string[] = (await response.json()).map(
-          (c: { name: string }) => c.name
+          (c: Crop) => c.name
         );
 
         getIsMounted() && setOptions(crops);
