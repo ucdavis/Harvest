@@ -156,6 +156,7 @@ namespace Harvest.Web
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
+            services.AddTransient<IDateTimeService, DateTimeService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

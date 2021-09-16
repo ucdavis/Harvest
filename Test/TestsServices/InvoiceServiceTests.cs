@@ -25,6 +25,7 @@ namespace Test.TestsServices
         public Mock<IEmailService> MockEmailService { get; set; }
         public Mock<IExpenseService> MockExpenseService { get; set; }
         public Mock<IOptions<DevSettings>> MockDevSettings { get; set; }
+        public Mock<IDateTimeService> MockDateTimeService { get; set; }
 
         public List<Project> Projects { get; set; }
         public List<Expense> Expenses { get; set; }
@@ -37,13 +38,14 @@ namespace Test.TestsServices
             MockEmailService = new Mock<IEmailService>();
             MockExpenseService = new Mock<IExpenseService>();
             MockDevSettings = new Mock<IOptions<DevSettings>>();
+            MockDateTimeService = new Mock<IDateTimeService>();
 
             var devSet = new DevSettings {RecreateDb = false, NightlyInvoices = true, UseSql = false};
 
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
 
             InvoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
         }
 
 
@@ -93,7 +95,7 @@ namespace Test.TestsServices
             MockData();
             Projects[0].IsActive.ShouldBe(true);
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
-
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2020, 01, 01));
 
             var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id);
             //TODO Check email sent if first day of month thing.
@@ -141,6 +143,7 @@ namespace Test.TestsServices
             {
                 MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
                 MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
+                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
             }
             catch (Exception e)
             {
