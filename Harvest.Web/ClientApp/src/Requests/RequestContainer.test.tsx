@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
 import { RequestContainer } from "./RequestContainer";
-import { fakeAppContext, fakeProject } from "../Test/mockData";
+import { fakeAppContext, fakeCrops, fakeProject } from "../Test/mockData";
 import "jest-canvas-mock";
 
 let container: Element;
@@ -40,11 +40,18 @@ describe("Request Container", () => {
     text: () => Promise.resolve("file 1"),
   };
 
+  const cropResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
+  };
+
   it("Populate form", async () => {
     await act(async () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(cropResponse))
         .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
       render(
@@ -81,6 +88,7 @@ describe("Request Container", () => {
     await act(async () => {
       global.fetch = jest
         .fn()
+        .mockImplementationOnce(() => Promise.resolve(cropResponse))
         .mockImplementationOnce(() => Promise.resolve(fileResponse));
 
       render(

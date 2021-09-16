@@ -65,7 +65,7 @@ namespace Harvest.Web.Controllers
         {
             var statuses = new string[]
                 {Project.Statuses.ChangeRequested, Project.Statuses.Requested, Project.Statuses.QuoteRejected};
-            var project = await _dbContext.Projects.SingleAsync(a => a.IsActive && statuses.Contains(a.Status));
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.IsActive && statuses.Contains(a.Status));
             project.IsActive = false;
             project.Status = Project.Statuses.Canceled;
 
@@ -106,7 +106,7 @@ namespace Harvest.Web.Controllers
                 project.Requirements = changeRequestProject.Requirements;
                 project.Status = Project.Statuses.Active;
                 project.Accounts = new List<Account>();
-                project.Attachments = new List<ProjectAttachment>(); 
+                project.Attachments = new List<ProjectAttachment>();
 
                 // clear old accounts
                 _dbContext.Accounts.RemoveRange(_dbContext.Accounts.Where(a => a.ProjectId == project.Id));
@@ -115,9 +115,11 @@ namespace Harvest.Web.Controllers
                 var originalAttachments = await _dbContext.ProjectAttachments.Where(a => a.ProjectId == project.Id).ToListAsync();
                 var changeRequestAttachments = await _dbContext.ProjectAttachments.Where(a => a.ProjectId == changeRequestProject.Id).ToListAsync();
 
-                foreach (var attachment in changeRequestAttachments) {
+                foreach (var attachment in changeRequestAttachments)
+                {
                     // if this new attachment isn't one of the original attachments, then reassign to the original project
-                    if (!originalAttachments.Any(a => a.Identifier == attachment.Identifier)) {
+                    if (!originalAttachments.Any(a => a.Identifier == attachment.Identifier))
+                    {
                         attachment.Project = project;
                     }
                 }
@@ -130,7 +132,7 @@ namespace Harvest.Web.Controllers
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
             }
-            
+
             var currentUser = await _userService.GetCurrentUser();
 
             var percentage = 0.0m;
@@ -382,7 +384,7 @@ namespace Harvest.Web.Controllers
             {
                 await _emailService.NewFieldRequest(newProject);
             }
-            
+
 
             return Ok(newProject);
         }
