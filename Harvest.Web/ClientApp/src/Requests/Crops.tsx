@@ -58,7 +58,7 @@ export const Crops = (props: Props) => {
   };
 
   return (
-    <Typeahead<string>
+    <Typeahead
       id="crops" // for accessibility
       allowNew
       multiple
