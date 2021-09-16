@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Harvest.Core.Extensions;
 using Test.Helpers;
 using TestHelpers.Helpers;
 using Xunit;
@@ -95,7 +96,8 @@ namespace Test.TestsServices
             MockData();
             Projects[0].IsActive.ShouldBe(true);
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
-            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2020, 01, 01));
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2020, 01, 04).FromPacificTime()); //Saturday
+            MockDateTimeService.Object.DateTimeUtcNow().DayOfWeek.ShouldBe(DayOfWeek.Saturday);
 
             var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id);
             //TODO Check email sent if first day of month thing.
@@ -103,8 +105,28 @@ namespace Test.TestsServices
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe($"Project expenses exceed quote: {Projects[0].Id}, invoiceAmount: 4600.0000, quoteRemaining: 4590.0000");
+            MockEmailService.Verify(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>()), Times.Never);
         }
-        
+        [Fact]
+        public async Task ProjectRunsOutOfMoneyOnFirstOfMonth()
+        {
+            SetupData();
+            Projects[0].QuoteTotal = Expenses.Where(a => a.ProjectId == Projects[0].Id).Sum(a => a.Total) - 10.00m;
+            MockData();
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2020, 01, 01).FromPacificTime()); //Wednesday
+            MockDateTimeService.Object.DateTimeUtcNow().DayOfWeek.ShouldBe(DayOfWeek.Wednesday);
+
+            var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id);
+            //TODO Check email sent if first day of month thing.
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"Project expenses exceed quote: {Projects[0].Id}, invoiceAmount: 4600.0000, quoteRemaining: 4590.0000");
+            MockEmailService.Verify(a => a.InvoiceExceedsQuote(Projects[0], 4600.00m, 4590.00m), Times.Once);
+        }
+
         [Fact]
         public async Task ActiveProjectBlahBlah()
         {
@@ -144,6 +166,7 @@ namespace Test.TestsServices
                 MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
                 MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
                 MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
+                MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(),It.IsAny<decimal>())).ReturnsAsync(true);
             }
             catch (Exception e)
             {
