@@ -153,7 +153,7 @@ namespace Test.TestsServices
 
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
-            rtValue.Message.ShouldBe("Project has not yet started: 1");
+            rtValue.Message.ShouldBe("Project has not yet started in following month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
@@ -162,7 +162,6 @@ namespace Test.TestsServices
         [InlineData(2020, 01, 02)]
         [InlineData(2020, 01, 03)]
         [InlineData(2020, 01, 31)]
-        [InlineData(2020, 02, 03, Skip = "This one should fail with new logic")]
         public async Task DoesNotCreateInvoiceUntilFollowingMonthJan20(int year, int month, int day)
         {
             var date = new DateTime(year, month, day).FromPacificTime();
@@ -191,7 +190,7 @@ namespace Test.TestsServices
 
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
-            rtValue.Message.ShouldBe("Project has not yet started: 1");
+            rtValue.Message.ShouldBe("Project has not yet started in following month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
