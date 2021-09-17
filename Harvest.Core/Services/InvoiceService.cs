@@ -106,7 +106,7 @@ namespace Harvest.Core.Services
                     projectId, invoiceAmount, quoteRemaining);
             }
 
-            if (totalExpenses < project.QuoteTotal)
+            if (isCloseout && totalExpenses < project.QuoteTotal)
             {
                 Log.Warning("Expenses: {totalExpenses} do not match quote: ({quoteTotal}) for project: {projectId}",
                     totalExpenses, project.QuoteTotal, project.Id);
@@ -115,7 +115,7 @@ namespace Harvest.Core.Services
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
 
-            if (unbilledExpenses.Length == 0 && !isCloseout)
+            if (!unbilledExpenses.Any() && !isCloseout)
             {
                 return Result.Error("No unbilled expenses found for project: {projectId}", projectId);
             }
@@ -125,7 +125,7 @@ namespace Harvest.Core.Services
                 CreatedOn = now,
                 ProjectId = projectId,
                 // empty invoice won't be processed by SlothService
-                Status = unbilledExpenses.Length > 0 ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
+                Status = unbilledExpenses.Any() ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
                 Total = unbilledExpenses.Sum(x => x.Total)
             };
             newInvoice.Expenses = new List<Expense>(unbilledExpenses);
