@@ -49,6 +49,40 @@ namespace Test.TestsServices
             InvoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
                 MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
         }
+        private void SetupData()
+        {
+            Projects = new List<Project>();
+            for (int i = 0; i < 3; i++)
+            {
+                Projects.Add(CreateValidEntities.Project(i + 1));
+            }
+            Projects[1].IsActive = false;
+
+            Expenses = new List<Expense>();
+            for (int i = 0; i < 6; i++)
+            {
+                Expenses.Add(CreateValidEntities.Expense(i + 1, Projects[(i % 3)].Id)); //Use Mod to divide expenses between the 3 projects
+            }
+
+        }
+
+        private void MockData()
+        {
+
+            try
+            {
+                MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
+                MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
+                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
+                MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>())).ReturnsAsync(true);
+                MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
+                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021, 01, 01));
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
 
         /// <summary>
         /// Only Status of Active and Project.IsActive will run
@@ -725,39 +759,6 @@ namespace Test.TestsServices
         }
         
 
-        private void SetupData()
-        {
-            Projects = new List<Project>();
-            for (int i = 0; i < 3; i++)
-            {
-                Projects.Add(CreateValidEntities.Project(i+1));
-            }
-            Projects[1].IsActive = false;
 
-            Expenses = new List<Expense>();
-            for (int i = 0; i < 6; i++)
-            {
-                Expenses.Add(CreateValidEntities.Expense(i+1, Projects[(i%3)].Id)); //Use Mod to divide expenses between the 3 projects
-            }
-
-        }
-
-        private void MockData()
-        {
-
-            try
-            {
-                MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
-                MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
-                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
-                MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(),It.IsAny<decimal>())).ReturnsAsync(true);
-                MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
-                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021,01,01));
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-        }
     }
 }
