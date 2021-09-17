@@ -483,7 +483,7 @@ namespace Test.TestsServices
         }
 
         /// <summary>
-        /// Make sue email service is called first of the month
+        /// Make sue email service is not called when not the first business day
         /// </summary>
         /// <param name="year"></param>
         /// <param name="month"></param>
@@ -514,6 +514,13 @@ namespace Test.TestsServices
             MockEmailService.Verify(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>()), Times.Never);
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
+        /// <summary>
+        /// Make sure email service is called on first business day of the month when the expense is too big
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(2020, 01, 01)]
         [InlineData(2020, 02, 03)]
@@ -541,6 +548,11 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
+        /// <summary>
+        /// Doesn't generate invoice if no unbilled expenses and not closeout.
+        /// This is assuming the expense service doesn't bill acreage
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task WhenNoUnbilledExpensesAndNotCloseout()
         {
@@ -563,6 +575,11 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
+        /// <summary>
+        /// No unbilled expenses and it is close out
+        /// Creates a completed invoice and sets project to completed
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task WhenNoUnbilledExpensesAndCloseout()
         {
@@ -597,6 +614,11 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.Completed);
         }
 
+        /// <summary>
+        /// When there are unbilled expenses and close out
+        /// Expect a pending invoice and project status to have final invoice pending
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task WhenUnbilledExpensesAndCloseout()
         {
@@ -625,6 +647,10 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.FinalInvoicePending);
         }
 
+        /// <summary>
+        /// Test the dev override for creating nightly invoices
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task InvoiceCreatedForActiveProjectWithNightlySetting()
         {
@@ -653,6 +679,10 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
         }
 
+        /// <summary>
+        /// Test invoice gets created first business day of month when no dev override
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task InvoiceCreatedForActiveProjectWithOutNightlySetting()
         {
