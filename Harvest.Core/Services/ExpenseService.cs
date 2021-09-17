@@ -35,6 +35,10 @@ namespace Harvest.Core.Services
 
         public async Task CreateAcreageExpense(int projectId, decimal amount)
         {
+            if (amount < 0.01m)
+            {
+                throw new Exception("Amount must be >= 0.01");
+            }
             var project = await _dbContext.Projects
                 .Include(p => p.AcreageRate)
                 .SingleOrDefaultAsync(p => p.Id == projectId);
@@ -55,6 +59,11 @@ namespace Harvest.Core.Services
             }
 
             var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2);
+            if (amountToCharge < 0.01m)
+            {
+                Log.Error("Project {projectId} would have an acreage amount less than 0.01. Skipping.", project.Id);
+                return;
+            }
 
             //Check for an unbilled acreage expense
             if (await _dbContext.Expenses.AnyAsync(a =>
