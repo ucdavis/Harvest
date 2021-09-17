@@ -57,10 +57,6 @@ namespace Test.TestsServices
             MockUserService.Setup(a => a.GetCurrentUser()).ReturnsAsync(() => null);
             //MockUserService.Setup(a => a.GetCurrentUser()).ReturnsAsync(CreateValidEntities.User(1));
 
-
-
-            //CancellationToken token
-
             MockDbContext.Setup(a => a.Expenses.Add(It.IsAny<Expense>())).Callback<Expense>(a => AddedExpense = a);
             MockDbContext.Setup(a => a.Expenses.AddAsync(It.IsAny<Expense>(), It.IsAny<System.Threading.CancellationToken>())).Callback((Expense a, CancellationToken token) => AddedExpense = a);
         }

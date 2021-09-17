@@ -41,7 +41,7 @@ namespace Harvest.Core.Services
             }
             var project = await _dbContext.Projects
                 .Include(p => p.AcreageRate)
-                .SingleOrDefaultAsync(p => p.Id == projectId);
+                .SingleAsync(p => p.Id == projectId);
 
             var expense = await CreateExpense(project, amount);
 
