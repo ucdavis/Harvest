@@ -9,7 +9,6 @@ using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.InvoiceModels;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
