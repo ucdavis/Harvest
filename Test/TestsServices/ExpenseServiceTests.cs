@@ -25,15 +25,19 @@ namespace Test.TestsServices
         public Mock<AppDbContext> MockDbContext { get; set; }
         public Mock<IProjectHistoryService> MockProjectHistoryService { get; set; }
         public Mock<IUserService> MockUserService { get; set; }
-        
+        public ExpenseService ExpenseService { get; set; }
 
         public List<Project> Projects { get; set; }
+        public Expense AddedExpense { get; set; } = null;
 
         public ExpenseServiceTests()
         {
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
             MockProjectHistoryService = new Mock<IProjectHistoryService>();
             MockUserService = new Mock<IUserService>();
+
+            ExpenseService = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockUserService.Object);
         }
 
         #region Setups
@@ -52,10 +56,25 @@ namespace Test.TestsServices
             MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
             MockUserService.Setup(a => a.GetCurrentUser()).ReturnsAsync(() => null);
             //MockUserService.Setup(a => a.GetCurrentUser()).ReturnsAsync(CreateValidEntities.User(1));
+
+
+
+            //CancellationToken token
+
+            MockDbContext.Setup(a => a.Expenses.Add(It.IsAny<Expense>())).Callback<Expense>(a => AddedExpense = a);
+            MockDbContext.Setup(a => a.Expenses.AddAsync(It.IsAny<Expense>(), It.IsAny<System.Threading.CancellationToken>())).Callback((Expense a, CancellationToken token) => AddedExpense = a);
         }
 
         #endregion
 
+        [Fact]
+        public async Task ExpenseIsCreated()
+        {
+            SetupData();
+            MockData();
 
+            await ExpenseService.CreateAcreageExpense(Projects[0].Id, 0.01m);
+            AddedExpense.ShouldNotBeNull();
+        }
     }
 }
