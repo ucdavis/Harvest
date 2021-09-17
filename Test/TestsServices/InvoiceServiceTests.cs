@@ -418,6 +418,35 @@ namespace Test.TestsServices
         }
 
         [Fact]
+        public async Task WhenUnbilledExpensesAndCloseout()
+        {
+            //This can happen if there is no acreage fee
+            SetupData();
+            MockData();
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+
+
+            var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id, true);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            addedInvoice.ShouldNotBeNull();
+            addedInvoice.Expenses.ShouldNotBeNull();
+            addedInvoice.Expenses.Any().ShouldBe(true);
+            addedInvoice.CreatedOn.Date.ShouldBe(new DateTime(2021, 01, 01).Date);
+            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            addedInvoice.Status.ShouldBe(Invoice.Statuses.Created);
+            addedInvoice.Total.ShouldBe(4600.00m);
+
+            Projects[0].Status.ShouldBe(Project.Statuses.FinalInvoicePending);
+        }
+
+        [Fact]
         public async Task ActiveProjectBlahBlah()
         {
 
