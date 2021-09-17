@@ -251,7 +251,6 @@ namespace Test.TestsServices
             Projects[0].End = new DateTime(2021, 02, 02).Date.FromPacificTime();
             Projects[0].QuoteTotal = 100.00m; //Just set it low so it will exit early.
             MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
-            MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
@@ -363,6 +362,62 @@ namespace Test.TestsServices
         }
 
         [Fact]
+        public async Task WhenNoUnbilledExpensesAndNotCloseout()
+        {
+            //This can happen if there is no acreage fee
+            SetupData();
+            foreach (var expense in Expenses.Where(a => a.ProjectId == Projects[0].Id))
+            {
+                //Set the expenses as billed
+                expense.Invoice = CreateValidEntities.Invoice(9 + expense.Id, Projects[0].Id);
+            }
+            MockData();
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+
+
+            var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id, false);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("No unbilled expenses found for project: 1");
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        [Fact]
+        public async Task WhenNoUnbilledExpensesAndCloseout()
+        {
+            //This can happen if there is no acreage fee
+            SetupData();
+            foreach (var expense in Expenses.Where(a => a.ProjectId == Projects[0].Id))
+            {
+                //Set the expenses as billed
+                expense.Invoice = CreateValidEntities.Invoice(9 + expense.Id, Projects[0].Id);
+            }
+            MockData();
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+
+
+            var rtValue = await InvoiceServ.CreateInvoice(Projects[0].Id, true);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            addedInvoice.ShouldNotBeNull();
+            addedInvoice.Expenses.ShouldNotBeNull();
+            addedInvoice.Expenses.Any().ShouldBe(false);
+            addedInvoice.CreatedOn.Date.ShouldBe(new DateTime(2021,01,01).Date);
+            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            addedInvoice.Status.ShouldBe(Invoice.Statuses.Completed);
+            addedInvoice.Total.ShouldBe(0);
+
+            Projects[0].Status.ShouldBe(Project.Statuses.Completed);
+        }
+
+        [Fact]
         public async Task ActiveProjectBlahBlah()
         {
 
@@ -402,6 +457,8 @@ namespace Test.TestsServices
                 MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
                 MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
                 MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(),It.IsAny<decimal>())).ReturnsAsync(true);
+                MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
+                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021,01,01));
             }
             catch (Exception e)
             {
