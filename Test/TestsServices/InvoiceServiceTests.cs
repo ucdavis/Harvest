@@ -50,7 +50,12 @@ namespace Test.TestsServices
                 MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
         }
 
-
+        /// <summary>
+        /// Only Status of Active and Project.IsActive will run
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="active"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(Project.Statuses.Active, false)]
         [InlineData(Project.Statuses.Requested, false)]
@@ -71,7 +76,7 @@ namespace Test.TestsServices
         [InlineData(Project.Statuses.PendingAccountApproval, true)]
         [InlineData(Project.Statuses.PendingApproval, false)]
         [InlineData(Project.Statuses.PendingApproval, true)]
-        public async Task ProjectsThatDoNotRun(string status, bool active)
+        public async Task ProjectThatDoNotRun(string status, bool active)
         {
             SetupData();
             Projects[1].IsActive = active;
@@ -89,6 +94,31 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
+        /// <summary>
+        /// Id not found
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task ProjectNotFound()
+        {
+            SetupData();
+            MockData();
+
+            var rtValue = await InvoiceServ.CreateInvoice(99);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"No active project found for given projectId: 99");
+
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        /// <summary>
+        /// Test that it doesn't run on weekends
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(2020, 01, 04)]
         [InlineData(2020, 01, 05)]
@@ -121,6 +151,13 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
+        /// <summary>
+        /// This makes sure that an invoice is only created the month after the project starts.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(2020, 01, 01)]
         [InlineData(2020, 01, 02)]
@@ -158,6 +195,69 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
+        /// <summary>
+        /// This makes sure that an invoice is only created the month after the project starts. (same as above except this one starts Feb 3 (The Monday)
+        /// The 4th and 5th tests would work, because there isn't an invoice created yet.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        [Theory]
+        [InlineData(2020, 02, 03)]
+        [InlineData(2020, 02, 04)]
+        [InlineData(2020, 02, 05)]
+        public async Task DoesCreateInvoiceFollowingMonthJan1(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 01);
+                invoices.Add(invoice);
+            }
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Start = new DateTime(2020, 01, 01).Date.FromPacificTime();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            addedInvoice.ShouldNotBeNull();
+            addedInvoice.Expenses.ShouldNotBeNull();
+            addedInvoice.Expenses.Any().ShouldBe(true);
+            addedInvoice.CreatedOn.Date.ShouldBe(new DateTime(year, month, day).Date);
+            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            addedInvoice.Status.ShouldBe(Invoice.Statuses.Created);
+            addedInvoice.Total.ShouldBe(4600.00m);
+
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+        }
+
+        /// <summary>
+        /// This one has the project start date of Jan 20, instead of Jan 1
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(2020, 01, 01)]
         [InlineData(2020, 01, 02)]
@@ -171,7 +271,7 @@ namespace Test.TestsServices
             for (int i = 0; i < 3; i++)
             {
                 var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
-                invoice.CreatedOn = new DateTime(2020, 01, 20);
+                invoice.CreatedOn = new DateTime(2020, 01, 01);
                 invoices.Add(invoice);
             }
             MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
@@ -180,7 +280,7 @@ namespace Test.TestsServices
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
             Projects[0].IsActive.ShouldBe(true); ;
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
-            Projects[0].Start = new DateTime(2020, 01, 01).Date.FromPacificTime();
+            Projects[0].Start = new DateTime(2020, 01, 20).Date.FromPacificTime(); //Change start to 20th
             MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
 
             //Use this invoice because we changed the Dev Settings
@@ -194,8 +294,68 @@ namespace Test.TestsServices
             rtValue.Message.ShouldBe("Project has not yet started in following month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
+        /// <summary>
+        /// This makes sure that an invoice is only created the month after the project starts. Have Project Start date Jan 20
+        /// The 4th and 5th tests would work, because there isn't an invoice created yet.
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
+        [Theory]
+        [InlineData(2020, 02, 03)]
+        [InlineData(2020, 02, 04)]
+        [InlineData(2020, 02, 05)]
+        public async Task DoesCreateInvoiceFollowingMonthJan20(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[1].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 01);
+                invoices.Add(invoice);
+            }
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true); ;
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Start = new DateTime(2020, 01, 20).Date.FromPacificTime();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            addedInvoice.ShouldNotBeNull();
+            addedInvoice.Expenses.ShouldNotBeNull();
+            addedInvoice.Expenses.Any().ShouldBe(true);
+            addedInvoice.CreatedOn.Date.ShouldBe(new DateTime(year, month, day).Date);
+            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            addedInvoice.Status.ShouldBe(Invoice.Statuses.Created);
+            addedInvoice.Total.ShouldBe(4600.00m);
+
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+        }
+
+        /// <summary>
+        /// Chck that a project past the end date sets the Awaiting Closeout status
+        /// </summary>
+        /// <returns></returns>
         [Fact]
-        public async Task GetsPastFollowingMonthAndSetesUpAwaitingCloseout()
+        public async Task GetsPastFollowingMonthAndSetsUpAwaitingCloseout()
         {
             //Kind of hacky. Setting the end date to 10 ish dates after the start so we can test that this runs in the first of the next month, but then we await closeout
             var date = new DateTime(2020, 02, 03).FromPacificTime();
@@ -229,6 +389,11 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             Projects[0].Status.ShouldBe(Project.Statuses.AwaitingCloseout);
         }
+
+        /// <summary>
+        /// Make sure expense service is called
+        /// </summary>
+        /// <returns></returns>
         [Fact]
         public async Task CreateMonthlyAcreageExpenseCalledWhenFirstInvoiceOfTheMonth()
         {
@@ -266,6 +431,13 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
+        /// <summary>
+        /// Make sure invoice is only created once per month and that the expense service isn't called
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(2020, 01, 01)]
         [InlineData(2020, 01, 02)]
@@ -307,8 +479,16 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe("An invoice already exists for current month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(Projects[0]), Times.Never);
         }
 
+        /// <summary>
+        /// Make sue email service is called first of the month
+        /// </summary>
+        /// <param name="year"></param>
+        /// <param name="month"></param>
+        /// <param name="day"></param>
+        /// <returns></returns>
         [Theory]
         [InlineData(2020, 02, 01)]
         [InlineData(2020, 02, 02)]
