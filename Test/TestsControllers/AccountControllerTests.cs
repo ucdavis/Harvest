@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Harvest.Web.Controllers;
+﻿using Harvest.Web.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using TestHelpers.Helpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -31,7 +27,7 @@ namespace Test.TestsControllers
             ControllerReflection = new ControllerReflection(this.output, typeof(AccountController));
         }
 
-        #region Controller Class Tests
+
         [Fact]
         public void TestControllerClassAttributes()
         {
@@ -41,9 +37,6 @@ namespace Test.TestsControllers
             attributes.ElementAt(0).IgnoreApi.ShouldBe(true);
         }
 
-        #endregion Controller Class Tests
-
-        #region Controller Method Tests
 
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
@@ -65,6 +58,5 @@ namespace Test.TestsControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("EndEmulate", countAdjustment + 1);
         }
 
-        #endregion Controller Method Tests
-        }
     }
+}
