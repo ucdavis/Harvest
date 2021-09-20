@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Harvest.Core.Models;
+﻿using Harvest.Core.Models;
 using Harvest.Web.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using TestHelpers.Helpers;
 using Xunit;
 using Xunit.Abstractions;
