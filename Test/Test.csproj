@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Harvest.Core\Harvest.Core.csproj" />
+    <ProjectReference Include="..\Harvest.Web\Harvest.Web.csproj" />
   </ItemGroup>
 
 </Project>
