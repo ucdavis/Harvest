@@ -54,21 +54,67 @@ namespace Test.Helpers
             return rtValue;
         }
 
-        public static Rate Rate(int? counter)
+        public static Rate Rate(int? counter, string type = Harvest.Core.Domain.Rate.Types.Acreage)
         {
-            var rtValue = new Rate
+            switch (type)
             {
-                Id = counter ?? 99,
-                Type = Harvest.Core.Domain.Rate.Types.Acreage,
-                Description = $"Description{counter}",
-                BillingUnit = $"BillingUnit{counter}",
-                Account = "3-RRACRES",
-                Price = 1150.00m,
-                Unit = $"Unit{counter}"
-            };
-
-            return rtValue;
-
+                case Harvest.Core.Domain.Rate.Types.Acreage:
+                    return new Rate
+                    {
+                        Id = counter ?? 99,
+                        Type = Harvest.Core.Domain.Rate.Types.Acreage,
+                        Description = $"Description{counter}",
+                        BillingUnit = $"BillingUnit{counter}",
+                        Account = "3-RRACRES",
+                        Price = 1150.00m,
+                        Unit = $"Unit{counter}"
+                    };
+                case Harvest.Core.Domain.Rate.Types.Equipment:
+                    return new Rate
+                    {
+                        Id = counter ?? 99,
+                        Type = Harvest.Core.Domain.Rate.Types.Equipment,
+                        Description = $"Description{counter}",
+                        BillingUnit = $"BillingUnit{counter}",
+                        Account = "3-RRACRES", //Use different account?
+                        Price = 1150.00m,
+                        Unit = $"Unit{counter}"
+                    };
+                case Harvest.Core.Domain.Rate.Types.Labor:
+                    return new Rate
+                    {
+                        Id = counter ?? 99,
+                        Type = Harvest.Core.Domain.Rate.Types.Labor,
+                        Description = $"Description{counter}",
+                        BillingUnit = $"BillingUnit{counter}",
+                        Account = "3-RRACRES", //Use different account?
+                        Price = 1150.00m,
+                        Unit = $"Unit{counter}"
+                    };
+                case Harvest.Core.Domain.Rate.Types.Other:
+                    return new Rate
+                    {
+                        Id = counter ?? 99,
+                        Type = Harvest.Core.Domain.Rate.Types.Other,
+                        Description = $"Description{counter}",
+                        BillingUnit = $"BillingUnit{counter}",
+                        Account = "3-RRACRES", //Use different account?
+                        Price = 1150.00m,
+                        Unit = $"Unit{counter}"
+                    };
+                default:
+                    return new Rate
+                    {
+                        Id = counter ?? 99,
+                        Type = type,
+                        Description = $"Description{counter}",
+                        BillingUnit = $"BillingUnit{counter}",
+                        Account = "3-RRACRES", //Use different account?
+                        Price = 1150.00m,
+                        Unit = $"Unit{counter}"
+                    };
+            }
+            
         }
 
         public static User User(int counter)
