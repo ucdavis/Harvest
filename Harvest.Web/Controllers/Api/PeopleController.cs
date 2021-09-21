@@ -6,7 +6,7 @@ using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Harvest.Web.Controllers
+namespace Harvest.Web.Controllers.Api
 {
     [Authorize()]
     public class PeopleController : Controller

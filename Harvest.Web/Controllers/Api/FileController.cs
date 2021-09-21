@@ -1,11 +1,10 @@
-using System;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-namespace Harvest.Web.Controllers
+namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
     public class FileController : Controller
