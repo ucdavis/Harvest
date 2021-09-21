@@ -1,10 +1,8 @@
-﻿using Harvest.Core.Models;
-using Harvest.Web.Controllers.Api;
+﻿using Harvest.Web.Controllers.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using TestHelpers.Helpers;
 using Xunit;
 using Xunit.Abstractions;
@@ -12,20 +10,20 @@ using Xunit.Abstractions;
 namespace Test.TestsControllers.TestsApiControllers
 {
     [Trait("Category", "ControllerTests")]
-    public class FieldControllerTests
+    public class FileControllerTests
     {
     }
 
     [Trait("Category", "ControllerReflectionTests")]
-    public class FieldControllerReflectionTests
+    public class FileControllerReflectionTests
     {
         private readonly ITestOutputHelper output;
         public ControllerReflection ControllerReflection;
 
-        public FieldControllerReflectionTests(ITestOutputHelper output)
+        public FileControllerReflectionTests(ITestOutputHelper output)
         {
             this.output = output;
-            ControllerReflection = new ControllerReflection(this.output, typeof(FieldController));
+            ControllerReflection = new ControllerReflection(this.output, typeof(FileController));
         }
 
         [Fact]
@@ -34,8 +32,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.ControllerInherits("Controller");
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
             var attributes = ControllerReflection.ClassExpectedAttribute<AuthorizeAttribute>(2, showListOfAttributes: true);
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
-
+            attributes.ElementAt(0).Policy.ShouldBeNull();
             //ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); //TODO: Enable when this gets added.
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
         }
@@ -43,7 +40,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(1);
+            ControllerReflection.ControllerPublicMethods(2);
         }
 
         [Fact]
@@ -56,7 +53,10 @@ namespace Test.TestsControllers.TestsApiControllers
 #endif
 
             //1
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Active", countAdjustment + 1);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUploadDetails", countAdjustment + 0);
+
+            //2
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetReadDetails", countAdjustment + 0);
         }
     }
 }
