@@ -59,6 +59,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Create
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public ActionResult Create()
         {
             var model = new RateEditModel {Rate = new Rate(), TypeList = Rate.Types.TypeList};
