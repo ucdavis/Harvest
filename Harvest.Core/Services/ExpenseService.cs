@@ -41,7 +41,7 @@ namespace Harvest.Core.Services
             }
             var project = await _dbContext.Projects
                 .Include(p => p.AcreageRate)
-                .SingleOrDefaultAsync(p => p.Id == projectId);
+                .SingleAsync(p => p.Id == projectId);
 
             var expense = await CreateExpense(project, amount);
 
@@ -58,7 +58,7 @@ namespace Harvest.Core.Services
                 return;
             }
 
-            var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2);
+            var amountToCharge = Math.Round((decimal)project.Acres * (project.AcreageRate.Price / 12), 2); //TODO: How to round this? I round to zero in the private method -- JS
             if (amountToCharge < 0.01m)
             {
                 Log.Error("Project {projectId} would have an acreage amount less than 0.01. Skipping.", project.Id);
@@ -91,7 +91,7 @@ namespace Harvest.Core.Services
                 Description = project.AcreageRate.Description,
                 Price = project.AcreageRate.Price / 12, //This can be more than 2 decimals
                 Quantity = (decimal) project.Acres,
-                Total = amountToCharge,
+                Total = Math.Round(amountToCharge,2, MidpointRounding.ToZero),
                 ProjectId = project.Id,
                 RateId = project.AcreageRate.Id,
                 InvoiceId = null,

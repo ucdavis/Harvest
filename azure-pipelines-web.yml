@@ -31,6 +31,11 @@ stages:
         command: 'install'
         workingDir: './Harvest.Web/ClientApp'
     
+    - task: DotNetCoreCLI@2
+      displayName: 'Run Server Tests'
+      inputs:
+        command: 'test'
+
     - task: Npm@1
       displayName: 'Run Client Tests'
       inputs:

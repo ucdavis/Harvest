@@ -71,6 +71,7 @@ namespace Harvest.Jobs.Invoice
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddTransient<IDateTimeService, DateTimeService>();
 
             return services.BuildServiceProvider();
         }

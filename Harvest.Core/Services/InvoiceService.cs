@@ -29,20 +29,22 @@ namespace Harvest.Core.Services
         private readonly IProjectHistoryService _historyService;
         private readonly IEmailService _emailService;
         private readonly IExpenseService _expenseService;
+        private readonly IDateTimeService _dateTimeService;
         private readonly DevSettings _devSettings;
 
         public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService,
-            IEmailService emailService, IExpenseService expenseService, IOptions<DevSettings> devSettings)
+            IEmailService emailService, IExpenseService expenseService, IOptions<DevSettings> devSettings, IDateTimeService dateTimeService)
         {
             _dbContext = dbContext;
             _historyService = historyService;
             _emailService = emailService;
             _expenseService = expenseService;
+            _dateTimeService = dateTimeService;
             _devSettings = devSettings.Value;
         }
         public async Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false)
         {
-            var now = DateTime.UtcNow;
+            var now = _dateTimeService.DateTimeUtcNow();// DateTime.UtcNow;
 
             //Look for an active project
             var project = await _dbContext.Projects.Include(a => a.AcreageRate)
@@ -64,7 +66,7 @@ namespace Harvest.Core.Services
                 }
 
                 //Check to see if there is an invoice within current month
-                if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == DateTime.UtcNow.Year && a.CreatedOn.Month == DateTime.UtcNow.Month))
+                if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == now.Year && a.CreatedOn.Month == now.Month))
                 {
                     return Result.Error("An invoice already exists for current month: {projectId}", projectId);
                 }
@@ -104,7 +106,7 @@ namespace Harvest.Core.Services
                     projectId, invoiceAmount, quoteRemaining);
             }
 
-            if (totalExpenses < project.QuoteTotal)
+            if (isCloseout && totalExpenses < project.QuoteTotal)
             {
                 Log.Warning("Expenses: {totalExpenses} do not match quote: ({quoteTotal}) for project: {projectId}",
                     totalExpenses, project.QuoteTotal, project.Id);
@@ -113,17 +115,17 @@ namespace Harvest.Core.Services
 
             var unbilledExpenses = await _dbContext.Expenses.Where(e => e.Invoice == null && e.Approved && e.ProjectId == projectId).ToArrayAsync();
 
-            if (unbilledExpenses.Length == 0 && !isCloseout)
+            if (!unbilledExpenses.Any() && !isCloseout)
             {
                 return Result.Error("No unbilled expenses found for project: {projectId}", projectId);
             }
 
             var newInvoice = new Invoice
             {
-                CreatedOn = DateTime.UtcNow,
+                CreatedOn = now,
                 ProjectId = projectId,
                 // empty invoice won't be processed by SlothService
-                Status = unbilledExpenses.Length > 0 ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
+                Status = unbilledExpenses.Any() ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
                 Total = unbilledExpenses.Sum(x => x.Total)
             };
             newInvoice.Expenses = new List<Expense>(unbilledExpenses);
