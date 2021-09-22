@@ -94,6 +94,7 @@ namespace Harvest.Web.Controllers.Api
 
         // Get all unbilled expenses for the given project
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetUnbilled(int projectId)
         {
             return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId).ToArrayAsync());

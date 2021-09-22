@@ -146,7 +146,7 @@ export const ProjectDetailContainer = () => {
                 </button>
               </ShowFor>
               <ShowFor
-                roles={["Supervisor", "FieldManager"]}
+                roles={["FieldManager"]}
                 condition={
                   project.status === "AwaitingCloseout" ||
                   project.status === "Active"
