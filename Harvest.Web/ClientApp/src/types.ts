@@ -61,6 +61,7 @@ export interface BlobFile {
 
 export interface Invoice {
   id: number;
+  projectId: number;
   total: number;
   createdOn: Date;
   notes: string;

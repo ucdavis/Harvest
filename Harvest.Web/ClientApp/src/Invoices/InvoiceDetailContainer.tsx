@@ -10,18 +10,19 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 const InvoicePDFLink = React.lazy(() => import("../Pdf/InvoicePDFLink"));
 
 interface RouteParams {
-  invoiceId?: string;
+  projectId: string;
+  invoiceId: string;
 }
 
 export const InvoiceDetailContainer = () => {
-  const { invoiceId } = useParams<RouteParams>();
+  const { projectId, invoiceId } = useParams<RouteParams>();
   const [projectAndInvoice, setProjectAndInvoice] =
     useState<ProjectWithInvoice>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const invoiceResponse = await fetch(`/Invoice/Get/${invoiceId}`);
+      const invoiceResponse = await fetch(`/Invoice/Get/${projectId}?invoiceId=${invoiceId}`);
 
       if (invoiceResponse.ok) {
         const projectWithInvoice: ProjectWithInvoice =
@@ -32,7 +33,7 @@ export const InvoiceDetailContainer = () => {
     };
 
     cb();
-  }, [invoiceId, getIsMounted]);
+  }, [invoiceId, getIsMounted, projectId]);
 
   if (projectAndInvoice === undefined) {
     return <div>Loading ...</div>;
