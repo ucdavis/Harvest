@@ -68,9 +68,9 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> DoCloseout(int id)
+        public async Task<ActionResult> DoCloseout(int projectId)
         {
-            var result = await _invoiceService.CreateInvoice(id, true);
+            var result = await _invoiceService.CreateInvoice(projectId, true);
             return Ok(result);
         }
     }
