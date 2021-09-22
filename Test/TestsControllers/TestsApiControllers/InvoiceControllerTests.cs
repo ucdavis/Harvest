@@ -63,7 +63,9 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("List", countAdjustment + 2);
 
             //3
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", countAdjustment + 0);
+            var getAttribute = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", countAdjustment + 0);
+            getAttribute.ShouldNotBeNull();
+            getAttribute.ElementAt(0).Template.ShouldBe("invoice/details/{projectId}/{invoiceId}");
 
             //4
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("DoCloseout", countAdjustment + 3);
