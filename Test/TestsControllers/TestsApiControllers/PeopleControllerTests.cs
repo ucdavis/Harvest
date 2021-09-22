@@ -42,7 +42,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(2);
+            ControllerReflection.ControllerPublicMethods(1);
         }
 
         [Fact]
@@ -59,12 +59,6 @@ namespace Test.TestsControllers.TestsApiControllers
             getAttribute.ShouldNotBeNull();
             getAttribute.ElementAt(0).Template.ShouldBe("/people/search");
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Search", countAdjustment + 2);
-
-            //2
-            var authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Create", 2);
         }
     }
 }
