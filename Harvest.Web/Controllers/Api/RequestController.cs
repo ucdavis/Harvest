@@ -15,7 +15,7 @@ using NetTopologySuite.Geometries;
 
 namespace Harvest.Web.Controllers.Api
 {
-
+    [Authorize]
     public class RequestController : Controller
     {
         private readonly AppDbContext _dbContext;
