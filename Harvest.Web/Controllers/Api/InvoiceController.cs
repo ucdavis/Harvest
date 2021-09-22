@@ -25,21 +25,27 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Get info on the project as well as invoice
-        [HttpGet("/invoice/get/{id}")]
-        public async Task<ActionResult> Get(int id)
+        [HttpGet]
+        public async Task<ActionResult> Get(int projectId, int invoiceId)
         {
             var invoice = await _dbContext.Invoices
                 .Include(a => a.Transfers)
                 .Include(i => i.Expenses)
                 .ThenInclude(e => e.Rate)
                 .AsNoTracking()
-                .SingleAsync(i => i.Id == id);
+                .SingleAsync(i => i.Id == invoiceId);
+
+            if (invoice.ProjectId != projectId) {
+                return BadRequest("Invoice not associated with the current project");
+            }
+
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.Accounts)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
+
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
         [HttpGet]
@@ -54,8 +60,8 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Get react view, whose router should choose InvoiceDetailContainer
-        [HttpGet]
-        public ActionResult Details(int id)
+        [HttpGet("invoice/details/{projectId}/{invoiceId}")]
+        public ActionResult Details(int projectId, int invoiceId)
         {
             return View("React");
         }
