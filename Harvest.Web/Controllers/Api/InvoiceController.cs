@@ -25,7 +25,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Get info on the project as well as invoice
-        [HttpGet]
+        [HttpGet("/invoice/get/{id}")]
         public async Task<ActionResult> Get(int id)
         {
             var invoice = await _dbContext.Invoices
@@ -33,7 +33,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(i => i.Expenses)
                 .ThenInclude(e => e.Rate)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(i => i.Id == id);
+                .SingleAsync(i => i.Id == id);
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
