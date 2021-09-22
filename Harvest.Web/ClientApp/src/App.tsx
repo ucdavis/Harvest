@@ -64,7 +64,7 @@ function App() {
           component={QuoteContainer}
         />
         <ConditionalRoute
-          roles={["FieldManager", "Supervisor"]}
+          roles={["FieldManager"]}
           path="/project/closeout/:projectId"
           component={CloseoutContainer}
         />

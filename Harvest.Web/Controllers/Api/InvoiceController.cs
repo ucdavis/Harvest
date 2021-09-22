@@ -68,7 +68,7 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> DoCloseout(int id)
         {
             var result = await _invoiceService.CreateInvoice(id, true);
