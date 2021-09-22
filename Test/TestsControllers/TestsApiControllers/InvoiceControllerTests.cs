@@ -70,7 +70,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("DoCloseout", countAdjustment + 3);
             var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("DoCloseout", countAdjustment + 3);
             attribute.ShouldNotBeNull();
-            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
         }
 
     }

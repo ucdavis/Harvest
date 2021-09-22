@@ -92,8 +92,11 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 3);
 
             //6 This should probably do PI auth... 
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilled", countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilled", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilled", countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilled", countAdjustment + 3);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetUnbilled", countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
 
             //7 
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilledTotal", countAdjustment + 2);
