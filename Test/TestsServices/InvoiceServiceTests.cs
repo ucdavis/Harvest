@@ -69,19 +69,12 @@ namespace Test.TestsServices
         private void MockData()
         {
 
-            try
-            {
-                MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
-                MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
-                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
-                MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>())).ReturnsAsync(true);
-                MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
-                MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021, 01, 01));
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
+            MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
+            MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
+            MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>())).ReturnsAsync(true);
+            MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021, 01, 01));
         }
 
         /// <summary>
