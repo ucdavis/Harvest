@@ -39,6 +39,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // create a new request via react
+        // I don't think this is used anywhere, and if it was, the FM access policy would break it. -JS
         [HttpGet]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public ActionResult Create()
