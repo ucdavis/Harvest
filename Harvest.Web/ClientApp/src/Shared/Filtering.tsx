@@ -1,4 +1,5 @@
 import * as React from "react";
+import DatePicker from "react-date-picker";
 import { Row, HeaderGroup } from "react-table";
 import { convertCamelCase } from "../Util/StringFormatting";
 
@@ -91,6 +92,34 @@ export const SelectColumnFilterRange = ({
       <option value="rangeFour">{">75%"}</option>
     </select>
   );
+};
+
+export const DatePickerFilter = ({
+  column: { filterValue, setFilter },
+}: any) => {
+  return (
+    <DatePicker
+      format="MM/dd/yyyy"
+      required={false}
+      clearIcon={null}
+      value={filterValue}
+      onChange={(e: Date) => setFilter(new Date(e))}
+    />
+  );
+};
+
+export const startDateFilter = (rows: any[], id: any, filterValue: any) => {
+  return rows.filter((row) => {
+    const startDate = row.values.startDate.split(" ")[0];
+    return new Date(startDate) > new Date(filterValue);
+  });
+};
+
+export const endDateFilter = (rows: any[], id: any, filterValue: any) => {
+  return rows.filter((row) => {
+    const endDate = row.values.endDate.split(" ")[0];
+    return new Date(endDate) < new Date(filterValue);
+  });
 };
 
 // Function to control which rows to showwhen filtering progresses
