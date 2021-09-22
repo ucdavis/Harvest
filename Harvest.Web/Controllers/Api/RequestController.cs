@@ -7,15 +7,13 @@ using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
-using Harvest.Web.Models;
-using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 using Microsoft.Extensions.Options;
+using NetTopologySuite.Geometries;
 
-namespace Harvest.Web.Controllers
+namespace Harvest.Web.Controllers.Api
 {
 
     public class RequestController : Controller

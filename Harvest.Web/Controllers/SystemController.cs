@@ -36,7 +36,6 @@ namespace Harvest.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize()]
         public async Task<IActionResult> Emulate(EmulateUserViewModel model)
         {
             Log.Information($"Emulation attempted for {model.Search} by {User.Identity.Name}");

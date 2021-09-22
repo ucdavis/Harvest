@@ -1,21 +1,14 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
-using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.InvoiceModels;
 using Harvest.Core.Services;
-using Harvest.Core.Utilities;
-using Harvest.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 
-namespace Harvest.Web.Controllers
+namespace Harvest.Web.Controllers.Api
 {
     [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
     public class InvoiceController : Controller

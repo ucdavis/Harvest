@@ -1,18 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Harvest.Core.Data;
-using Harvest.Core.Extensions;
+﻿using Harvest.Core.Data;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
-using Harvest.Email.Models.Ticket;
-using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Razor.Templating.Core;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers
 {
