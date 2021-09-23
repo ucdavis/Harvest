@@ -110,17 +110,31 @@ export const DatePickerFilter = ({
   );
 };
 
+// Function to convert date format to yyyy/mm/dd for better date comparison
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  return new Date(`${year}/${month}/${day}`);
+}
+
 export const startDateFilter = (rows: any[], id: any, filterValue: any) => {
   return rows.filter((row) => {
-    const startDate = row.values.startDate.split(" ")[0];
-    return new Date(startDate) > new Date(filterValue);
+    const startDate = formatDate(row.values.startDate.split(" ")[0]);
+    const filterDate = formatDate(filterValue);
+
+    return startDate >= filterDate;
   });
 };
 
 export const endDateFilter = (rows: any[], id: any, filterValue: any) => {
   return rows.filter((row) => {
-    const endDate = row.values.endDate.split(" ")[0];
-    return new Date(endDate) < new Date(filterValue);
+    const endDate = formatDate(row.values.endDate.split(" ")[0]);
+    const filterDate = formatDate(filterValue);
+
+    return endDate <= filterDate;
   });
 };
 
