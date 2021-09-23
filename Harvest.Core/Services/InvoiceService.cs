@@ -152,6 +152,9 @@ namespace Harvest.Core.Services
             }
 
             await _dbContext.SaveChangesAsync();
+            
+            await _emailService.InvoiceCreated(newInvoice); 
+
             return Result.Value(newInvoice.Id, resultMessage);
         }
 

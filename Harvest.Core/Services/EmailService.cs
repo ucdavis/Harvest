@@ -38,6 +38,9 @@ namespace Harvest.Core.Services
         /// <param name="days">Specifies number of days before the project ends to include in the notification</param>
         /// <returns></returns>
         Task<int> SendExpiringProjectsNotification(int days);
+
+        Task<bool> InvoiceCreated(Invoice invoice);
+        Task<bool> InvoiceDone(Invoice invoice, string status);
     }
 
     public class EmailService : IEmailService
@@ -442,6 +445,95 @@ namespace Harvest.Core.Services
             }
 
             return 0;
+        }
+
+        public async Task<bool> InvoiceCreated(Invoice invoice)
+        {
+            try
+            {
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
+                var project = await GetProjectAndPiFromInvoice(invoice);
+                var emailTo = new string[] {project.PrincipalInvestigator.Email};
+                //CC field managers? I'd say no....
+
+                var model = new InvoiceEmailModel()
+                {
+                    InvoiceAmount = invoice.Total.ToString("C"),
+                    InvoiceStatus = invoice.Status.SafeHumanizeTitle(),
+                    InvoiceId = invoice.Id,
+                    InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
+                    ProjectName = project.Name,
+                    Title = $"Invoice {invoice.Id} Has Been Created.",
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
+                    PiName = project.PrincipalInvestigator.Name,
+                };
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var textVersion = $"Invoice for project {model.ProjectName} has been created.";
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Created");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing invoice created", ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> InvoiceDone(Invoice invoice, string status) //Status like Completed or Cancelled
+        {
+            try
+            {
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
+                var project = await GetProjectAndPiFromInvoice(invoice);
+                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                //CC field managers? I'd say no....
+
+                var model = new InvoiceEmailModel()
+                {
+                    InvoiceAmount = invoice.Total.ToString("C"),
+                    InvoiceStatus = status.SafeHumanizeTitle(),
+                    InvoiceId = invoice.Id,
+                    InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
+                    ProjectName = project.Name,
+                    Title = $"Invoice {invoice.Id} Has Been Processed.",
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
+                    PiName = project.PrincipalInvestigator.Name,
+                }; 
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var textVersion = $"Invoice for project {model.ProjectName} has been processed.";
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Processed");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing invoice done", ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets missing info if it wasn't included in the initial call
+        /// </summary>
+        /// <param name="invoice"></param>
+        /// <returns></returns>
+        private async Task<Project> GetProjectAndPiFromInvoice(Invoice invoice)
+        {
+            var project = invoice.Project;
+            if (project?.PrincipalInvestigator == null)
+            {
+                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator)
+                    .SingleAsync(a => a.Id == invoice.ProjectId);
+            }
+
+            return project;
         }
     }
 }

@@ -30,11 +30,11 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-            var model = new NewFieldRequestModel();
+            var model = new InvoiceEmailModel();
 
 
 
-            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/NewFieldRequest_mjml.cshtml", model);
+            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -125,6 +125,20 @@ namespace Harvest.Web.Controllers
             var numProjects = await _emailService.SendExpiringProjectsNotification(7);
 
             return Content($"Sent email for {numProjects} projects");
+        }
+
+        public async Task<IActionResult> TestInvoiceCreated()
+        {
+            var invoice = await _dbContext.Invoices.SingleAsync(a => a.Id == 4);
+            var rtValue = await _emailService.InvoiceCreated(invoice);
+            return Content($"Email was {rtValue}");
+        }
+
+        public async Task<IActionResult> TestInvoiceCancelled()
+        {
+            var invoice = await _dbContext.Invoices.SingleAsync(a => a.Id == 4);
+            var rtValue = await _emailService.InvoiceDone(invoice, "Cancelled");
+            return Content($"Email was {rtValue}");
         }
     }
 }
