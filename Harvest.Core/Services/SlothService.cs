@@ -71,7 +71,7 @@ namespace Harvest.Core.Services
             var model = new TransactionViewModel
             {
                 MerchantTrackingNumber = invoiceId.ToString(),
-                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoiceId}" //Invoice/Details/ but maybe instead an admin page view of the invoce
+                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoice.ProjectId}/{invoiceId}" //Invoice/Details/ but maybe instead an admin page view of the invoice
             };
 
             if (invoice.Expenses.Count == 0)

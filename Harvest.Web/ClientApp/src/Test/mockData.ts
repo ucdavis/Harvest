@@ -127,6 +127,7 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
 export const fakeInvoices: Invoice[] = [
   {
     id: 1,
+    projectId: 1,
     total: 100,
     createdOn: new Date("2021-03-15T00:00:00"),
     notes: "hello",
@@ -136,6 +137,7 @@ export const fakeInvoices: Invoice[] = [
   },
   {
     id: 2,
+    projectId: 1,
     total: 200,
     createdOn: new Date("2021-03-15T00:00:00"),
     notes: "hello",
@@ -145,6 +147,7 @@ export const fakeInvoices: Invoice[] = [
   },
   {
     id: 3,
+    projectId: 1,
     total: 300,
     createdOn: new Date("2021-03-15T00:00:00"),
     notes: "hello",
