@@ -496,7 +496,7 @@ namespace Harvest.Core.Services
                 var model = new InvoiceEmailModel()
                 {
                     InvoiceAmount = invoice.Total.ToString("C"),
-                    InvoiceStatus = invoice.Status.SafeHumanizeTitle(),
+                    InvoiceStatus = status.SafeHumanizeTitle(),
                     InvoiceId = invoice.Id,
                     InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
                     ProjectName = project.Name,
@@ -504,15 +504,19 @@ namespace Harvest.Core.Services
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
                     ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
                     PiName = project.PrincipalInvestigator.Name,
-                };
+                }; 
 
-                throw new NotImplementedException();
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var textVersion = $"Invoice for project {model.ProjectName} has been processed.";
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Processed");
             }
             catch (Exception ex)
             {
                 Log.Error("Error emailing invoice done", ex);
-                throw;
+                return false;
             }
+
+            return true;
         }
 
         /// <summary>

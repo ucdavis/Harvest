@@ -34,15 +34,17 @@ namespace Harvest.Core.Services
         private readonly IFinancialService _financialService;
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly IProjectHistoryService _historyService;
+        private readonly IEmailService _emailService;
 
         public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService,
-            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService)
+            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService, IEmailService emailService)
         {
             _dbContext = dbContext;
             _slothSettings = slothSettings.Value;
             _financialService = financialService;
             _serializerOptions = serializerOptions;
             _historyService = historyService;
+            _emailService = emailService;
         }
 
 
@@ -291,10 +293,16 @@ namespace Harvest.Core.Services
                                 await _historyService.ProjectCompleted(invoice.ProjectId, invoice.Project);
                             }
                             await _dbContext.SaveChangesAsync();
+
+                            await _emailService.InvoiceDone(invoice, invoice.Status);
+
                             break;
                         case SlothStatuses.Cancelled:
                             Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
                             await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
+
+                            //await _emailService.InvoiceDone(invoice, SlothStatuses.Cancelled); //Email the PI that it was canceled? 
+
                             rolledBackCount++;
                             //TODO: Write to the notes field? Trigger off an email?
                             break;

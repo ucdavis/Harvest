@@ -133,5 +133,12 @@ namespace Harvest.Web.Controllers
             var rtValue = await _emailService.InvoiceCreated(invoice);
             return Content($"Email was {rtValue}");
         }
+
+        public async Task<IActionResult> TestInvoiceCancelled()
+        {
+            var invoice = await _dbContext.Invoices.SingleAsync(a => a.Id == 4);
+            var rtValue = await _emailService.InvoiceDone(invoice, "Cancelled");
+            return Content($"Email was {rtValue}");
+        }
     }
 }
