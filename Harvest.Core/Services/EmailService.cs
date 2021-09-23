@@ -464,19 +464,23 @@ namespace Harvest.Core.Services
                     InvoiceId = invoice.Id,
                     InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
                     ProjectName = project.Name,
-                    Message = $"Invoice {invoice.Id} has been created.",
+                    Title = $"Invoice {invoice.Id} Has Been Created.",
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
-                    ButtonUrlForInvoice = $"{invoiceUrl}/{project.Id}/{invoice.Id}"
+                    ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
+                    PiName = project.PrincipalInvestigator.Name,
                 };
 
-                throw new NotImplementedException();
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var textVersion = $"Invoice for project {model.ProjectName} has been created.";
+                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Created");
             }
             catch (Exception ex)
             {
                 Log.Error("Error emailing invoice created", ex);
-                throw;
+                return false;
             }
-            
+
+            return true;
         }
 
         public async Task<bool> InvoiceDone(Invoice invoice, string status) //Status like Completed or Cancelled
@@ -496,9 +500,10 @@ namespace Harvest.Core.Services
                     InvoiceId = invoice.Id,
                     InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
                     ProjectName = project.Name,
-                    Message = $"Invoice {invoice.Id} has been processed.",
+                    Title = $"Invoice {invoice.Id} Has Been Processed.",
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
-                    ButtonUrlForInvoice = $"{invoiceUrl}/{project.Id}/{invoice.Id}"
+                    ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
+                    PiName = project.PrincipalInvestigator.Name,
                 };
 
                 throw new NotImplementedException();
