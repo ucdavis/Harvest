@@ -105,7 +105,7 @@ export const DatePickerFilter = ({
       required={false}
       clearIcon={<FontAwesomeIcon icon={faTrash} />}
       value={filterValue}
-      onChange={(e: any) => (e ? setFilter(new Date(e)) : setFilter(null))}
+      onChange={(e: any) => (e ? setFilter(new Date(e)) : setFilter(undefined))}
     />
   );
 };
