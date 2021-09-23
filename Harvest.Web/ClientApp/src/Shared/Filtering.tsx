@@ -2,6 +2,8 @@ import * as React from "react";
 import DatePicker from "react-date-picker";
 import { Row, HeaderGroup } from "react-table";
 import { convertCamelCase } from "../Util/StringFormatting";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 // Define a default UI for filtering
 export const GlobalFilter = ({
@@ -101,9 +103,9 @@ export const DatePickerFilter = ({
     <DatePicker
       format="MM/dd/yyyy"
       required={false}
-      clearIcon={null}
+      clearIcon={<FontAwesomeIcon icon={faTrash} />}
       value={filterValue}
-      onChange={(e: Date) => setFilter(new Date(e))}
+      onChange={(e: any) => (e ? setFilter(new Date(e)) : setFilter(null))}
     />
   );
 };
