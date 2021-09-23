@@ -59,6 +59,7 @@ namespace Harvest.Jobs.Invoice
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
             services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
             services.Configure<DevSettings>(Configuration.GetSection("Dev"));
+            services.Configure<EmailSettings>(Configuration.GetSection("Email"));
 
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
