@@ -60,8 +60,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
     // rate can be undefinied if they select the default option
     if (rate !== undefined) {
-      alert(rate.isPassThrough);
-      // new rate selected, update the work item with defaults
+        // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
         description: requiresCustomDescription(rate.isPassThrough)
