@@ -60,16 +60,18 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
     // rate can be undefinied if they select the default option
     if (rate !== undefined) {
+      alert(rate.isPassThrough);
       // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
-        description: requiresCustomDescription(rate.unit)
+        description: requiresCustomDescription(rate.isPassThrough)
           ? ""
           : rate.description,
         rateId,
         rate: rate.price,
         unit: rate.unit,
         total: 0,
+        isPassthrough: rate.isPassThrough,
       });
     } else {
       // reset values to prevent stale data from impacting logic elsewhere
@@ -81,13 +83,14 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
+        isPassthrough: false,
       });
     }
   };
 
   // TODO: Determine a better way of working out which other options need extra description text
-  const requiresCustomDescription = (unit: string) => {
-    return props.category === "Other" && unit === "Unit";
+  const requiresCustomDescription = (isPass: boolean) => {
+    return isPass;
   };
 
   const typeaheadRef = useRef<any>(null);
@@ -109,6 +112,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
+        isPassthrough: false,
       });
     }
   };
@@ -125,6 +129,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
+        isPassthrough: false,
       });
     }
 
@@ -150,7 +155,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             onBlur={(e) => typeaheadBlur(e)}
           />
           <InputErrorMessage name="rateId" />
-          {requiresCustomDescription(workItem.unit) && (
+          {requiresCustomDescription(workItem.isPassthrough) && (
             <>
               <Input
                 className={getClassName("description")}
