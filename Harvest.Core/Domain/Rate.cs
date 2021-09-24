@@ -56,6 +56,9 @@ namespace Harvest.Core.Domain
         [Display(Name = "Updated Date")]
         public DateTime UpdatedOn { get; set; }
 
+        [Display(Name = "Pass Through")]
+        public bool IsPassthrough { get; set; } = false;
+
         // projects using this rate
         [JsonIgnore]
         public List<Project> Projects { get; set; }
@@ -66,6 +69,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Rate>().HasIndex(a => a.Description);
             modelBuilder.Entity<Rate>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Rate>().HasIndex(a => a.UpdatedById);
+            modelBuilder.Entity<Rate>().Property(a => a.IsPassthrough).HasDefaultValue(false);
 
 
             modelBuilder.Entity<Rate>().Property(a => a.Price).HasPrecision(18, 2);

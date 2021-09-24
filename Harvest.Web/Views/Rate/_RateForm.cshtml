@@ -11,6 +11,11 @@
     <span asp-validation-for="Rate.Type" class="text-danger"></span>
 </div>
 <div class="form-group">
+    <label asp-for="Rate.IsPassthrough" class="control-label"></label>
+    <input asp-for="Rate.IsPassthrough" class="form-control" />
+    <span asp-validation-for="Rate.IsPassthrough" class="text-danger"></span>
+</div>
+<div class="form-group">
     <label asp-for="Rate.Unit" class="control-label"></label>
     <input asp-for="Rate.Unit" class="form-control" />
     <span asp-validation-for="Rate.Unit" class="text-danger"></span>

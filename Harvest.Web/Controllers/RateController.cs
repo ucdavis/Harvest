@@ -85,6 +85,11 @@ namespace Harvest.Web.Controllers
                 ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
             }
 
+            if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
+            {
+                ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
@@ -99,7 +104,7 @@ namespace Harvest.Web.Controllers
             rateToCreate.IsActive  = true;
             rateToCreate.CreatedBy = user;
             rateToCreate.CreatedOn = rateToCreate.UpdatedOn;
-            
+
 
             try
             {
@@ -144,6 +149,11 @@ namespace Harvest.Web.Controllers
                 ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
             }
 
+            if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
+            {
+                ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
@@ -172,15 +182,16 @@ namespace Harvest.Web.Controllers
 
         private static void UpdateCommonValues(RateEditModel model, Rate destinationRate, AccountValidationModel accountValidation, User user)
         {
-            destinationRate.Account     = accountValidation.KfsAccount.ToString(); 
-            destinationRate.BillingUnit = model.Rate.BillingUnit;
-            destinationRate.Description = model.Rate.Description;
-            destinationRate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
-            destinationRate.Price       = model.Rate.Price; 
-            destinationRate.Type        = model.Rate.Type;
-            destinationRate.Unit        = model.Rate.Unit;
-            destinationRate.UpdatedOn   = DateTime.UtcNow;
-            destinationRate.UpdatedBy   = user;
+            destinationRate.Account       = accountValidation.KfsAccount.ToString(); 
+            destinationRate.BillingUnit   = model.Rate.BillingUnit;
+            destinationRate.Description   = model.Rate.Description;
+            destinationRate.EffectiveOn   = model.Rate.EffectiveOn.FromPacificTime();
+            destinationRate.Price         = model.Rate.Price; 
+            destinationRate.Type          = model.Rate.Type;
+            destinationRate.Unit          = model.Rate.Unit;
+            destinationRate.UpdatedOn     = DateTime.UtcNow;
+            destinationRate.UpdatedBy     = user;
+            destinationRate.IsPassthrough = model.Rate.Type == Rate.Types.Other && model.Rate.IsPassthrough;
         }
 
         // GET: RateController/Delete/5
