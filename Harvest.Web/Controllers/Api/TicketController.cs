@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers.Api
 {
+    [Authorize]
     public class TicketController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -36,6 +37,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
+        [Authorize(policy:AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
         {
             var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
@@ -49,14 +51,15 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult List(int id)
         {
             return View("React");
         }
 
         // create a new ticket via react
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Create()
         {
             return View("React");
@@ -126,13 +129,15 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(project);
         }
-        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        [HttpGet("[controller]/[action]/{projectId}/{ticketId}")]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Details(int projectId, int ticketId)
         {
             return View("React");
         }
-        [HttpGet]
-        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+
+        [HttpGet("[controller]/[action]/{projectId}/{ticketId}")]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Get(int projectId, int ticketId)
         {
             var ticket = await _dbContext.Tickets
@@ -199,9 +204,8 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
-        [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        [Route("[controller]/[action]/{projectId}/{ticketId}")]
+        [HttpPost("[controller]/[action]/{projectId}/{ticketId}")]
         public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();

@@ -12,20 +12,20 @@ using Xunit.Abstractions;
 namespace Test.TestsControllers.TestsApiControllers
 {
     [Trait("Category", "ControllerTests")]
-    public class InvoiceControllerTests
+    public class QuoteControllerTests
     {
     }
 
     [Trait("Category", "ControllerReflectionTests")]
-    public class InvoiceControllerReflectionTests
+    public class QuoteControllerReflectionTests
     {
         private readonly ITestOutputHelper output;
         public ControllerReflection ControllerReflection;
 
-        public InvoiceControllerReflectionTests(ITestOutputHelper output)
+        public QuoteControllerReflectionTests(ITestOutputHelper output)
         {
             this.output = output;
-            ControllerReflection = new ControllerReflection(this.output, typeof(InvoiceController));
+            ControllerReflection = new ControllerReflection(this.output, typeof(QuoteController));
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(4);
+            ControllerReflection.ControllerPublicMethods(3);
         }
 
         [Fact]
@@ -59,21 +59,17 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
 
             //2
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("List", countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("List", countAdjustment + 2);
+            var authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", 2);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Create", 2);
 
             //3
-            var getAttribute = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", countAdjustment + 0);
-            getAttribute.ShouldNotBeNull();
-            getAttribute.ElementAt(0).Template.ShouldBe("invoice/details/{projectId}/{invoiceId}");
-
-            //4
-            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("DoCloseout", countAdjustment + 3);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("DoCloseout", countAdjustment + 3);
-            var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("DoCloseout", countAdjustment + 3);
-            attribute.ShouldNotBeNull();
-            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Save", countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Save", countAdjustment +  3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Save", countAdjustment + 3);
         }
-
     }
 }

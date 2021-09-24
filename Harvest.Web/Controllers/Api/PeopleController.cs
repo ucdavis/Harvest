@@ -37,13 +37,5 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(user);
         }
-
-        // create a new request via react
-        [HttpGet]
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public ActionResult Create()
-        {
-            return View("React");
-        }
     }
 }
