@@ -27,7 +27,9 @@ export const HomeContainer = () => {
     <div className="row mt-3">
       <div className="col">
         <h1>Welcome to Harvest, {userInfo.user.detail.name}</h1>
-        <p>You have the following roles: {userInfo.user.roles.join(", ")}.</p>
+        {userInfo.user.roles.length > 0 && (
+          <p>You have the following roles: {userInfo.user.roles.join(", ")}.</p>
+        )}
         <hr />
         <div className="quick-actions-wrapper">
           {ShowCustomActions(userInfo.user.roles)}
