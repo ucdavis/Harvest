@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Harvest.Core.Extensions;
+using Humanizer;
 using Test.Helpers;
 using TestHelpers.Helpers;
 using Xunit;
@@ -514,6 +515,8 @@ namespace Test.TestsServices
             rtValue.Message.ShouldBe("An invoice already exists for current month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
             MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(Projects[0]), Times.Never);
+
+            MockEmailService.Verify(a => a.InvoiceCreated(It.IsAny<Invoice>()), Times.Never);
         }
 
         /// <summary>
@@ -769,6 +772,50 @@ namespace Test.TestsServices
             addedInvoice.Expenses.Sum(a => a.Total).ShouldBe(4600.00m);
 
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
+        }
+
+        [Fact]
+        public async Task CreateInvoiceCallsEmailService()
+        {
+            SetupData();
+            var invoices = new List<Invoice>();
+            for (int i = 0; i < 3; i++)
+            {
+                var invoice = CreateValidEntities.Invoice(i + 1, Projects[i].Id);
+                invoice.CreatedOn = new DateTime(2020, 01, 01); //Invoice created on first of month
+                invoices.Add(invoice);
+            }
+
+            var ignoredExpense = CreateValidEntities.Expense(95, Projects[0].Id);
+            ignoredExpense.Approved = false;
+            Expenses.Add(ignoredExpense);
+            ignoredExpense = CreateValidEntities.Expense(95, Projects[0].Id);
+            ignoredExpense.Invoice = CreateValidEntities.Invoice(88, Projects[0].Id);
+            Expenses.Add(ignoredExpense);
+
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021, 10, 01));
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            MockDbContext.Setup(a => a.Invoices).Returns(invoices.AsQueryable().MockAsyncDbSet().Object);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(It.IsAny<Project>()), Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            
+            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+
+            MockEmailService.Verify(a => a.InvoiceCreated(addedInvoice), times: Times.Once);
         }
 
         [Fact]
