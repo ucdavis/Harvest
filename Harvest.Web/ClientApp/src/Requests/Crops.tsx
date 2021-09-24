@@ -30,9 +30,12 @@ export const Crops = (props: Props) => {
     onSearch();
   }, [props.cropType]);
 
-  const onSelect = (selected: string[]) => {
-    if (selected && selected.length > 0) {
-      props.onChange(selected.join(","));
+  const onSelect = (selected: (string | { label: string })[]) => {
+    const selectedStrings = selected.map((s) =>
+      typeof s === "string" ? s : s.label
+    );
+    if (selectedStrings && selectedStrings.length > 0) {
+      props.onChange(selectedStrings.join(","));
     } else {
       props.onChange(""); //If it is cleared out...
     }
