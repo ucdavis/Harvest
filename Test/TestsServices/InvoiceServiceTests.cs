@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Harvest.Core.Extensions;
-using Humanizer;
 using Test.Helpers;
 using TestHelpers.Helpers;
 using Xunit;
