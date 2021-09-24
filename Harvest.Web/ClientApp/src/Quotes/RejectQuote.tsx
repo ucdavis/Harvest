@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import { Project } from "../types";
@@ -13,9 +13,8 @@ interface Props {
 export const RejectQuote = (props: Props) => {
   const history = useHistory();
   const [reason, setReason] = useState("");
-
+  const [canUpdate, setCanUpdate] = useState(false);
   const [notification, setNotification] = usePromiseNotification();
-
   const [getConfirmation] = useConfirmationDialog(
     {
       title: "RejectQuote",
@@ -40,28 +39,40 @@ export const RejectQuote = (props: Props) => {
     [reason, setReason, notification.pending]
   );
 
+  useEffect(() => {
+    const cb = async () => {
+      console.log("fe");
+      const request = fetch(`/Request/RejectQuote/${props.project.id}`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reason }),
+      });
+
+      setNotification(request, "Saving", "Quote Rejection Saved");
+      setCanUpdate(false);
+      const response = await request;
+
+      if (response.ok) {
+        history.replace(`/project/details/${props.project.id}`);
+      }
+    };
+
+    if (canUpdate) {
+      cb();
+    }
+  }, [history, canUpdate, props.project.id, reason, setNotification]);
+
   const reject = async () => {
     if (!(await getConfirmation())) {
       return;
     }
 
-    const request = fetch(`/Request/RejectQuote/${props.project.id}`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ reason }),
-    });
-
-    setNotification(request, "Saving", "Quote Rejection Saved");
-
-    const response = await request;
-
-    if (response.ok) {
-      history.replace(`/project/details/${props.project.id}`);
-    }
+    setCanUpdate(true);
   };
+
   return (
     <button onClick={reject} className="btn btn-link mr-2">
       Reject
