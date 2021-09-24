@@ -213,7 +213,6 @@ export class WorkItemImpl implements WorkItem {
   quantity;
   markup = false;
   total = 0;
-  isPassthrough;
 
   constructor(activityId: number, id: number, type: RateType) {
     this.activityId = activityId;
@@ -223,7 +222,6 @@ export class WorkItemImpl implements WorkItem {
     this.quantity = 0;
     this.description = "";
     this.unit = "";
-    this.isPassthrough = false;
   }
 }
 export interface WorkItem {
@@ -237,7 +235,6 @@ export interface WorkItem {
   unit: string;
   markup: boolean;
   total: number;
-  isPassthrough: boolean;
 }
 
 export interface Activity {

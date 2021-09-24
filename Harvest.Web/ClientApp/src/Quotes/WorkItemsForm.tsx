@@ -60,7 +60,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
     // rate can be undefinied if they select the default option
     if (rate !== undefined) {
-        // new rate selected, update the work item with defaults
+      // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
         description: requiresCustomDescription(rate.isPassThrough)
@@ -70,7 +70,6 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         rate: rate.price,
         unit: rate.unit,
         total: 0,
-        isPassthrough: rate.isPassThrough,
       });
     } else {
       // reset values to prevent stale data from impacting logic elsewhere
@@ -82,7 +81,6 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
-        isPassthrough: false,
       });
     }
   };
@@ -96,6 +94,9 @@ const WorkItemForm = (props: WorkItemFormProps) => {
   const selectedRate = props.rates.filter(
     (rate) => rate.id === props.workItem.rateId
   );
+
+  const isPassThrough =
+    selectedRate.length > 0 ? selectedRate[0].isPassThrough : false;
 
   const typeaheadChange = (selected: Rate) => {
     if (selected) {
@@ -111,7 +112,6 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
-        isPassthrough: false,
       });
     }
   };
@@ -128,7 +128,6 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
-        isPassthrough: false,
       });
     }
 
@@ -154,7 +153,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             onBlur={(e) => typeaheadBlur(e)}
           />
           <InputErrorMessage name="rateId" />
-          {requiresCustomDescription(workItem.isPassthrough) && (
+          {requiresCustomDescription(isPassThrough) && (
             <>
               <Input
                 className={getClassName("description")}
