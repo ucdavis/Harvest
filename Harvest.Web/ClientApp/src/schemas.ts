@@ -86,6 +86,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
     ),
   unit: yup.string().defined(),
   markup: yup.boolean().defined(),
+  isPassthrough: yup.boolean().defined(),
   total: yup
     .number()
     .required()
