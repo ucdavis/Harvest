@@ -48,11 +48,12 @@ namespace Harvest.Web.Controllers.Api
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
-                expense.CreatedBy = user;
-                expense.CreatedOn = DateTime.UtcNow;
-                expense.ProjectId = projectId;
-                expense.InvoiceId = null;
-                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                expense.CreatedBy     = user;
+                expense.CreatedOn     = DateTime.UtcNow;
+                expense.ProjectId     = projectId;
+                expense.InvoiceId     = null;
+                expense.Account       = allRates.Single(a => a.Id == expense.RateId).Account;
+                expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
             }
 
             _dbContext.Expenses.AddRange(expenses);
