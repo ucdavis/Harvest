@@ -54,6 +54,11 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     resetLocalFields,
   } = useInputValidator(workItemSchema, props.workItem);
 
+  const requiresCustomDescription = () => {
+    const fnd = props.rates.find((r) => r.id === props.workItem.rateId);
+    return fnd?.isPassthrough ?? false;
+  };
+
   const rateItemChanged = (selected: Rate) => {
     const rateId = selected.id;
     const rate = props.rates.find((r) => r.id === rateId);
@@ -63,9 +68,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
       // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
-        description: requiresCustomDescription(rate.isPassThrough)
-          ? ""
-          : rate.description,
+        description: requiresCustomDescription() ? "" : rate.description,
         rateId,
         rate: rate.price,
         unit: rate.unit,
@@ -85,18 +88,12 @@ const WorkItemForm = (props: WorkItemFormProps) => {
     }
   };
 
-  // TODO: Determine a better way of working out which other options need extra description text
-  const requiresCustomDescription = (isPass: boolean) => {
-    return isPass;
-  };
-
   const typeaheadRef = useRef<any>(null);
   const selectedRate = props.rates.filter(
     (rate) => rate.id === props.workItem.rateId
   );
 
-  const isPassThrough =
-    selectedRate.length > 0 ? selectedRate[0].isPassThrough : false;
+  const foundRate = props.rates.find((r) => r.id === props.workItem.rateId);
 
   const typeaheadChange = (selected: Rate) => {
     if (selected) {
@@ -153,7 +150,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             onBlur={(e) => typeaheadBlur(e)}
           />
           <InputErrorMessage name="rateId" />
-          {requiresCustomDescription(isPassThrough) && (
+          {requiresCustomDescription() && (
             <>
               <Input
                 className={getClassName("description")}

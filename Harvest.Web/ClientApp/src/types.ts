@@ -86,7 +86,7 @@ export interface Rate {
   type: RateType;
   description: string;
   id: number;
-  isPassThrough: boolean;
+  isPassthrough: boolean;
 }
 
 export interface Expense {
