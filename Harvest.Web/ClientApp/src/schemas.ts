@@ -3,6 +3,7 @@ import { SchemaOf } from "yup";
 import { BlobFile, User, TicketInput, WorkItem, Activity } from "./types";
 import { ErrorMessages } from "./errorMessages";
 import { addDays } from "./Util/Calculations";
+import { roundToTwo } from "./Util/Calculations";
 
 // @ts-ignore - override correct yup type
 export const requiredDateSchema: yup.SchemaOf<Date> = yup.date().required();
@@ -144,5 +145,9 @@ export const finalAcreageExpenseSchema = yup.object().shape({
     .required()
     .default(0)
     .typeError("Acreage Expense must be a number")
-    .positive("Acreage Expense must be positive"),
+    .test(
+      "amount",
+      "Acreage Expense must be positive",
+      (value) => roundToTwo(value) > 0
+    ),
 });

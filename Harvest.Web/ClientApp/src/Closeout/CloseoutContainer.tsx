@@ -29,20 +29,13 @@ export const CloseoutContainer = () => {
   const [project, setProject] = useState<Project | undefined>();
   const [newExpenseCount, setNewExpenseCount] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
-  const [
-    finalAcreageExpense,
-    setFinalAcreageExpense,
-  ] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
+  const [finalAcreageExpense, setFinalAcreageExpense] =
+    useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
   const [closeoutRequested, setCloseoutRequested] = useState(false);
 
-  const {
-    onChange,
-    InputErrorMessage,
-    getClassName,
-    onBlur,
-    formErrorCount,
-  } = useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur, formErrorCount } =
+    useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -62,7 +55,7 @@ export const CloseoutContainer = () => {
       return;
     }
 
-    if (finalAcreageExpense.amount === 0) {
+    if (finalAcreageExpense.amount === 0 && project.acreageRate) {
       setFinalAcreageExpense({
         amount: roundToTwo(project.acres * (project.acreageRate.price / 12)),
       });
