@@ -81,6 +81,7 @@ export const fakeProject: Project = {
     unit: "",
     type: "Acreage",
     description: "",
+    isPassthrough: false,
   },
 };
 
@@ -119,6 +120,7 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       unit: "",
       type: "Acreage",
       description: "",
+      isPassthrough: false,
     },
   },
   quote: null,
@@ -200,6 +202,7 @@ export const sampleRates: Rate[] = [
     type: "Acreage",
     description: "Russell Ranch Acreage",
     id: 1,
+    isPassthrough: false,
   },
   {
     price: 60.0,
@@ -207,6 +210,7 @@ export const sampleRates: Rate[] = [
     type: "Labor",
     description: "Skilled Labor",
     id: 3,
+    isPassthrough: false,
   },
   {
     price: 66.67,
@@ -214,6 +218,7 @@ export const sampleRates: Rate[] = [
     type: "Other",
     description: "Crop Destruction",
     id: 5,
+    isPassthrough: false,
   },
   {
     price: 34.91,
@@ -221,6 +226,7 @@ export const sampleRates: Rate[] = [
     type: "Equipment",
     description: "Backhoe",
     id: 8,
+    isPassthrough: false,
   },
 ];
 

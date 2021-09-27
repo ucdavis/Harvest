@@ -63,13 +63,14 @@ const WorkItemForm = (props: WorkItemFormProps) => {
       // new rate selected, update the work item with defaults
       props.updateWorkItems({
         ...workItem,
-        description: requiresCustomDescription(rate.unit)
+        description: requiresCustomDescription(rate.isPassthrough)
           ? ""
           : rate.description,
         rateId,
         rate: rate.price,
         unit: rate.unit,
         total: 0,
+        isPassthrough: rate.isPassthrough,
       });
     } else {
       // reset values to prevent stale data from impacting logic elsewhere
@@ -81,13 +82,15 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
+        isPassthrough: false,
       });
     }
   };
 
   // TODO: Determine a better way of working out which other options need extra description text
-  const requiresCustomDescription = (unit: string) => {
-    return props.category === "Other" && unit === "Unit";
+  // Don't really need the category check
+  const requiresCustomDescription = (isPass: boolean) => {
+    return props.category === "Other" && isPass === true;
   };
 
   const typeaheadRef = useRef<any>(null);
@@ -109,6 +112,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
+        isPassthrough: false,
       });
     }
   };
@@ -125,6 +129,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         description: "",
         quantity: 0,
         total: 0,
+        isPassthrough: false,
       });
     }
 
@@ -150,7 +155,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             onBlur={(e) => typeaheadBlur(e)}
           />
           <InputErrorMessage name="rateId" />
-          {requiresCustomDescription(workItem.unit) && (
+          {requiresCustomDescription(workItem.isPassthrough) && (
             <>
               <Input
                 className={getClassName("description")}
