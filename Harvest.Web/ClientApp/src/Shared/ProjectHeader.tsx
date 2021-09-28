@@ -26,7 +26,6 @@ export const ProjectHeader = (props: Props) => {
           <button className="btn btn-link" onClick={toggleModal}>
             See More
           </button>
-
         </p>
       );
     } else {
@@ -52,7 +51,10 @@ export const ProjectHeader = (props: Props) => {
 
             {project.accounts.map((acc: ProjectAccount) => (
               <div key={acc.id}>
-                {acc.name} {acc.percentage}%
+                <p>
+                  {acc.number} {acc.percentage}% <br />{" "}
+                  <small> {acc.name} </small>
+                </p>
               </div>
             ))}
             <p className="lede">Requirements</p>
