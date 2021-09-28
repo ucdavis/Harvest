@@ -34,7 +34,7 @@ namespace Harvest.Core.Models
         public string ProjectName { get; set; }
         public double Acres { get; set; }
         public double AcreageRate { get; set; }
-        public int AcreageRateId { get; set; }
+        public int? AcreageRateId { get; set; }
         public string AcreageRateDescription { get; set; }
         public double AcreageTotal { get; set; }
         public double ActivitiesTotal { get; set; }
@@ -79,5 +79,6 @@ namespace Harvest.Core.Models
         public double Total { get; set; }
         public string Unit { get; set; }
         public bool Markup { get; set; }
+        public bool IsPassthrough { get; set; }
     }
 }
