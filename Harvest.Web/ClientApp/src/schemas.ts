@@ -122,7 +122,7 @@ export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup
       .min(0, ErrorMessages.NumberAcresNegative)
       .required(ErrorMessages.NumberAcresRequired),
     acreageRate: yup.number().required(ErrorMessages.AcreageRateRequired),
-    acreageRateId: yup.number().required(),
+    acreageRateId: yup.number().nullable(),
     acreageRateDescription: yup.string().defined(),
     activities: yup.array().of(activitySchema).required(),
     years: yup
