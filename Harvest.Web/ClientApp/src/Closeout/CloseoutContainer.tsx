@@ -29,20 +29,13 @@ export const CloseoutContainer = () => {
   const [project, setProject] = useState<Project | undefined>();
   const [newExpenseCount, setNewExpenseCount] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
-  const [
-    finalAcreageExpense,
-    setFinalAcreageExpense,
-  ] = useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
+  const [finalAcreageExpense, setFinalAcreageExpense] =
+    useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
   const [closeoutRequested, setCloseoutRequested] = useState(false);
 
-  const {
-    onChange,
-    InputErrorMessage,
-    getClassName,
-    onBlur,
-    formErrorCount,
-  } = useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
+  const { onChange, InputErrorMessage, getClassName, onBlur, formErrorCount } =
+    useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -62,7 +55,11 @@ export const CloseoutContainer = () => {
       return;
     }
 
-    if (finalAcreageExpense.amount === 0) {
+    if (
+      finalAcreageExpense.amount === 0 &&
+      project.acreageRate &&
+      project.acres
+    ) {
       setFinalAcreageExpense({
         amount: roundToTwo(project.acres * (project.acreageRate.price / 12)),
       });
@@ -140,30 +137,34 @@ export const CloseoutContainer = () => {
           <div className="col-md-8">
             <h2>Prepare final invoice for project closeout</h2>
 
-            <Label for="amount">
-              Final Acreage Expense (defaults to monthly)
-            </Label>
-            <Input
-              className={getClassName("amount")}
-              type="number"
-              id="amount"
-              value={finalAcreageExpense.amount}
-              onChange={onChange("amount", (e) =>
-                setFinalAcreageExpense({
-                  amount: parseFloat(e.target.value),
-                })
-              )}
-              onBlur={onBlur("amount")}
-            />
-            <InputErrorMessage name="amount" />
+            {project.acres == 0 && (
+              <>
+                <Label for="amount">
+                  Final Acreage Expense (defaults to monthly)
+                </Label>
+                <Input
+                  className={getClassName("amount")}
+                  type="number"
+                  id="amount"
+                  value={finalAcreageExpense.amount}
+                  onChange={onChange("amount", (e) =>
+                    setFinalAcreageExpense({
+                      amount: parseFloat(e.target.value),
+                    })
+                  )}
+                  onBlur={onBlur("amount")}
+                />
+                <InputErrorMessage name="amount" />
 
-            <Button
-              color="link btn-sm"
-              disabled={notification.pending || formErrorCount > 0}
-              onClick={addAcreageExpense}
-            >
-              Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
-            </Button>
+                <Button
+                  color="link btn-sm"
+                  disabled={notification.pending || formErrorCount > 0}
+                  onClick={addAcreageExpense}
+                >
+                  Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="col-md-8 mt-4">

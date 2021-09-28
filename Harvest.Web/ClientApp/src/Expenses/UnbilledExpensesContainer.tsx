@@ -78,21 +78,17 @@ export const UnbilledExpensesContainer = (props: Props) => {
     });
   };
 
-  if (expenses.length === 0) {
-    return <h3>No un-billed expenses found</h3>;
-  }
-
   return (
     <div>
       <div className="row justify-content-between mb-3">
         <div className="col">
-          <h1>
+          <h2>
             Un-billed Expenses for{" "}
             <Link to={`/project/details/${projectId}`}>
               Project {projectId}
             </Link>{" "}
             <small>(${formatCurrency(total)} total)</small>
-          </h1>
+          </h2>
         </div>
         <div className="col text-right">
           <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
