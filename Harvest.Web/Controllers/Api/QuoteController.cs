@@ -47,6 +47,12 @@ namespace Harvest.Web.Controllers.Api
             return View("React");
         }
 
+        [HttpGet]
+        public ActionResult Details(int projectId)
+        {
+            return View("React");
+        }
+
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
         [HttpPost]
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)

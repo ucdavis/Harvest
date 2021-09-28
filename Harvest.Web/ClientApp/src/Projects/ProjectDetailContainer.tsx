@@ -188,6 +188,23 @@ export const ProjectDetailContainer = () => {
                   Change Requirements
                 </Link>
               </ShowFor>
+              <ShowFor
+                roles={["PI"]}
+                condition={
+                  // all statuses with approved quotes
+                  project.status === "Active" ||
+                  project.status === "Completed" ||
+                  project.status === "AwaitingCloseout" ||
+                  project.status === "FinalInvoicePending"
+                }
+              >
+                <Link
+                  className="btn btn-primary btn-sm mr-4"
+                  to={`/quote/details/${project.id}`}
+                >
+                  View Quote
+                </Link>
+              </ShowFor>
             </div>
           </div>
         </div>
