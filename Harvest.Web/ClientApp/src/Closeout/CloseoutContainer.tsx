@@ -133,30 +133,34 @@ export const CloseoutContainer = () => {
           <div className="col-md-8">
             <h2>Prepare final invoice for project closeout</h2>
 
-            <Label for="amount">
-              Final Acreage Expense (defaults to monthly)
-            </Label>
-            <Input
-              className={getClassName("amount")}
-              type="number"
-              id="amount"
-              value={finalAcreageExpense.amount}
-              onChange={onChange("amount", (e) =>
-                setFinalAcreageExpense({
-                  amount: parseFloat(e.target.value),
-                })
-              )}
-              onBlur={onBlur("amount")}
-            />
-            <InputErrorMessage name="amount" />
+            {project.acres == 0 && (
+              <>
+                <Label for="amount">
+                  Final Acreage Expense (defaults to monthly)
+                </Label>
+                <Input
+                  className={getClassName("amount")}
+                  type="number"
+                  id="amount"
+                  value={finalAcreageExpense.amount}
+                  onChange={onChange("amount", (e) =>
+                    setFinalAcreageExpense({
+                      amount: parseFloat(e.target.value),
+                    })
+                  )}
+                  onBlur={onBlur("amount")}
+                />
+                <InputErrorMessage name="amount" />
 
-            <Button
-              color="link btn-sm"
-              disabled={notification.pending || formErrorCount > 0}
-              onClick={addAcreageExpense}
-            >
-              Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
-            </Button>
+                <Button
+                  color="link btn-sm"
+                  disabled={notification.pending || formErrorCount > 0}
+                  onClick={addAcreageExpense}
+                >
+                  Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="col-md-8 mt-4">
