@@ -55,7 +55,11 @@ export const CloseoutContainer = () => {
       return;
     }
 
-    if (finalAcreageExpense.amount === 0 && project.acreageRate) {
+    if (
+      finalAcreageExpense.amount === 0 &&
+      project.acreageRate &&
+      project.acres
+    ) {
       setFinalAcreageExpense({
         amount: roundToTwo(project.acres * (project.acreageRate.price / 12)),
       });
