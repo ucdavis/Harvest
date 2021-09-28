@@ -88,11 +88,19 @@ namespace Harvest.Web.Controllers.Api
 
                 // quote for change request
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
+                var originalQuote =
+                    await _dbContext.Quotes.SingleAsync(a => a.ProjectId == changeRequestProject.OriginalProjectId);
+                originalQuote.Status = Quote.Statuses.Superseded;
+                originalQuote.ProjectId = changeRequestProject.Id; //Assign the original quote to the change request project
+
+                quote.Status = Quote.Statuses.Approved;
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
+                quote.ProjectId = changeRequestProject.OriginalProjectId.Value;
 
                 project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == changeRequestProject.OriginalProjectId);
 
                 changeRequestProject.IsActive = false; // soft delete change request so we don't see it anymore
+                changeRequestProject.Status = Project.Statuses.ChangeApplied;
 
                 // replace original project info with newly approved project info
                 project.PrincipalInvestigatorId = changeRequestProject.PrincipalInvestigatorId;
@@ -128,6 +136,7 @@ namespace Harvest.Web.Controllers.Api
                 project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
+                quote.Status = Quote.Statuses.Approved;
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
             }
 
@@ -196,6 +205,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest();
             }
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+            var quote = await _dbContext.Quotes.SingleAsync(a => a.ProjectId == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
 
@@ -211,6 +221,7 @@ namespace Harvest.Web.Controllers.Api
             await _historyService.TicketCreated(project.Id, ticketToCreate);
 
             project.Status = Project.Statuses.QuoteRejected;
+            quote.Status = Quote.Statuses.Rejected;
 
             await _historyService.QuoteRejected(project.Id, model.Reason);
 
