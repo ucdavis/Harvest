@@ -26,7 +26,6 @@ export const ProjectHeader = (props: Props) => {
           <button className="btn btn-link" onClick={toggleModal}>
             See More
           </button>
-
         </p>
       );
     } else {
@@ -78,6 +77,8 @@ export const ProjectHeader = (props: Props) => {
                 </p>
                 <p className="lede">Type</p>
                 <p>{project.cropType}</p>
+                <p className="lede">Acres</p>
+                <p>{project.acres}</p>
               </div>
               <div className="col">
                 <p className="lede">Timeline</p>
