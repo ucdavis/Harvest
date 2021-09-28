@@ -120,7 +120,10 @@ export const quoteContentSchema /*: SchemaOf<QuoteContent>*/ = yup
       .number()
       .typeError(ErrorMessages.NumberAcresType)
       .min(0, ErrorMessages.NumberAcresNegative)
-      .required(ErrorMessages.NumberAcresRequired),
+      .required(ErrorMessages.NumberAcresRequired)
+      .when("acreageRateId", (value, schema) =>
+        value ? schema.positive(ErrorMessages.NumberAcresRequired) : schema
+      ),
     acreageRate: yup.number().required(ErrorMessages.AcreageRateRequired),
     acreageRateId: yup.number().nullable(),
     acreageRateDescription: yup.string().defined(),
