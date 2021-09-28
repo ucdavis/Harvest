@@ -28,7 +28,7 @@ export const QuoteDisplayContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
+      const quoteResponse = await fetch(`/Quote/GetApproved/${projectId}`);
 
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
@@ -49,7 +49,7 @@ export const QuoteDisplayContainer = () => {
     projectAndQuote.quote === undefined ||
     projectAndQuote.quote === null
   ) {
-    return <div>No project or open quote found</div>;
+    return <div>No quote found</div>;
   }
 
   return (

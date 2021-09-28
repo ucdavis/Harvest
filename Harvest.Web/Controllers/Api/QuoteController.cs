@@ -50,7 +50,11 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.CreatedBy)
                 .SingleAsync(p => p.Id == projectId);
 
-            var model = new QuoteModel { Project = project, Quote = QuoteDetail.Deserialize(project.Quote.Text) };
+            var model = new QuoteModel
+            {
+                Project = project,
+                Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null
+            };
 
             return Ok(model);
         }
