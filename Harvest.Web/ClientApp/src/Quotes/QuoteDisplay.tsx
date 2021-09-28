@@ -15,12 +15,16 @@ export const QuoteDisplay = (props: Props) => {
     <div>
       <h1>Quote</h1>
       <p>
-        <b>
-          {quote.acreageRateDescription}: {quote.acres} @{" "}
-          {formatCurrency(quote.acreageRate)} * {quote.years}{" "}
-          {quote.years > 1 ? "years" : "year"} = $
-          {formatCurrency(quote.acreageTotal)}
-        </b>
+        {quote.acreageTotal ? (
+          <b>
+            {quote.acreageRateDescription}: {quote.acres} @{" "}
+            {formatCurrency(quote.acreageRate)} * {quote.years}{" "}
+            {quote.years > 1 ? "years" : "year"} = $
+            {formatCurrency(quote.acreageTotal)}
+          </b>
+        ) : (
+          <b>No acreage fees</b>
+        )}
       </p>
       {quote.activities.map((activity) => (
         <div
