@@ -74,6 +74,9 @@ namespace Test.TestsControllers.TestsApiControllers
             //4
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetApproved", countAdjustment + 2);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetApproved", countAdjustment + 2);
+
+            //5
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", 1);
         }
     }
 }
