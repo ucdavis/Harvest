@@ -15,6 +15,7 @@ import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer"
 import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
+import { QuoteDisplayContainer } from "./Quotes/QuoteDisplayContainer";
 import { ProjectDetailContainer } from "./Projects/ProjectDetailContainer";
 import { ProjectFields } from "./Projects/ProjectFields";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
@@ -62,6 +63,11 @@ function App() {
           roles={["FieldManager", "Supervisor"]}
           path="/quote/create/:projectId"
           component={QuoteContainer}
+        />
+        <ConditionalRoute
+          roles={["PI"]}
+          path="/quote/details/:projectId"
+          component={QuoteDisplayContainer}
         />
         <ConditionalRoute
           roles={["FieldManager"]}
