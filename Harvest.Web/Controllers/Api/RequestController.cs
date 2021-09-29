@@ -86,6 +86,8 @@ namespace Harvest.Web.Controllers.Api
             Project project;
             QuoteDetail quoteDetail;
 
+            var currentUser = await _userService.GetCurrentUser();
+
             if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
@@ -101,6 +103,8 @@ namespace Harvest.Web.Controllers.Api
                 quote.Status = Quote.Statuses.Approved;
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
                 quote.ProjectId = changeRequestProject.OriginalProjectId.Value;
+                quote.ApprovedById = currentUser.Id;
+                quote.ApprovedOn = DateTime.UtcNow;
 
                 project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == changeRequestProject.OriginalProjectId);
 
@@ -144,10 +148,11 @@ namespace Harvest.Web.Controllers.Api
 
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
                 quote.Status = Quote.Statuses.Approved;
+                quote.ApprovedOn = DateTime.UtcNow;
+                quote.ApprovedById = currentUser.Id;
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
             }
 
-            var currentUser = await _userService.GetCurrentUser();
 
             var percentage = 0.0m;
 
