@@ -1,12 +1,11 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { Project, ProjectAccount, ProjectWithQuote } from "../types";
+import { ProjectWithQuote } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "./QuoteDisplay";
 import { formatCurrency } from "../Util/NumberFormatting";
 
-import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 // Lazy load quote pdf link since it's a large JS file and causes a console warning
@@ -20,10 +19,6 @@ export const QuoteDisplayContainer = () => {
   const history = useHistory();
   const { projectId } = useParams<RouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
-  const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
-  const [disabled, setDisabled] = useState<boolean>(true);
-
-  const [notification, setNotification] = usePromiseNotification();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
