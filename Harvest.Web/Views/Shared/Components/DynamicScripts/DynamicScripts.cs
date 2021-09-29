@@ -25,7 +25,7 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
             /* 
              * Get the important JS files in the static build folder
              * Should include the following files:
-             * - 3.[hash].chunk.js (determined from the generated index.html by CRA)
+             * - [num].[hash].chunk.js (determined from the generated index.html by CRA)
              * - main.*.js
              * - runtime-main.*.js
 
@@ -48,13 +48,23 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
                 }
             }
 
-            // Get all the chunk files
-            var chunks = files.Where(f => Regex.IsMatch(f.Name, "^[0-9]*\\..*\\.chunk\\.js$")).Select(f => f.Name);
-
             var scripts = new List<string>();
 
-            // read the 3.*.chunk.js files (There is probably only one, but doesn't hurt to be careful)
-            scripts.AddRange(chunks.Where(c => c.StartsWith("3")));
+            // Assumption: We need the chunk file that contains code from react.production.min.js
+            // Assumption: The chunk file will always be accompanied by a corresponding [chunk file name].LICENSE.txt file that contains the string "react.production"
+            // Assumption: No other LICENSE.txt file will contain "react.production" (though it shouldn't break anything if it does happen)
+            var regex = new Regex("react\\.production");
+            foreach (var fileName in files.Where(f => Regex.IsMatch(f.Name, "^[0-9]*\\..*\\.chunk\\.js\\.LICENSE.txt$")).Select(f => f.Name))
+            {
+                foreach (var line in File.ReadLines(fileName))
+                {
+                    if (regex.IsMatch(line))
+                    {
+                        scripts.Add(fileName.Replace(".LICENSE.txt", ""));
+                        break;
+                    }
+                }
+            }
 
             // now add in main.*.chunk.js
             scripts.AddRange(files.Where(f => Regex.IsMatch(f.Name, "^.*main\\..*\\.chunk\\.js$")).Select(f => f.Name));
