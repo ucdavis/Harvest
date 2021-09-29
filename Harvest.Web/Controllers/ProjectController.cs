@@ -97,12 +97,11 @@ namespace Harvest.Web.Controllers
 
         public async Task<ActionResult> RequiringPIAttention()
         {
-            var user = await _userService.GetCurrentUser();
             // return basic info on projects which are waiting for PI attention
             var attentionStatuses = new string[] { Project.Statuses.PendingApproval, Project.Statuses.PendingAccountApproval }.ToArray();
 
             return Ok(await _dbContext.Projects.AsNoTracking()
-                .Where(p =>p.PrincipalInvestigatorId == user.Id && p.IsActive && attentionStatuses.Contains(p.Status))
+                .Where(p => p.IsActive && attentionStatuses.Contains(p.Status))
                 .Select(p => new { p.Id, p.Status, p.Name })
                 .Take(4)
                 .ToArrayAsync());
