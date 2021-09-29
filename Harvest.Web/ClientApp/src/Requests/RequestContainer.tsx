@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Link } from "react-router-dom";
 import { Button, FormGroup, Input, Label } from "reactstrap";
-import DatePicker from "react-date-picker";
+import DatePicker from "react-datepicker";
 
 import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
@@ -168,13 +168,11 @@ export const RequestContainer = () => {
                           onBlur={() => onBlurValue("start")}
                         >
                           <DatePicker
-                            format="MM/dd/yyyy"
-                            required={false}
-                            clearIcon={null}
-                            value={project.start}
+                            selected={project.start}
                             onChange={onChangeValue("start", (date: Date) =>
                               setProject({ ...project, start: date })
                             )}
+                            isClearable
                           />
                         </div>
                         <InputErrorMessage name="start" />
@@ -189,13 +187,11 @@ export const RequestContainer = () => {
                           onBlur={() => onBlurValue("end")}
                         >
                           <DatePicker
-                            format="MM/dd/yyyy"
-                            required={false}
-                            clearIcon={null}
-                            value={project.end}
+                            selected={project.end}
                             onChange={onChangeValue("end", (date: Date) =>
                               setProject({ ...project, end: date })
                             )}
+                            isClearable
                           />
                         </div>
                         <InputErrorMessage name="end" />
