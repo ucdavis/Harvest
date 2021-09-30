@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from "react";
+import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import { Row, HeaderGroup } from "react-table";
 import { convertCamelCase } from "../Util/StringFormatting";

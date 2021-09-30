@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
-// import DatePicker from "react-date-picker";
 import DatePicker from "react-datepicker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
