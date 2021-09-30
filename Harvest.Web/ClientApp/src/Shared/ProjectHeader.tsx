@@ -3,6 +3,7 @@ import { Project, ProjectAccount } from "../types";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import { convertCamelCase } from "../Util/StringFormatting";
 import { ReturnToProject } from "../Shared/ReturnToProject";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   project: Project;
@@ -87,7 +88,9 @@ export const ProjectHeader = (props: Props) => {
                   {new Date(project.end).toLocaleDateString()}
                 </p>
                 <p className="lede">Crops</p>
-                <p>{crops}</p>
+                              <p>{crops}</p>
+                  <p className="lede">Totals (Quote/Charged)</p>
+                              <p> ${formatCurrency(project.quoteTotal)} / ${formatCurrency(project.chargedTotal)}</p>
               </div>
             </div>
           </div>
