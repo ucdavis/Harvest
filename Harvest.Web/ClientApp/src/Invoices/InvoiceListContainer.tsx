@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { Invoice, Project } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
@@ -58,7 +58,7 @@ export const InvoiceListContainer = () => {
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
       <div className="card-content">
-        <h3>Invoices for Project {projectId}</h3>
+        <h3>Invoices</h3>
         <InvoiceTable invoices={invoices}></InvoiceTable>
       </div>
     </div>
