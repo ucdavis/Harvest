@@ -176,7 +176,10 @@ export const CloseoutContainer = () => {
       <div className="card-content">
         <div className="row">
           <div className="col-md-12">
-            <UnbilledExpensesContainer newExpenseCount={newExpenseCount} />
+            <UnbilledExpensesContainer
+              newExpenseCount={newExpenseCount}
+              hideProjectHeader={true}
+            />
             <br />
             <Button
               id="CloseoutButton"

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Harvest.Web.Controllers
 {
@@ -97,15 +98,30 @@ namespace Harvest.Web.Controllers
 
         public async Task<ActionResult> RequiringPIAttention()
         {
-            var user = await _userService.GetCurrentUser();
-            // return basic info on projects which are waiting for PI attention
-            var attentionStatuses = new string[] { Project.Statuses.PendingApproval, Project.Statuses.PendingAccountApproval }.ToArray();
+            try
+            {
+                var user = await _userService.GetCurrentUser();
+                if (user == null)
+                {
+                    throw new Exception("User is null");
+                }
+                var attentionStatuses = new string[] { Project.Statuses.PendingApproval, Project.Statuses.PendingAccountApproval }.ToArray();
 
-            return Ok(await _dbContext.Projects.AsNoTracking()
-                .Where(p =>p.PrincipalInvestigatorId == user.Id && p.IsActive && attentionStatuses.Contains(p.Status))
-                .Select(p => new { p.Id, p.Status, p.Name })
-                .Take(4)
-                .ToArrayAsync());
+                return Ok(await _dbContext.Projects.AsNoTracking()
+                    .Where(p => p.PrincipalInvestigatorId == user.Id && p.IsActive && attentionStatuses.Contains(p.Status))
+                    .Select(p => new { p.Id, p.Status, p.Name })
+                    .Take(4)
+                    .ToArrayAsync());
+
+            }
+            catch (Exception e)
+            {
+                Log.Error("Exception getting projects requiring PI Attention. {e}", e.Message);
+                return Ok(null);
+            }
+
+            // return basic info on projects which are waiting for PI attention
+
         }
 
         public async Task<ActionResult> GetMine()

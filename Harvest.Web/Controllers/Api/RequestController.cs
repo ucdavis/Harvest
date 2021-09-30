@@ -321,6 +321,7 @@ namespace Harvest.Web.Controllers.Api
                 changeRequest = true;
                 newProject.Status = Project.Statuses.ChangeRequested;
                 newProject.OriginalProjectId = project.Id;
+                newProject.Acres = project.Acres;
 
                 // get the quote for this project and copy over so we have a good starting point
                 var originalProjectQuote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == project.Id);
