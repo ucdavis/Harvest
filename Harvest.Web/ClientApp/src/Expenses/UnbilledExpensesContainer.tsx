@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Expense, ExpenseQueryParams } from "../types";
+import { Expense, ExpenseQueryParams, Project } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
 import { ShowFor } from "../Shared/ShowFor";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -23,6 +24,7 @@ interface Props {
 export const UnbilledExpensesContainer = (props: Props) => {
   const { projectId } = useParams<RouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [project, setProject] = useState<Project>();
   const [total, setTotal] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
   const [confirmRemoveExpense] = useConfirmationDialog({
@@ -50,6 +52,26 @@ export const UnbilledExpensesContainer = (props: Props) => {
 
     cb();
   }, [projectId, props.newExpenseCount, getIsMounted]);
+
+  useEffect(() => {
+    // get rates so we can load up all expense types and info
+    const cb = async () => {
+      const response = await fetch(`/Project/Get/${projectId}`);
+
+      if (response.ok) {
+        const project = (await response.json()) as Project;
+        getIsMounted() && setProject(project);
+      }
+    };
+
+    if (projectId) {
+      cb();
+    }
+  }, [projectId, getIsMounted]);
+
+  if (project === undefined) {
+    return <div>Loading...</div>;
+  }
 
   const deleteExpense = async (expense: Expense) => {
     if (!(await confirmRemoveExpense())) {
@@ -79,34 +101,38 @@ export const UnbilledExpensesContainer = (props: Props) => {
   };
 
   return (
-    <div>
-      <div className="row justify-content-between mb-3">
-        <div className="col">
-          <h2>
-            Un-billed Expenses for{" "}
-            <Link to={`/project/details/${projectId}`}>
-              Project {projectId}
-            </Link>{" "}
-            <small>(${formatCurrency(total)} total)</small>
-          </h2>
+    <div className="card-wrapper">
+      <ProjectHeader
+        project={project}
+        title={"Field Request #" + (project?.id || "")}
+        hideBack={false}
+      />
+      <div className="card-content">
+        <div className="row justify-content-between mb-3">
+          <div className="col">
+            <h3>
+              Un-billed Expenses for Project {projectId}
+              <small> (${formatCurrency(total)} total)</small>
+            </h3>
+          </div>
+          <div className="col text-right">
+            <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
+              <Link
+                to={`/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
+                className="btn btn btn-primary "
+              >
+                Enter New <FontAwesomeIcon icon={faPlus} />
+              </Link>
+            </ShowFor>
+          </div>
         </div>
-        <div className="col text-right">
-          <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
-            <Link
-              to={`/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
-              className="btn btn btn-primary "
-            >
-              Enter New <FontAwesomeIcon icon={faPlus} />
-            </Link>
-          </ShowFor>
-        </div>
-      </div>
 
-      <ExpenseTable
-        expenses={expenses}
-        deleteExpense={deleteExpense}
-        canDeleteExpense={!notification.pending}
-      ></ExpenseTable>
+        <ExpenseTable
+          expenses={expenses}
+          deleteExpense={deleteExpense}
+          canDeleteExpense={!notification.pending}
+        ></ExpenseTable>
+      </div>
     </div>
   );
 };
