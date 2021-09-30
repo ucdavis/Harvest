@@ -1,5 +1,7 @@
-import * as React from "react";
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
 import { Row, HeaderGroup } from "react-table";
+import { start } from "repl";
 import { convertCamelCase } from "../Util/StringFormatting";
 
 // Define a default UI for filtering
@@ -113,6 +115,56 @@ export const progressFilter = (rows: any[], id: any, filterValue: any) => {
   }
 
   return rows;
+};
+
+export const DatePickerFilter = ({
+  column: { filterValue, setFilter },
+}: any) => {
+  const [dateRange, setDateRange] = useState([undefined, undefined]);
+  const [startDate, endDate] = dateRange;
+
+  return (
+    <DatePicker
+      selectsRange={true}
+      startDate={startDate}
+      endDate={endDate}
+      onChange={(e: any) => {
+        setDateRange(e);
+        setFilter(e);
+      }}
+      isClearable
+    />
+  );
+};
+
+// Function to convert date format to yyyy/mm/dd for better date comparison
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  return new Date(`${year}/${month}/${day}`);
+};
+
+export const startDateFilter = (rows: any[], id: any, filterValue: any) => {
+  return rows.filter((row) => {
+    const startDate = formatDate(row.values.startDate.split(" ")[0]);
+    const filterDateStart = formatDate(filterValue[0]);
+    const filterDateEnd = formatDate(filterValue[1]);
+
+    return startDate >= filterDateStart && startDate <= filterDateEnd;
+  });
+};
+
+export const endDateFilter = (rows: any[], id: any, filterValue: any) => {
+  return rows.filter((row) => {
+    const endDate = formatDate(row.values.endDate.split(" ")[0]);
+    const filterDateStart = formatDate(filterValue[0]);
+    const filterDateEnd = formatDate(filterValue[1]);
+
+    return endDate >= filterDateStart && endDate <= filterDateEnd;
+  });
 };
 
 export const ColumnFilterHeaders = ({ headerGroups }: any) => {
