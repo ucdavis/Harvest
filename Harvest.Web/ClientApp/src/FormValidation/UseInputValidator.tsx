@@ -66,7 +66,7 @@ export function useInputValidator<T>(
   }, [errors, formErrorCount, setFormErrorCount, previousErrors]);
 
   const validateFieldImpl = useCallback(
-    async (name: TKey, value: T[TKey]) => {
+    async (name: TKey, value: T[TKey], reevaluateErrors: boolean = false) => {
       const newValues = { ...values, [name]: value } as unknown as T;
       setValues(newValues);
       try {
@@ -81,6 +81,15 @@ export function useInputValidator<T>(
             e as ValidationError,
           ]);
           return e;
+        }
+      } finally {
+        if (reevaluateErrors) {
+          // make sure other field errors are reevaluated to account for complex validations
+          for (const field of errors
+            .filter((e) => e.path !== name)
+            .map((e) => e.path as TKey)) {
+            validateFieldImpl(field, newValues[field]);
+          }
         }
       }
     },
@@ -170,8 +179,8 @@ export function useInputValidator<T>(
     ) : null;
   };
 
-  const valueChanged = (name: TKey, value: T[TKey]) => {
-    validateField(name, value);
+  const valueChanged = async (name: TKey, value: T[TKey]) => {
+    validateField(name, value, true);
   };
 
   const onChange =
