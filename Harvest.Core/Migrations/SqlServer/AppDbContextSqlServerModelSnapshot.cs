@@ -149,6 +149,11 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsPassthrough")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<bool>("Markup")
                         .HasColumnType("bit");
 
