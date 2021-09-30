@@ -54,13 +54,13 @@ namespace Harvest.Web.Views.Shared.Components.DynamicScripts
             // Assumption: The chunk file will always be accompanied by a corresponding [chunk file name].LICENSE.txt file that contains the string "react.production"
             // Assumption: No other LICENSE.txt file will contain "react.production" (though it shouldn't break anything if it does happen)
             var regex = new Regex("react\\.production");
-            foreach (var fileName in files.Where(f => Regex.IsMatch(f.Name, "^[0-9]*\\..*\\.chunk\\.js\\.LICENSE.txt$")).Select(f => f.Name))
+            foreach (var file in files.Where(f => Regex.IsMatch(f.Name, "^[0-9]*\\..*\\.chunk\\.js\\.LICENSE.txt$")))
             {
-                foreach (var line in File.ReadLines(fileName))
+                foreach (var line in File.ReadLines(file.PhysicalPath))
                 {
                     if (regex.IsMatch(line))
                     {
-                        scripts.Add(fileName.Replace(".LICENSE.txt", ""));
+                        scripts.Add(file.Name.Replace(".LICENSE.txt", ""));
                         break;
                     }
                 }
