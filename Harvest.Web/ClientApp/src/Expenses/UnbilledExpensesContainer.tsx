@@ -19,6 +19,7 @@ interface RouteParams {
 
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
+  hideProjectHeader?: boolean;
 }
 
 export const UnbilledExpensesContainer = (props: Props) => {
@@ -101,12 +102,14 @@ export const UnbilledExpensesContainer = (props: Props) => {
   };
 
   return (
-    <div className="card-wrapper">
-      <ProjectHeader
-        project={project}
-        title={"Field Request #" + (project?.id || "")}
-        hideBack={false}
-      />
+    <div className={!props.hideProjectHeader ? "card-wrapper" : ""}>
+      {!props.hideProjectHeader && (
+        <ProjectHeader
+          project={project}
+          title={"Field Request #" + (project?.id || "")}
+          hideBack={false}
+        />
+      )}
       <div className="card-content">
         <div className="row justify-content-between mb-3">
           <div className="col">
