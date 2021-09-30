@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-import { Invoice } from "../types";
+import { Invoice, Project } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { ProjectHeader } from "../Shared/ProjectHeader";
 
 interface RouteParams {
   projectId?: string;
@@ -11,6 +12,7 @@ interface RouteParams {
 
 export const InvoiceListContainer = () => {
   const { projectId } = useParams<RouteParams>();
+  const [project, setProject] = useState<Project>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   const getIsMounted = useIsMounted();
@@ -28,17 +30,35 @@ export const InvoiceListContainer = () => {
       cb();
     }
   }, [projectId, getIsMounted]);
+  useEffect(() => {
+    const cb = async () => {
+      const response = await fetch(`/Project/Get/${projectId}`);
+
+      if (response.ok) {
+        const proj: Project = await response.json();
+        getIsMounted() && setProject(proj);
+      }
+    };
+
+    cb();
+  }, [projectId, getIsMounted]);
+
+  if (project === undefined) {
+    return <div>Loading...</div>;
+  }
 
   if (invoices.length === 0) {
     return <div>No invoices found</div>;
   }
+
   return (
-    <div className="">
+    <div className="card-wrapper">
+      <ProjectHeader
+        project={project}
+        title={"Field Request #" + (project.id || "")}
+      ></ProjectHeader>
       <div className="card-content">
-        <h1>
-          Invoices for{" "}
-          <Link to={`/project/details/${projectId}`}>Project {projectId}</Link>
-        </h1>
+        <h3>Invoices</h3>
         <InvoiceTable invoices={invoices}></InvoiceTable>
       </div>
     </div>
