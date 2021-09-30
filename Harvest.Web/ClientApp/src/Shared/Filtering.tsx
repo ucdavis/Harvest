@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { forwardRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import { Row, HeaderGroup } from "react-table";
-import { start } from "repl";
 import { convertCamelCase } from "../Util/StringFormatting";
 
 // Define a default UI for filtering
