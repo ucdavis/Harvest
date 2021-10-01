@@ -26,10 +26,6 @@ export const Crops = (props: Props) => {
     }
   }, [props.crops]);
 
-  useEffect(() => {
-    onSearch();
-  }, [props.cropType]);
-
   const onSelect = (selected: (string | { label: string })[]) => {
     const selectedStrings = selected.map((s) =>
       typeof s === "string" ? s : s.label
@@ -41,24 +37,28 @@ export const Crops = (props: Props) => {
     }
   };
 
-  const onSearch = async () => {
-    setIsSearchLoading(true);
+  useEffect(() => {
+    const onSearch = async () => {
+      setIsSearchLoading(true);
 
-    const response = await fetch(`/Crop/Search?type=${props.cropType}`);
+      const response = await fetch(`/Crop/Search?type=${props.cropType}`);
 
-    if (response.ok) {
-      if (response.status === 204) {
-        getIsMounted() && setOptions([]); // no content means no match
-      } else {
-        const crops: string[] = (await response.json()).map(
-          (c: Crop) => c.name
-        );
+      if (response.ok) {
+        if (response.status === 204) {
+          getIsMounted() && setOptions([]); // no content means no match
+        } else {
+          const crops: string[] = (await response.json()).map(
+            (c: Crop) => c.name
+          );
 
-        getIsMounted() && setOptions(crops);
+          getIsMounted() && setOptions(crops);
+        }
       }
-    }
-    getIsMounted() && setIsSearchLoading(false);
-  };
+      getIsMounted() && setIsSearchLoading(false);
+    };
+
+    onSearch();
+  }, [props.cropType, getIsMounted]);
 
   return (
     <Typeahead

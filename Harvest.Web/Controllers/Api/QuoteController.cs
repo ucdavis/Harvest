@@ -39,10 +39,36 @@ namespace Harvest.Web.Controllers.Api
             return Ok(model);
         }
 
+        // Get info on the project as well as in-progess quote if it exists
+        [HttpGet]
+        public async Task<ActionResult> GetApproved(int projectId)
+        {
+            var project = await _dbContext.Projects
+                .Include(p => p.Quote)
+                .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.Accounts)
+                .Include(p => p.CreatedBy)
+                .SingleAsync(p => p.Id == projectId);
+
+            var model = new QuoteModel
+            {
+                Project = project,
+                Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null
+            };
+
+            return Ok(model);
+        }
+
         // Create a quote for project ID
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
         [HttpGet]
         public ActionResult Create(int projectId)
+        {
+            return View("React");
+        }
+
+        [HttpGet]
+        public ActionResult Details(int projectId)
         {
             return View("React");
         }

@@ -137,7 +137,7 @@ export const CloseoutContainer = () => {
           <div className="col-md-8">
             <h2>Prepare final invoice for project closeout</h2>
 
-            {project.acres == 0 && (
+            {project.acres === 0 && (
               <>
                 <Label for="amount">
                   Final Acreage Expense (defaults to monthly)
@@ -176,7 +176,10 @@ export const CloseoutContainer = () => {
       <div className="card-content">
         <div className="row">
           <div className="col-md-12">
-            <UnbilledExpensesContainer newExpenseCount={newExpenseCount} />
+            <UnbilledExpensesContainer
+              newExpenseCount={newExpenseCount}
+              hideProjectHeader={true}
+            />
             <br />
             <Button
               id="CloseoutButton"
