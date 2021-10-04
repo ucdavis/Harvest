@@ -712,7 +712,7 @@ namespace Test.TestsServices
         /// Test invoice gets created first business day of month when no dev override
         /// </summary>
         /// <returns></returns>
-        [Fact(Skip = "Ignore until I can debug")]
+        [Fact]
         public async Task InvoiceCreatedForActiveProjectWithOutNightlySetting()
         {
             SetupData();
@@ -766,7 +766,7 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
         }
 
-        [Fact(Skip = "Ignore until I can debug")]
+        [Fact]
         public async Task CreateInvoiceCallsEmailService()
         {
             SetupData();
@@ -810,7 +810,7 @@ namespace Test.TestsServices
             MockEmailService.Verify(a => a.InvoiceCreated(addedInvoice), times: Times.Once);
         }
 
-        [Fact(Skip = "Ignore until I can debug")]
+        [Fact]
         public async Task CreateInvoicesWithOneProject()
         {
             SetupData();

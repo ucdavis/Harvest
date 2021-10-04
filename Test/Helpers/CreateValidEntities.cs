@@ -14,7 +14,7 @@ namespace Test.Helpers
         {
             var rtValue = new Project();
             rtValue.Id = counter ?? 99;
-            rtValue.Start = DateTime.UtcNow.AddDays(-30);
+            rtValue.Start = new DateTime(2021, 06, 01);
             rtValue.End = DateTime.UtcNow.AddYears(1);
             rtValue.CropType = Harvest.Core.Domain.Project.CropTypes.Tree;
             rtValue.Crop = $"Crop{counter}";
@@ -40,7 +40,7 @@ namespace Test.Helpers
             rtValue.ChargedTotal = 5000.0m;
             rtValue.CreatedById = 1;
             rtValue.CreatedBy = CreateValidEntities.User(1);
-            rtValue.CreatedOn = DateTime.UtcNow.AddDays(-30);
+            rtValue.CreatedOn = new DateTime(2021, 09, 01);
             rtValue.CurrentAccountVersion = 1;
             rtValue.IsActive = true;
             rtValue.Accounts = new List<Account>();
