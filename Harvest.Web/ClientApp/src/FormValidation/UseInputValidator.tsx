@@ -179,7 +179,7 @@ export function useInputValidator<T>(
     ) : null;
   };
 
-  const valueChanged = async (name: TKey, value: T[TKey]) => {
+  const valueChanged = (name: TKey, value: T[TKey]) => {
     validateField(name, value, true);
   };
 
