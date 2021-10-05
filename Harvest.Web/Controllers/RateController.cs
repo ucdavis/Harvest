@@ -90,6 +90,28 @@ namespace Harvest.Web.Controllers
                 ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
             }
 
+            if (!model.Rate.IsPassthrough)
+            {
+                if (string.IsNullOrWhiteSpace(model.Rate.ExpenseObjectCode))
+                {
+                    ModelState.AddModelError("Rate.ExpenseObjectCode", errorMessage: "Expense Object Code is required.");
+                }
+                else
+                {
+                    if (accountValidation.IsValid &&
+                        !(await _financialService.IsObjectValid(accountValidation.KfsAccount.ChartOfAccountsCode,
+                            model.Rate.ExpenseObjectCode)))
+                    {
+                        ModelState.AddModelError("Rate.ExpenseObjectCode", errorMessage: "Expense Object Code is invalid.");
+                    }
+                }
+            }
+            else
+            {
+                model.Rate.ExpenseObjectCode = "80RS";
+            }
+
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
@@ -154,6 +176,27 @@ namespace Harvest.Web.Controllers
                 ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
             }
 
+            if (!model.Rate.IsPassthrough)
+            {
+                if (string.IsNullOrWhiteSpace(model.Rate.ExpenseObjectCode))
+                {
+                    ModelState.AddModelError("Rate.ExpenseObjectCode", errorMessage: "Expense Object Code is required.");
+                }
+                else
+                {
+                    if (accountValidation.IsValid &&
+                        !(await _financialService.IsObjectValid(accountValidation.KfsAccount.ChartOfAccountsCode,
+                            model.Rate.ExpenseObjectCode)))
+                    {
+                        ModelState.AddModelError("Rate.ExpenseObjectCode", errorMessage: "Expense Object Code is invalid.");
+                    }
+                }
+            }
+            else
+            {
+                model.Rate.ExpenseObjectCode = "80RS"; //Config setting?
+            }
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
@@ -182,16 +225,17 @@ namespace Harvest.Web.Controllers
 
         private static void UpdateCommonValues(RateEditModel model, Rate destinationRate, AccountValidationModel accountValidation, User user)
         {
-            destinationRate.Account       = accountValidation.KfsAccount.ToString(); 
-            destinationRate.BillingUnit   = model.Rate.BillingUnit;
-            destinationRate.Description   = model.Rate.Description;
-            destinationRate.EffectiveOn   = model.Rate.EffectiveOn.FromPacificTime();
-            destinationRate.Price         = model.Rate.Price; 
-            destinationRate.Type          = model.Rate.Type;
-            destinationRate.Unit          = model.Rate.Unit;
-            destinationRate.UpdatedOn     = DateTime.UtcNow;
-            destinationRate.UpdatedBy     = user;
-            destinationRate.IsPassthrough = model.Rate.Type == Rate.Types.Other && model.Rate.IsPassthrough;
+            destinationRate.Account           = accountValidation.KfsAccount.ToString(); 
+            destinationRate.BillingUnit       = model.Rate.BillingUnit;
+            destinationRate.Description       = model.Rate.Description;
+            destinationRate.EffectiveOn       = model.Rate.EffectiveOn.FromPacificTime();
+            destinationRate.Price             = model.Rate.Price; 
+            destinationRate.Type              = model.Rate.Type;
+            destinationRate.Unit              = model.Rate.Unit;
+            destinationRate.UpdatedOn         = DateTime.UtcNow;
+            destinationRate.UpdatedBy         = user;
+            destinationRate.IsPassthrough     = model.Rate.Type == Rate.Types.Other && model.Rate.IsPassthrough;
+            destinationRate.ExpenseObjectCode = model.Rate.ExpenseObjectCode.Trim().ToUpper();
         }
 
         // GET: RateController/Delete/5
