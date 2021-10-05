@@ -77,6 +77,12 @@
     <dd class="col-sm-10">
         @Html.DisplayFor(model => model.Rate.Account)
     </dd>
+    <dt class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Rate.ExpenseObjectCode)
+    </dt>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Rate.ExpenseObjectCode)
+    </dd>
     @if (Model.AccountValidation.IsValid)
     {
         <dt class="col-sm-2">
