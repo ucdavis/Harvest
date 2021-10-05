@@ -147,7 +147,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("ExpenseObjectCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
