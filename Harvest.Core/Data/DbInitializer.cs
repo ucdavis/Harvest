@@ -68,15 +68,7 @@ namespace Harvest.Core.Data
                 LastName = "Doval",
                 Iam = "1000050298"
             };
-            await CheckOrCreatePermission(systemRole, user);
-            user = new User
-            {
-                Email = "bmwong@ucdavis.edu",
-                Kerberos = "wongband",
-                FirstName = "Bryan",
-                LastName = "Wong",
-                Iam = "1000274724"
-            };
+
             await CheckOrCreatePermission(systemRole, user);
             await _dbContext.SaveChangesAsync();
 
@@ -148,6 +140,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 34.91m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -158,6 +151,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 132.01m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -168,6 +162,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 34.44m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -178,6 +173,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 14.11m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -188,6 +184,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 90.02m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -198,6 +195,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 16.67m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -208,6 +206,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 685.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -218,6 +217,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 385.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -228,6 +228,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 1250.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -238,6 +239,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 50.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -248,6 +250,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 50.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -258,6 +261,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 25.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -268,6 +272,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 250.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -278,6 +283,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 190.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -288,6 +294,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 25.00m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -298,6 +305,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 25.00m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -308,6 +316,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 20.00m;
             rate.Unit = "Per Gallon";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -318,6 +327,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 90.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -328,6 +338,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 90.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -338,6 +349,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 14.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -348,6 +360,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 75.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -358,6 +371,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 50.00m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -368,6 +382,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 500.00m;
             rate.Unit = "Each";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -378,6 +393,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 125.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -388,6 +404,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 55.00m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -398,6 +415,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 16.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -408,6 +426,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 57.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -418,6 +437,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 76.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -428,6 +448,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 18.00m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -438,6 +459,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 35.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -448,6 +470,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 65.00m;
             rate.Unit = "Per Acre";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -458,6 +481,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 132.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -468,6 +492,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 114.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -478,6 +503,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 34.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -488,6 +514,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 16.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -498,6 +525,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 427.00m;
             rate.Unit = "Per Month";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -508,6 +536,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 105.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -518,6 +547,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 63.00m;
             rate.Unit = "Daily";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -528,6 +558,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 30.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -538,6 +569,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 15.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -548,6 +580,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 65.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -558,6 +591,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-FRMRATE";
             rate.Price = 184.00m;
             rate.Unit = "Per Strip Weighed";
+            rate.ExpenseObjectCode = "RAY9";
 
             await _dbContext.Rates.AddAsync(rate);
         }
@@ -571,6 +605,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLV";
             rate.Price = 66.67m;
             rate.Unit = "Per acre";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -581,6 +616,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLP";
             rate.Price = 66.67m;
             rate.Unit = "Per acre";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -591,6 +627,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLE";
             rate.Price = 66.67m;
             rate.Unit = "Per acre";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -601,6 +638,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLW";
             rate.Price = 66.67m;
             rate.Unit = "Per acre";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -611,6 +649,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRCNTRY";
             rate.Price = 70.00m;
             rate.Unit = "Per sample";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -621,6 +660,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRBARN1";
             rate.Price = 1200.00m;
             rate.Unit = "Per event";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -631,6 +671,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRBARN1";
             rate.Price = 1605.00m;
             rate.Unit = "Per event";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -641,6 +682,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRBARN1";
             rate.Price = 600.00m;
             rate.Unit = "Per 1/2 day";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -651,6 +693,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRBARN1";
             rate.Price = 803.00m;
             rate.Unit = "Per 1/2 day";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -661,6 +704,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRBARN1";
             rate.Price = 1000.00m;
             rate.Unit = "Per day";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -671,6 +715,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRBARN1";
             rate.Price = 1337.00m;
             rate.Unit = "Per day";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
         }
@@ -685,6 +730,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRACRES";
             rate.Price = 60.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -695,6 +741,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRMSHOP";
             rate.Price = 72.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -705,6 +752,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRCNTRY";
             rate.Price = 91.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -715,6 +763,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRCNTRY";
             rate.Price = 92.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -725,6 +774,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFSA";
             rate.Price = 34.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -735,6 +785,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLV";
             rate.Price = 60.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -745,6 +796,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLP";
             rate.Price = 60.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -755,6 +807,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLE";
             rate.Price = 60.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -765,6 +818,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLW";
             rate.Price = 60.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -775,6 +829,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLV";
             rate.Price = 50.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -785,6 +840,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLP";
             rate.Price = 50.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -795,6 +851,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLE";
             rate.Price = 50.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -805,6 +862,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLW";
             rate.Price = 50.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -815,6 +873,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFDS";
             rate.Price = 72.00m;
             rate.Unit = "Hourly";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
         }
@@ -828,6 +887,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRACRES";
             rate.Price = 1150.00m;
             rate.Unit = "Acre per Year";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -838,6 +898,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-RRCNTRY";
             rate.Price = 3281.00m;
             rate.Unit = "Acre per Year";
+            rate.ExpenseObjectCode = "RAS5";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -848,6 +909,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLV";
             rate.Price = 1150.00m;
             rate.Unit = "Acre per Year";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -858,6 +920,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLP";
             rate.Price = 1150.00m;
             rate.Unit = "Acre per Year";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
 
@@ -868,6 +931,7 @@ namespace Harvest.Core.Data
             rate.Account = "3-APSNFLW";
             rate.Price = 1150.00m;
             rate.Unit = "Acre per Year";
+            rate.ExpenseObjectCode = "RAPB";
 
             await _dbContext.Rates.AddAsync(rate);
         }
