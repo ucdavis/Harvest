@@ -146,6 +146,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("ExpenseObjectCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("InvoiceId")
                         .HasColumnType("int");
 
@@ -569,6 +572,10 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.Property<DateTime?>("EffectiveOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ExpenseObjectCode")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");

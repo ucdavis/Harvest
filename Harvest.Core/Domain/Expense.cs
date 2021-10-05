@@ -59,6 +59,7 @@ namespace Harvest.Core.Domain
         [StringLength(50)]
         public string Account { get; set; }
 
+        //This is actually required, but that will make the migration a pain...
         public string ExpenseObjectCode { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
