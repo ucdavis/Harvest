@@ -87,17 +87,18 @@ namespace Harvest.Core.Services
 
             var expense = new Expense
             {
-                Type = project.AcreageRate.Type,
-                Description = project.AcreageRate.Description,
-                Price = project.AcreageRate.Price / 12, //This can be more than 2 decimals
-                Quantity = (decimal) project.Acres,
-                Total = Math.Round(amountToCharge,2, MidpointRounding.ToZero),
-                ProjectId = project.Id,
-                RateId = project.AcreageRate.Id,
-                InvoiceId = null,
-                CreatedOn = DateTime.UtcNow,
-                CreatedBy = user,
-                Account = project.AcreageRate.Account,
+                Type              = project.AcreageRate.Type,
+                Description       = project.AcreageRate.Description,
+                Price             = project.AcreageRate.Price / 12, //This can be more than 2 decimals
+                Quantity          = (decimal) project.Acres,
+                Total             = Math.Round(amountToCharge,2, MidpointRounding.ToZero),
+                ProjectId         = project.Id,
+                RateId            = project.AcreageRate.Id,
+                InvoiceId         = null,
+                CreatedOn         = DateTime.UtcNow,
+                CreatedBy         = user,
+                Account           = project.AcreageRate.Account,
+                ExpenseObjectCode = project.AcreageRate.ExpenseObjectCode,
             };
             return expense;
         }
