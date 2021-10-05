@@ -59,6 +59,8 @@ namespace Harvest.Core.Domain
         [StringLength(50)]
         public string Account { get; set; }
 
+        public string ExpenseObjectCode { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Expense>().HasIndex(a => a.ProjectId);

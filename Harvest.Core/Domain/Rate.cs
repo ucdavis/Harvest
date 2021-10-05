@@ -59,6 +59,10 @@ namespace Harvest.Core.Domain
         [Display(Name = "Pass Through")]
         public bool IsPassthrough { get; set; } = false;
 
+        [Display(Name = "Expense Object Code")]
+        [StringLength(5)]
+        public string ExpenseObjectCode { get; set; }
+
         // projects using this rate
         [JsonIgnore]
         public List<Project> Projects { get; set; }
