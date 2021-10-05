@@ -646,7 +646,7 @@ namespace Harvest.Core.Data
             rate.Type = Rate.Types.Other;
             rate.Description = "Century Project Soil Sample";
             rate.BillingUnit = "Russell Ranch";
-            rate.Account = "3-RRCNTRY";
+            rate.Account = "3-RRACRES-CNTRY";
             rate.Price = 70.00m;
             rate.Unit = "Per sample";
             rate.ExpenseObjectCode = "RAS5";
@@ -749,7 +749,7 @@ namespace Harvest.Core.Data
             rate.Type = Rate.Types.Labor;
             rate.Description = "Century Project Skilled Labor";
             rate.BillingUnit = "Russell Ranch";
-            rate.Account = "3-RRCNTRY";
+            rate.Account = "3-RRACRES-CNTRY";
             rate.Price = 91.00m;
             rate.Unit = "Hourly";
             rate.ExpenseObjectCode = "RAS5";
@@ -760,7 +760,7 @@ namespace Harvest.Core.Data
             rate.Type = Rate.Types.Labor;
             rate.Description = "Century Project Mechanic";
             rate.BillingUnit = "Russell Ranch";
-            rate.Account = "3-RRCNTRY";
+            rate.Account = "3-RRACRES-CNTRY";
             rate.Price = 92.00m;
             rate.Unit = "Hourly";
             rate.ExpenseObjectCode = "RAS5";
@@ -895,7 +895,7 @@ namespace Harvest.Core.Data
             rate.Type = Rate.Types.Acreage;
             rate.Description = "Century Project";
             rate.BillingUnit = "Russell Ranch";
-            rate.Account = "3-RRCNTRY";
+            rate.Account = "3-RRACRES-CNTRY";
             rate.Price = 3281.00m;
             rate.Unit = "Acre per Year";
             rate.ExpenseObjectCode = "RAS5";
