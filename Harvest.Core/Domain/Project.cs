@@ -181,6 +181,7 @@ namespace Harvest.Core.Domain
             public const string FinalInvoicePending = "FinalInvoicePending";
             public const string Completed = "Completed";
             public const string Canceled = "Canceled";
+            public const string ChangeApplied = "ChangeApplied"; //Change Request was approved and applied, this is no longer an active project.
 
             public static List<string> TypeList = new List<string>
             {
@@ -194,6 +195,7 @@ namespace Harvest.Core.Domain
                 FinalInvoicePending,
                 Completed,
                 Canceled,
+                ChangeApplied,
             }.ToList();
         }
 

@@ -82,6 +82,7 @@ namespace Harvest.Web.Controllers.Api
 
             // Use existing quote if it exists, otherwise create new one
             var quote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).SingleOrDefaultAsync();
+            var project = await _dbContext.Projects.Include(a => a.Quote).SingleAsync(a => a.Id == projectId);
 
             if (quote == null)
             {
@@ -93,7 +94,7 @@ namespace Harvest.Web.Controllers.Api
                 quote.Status = "New"; // TODO: definte status progression
                 quote.CreatedDate = DateTime.UtcNow;
                 quote.ProjectId = projectId;
-
+                project.Quote = quote;
                 await _dbContext.Quotes.AddAsync(quote);
             }
 
@@ -103,8 +104,6 @@ namespace Harvest.Web.Controllers.Api
             if (submit)
             {
                 quote.Status = Quote.Statuses.Proposed;
-
-                var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
                 project.Status = Project.Statuses.PendingApproval;
                 await _historyService.QuoteSubmitted(projectId, quote);
             }
@@ -118,7 +117,7 @@ namespace Harvest.Web.Controllers.Api
             if (submit)
             {
                 //Email needs the quote and PI
-                var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
                 await _emailService.ProfessorQuoteReady(project, quote);
             }
 
