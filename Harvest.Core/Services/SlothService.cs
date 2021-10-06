@@ -10,7 +10,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
-using Harvest.Core.Models.InvoiceModels;
+using Harvest.Core.Models.FinancialAccountModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
 using Microsoft.EntityFrameworkCore;
@@ -81,115 +81,29 @@ namespace Harvest.Core.Services
                 return Result.Error("No expenses found for invoice: {invoiceId}", invoiceId);
             }
 
-            if (!invoice.Expenses.All(e => e.Total > 0))
+            var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
+            if (grandTotal <= 0)
             {
+                Result.ResultError xx1x = Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
                 return Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
             }
 
-            var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
             if (invoice.Total != grandTotal)
             {
                 Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
                 invoice.Total = grandTotal;
             }
 
-            //Need to group here by expense.object code. IsPassthough will have a specific object code as well, so that works.
-            //Instead of the grandTotal, there will be "object code" Totals.
-            //================================================================================================
-            var objectCodeTotals = invoice.Expenses.GroupBy(a => a.ExpenseObjectCode)
-                .Select(s => new {objectCode = s.Key, total = s.Sum(s1 => s1.Total)}).ToArray();
-            //Ok, this groups all the debits/expenses/object code.
-            foreach (var objectCodeTotal in objectCodeTotals)
+            if (!await ProcessDebits(model, grandTotal, invoice))
             {
-                foreach (var projectAccount in invoice.Project.Accounts)
-                {
-                    //Debits
-                    //Validate accounts
-                    var debit = await _financialService.IsValid(projectAccount.Number);
-                    if (!debit.IsValid)
-                    {
-                        return Result.Error("Unable to validate debit account {debitAccount}: {debitMessage}",
-                            projectAccount.Number, debit.Message);
-                    }
-
-                    var tvm = new TransferViewModel
-                    {
-                        Account = debit.KfsAccount.AccountNumber,
-                        Amount = Math.Round(objectCodeTotal.total * (projectAccount.Percentage / 100), 2),
-                        Chart = debit.KfsAccount.ChartOfAccountsCode,
-                        SubAccount = debit.KfsAccount.SubAccount,
-                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
-                        Direction = TransferViewModel.Directions.Debit,
-                        ObjectCode = objectCodeTotal.objectCode,
-                    };
-                    if (tvm.Amount >= 0.01m)
-                    {
-                        //Only create this if the amount if 0.01 or greater (sloth requirement)
-                        model.Transfers.Add(tvm);
-                    }
-                    else
-                    {
-                        Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
-                    }
-                }
-
-                //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
-                var debitTotal1 = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == objectCodeTotal.objectCode).Select(a => a.Amount).Sum();
-                if (objectCodeTotal.total != debitTotal1)
-                {
-                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == objectCodeTotal.objectCode);
-                    lastTransfer.Amount = lastTransfer.Amount + (objectCodeTotal.total - debitTotal1);
-                    if (lastTransfer.Amount <= 0 || objectCodeTotal.total != model.Transfers
-                        .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == objectCodeTotal.objectCode)
-                        .Select(a => a.Amount).Sum())
-                    {
-                        return Result.Error("Couldn't get Debits to balance for invoice {invoiceId}", invoice.Id);
-                    }
-                }
+                return Result.Error("ProcessDebits Failed");
             }
 
-            //For the Credits, we need to group by account and IsPassthrough...
-            var expenses1 = invoice.Expenses.GroupBy(a => new{a.Account, a.IsPassthrough});
-            foreach (var expenseGroup in expenses1)
+            if (!await ProcessCredits(model, grandTotal, invoice))
             {
-                //Credits
-                //Validate Accounts.
-                var credit = await _financialService.IsValid(expenseGroup.Key.Account);
-                if (!credit.IsValid)
-                {
-                    Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expenseGroup.Key.Account, credit.Message);
-                }
-                var totalCost = Math.Round(expenseGroup.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
-                if (totalCost >= 0.01m)
-                {
-                    model.Transfers.Add(new TransferViewModel
-                    {
-                        Account = credit.KfsAccount.AccountNumber,
-                        Amount = totalCost,
-                        Chart = credit.KfsAccount.ChartOfAccountsCode,
-                        SubAccount = credit.KfsAccount.SubAccount,
-                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
-                        Direction = TransferViewModel.Directions.Credit,
-                        ObjectCode = expenseGroup.Key.IsPassthrough ? "3918":"3900", //Replace with config values
-                    });
-                }
-                else
-                {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
-                }
+                return Result.Error("ProcessCredits Failed");
             }
-            var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
-            if (grandTotal != creditTotal)
-            {
-                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
-                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - creditTotal);
-                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit)
-                    .Select(a => a.Amount).Sum())
-                {
-                    return Result.Error("Couldn't get Credits to balance for invoice {invoiceId}", invoice.Id);
-                }
-            }
-
+            
             if (model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount)
                 .Sum() != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit)
                 .Select(a => a.Amount).Sum())
@@ -257,6 +171,127 @@ namespace Harvest.Core.Services
 
             var data = await response.Content.ReadAsStringAsync();
             return Result.Error("Sloth Response didn't have a success code for moneyTransfer id {transferId}: {data}", invoice.Id, data);
+        }
+
+        private async Task<bool> ProcessDebits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
+        {
+            //Passthrough rates have their own object codes, so they should be split properly here.
+            var expenseGroups = invoice.Expenses
+                .GroupBy(a => a.ExpenseObjectCode)
+                .Select(s => new { objectCode = s.Key, total = s.Sum(s1 => s1.Total) })
+                .ToArray();
+
+            var validatedProjectAccounts = new Dictionary<Account, AccountValidationModel>();
+            //Validate accounts
+            foreach (var projectAccount in invoice.Project.Accounts)
+            {
+                var account = await _financialService.IsValid(projectAccount.Number);
+                if (!account.IsValid)
+                {
+                    Result.Error("Unable to validate debit account {debitAccount}: {debitMessage}",
+                        projectAccount.Number, account.Message);
+                    return false;
+                }
+                validatedProjectAccounts.Add(projectAccount, account);
+            }
+
+            //Ok, this groups all the debits/expenses/object code.
+            foreach (var expenseGroup in expenseGroups)
+            {
+                foreach (var projectAccount in validatedProjectAccounts)
+                {
+                    //Debits
+                    var debit = projectAccount.Value;
+
+                    var tvm = new TransferViewModel
+                    {
+                        Account = debit.KfsAccount.AccountNumber,
+                        Amount = Math.Round(expenseGroup.total * (projectAccount.Key.Percentage / 100), 2),
+                        Chart = debit.KfsAccount.ChartOfAccountsCode,
+                        SubAccount = debit.KfsAccount.SubAccount,
+                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                        Direction = TransferViewModel.Directions.Debit,
+                        ObjectCode = expenseGroup.objectCode,
+                    };
+                    if (tvm.Amount >= 0.01m)
+                    {
+                        //Only create this if the amount if 0.01 or greater (sloth requirement)
+                        model.Transfers.Add(tvm);
+                    }
+                    else
+                    {
+                        Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
+                    }
+                }
+
+                //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
+                var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode).Select(a => a.Amount).Sum();
+                if (expenseGroup.total != debitTotal)
+                {
+                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode);
+                    lastTransfer.Amount = lastTransfer.Amount + (expenseGroup.total - debitTotal);
+                    if (lastTransfer.Amount <= 0 || expenseGroup.total != model.Transfers
+                        .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode)
+                        .Select(a => a.Amount).Sum())
+                    {
+                        Result.Error("Couldn't get Debits to balance for invoice {invoiceId}", invoice.Id);
+                        return false;
+                    }
+                    Log.Information("Adjusted debit expense amount to get everything to balance. {exTotal} {dbTotal}", expenseGroup.total, debitTotal);
+                }
+            }
+
+
+
+            return true;
+        }
+
+        private async Task<bool> ProcessCredits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
+        {
+            //For the Credits, we need to group by account and IsPassthrough...
+            var expenseGroups = invoice.Expenses.GroupBy(a => new { a.Account, a.IsPassthrough });
+            foreach (var expenseGroup in expenseGroups)
+            {
+                //Credits
+                //Validate Accounts.
+                var credit = await _financialService.IsValid(expenseGroup.Key.Account);
+                if (!credit.IsValid)
+                {
+                    Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expenseGroup.Key.Account, credit.Message);
+                }
+                var totalCost = Math.Round(expenseGroup.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
+                if (totalCost >= 0.01m)
+                {
+                    model.Transfers.Add(new TransferViewModel
+                    {
+                        Account = credit.KfsAccount.AccountNumber,
+                        Amount = totalCost,
+                        Chart = credit.KfsAccount.ChartOfAccountsCode,
+                        SubAccount = credit.KfsAccount.SubAccount,
+                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                        Direction = TransferViewModel.Directions.Credit,
+                        ObjectCode = expenseGroup.Key.IsPassthrough ? _slothSettings.CreditPassthroughObjectCode : _slothSettings.CreditObjectCode, 
+                    });
+                }
+                else
+                {
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
+                }
+            }
+            var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
+            if (grandTotal != creditTotal)
+            {
+                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
+                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - creditTotal);
+                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit)
+                    .Select(a => a.Amount).Sum())
+                {
+                    Result.Error("Couldn't get Credits to balance for invoice {invoiceId}", invoice.Id);
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public async Task ProcessTransferUpdates()
