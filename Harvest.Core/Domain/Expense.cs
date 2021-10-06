@@ -53,6 +53,7 @@ namespace Harvest.Core.Domain
         public User CreatedBy { get; set; }
 
         public bool Approved { get; set; } = true;
+        public bool IsPassthrough { get; set; } = false;
 
         [Required]
         [StringLength(50)]
@@ -65,6 +66,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>().Property(a => a.Price).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.Total).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.Quantity).HasPrecision(18, 2);
+            modelBuilder.Entity<Expense>().Property(a => a.IsPassthrough).HasDefaultValue(false);
         }
     }
 }
