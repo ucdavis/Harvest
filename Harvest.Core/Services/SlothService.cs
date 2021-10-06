@@ -84,7 +84,6 @@ namespace Harvest.Core.Services
             var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
             if (grandTotal <= 0)
             {
-                Result.ResultError xx1x = Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
                 return Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
             }
 
