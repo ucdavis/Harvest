@@ -68,6 +68,7 @@ namespace Harvest.Core.Domain
             public const string Approved = "Approved";
             public const string Rejected = "Rejected";
             public const string Superseded = "Superseded"; // When a newer quote takes the place of an existing approved quote
+            public const string Canceled = "Canceled"; //Project or project change request was canceled
 
             public static List<string> TypeList = new List<string>
             {
@@ -75,7 +76,8 @@ namespace Harvest.Core.Domain
                 Proposed,
                 Approved,
                 Rejected,
-                Superseded
+                Superseded,
+                Canceled,
             }.ToList();
         }
     }

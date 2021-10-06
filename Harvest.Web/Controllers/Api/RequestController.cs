@@ -66,6 +66,11 @@ namespace Harvest.Web.Controllers.Api
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.IsActive && statuses.Contains(a.Status));
             project.IsActive = false;
             project.Status = Project.Statuses.Canceled;
+            var quote = await _dbContext.Quotes.SingleOrDefaultAsync(a => a.ProjectId == projectId);
+            if (quote != null)
+            {
+                quote.Status = Quote.Statuses.Canceled;
+            }
 
             await _historyService.ProjectRequestCanceled(projectId, project);
 
@@ -80,6 +85,8 @@ namespace Harvest.Web.Controllers.Api
         {
             Project project;
             QuoteDetail quoteDetail;
+
+            var currentUser = await _userService.GetCurrentUser();
 
             if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
@@ -96,11 +103,14 @@ namespace Harvest.Web.Controllers.Api
                 quote.Status = Quote.Statuses.Approved;
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
                 quote.ProjectId = changeRequestProject.OriginalProjectId.Value;
+                quote.ApprovedById = currentUser.Id;
+                quote.ApprovedOn = DateTime.UtcNow;
 
                 project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == changeRequestProject.OriginalProjectId);
 
                 changeRequestProject.IsActive = false; // soft delete change request so we don't see it anymore
                 changeRequestProject.Status = Project.Statuses.ChangeApplied;
+                changeRequestProject.Quote = originalQuote;
 
                 // replace original project info with newly approved project info
                 project.PrincipalInvestigatorId = changeRequestProject.PrincipalInvestigatorId;
@@ -113,6 +123,7 @@ namespace Harvest.Web.Controllers.Api
                 project.Status = Project.Statuses.Active;
                 project.Accounts = new List<Account>();
                 project.Attachments = new List<ProjectAttachment>();
+                project.Quote = quote;
 
                 // clear old accounts
                 _dbContext.Accounts.RemoveRange(_dbContext.Accounts.Where(a => a.ProjectId == project.Id));
@@ -137,10 +148,11 @@ namespace Harvest.Web.Controllers.Api
 
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
                 quote.Status = Quote.Statuses.Approved;
+                quote.ApprovedOn = DateTime.UtcNow;
+                quote.ApprovedById = currentUser.Id;
                 quoteDetail = QuoteDetail.Deserialize(quote.Text);
             }
 
-            var currentUser = await _userService.GetCurrentUser();
 
             var percentage = 0.0m;
 
