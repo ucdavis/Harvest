@@ -249,7 +249,12 @@ namespace Harvest.Core.Services
                 {
                     rtValue.KfsAccount.SubAccount = accountArray[2].ToUpper();
                 }
-                //TODO: Maybe a project?
+                //TODO: Maybe a project? or leave a placeholder for project?
+                if (accountArray.Length > 3)
+                {
+                    rtValue.KfsAccount.ObjectCode = accountArray[3].Trim().ToUpper();
+                }
+                
 
                 rtValue = await IsValid(rtValue.KfsAccount);
             }
@@ -294,6 +299,24 @@ namespace Harvest.Core.Services
                 else
                 {
                     rtValue.KfsAccount.ProjectName = await GetProjectName(account.Project);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(account.ObjectCode))
+            {
+                if (account.ObjectCode.Trim().Length > 4)
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Field = "ObjectCode";
+                    rtValue.Message = "Object Code is too long";
+                    return rtValue;
+                }
+                if (!await IsObjectValid(account.ChartOfAccountsCode, account.ObjectCode))
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Field = "ObjectCode";
+                    rtValue.Message = "Object Code is not valid";
+                    return rtValue;
                 }
             }
 
