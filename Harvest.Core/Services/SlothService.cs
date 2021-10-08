@@ -10,6 +10,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Models.FinancialAccountModels;
 using Harvest.Core.Models.InvoiceModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
@@ -92,91 +93,17 @@ namespace Harvest.Core.Services
                 Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
                 invoice.Total = grandTotal;
             }
-            foreach (var projectAccount in invoice.Project.Accounts)
-            {
-                //Debits
-                //Validate accounts
-                var debit = await _financialService.IsValid(projectAccount.Number);
-                if (!debit.IsValid)
-                {
-                    return Result.Error("Unable to validate debit account {debitAccount}: {debitMessage}",
-                        projectAccount.Number, debit.Message);
-                }
 
-                var tvm = new TransferViewModel
-                {
-                    Account = debit.KfsAccount.AccountNumber,
-                    Amount = Math.Round(grandTotal * (projectAccount.Percentage / 100), 2),
-                    Chart = debit.KfsAccount.ChartOfAccountsCode,
-                    SubAccount = debit.KfsAccount.SubAccount,
-                    Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
-                    Direction = TransferViewModel.Directions.Debit,
-                    ObjectCode = _slothSettings.DebitObjectCode
-                };
-                if (tvm.Amount >= 0.01m)
-                {
-                    //Only create this if the amount if 0.01 or greater (sloth requirement)
-                    model.Transfers.Add(tvm);
-                }
-                else
-                {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
-                }
-            }
-            //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
-            var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Select(a => a.Amount).Sum();
-            if (grandTotal != debitTotal)
+            if (!(await ProcessDebits(model, grandTotal, invoice)).Value)
             {
-                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit);
-                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - debitTotal);
-                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit)
-                    .Select(a => a.Amount).Sum())
-                {
-                    return Result.Error("Couldn't get Debits to balance for invoice {invoiceId}", invoice.Id);
-                }
+                return Result.Error("ProcessDebits Failed");
             }
 
-            var expenses = invoice.Expenses.GroupBy(a => a.Account);
-            foreach (var expense in expenses)
+            if (!(await ProcessCredits(model, grandTotal, invoice)).Value)
             {
-                //Credits
-                //Validate Accounts.
-                var credit = await _financialService.IsValid(expense.Key);
-                if (!credit.IsValid)
-                {
-                    Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expense.Key, credit.Message);
-                }
-                var totalCost = Math.Round(expense.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
-                if(totalCost >= 0.01m)
-                { 
-                    model.Transfers.Add(new TransferViewModel
-                    {
-                        Account = credit.KfsAccount.AccountNumber,
-                        Amount = totalCost,
-                        Chart = credit.KfsAccount.ChartOfAccountsCode,
-                        SubAccount = credit.KfsAccount.SubAccount,
-                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
-                        Direction = TransferViewModel.Directions.Credit,
-                        ObjectCode = _slothSettings.CreditObjectCode
-                    });
-                }
-                else
-                {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
-                }
+                return Result.Error("ProcessCredits Failed");
             }
-            var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
-            if (grandTotal != creditTotal)
-            {
-                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
-                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - creditTotal);
-                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit)
-                    .Select(a => a.Amount).Sum())
-                {
-                    return Result.Error("Couldn't get Credits to balance for invoice {invoiceId}", invoice.Id);
-                }
-            }
-            
+
             using var client = new HttpClient { BaseAddress = new Uri(url) };
             client.DefaultRequestHeaders.Add("X-Auth-Token", token);
 
@@ -236,6 +163,131 @@ namespace Harvest.Core.Services
 
             var data = await response.Content.ReadAsStringAsync();
             return Result.Error("Sloth Response didn't have a success code for moneyTransfer id {transferId}: {data}", invoice.Id, data);
+        }
+
+        private async Task<Result<bool>> ProcessDebits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
+        {
+            //Don't need to group by IsPassthrough here because the account will have the expenseObject code in it.
+            var expenseGroups = invoice.Expenses
+                .GroupBy(a => a.Account)
+                .Select(a => new {account = a.Key, total = a.Sum(s => s.Total)})
+                .ToArray();
+
+            //Validate accounts. Do it here so we don't call this every time we go through the expense loop.
+            var validatedProjectAccounts = new Dictionary<Account, AccountValidationModel>();
+            foreach (var projectAccount in invoice.Project.Accounts)
+            {
+                var account = await _financialService.IsValid(projectAccount.Number);
+                if (!account.IsValid)
+                {
+                    return Result.Error("Unable to validate debit account {debitAccount}: {debitMessage}", projectAccount.Number, account.Message);
+                }
+                validatedProjectAccounts.Add(projectAccount, account);
+            }
+
+            //Go through all the grouped expenses (by the expense account)
+            foreach (var expenseGroup in expenseGroups)
+            {
+                foreach (var projectAccount in validatedProjectAccounts)
+                {
+                    //Debits
+                    var debit = projectAccount.Value;
+                    var tvm = new TransferViewModel
+                    {
+                        Account     = debit.KfsAccount.AccountNumber,
+                        Amount      = Math.Round(expenseGroup.total * (projectAccount.Key.Percentage / 100), 2),
+                        Chart       = debit.KfsAccount.ChartOfAccountsCode,
+                        SubAccount  = debit.KfsAccount.SubAccount,
+                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                        Direction   = TransferViewModel.Directions.Debit,
+                        ObjectCode  = _financialService.Parse(expenseGroup.account).ObjectCode,
+                    };
+                    if (tvm.Amount >= 0.01m)
+                    {
+                        //Only create this if the amount if 0.01 or greater (sloth requirement)
+                        model.Transfers.Add(tvm);
+                    }
+                    else
+                    {
+                        Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
+                    }
+                }
+
+                //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
+                var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode).Select(a => a.Amount).Sum();
+                if (expenseGroup.total != debitTotal)
+                {
+                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode);
+                    lastTransfer.Amount = lastTransfer.Amount + (expenseGroup.total - debitTotal);
+                    if (lastTransfer.Amount <= 0 || expenseGroup.total != model.Transfers
+                        .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode)
+                        .Select(a => a.Amount).Sum())
+                    {
+                        return Result.Error("Couldn't get Debits to balance for invoice {invoiceId}", invoice.Id);
+                    }
+                    Log.Information("Adjusted debit expense amount to get everything to balance. {exTotal} {dbTotal}", expenseGroup.total, debitTotal);
+                }
+            }
+
+            var debitGrandTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Select(a => a.Amount).Sum();
+            if (debitGrandTotal != grandTotal)
+            {
+                //This shouldn't happen, but maybe if there was a 1 cent last transaction... Extra check doesn't hurt.
+                return Result.Error("Couldn't get Debits Total to balance with the Grand Total for invoice {invoiceId}", invoice.Id);
+            }
+
+
+            return Result.Value(true);
+        }
+
+
+        private async Task<Result<bool>> ProcessCredits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
+        {
+            //For the Credits, we need to group by account and IsPassthrough... 
+            var expenseGroups = invoice.Expenses.GroupBy(a => new { a.Account, a.IsPassthrough });
+            foreach (var expenseGroup in expenseGroups)
+            {
+                //Credits
+                //Validate Accounts.
+                var credit = await _financialService.IsValid(expenseGroup.Key.Account);
+                if (!credit.IsValid)
+                {
+                    //Maybe this should prevent it?
+                    Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expenseGroup.Key.Account, credit.Message);
+                }
+                var totalCost = Math.Round(expenseGroup.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
+                if (totalCost >= 0.01m)
+                {
+                    model.Transfers.Add(new TransferViewModel
+                    {
+                        Account     = credit.KfsAccount.AccountNumber,
+                        Amount      = totalCost,
+                        Chart       = credit.KfsAccount.ChartOfAccountsCode,
+                        SubAccount  = credit.KfsAccount.SubAccount,
+                        Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                        Direction   = TransferViewModel.Directions.Credit,
+                        ObjectCode  = expenseGroup.Key.IsPassthrough ? _slothSettings.CreditPassthroughObjectCode : _slothSettings.CreditObjectCode,
+                    });
+                }
+                else
+                {
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
+                }
+            }
+            var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
+            if (grandTotal != creditTotal)
+            {
+                var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
+                lastTransfer.Amount = lastTransfer.Amount + (grandTotal - creditTotal);
+                if (lastTransfer.Amount <= 0 || grandTotal != model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit)
+                    .Select(a => a.Amount).Sum())
+                {
+                    return Result.Error("Couldn't get Credits to balance for invoice {invoiceId}", invoice.Id);
+                }
+            }
+
+
+            return Result.Value(true);
         }
 
         public async Task ProcessTransferUpdates()

@@ -28,6 +28,7 @@ namespace Harvest.Core.Services
 
         Task<AccountValidationModel> IsValid(string account);
         Task<AccountValidationModel> IsValid(KfsAccount account);
+        KfsAccount Parse(string account);
     }
 
     public class FinancialService : IFinancialService
@@ -349,6 +350,39 @@ namespace Harvest.Core.Services
             //}
 
 
+            return rtValue;
+        }
+
+        /// <summary>
+        /// Note This doesn't validate
+        /// This is just to get the KFS account parts without calling the KFS api each time.
+        /// </summary>
+        /// <param name="account"></param>
+        /// <returns></returns>
+        public KfsAccount Parse(string account)
+        {
+            var rtValue = new KfsAccount();
+
+            account = account.Trim();
+            var delimiter = new string[] { "-" };
+            var accountArray = account.Split(delimiter, StringSplitOptions.None);
+            if (accountArray.Length < 2)
+            {
+                throw new Exception("Invalid Account format");
+            }
+
+            rtValue.ChartOfAccountsCode = accountArray[0].ToUpper();
+            rtValue.AccountNumber = accountArray[1].ToUpper();
+            if (accountArray.Length > 2)
+            {
+                rtValue.SubAccount = accountArray[2].ToUpper();
+            }
+            //TODO: Maybe a project? or leave a placeholder for project?
+            if (accountArray.Length > 3)
+            {
+                rtValue.ObjectCode = accountArray[3].Trim().ToUpper();
+            }
+            
             return rtValue;
         }
     }
