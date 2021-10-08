@@ -46,12 +46,6 @@ export const SearchPerson = (props: Props) => {
     }
   };
 
-  const searchPersonsClearButtonStyles = {
-    container: {
-      margin: "-1.3em .5em 0em 0em"
-    },
-  } as const;
-
   return (
     <AsyncTypeahead
       id="searchPeople" // for accessibility
@@ -83,7 +77,7 @@ export const SearchPerson = (props: Props) => {
       >
         {({onClear, selected} : { onClear : any, selected : any}) => (
           <div className="searchPersonsClearButton">
-            {!!selected.length && <ClearButton onClick={onClear} style={searchPersonsClearButtonStyles.container}/>}
+            {!!selected.length && <ClearButton onClick={onClear} />}
           </div>
         )}
     </AsyncTypeahead>

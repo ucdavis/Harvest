@@ -41,6 +41,7 @@ export const RequestContainer = () => {
     onBlur,
     onBlurValue,
     InputErrorMessage,
+    propertyHasErrors,
   } = useInputValidator(requestSchema, project);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -264,7 +265,8 @@ export const RequestContainer = () => {
                       )}
                       onBlur={() => onBlurValue("principalInvestigator")}
                     />
-                    <InputErrorMessage name="principalInvestigator" />
+                    {propertyHasErrors("principalInvestigator") ? (<InputErrorMessage name="principalInvestigator" />) :
+                    (<small id="PIHelp" className="form-text text-muted">Enter PI Email or Kerberos. Click [x] to clear out an existing PI.</small>)}
                   </FormGroup>
 
                   <FormGroup>
