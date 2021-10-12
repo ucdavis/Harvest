@@ -40,7 +40,11 @@ namespace Harvest.Core.Services
             }
 
             //Look for an acreage expense in the last year or so.
-            var compareDate = DateTime.UtcNow.Date.AddYears(-1).AddDays(-1);
+            //My thoughts are, invoices get created on the first business day of the month, so if I look back exactly 1 year, I may find one created on the 3rd
+            //This wouldn't be horrible as I would catch it next month. But the year after that the fee could get moved another month back....
+            //So, if I look back 1 year, less a week (or maybe 14 days), that will not find the one at the start of the month.
+            //If it was created Jan 3, and this is running Dec 1-7, it will find it and not create the fee
+            var compareDate = DateTime.UtcNow.Date.AddYears(-1).AddDays(7); 
             if (await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
             {
                 Log.Information("Project {projectId} found an acreage expense within the last year, skipping", project.Id);
