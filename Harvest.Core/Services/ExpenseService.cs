@@ -24,11 +24,13 @@ namespace Harvest.Core.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly IProjectHistoryService _historyService;
+        private readonly IDateTimeService _dateTimeService;
 
-        public ExpenseService(AppDbContext dbContext, IProjectHistoryService historyService)
+        public ExpenseService(AppDbContext dbContext, IProjectHistoryService historyService, IDateTimeService dateTimeService)
         {
             _dbContext = dbContext;
             _historyService = historyService;
+            _dateTimeService = dateTimeService;
         }
 
 
@@ -39,12 +41,14 @@ namespace Harvest.Core.Services
                 return;
             }
 
+            var now = _dateTimeService.DateTimeUtcNow();
+
             //Look for an acreage expense in the last year or so.
             //My thoughts are, invoices get created on the first business day of the month, so if I look back exactly 1 year, I may find one created on the 3rd
             //This wouldn't be horrible as I would catch it next month. But the year after that the fee could get moved another month back....
             //So, if I look back 1 year, less a week (or maybe 14 days), that will not find the one at the start of the month.
             //If it was created Jan 3, and this is running Dec 1-7, it will find it and not create the fee
-            var compareDate = DateTime.UtcNow.Date.AddYears(-1).AddDays(7); 
+            var compareDate = now.Date.AddYears(-1).AddDays(7); 
             if (await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
             {
                 Log.Information("Project {projectId} found an acreage expense within the last year, skipping", project.Id);
@@ -96,7 +100,7 @@ namespace Harvest.Core.Services
         private Expense CreateExpense(Project project, decimal amountToCharge, decimal acres)
         {
             //If we populate the user, then this will have the PI's user because it is done in the request approval for change requests.
-
+            var now = _dateTimeService.DateTimeUtcNow();
 
             var expense = new Expense
             {
@@ -108,7 +112,7 @@ namespace Harvest.Core.Services
                 ProjectId = project.Id,
                 RateId = project.AcreageRate.Id,
                 InvoiceId = null,
-                CreatedOn = DateTime.UtcNow,
+                CreatedOn = now,
                 CreatedBy = null,
                 Account = project.AcreageRate.Account,
             };

@@ -27,6 +27,7 @@ namespace Test.TestsServices
         public Mock<AppDbContext> MockDbContext { get; set; }
         public Mock<IProjectHistoryService> MockProjectHistoryService { get; set; }
         public Mock<IUserService> MockUserService { get; set; }
+        public Mock<IDateTimeService> MockDateTimeService { get; set; }
         public ExpenseService ExpenseService { get; set; }
 
         public List<Project> Projects { get; set; }
@@ -37,8 +38,9 @@ namespace Test.TestsServices
         {
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
             MockProjectHistoryService = new Mock<IProjectHistoryService>();
+            MockDateTimeService = new Mock<IDateTimeService>();
 
-            ExpenseService = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object);
+            ExpenseService = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object, MockDateTimeService.Object);
         }
 
         #region Setups
@@ -63,8 +65,7 @@ namespace Test.TestsServices
         {
             MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
             MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
-            //MockUserService.Setup(a => a.GetCurrentUser()).ReturnsAsync(() => null);
-            //MockUserService.Setup(a => a.GetCurrentUser()).ReturnsAsync(CreateValidEntities.User(1));
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
 
             MockDbContext.Setup(a => a.Expenses.Add(It.IsAny<Expense>())).Callback<Expense>(a => AddedExpense = a);
             MockDbContext.Setup(a => a.Expenses.AddAsync(It.IsAny<Expense>(), It.IsAny<System.Threading.CancellationToken>())).Callback((Expense a, CancellationToken token) => AddedExpense = a);
@@ -73,50 +74,6 @@ namespace Test.TestsServices
 
         #endregion
 
-        //[Fact]
-        //public async Task CreateAcreageExpenseThrowsExceptionWhenLessThanCent()
-        //{
-        //    var rtValue = await Should.ThrowAsync<Exception>( () => ExpenseService.CreateAcreageExpense(1, 0.009m));
-        //    rtValue.ShouldNotBeNull();
-        //    rtValue.Message.ShouldBe("Amount must be >= 0.01");
-        //}
-
-        //#region theory
-        //[Theory]
-        //[InlineData(0.01)]
-        //[InlineData(0.014)]
-        //[InlineData(0.015)]
-        //[InlineData(0.016)]
-        //[InlineData(0.02)]
-        //[InlineData(0.024)]
-        //[InlineData(0.025)]
-        //[InlineData(0.026)]
-        //[InlineData(1000000.00)]
-        //[InlineData(1000000.01)]
-        //#endregion
-        //public async Task CreateAcreageExpenseCreatesExpectedExpense(decimal amount)
-        //{
-        //    SetupData();
-        //    MockData();
-        //    AddedExpense.ShouldBeNull();
-
-        //    await ExpenseService.CreateAcreageExpense(Projects[0].Id, amount);
-        //    AddedExpense.ShouldNotBeNull();
-        //    MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(Projects[0].Id, AddedExpense), times: Times.Once);
-        //    MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
-
-        //    AddedExpense.Type.ShouldBe(Projects[0].AcreageRate.Type);
-        //    AddedExpense.Description.ShouldBe(Projects[0].AcreageRate.Description);
-        //    AddedExpense.Price.ShouldBe(Projects[0].AcreageRate.Price);
-        //    AddedExpense.Quantity.ShouldBe((decimal)Projects[0].Acres);
-        //    AddedExpense.Total.ShouldBe(Math.Round(amount, 2, MidpointRounding.ToZero));
-        //    AddedExpense.ProjectId.ShouldBe(Projects[0].Id);
-        //    AddedExpense.RateId.ShouldBe(Projects[0].AcreageRate.Id);
-        //    AddedExpense.InvoiceId.ShouldBeNull();
-        //    AddedExpense.CreatedOn.Date.ShouldBe(DateTime.UtcNow.Date); //This could fail on some unique runs
-        //    AddedExpense.CreatedBy.ShouldBeNull();
-        //    AddedExpense.Account.ShouldBe(Projects[0].AcreageRate.Account);
-        //}
 
         [Fact]
         public async Task CreateYearlyAcreageExpenseReturnsEarlyWhenNoAcres()
