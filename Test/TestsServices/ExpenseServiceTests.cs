@@ -122,10 +122,77 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
         }
 
-        [Fact(Skip = "TODO")]
-        public void CreateYearlyAcreageExpenseReturnsEarlyIfAnyAcreageExpenseExistsWithinTheLastYear()
+        [Theory]
+        [InlineData(2020, 12, 01)]
+        [InlineData(2020, 12, 02)]
+        [InlineData(2020, 12, 03)]
+        [InlineData(2020, 12, 04)]
+        [InlineData(2021, 01, 01)]
+        [InlineData(2021, 01, 02)]
+        [InlineData(2021, 01, 03)]
+        [InlineData(2021, 01, 04)]
+        public async Task CreateYearlyAcreageExpenseReturnsEarlyIfAnyAcreageExpenseExistsWithinTheLastYear(int year, int month, int day)
         {
-            return;
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            Expenses[0].ProjectId = Projects[0].Id;
+            Expenses[0].Rate.Type = Rate.Types.Acreage;
+            Expenses[0].CreatedOn = new DateTime(2020,02,03).FromPacificTime(); //Create an expense 2020/02/03 (feb 3 is a Monday, first business day of the month
+            Projects[0].Acres = 10;
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+            AddedExpense.ShouldBeNull();
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            await expenseServ.CreateYearlyAcreageExpense(Projects[0]);
+            AddedExpense.ShouldBeNull();
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(2021, 02, 01)]
+        [InlineData(2021, 02, 02)]
+        [InlineData(2021, 02, 03)]
+        [InlineData(2021, 02, 04)]
+        [InlineData(2021, 03, 01)] //Will run following month if it missed prior month
+        [InlineData(2021, 03, 02)]
+        [InlineData(2021, 03, 03)]
+        [InlineData(2021, 03, 04)]
+        public async Task CreateYearlyAcreageExpenseCreatesExpense(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            Expenses[0].ProjectId = Projects[0].Id;
+            Expenses[0].Rate.Type = Rate.Types.Acreage;
+            Expenses[0].CreatedOn = new DateTime(2020, 02, 03).FromPacificTime(); //Create an expense 2020/02/03 (feb 3 is a Monday, first business day of the month
+            Projects[0].Acres = 10;
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+            AddedExpense.ShouldBeNull();
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            await expenseServ.CreateYearlyAcreageExpense(Projects[0]);
+            AddedExpense.ShouldNotBeNull();
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            AddedExpense.Type.ShouldBe(Projects[0].AcreageRate.Type);
+            AddedExpense.Description.ShouldBe(Projects[0].AcreageRate.Description);
+            AddedExpense.Price.ShouldBe(Projects[0].AcreageRate.Price);
+            AddedExpense.Quantity.ShouldBe((decimal)Projects[0].Acres);
+            AddedExpense.Total.ShouldBe(11500.00m);
+            AddedExpense.ProjectId.ShouldBe(Projects[0].Id);
+            AddedExpense.RateId.ShouldBe(Projects[0].AcreageRate.Id);
+            AddedExpense.InvoiceId.ShouldBeNull();
+            AddedExpense.CreatedOn.Date.ShouldBe(date.Date); 
+            AddedExpense.CreatedBy.ShouldBeNull();
+            AddedExpense.Account.ShouldBe(Projects[0].AcreageRate.Account);
         }
 
         [Fact(Skip = "TODO")]
