@@ -9,7 +9,7 @@ import {
   fakeProjectWithQuote,
   sampleRates,
 } from "../Test/mockData";
-import { ValidationProvider } from "../FormValidation";
+import { ValidationProvider } from "use-input-validator";
 
 let container: Element;
 
@@ -88,8 +88,8 @@ describe("Quote Container", () => {
       );
     });
 
-    const messageContent = document.querySelector("#request-title")
-      ?.textContent;
+    const messageContent =
+      document.querySelector("#request-title")?.textContent;
     expect(messageContent).toContain("Field Request #3");
   });
 });

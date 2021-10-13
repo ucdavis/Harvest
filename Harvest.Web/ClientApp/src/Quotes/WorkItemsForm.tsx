@@ -15,7 +15,7 @@ import { Typeahead } from "react-bootstrap-typeahead";
 
 import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { useInputValidator } from "../FormValidation";
+import { useInputValidator } from "use-input-validator";
 import { workItemSchema } from "../schemas";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
