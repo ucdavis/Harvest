@@ -195,10 +195,61 @@ namespace Test.TestsServices
             AddedExpense.Account.ShouldBe(Projects[0].AcreageRate.Account);
         }
 
-        [Fact(Skip = "TODO")]
-        public void CreateChangeRequestAdjustmentTests()
+        [Theory]
+        [InlineData(-10.0)]
+        [InlineData(-0.0001)]
+        [InlineData(0.0)]
+        [InlineData(0.000001)] //This causes the amount to be less than 1 cent
+        public async Task CreateChangeRequestAdjustmentReturnsEarly(decimal acres)
         {
-            return;
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
+            AddedExpense.ShouldBeNull();
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            await expenseServ.CreateChangeRequestAdjustment(Projects[0], acres);
+            AddedExpense.ShouldBeNull();
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(0.01, 11.50)]
+        [InlineData(0.02, 23.00)]
+        [InlineData(1, 1150.00)]
+        [InlineData(2, 2300.00)]
+        [InlineData(0.001, 1.15)]
+        [InlineData(0.00001, 0.01)]
+        public async Task CreateChangeRequestAdjustmentTests(decimal acres, decimal expectedAmount)
+        {
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
+            AddedExpense.ShouldBeNull();
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            await expenseServ.CreateChangeRequestAdjustment(Projects[0], acres);
+            AddedExpense.ShouldNotBeNull();
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            AddedExpense.Type.ShouldBe(Projects[0].AcreageRate.Type);
+            AddedExpense.Description.ShouldBe(Projects[0].AcreageRate.Description);
+            AddedExpense.Price.ShouldBe(Projects[0].AcreageRate.Price);
+            AddedExpense.Quantity.ShouldBe(acres);
+            AddedExpense.Total.ShouldBe(expectedAmount);
+            AddedExpense.ProjectId.ShouldBe(Projects[0].Id);
+            AddedExpense.RateId.ShouldBe(Projects[0].AcreageRate.Id);
+            AddedExpense.InvoiceId.ShouldBeNull();
+            AddedExpense.CreatedOn.Date.ShouldBe(DateTime.UtcNow.Date); //Don't really care about mocking it here.
+            AddedExpense.CreatedBy.ShouldBeNull();
+            AddedExpense.Account.ShouldBe(Projects[0].AcreageRate.Account);
         }
 
 
