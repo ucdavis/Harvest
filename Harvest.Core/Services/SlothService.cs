@@ -169,8 +169,8 @@ namespace Harvest.Core.Services
         {
             //Don't need to group by IsPassthrough here because the account will have the expenseObject code in it.
             var expenseGroups = invoice.Expenses
-                .GroupBy(a => a.Account)
-                .Select(a => new {account = a.Key, total = a.Sum(s => s.Total)})
+                .GroupBy(a => _financialService.Parse(a.Account).ObjectCode)
+                .Select(a => new {objectCode = a.Key, total = a.Sum(s => s.Total)})
                 .ToArray();
 
             //Validate accounts. Do it here so we don't call this every time we go through the expense loop.
@@ -200,7 +200,7 @@ namespace Harvest.Core.Services
                         SubAccount  = debit.KfsAccount.SubAccount,
                         Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                         Direction   = TransferViewModel.Directions.Debit,
-                        ObjectCode  = _financialService.Parse(expenseGroup.account).ObjectCode,
+                        ObjectCode  = expenseGroup.objectCode,
                     };
                     if (tvm.Amount >= 0.01m)
                     {
@@ -214,17 +214,19 @@ namespace Harvest.Core.Services
                 }
 
                 //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
-                var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode).Select(a => a.Amount).Sum();
+                var debitTotal = model.Transfers
+                    .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode)
+                    .Select(a => a.Amount).Sum();
                 if (expenseGroup.total != debitTotal)
                 {
                     Log.Information("Debit Total doesn't match. Attempting to fix. ExpenseTotal {expenseTotal} DebitTotal {debitTotal}", expenseGroup.total, debitTotal);
-                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode);
+                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode);
                     lastTransfer.Amount = lastTransfer.Amount + (expenseGroup.total - debitTotal);
                     if (lastTransfer.Amount <= 0 || expenseGroup.total != model.Transfers
-                        .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode)
+                        .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode)
                         .Select(a => a.Amount).Sum())
                     {
-                        return Result.Error("Couldn't get Debits to balance for invoice {invoiceId} objectCode {objectCode}", invoice.Id, _financialService.Parse(expenseGroup.account).ObjectCode);
+                        return Result.Error("Couldn't get Debits to balance for invoice {invoiceId} objectCode {objectCode}", invoice.Id, expenseGroup.objectCode);
                     }
                     Log.Information("Adjusted debit expense amount to get everything to balance. {exTotal} {dbTotal}", expenseGroup.total, debitTotal);
                 }
