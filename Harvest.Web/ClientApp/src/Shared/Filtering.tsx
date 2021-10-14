@@ -149,21 +149,29 @@ const formatDate = (dateString: string) => {
 
 export const startDateFilter = (rows: any[], id: any, filterValue: any) => {
   return rows.filter((row) => {
-    const startDate = formatDate(row.values.startDate.split(" ")[0]);
-    const filterDateStart = formatDate(filterValue[0]);
-    const filterDateEnd = formatDate(filterValue[1]);
+    if (filterValue[0] && filterValue[1]) {
+      const startDate = formatDate(row.values.startDate.split(" ")[0]);
+      const filterDateStart = formatDate(filterValue[0]);
+      const filterDateEnd = formatDate(filterValue[1]);
 
-    return startDate >= filterDateStart && startDate <= filterDateEnd;
+      return startDate >= filterDateStart && startDate <= filterDateEnd;
+    } else {
+      return true;
+    }
   });
 };
 
 export const endDateFilter = (rows: any[], id: any, filterValue: any) => {
   return rows.filter((row) => {
-    const endDate = formatDate(row.values.endDate.split(" ")[0]);
-    const filterDateStart = formatDate(filterValue[0]);
-    const filterDateEnd = formatDate(filterValue[1]);
+    if (filterValue[0] && filterValue[1]) {
+      const endDate = formatDate(row.values.endDate.split(" ")[0]);
+      const filterDateStart = formatDate(filterValue[0]);
+      const filterDateEnd = formatDate(filterValue[1]);
 
-    return endDate >= filterDateStart && endDate <= filterDateEnd;
+      return endDate >= filterDateStart && endDate <= filterDateEnd;
+    } else {
+      return true;
+    }
   });
 };
 
