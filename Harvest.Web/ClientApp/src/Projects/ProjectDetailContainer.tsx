@@ -211,8 +211,7 @@ export const ProjectDetailContainer = () => {
       </div>
       <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
-          <ProjectProgress project={project} />
-          <ProjectUnbilledButton projectId={project.id} />
+            <ProjectUnbilledButton projectId={project.id} />
         </div>
       </div>
       <div>

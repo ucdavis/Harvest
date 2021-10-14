@@ -14,7 +14,7 @@ namespace Test.Helpers
         {
             var rtValue = new Project();
             rtValue.Id = counter ?? 99;
-            rtValue.Start = DateTime.UtcNow.AddDays(-30);
+            rtValue.Start = new DateTime(2021, 06, 01);
             rtValue.End = DateTime.UtcNow.AddYears(1);
             rtValue.CropType = Harvest.Core.Domain.Project.CropTypes.Tree;
             rtValue.Crop = $"Crop{counter}";
@@ -40,7 +40,7 @@ namespace Test.Helpers
             rtValue.ChargedTotal = 5000.0m;
             rtValue.CreatedById = 1;
             rtValue.CreatedBy = CreateValidEntities.User(1);
-            rtValue.CreatedOn = DateTime.UtcNow.AddDays(-30);
+            rtValue.CreatedOn = new DateTime(2021, 06, 01);
             rtValue.CurrentAccountVersion = 1;
             rtValue.IsActive = true;
             rtValue.Accounts = new List<Account>();
@@ -65,7 +65,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Acreage,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES",
+                        Account = "3-RRACRES--RAS5",
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -76,7 +76,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Equipment,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -87,7 +87,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Labor,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -98,7 +98,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Other,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -109,7 +109,7 @@ namespace Test.Helpers
                         Type = type,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -162,7 +162,7 @@ namespace Test.Helpers
             rtValue.Description = $"Description{counter}";
             rtValue.Rate = Rate(3);
             rtValue.RateId = 3;
-            rtValue.Rate.Account = "3-FRMRATE";
+            rtValue.Rate.Account = "3-FRMRATE--RAY9";
             rtValue.Quantity = 2.00m;
             rtValue.Total = rtValue.Quantity * rtValue.Rate.Price;
             rtValue.Price = rtValue.Rate.Price;
