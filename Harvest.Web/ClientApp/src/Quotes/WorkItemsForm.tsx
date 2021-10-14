@@ -84,6 +84,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         total: 0,
         isPassthrough: false,
       });
+      resetLocalFields();
     }
   };
 
@@ -114,6 +115,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         total: 0,
         isPassthrough: false,
       });
+      resetLocalFields();
     }
   };
 
@@ -210,6 +212,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
               })
             )}
             onBlur={onBlur("quantity")}
+            disabled={!workItem.rateId}
           />
         </InputGroup>
         <InputErrorMessage name="quantity" />
