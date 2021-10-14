@@ -43,7 +43,7 @@ export const InvoicePDF = (props: Props) => {
   const { invoice } = props;
   const acreageTotal = invoice.expenses
     .filter(
-      (expense) => expense.type === "Acreage" || expense.type === "A-Adjustment"
+      (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
     )
     .reduce((a, b) => a + b.total, 0);
   const laborTotal = invoice.expenses
@@ -58,11 +58,11 @@ export const InvoicePDF = (props: Props) => {
   const grandTotal = acreageTotal + laborTotal + equipmentTotal + otherTotal;
 
   const acreageExpenses = invoice.expenses.filter(
-    (expense) => expense.type === "Acreage" || expense.type === "A-Adjustment"
+    (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
   );
   const activities = groupBy(
     invoice.expenses.filter(
-      (expense) => expense.type !== "Acreage" && expense.type !== "A-Adjustment"
+      (expense) => expense.type !== "Acreage" && expense.type !== "Adjustment"
     ),
     (expense) => expense.activity || "Activity"
   );

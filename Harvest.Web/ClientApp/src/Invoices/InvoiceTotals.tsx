@@ -12,7 +12,7 @@ export const InvoiceTotals = (props: Props) => {
   const { invoice } = props;
   const acreageTotal = invoice.expenses
     .filter(
-      (expense) => expense.type === "Acreage" || expense.type === "A-Adjustment"
+      (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
     )
     .reduce((a, b) => a + b.total, 0);
   const laborTotal = invoice.expenses

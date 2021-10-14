@@ -25,7 +25,7 @@ namespace Harvest.Core.Services
         private readonly AppDbContext _dbContext;
         private readonly IProjectHistoryService _historyService;
         private readonly IDateTimeService _dateTimeService;
-        private readonly string _adjustmentType = "A-Adjustment";
+        private readonly string _adjustmentType = "Adjustment";
 
         public ExpenseService(AppDbContext dbContext, IProjectHistoryService historyService, IDateTimeService dateTimeService)
         {
@@ -92,6 +92,7 @@ namespace Harvest.Core.Services
 
             var expense = CreateExpense(project, amountToCharge, extraAcres);
             expense.Type = _adjustmentType;
+            expense.Description = $"Acreage Adjustment -- {expense.Description}".Truncate(250);
 
             await _dbContext.Expenses.AddAsync(expense);
             await _historyService.AcreageExpenseCreated(project.Id, expense);

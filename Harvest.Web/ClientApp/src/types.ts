@@ -10,7 +10,7 @@ export type RateType =
   | "Equipment"
   | "Labor"
   | "Other"
-  | "A-Adjustment";
+  | "Adjustment";
 export type RoleName =
   | "System"
   | "FieldManager"
