@@ -239,9 +239,9 @@ namespace Test.TestsServices
             MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
 
-            AddedExpense.Type.ShouldBe(Projects[0].AcreageRate.Type);
-            AddedExpense.Description.ShouldBe(Projects[0].AcreageRate.Description);
-            AddedExpense.Price.ShouldBe(Projects[0].AcreageRate.Price);
+            AddedExpense.Type.ShouldBe("Adjustment");
+            AddedExpense.Description.ShouldBe($"Acreage Adjustment -- {Projects[0].AcreageRate.Description}");
+            AddedExpense.Price.ShouldBe( Projects[0].AcreageRate.Price);
             AddedExpense.Quantity.ShouldBe(acres);
             AddedExpense.Total.ShouldBe(expectedAmount);
             AddedExpense.ProjectId.ShouldBe(Projects[0].Id);
