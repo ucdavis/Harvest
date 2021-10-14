@@ -240,8 +240,8 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
 
             AddedExpense.Type.ShouldBe("Adjustment");
-            AddedExpense.Description.ShouldBe(Projects[0].AcreageRate.Description);
-            AddedExpense.Price.ShouldBe(Projects[0].AcreageRate.Price);
+            AddedExpense.Description.ShouldBe($"Acreage Adjustment -- {Projects[0].AcreageRate.Description}");
+            AddedExpense.Price.ShouldBe( Projects[0].AcreageRate.Price);
             AddedExpense.Quantity.ShouldBe(acres);
             AddedExpense.Total.ShouldBe(expectedAmount);
             AddedExpense.ProjectId.ShouldBe(Projects[0].Id);
