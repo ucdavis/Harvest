@@ -124,6 +124,7 @@ export const DatePickerFilter = ({
 
   return (
     <DatePicker
+      className="form-control"
       selectsRange={true}
       startDate={startDate}
       endDate={endDate}
