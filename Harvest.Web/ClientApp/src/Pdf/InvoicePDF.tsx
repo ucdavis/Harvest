@@ -7,6 +7,7 @@ import { TotalSection } from "./TotalSection";
 import { Invoice } from "../types";
 import { groupBy } from "../Util/ArrayHelpers";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { ensurePluginOrder } from "react-table";
 
 interface Props {
   invoice: Invoice;
@@ -41,7 +42,9 @@ const styles = StyleSheet.create({
 export const InvoicePDF = (props: Props) => {
   const { invoice } = props;
   const acreageTotal = invoice.expenses
-    .filter((expense) => expense.type === "Acreage")
+    .filter(
+      (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
+    )
     .reduce((a, b) => a + b.total, 0);
   const laborTotal = invoice.expenses
     .filter((expense) => expense.type === "Labor")
@@ -55,10 +58,12 @@ export const InvoicePDF = (props: Props) => {
   const grandTotal = acreageTotal + laborTotal + equipmentTotal + otherTotal;
 
   const acreageExpenses = invoice.expenses.filter(
-    (expense) => expense.type === "Acreage"
+    (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
   );
   const activities = groupBy(
-    invoice.expenses.filter((expense) => expense.type !== "Acreage"),
+    invoice.expenses.filter(
+      (expense) => expense.type !== "Acreage" && expense.type !== "Adjustment"
+    ),
     (expense) => expense.activity || "Activity"
   );
 

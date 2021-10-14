@@ -86,7 +86,11 @@ namespace Harvest.Core.Services
                 }
 
                 //Acreage fees are ignored for manually created invoices
-                await _expenseService.CreateMonthlyAcreageExpense(project);
+                await _expenseService.CreateYearlyAcreageExpense(project); //I don't think we want to call the acreage expense on closeout. It will be called on the yearly anniversary 
+            }
+            else if(!isCloseout)
+            {
+                await _expenseService.CreateYearlyAcreageExpense(project); //Call it for the nightly invoices though.
             }
 
             //Don't exceed quoted amount
