@@ -13,7 +13,8 @@ import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { useInputValidator, ValidationProvider } from "../FormValidation";
+import { useInputValidator, ValidationProvider } from "use-input-validator";
+import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -41,7 +42,7 @@ export const RequestContainer = () => {
     onBlur,
     onBlurValue,
     InputErrorMessage,
-  } = useInputValidator(requestSchema, project);
+  } = useInputValidator(requestSchema, project, validatorOptions);
 
   const [notification, setNotification] = usePromiseNotification();
 

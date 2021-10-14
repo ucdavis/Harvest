@@ -71,11 +71,11 @@ namespace Harvest.Core.Data
             await CheckOrCreatePermission(systemRole, user);
             user = new User
             {
-                Email = "bmwong@ucdavis.edu",
-                Kerberos = "wongband",
-                FirstName = "Bryan",
-                LastName = "Wong",
-                Iam = "1000274724"
+                Email = "mxthu@ucdavis.edu",
+                Kerberos = "mhu313",
+                FirstName = "Michelle",
+                LastName = "Hu",
+                Iam = "1000313846"
             };
             await CheckOrCreatePermission(systemRole, user);
             await _dbContext.SaveChangesAsync();

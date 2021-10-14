@@ -19,12 +19,13 @@ import AppContext from "../Shared/AppContext";
 import {
   useOrCreateValidationContext,
   ValidationProvider,
-} from "../FormValidation";
+} from "use-input-validator";
 import { workItemSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import * as yup from "yup";
 import { useQuery } from "../Shared/UseQuery";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -49,7 +50,7 @@ export const ExpenseEntryContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
-  const context = useOrCreateValidationContext();
+  const context = useOrCreateValidationContext(validatorOptions);
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([

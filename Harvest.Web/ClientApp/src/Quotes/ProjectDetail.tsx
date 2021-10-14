@@ -6,8 +6,9 @@ import { Button, Col, Input, Label, Row } from "reactstrap";
 
 import { formatCurrency } from "../Util/NumberFormatting";
 import { Location } from "../Fields/Location";
-import { useInputValidator } from "../FormValidation";
+import { useInputValidator } from "use-input-validator";
 import { quoteContentSchema } from "../schemas";
+import { validatorOptions } from "../constants";
 
 interface Props {
   rates: Rate[];
@@ -18,7 +19,7 @@ interface Props {
 
 export const ProjectDetail = (props: Props) => {
   const { onChange, InputErrorMessage, getClassName, onBlur } =
-    useInputValidator(quoteContentSchema, props.quote);
+    useInputValidator(quoteContentSchema, props.quote, validatorOptions);
 
   // TODO: should we do the work here or pass up to parent?
   const addActivity = () => {
