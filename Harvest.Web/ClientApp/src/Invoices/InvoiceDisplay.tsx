@@ -14,13 +14,15 @@ interface Props {
 export const InvoiceDisplay = (props: Props) => {
   const { invoice } = props;
   const acreageExpenses = invoice.expenses.filter(
-    (expense) => expense.type === "Acreage"
+    (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
   );
   const accounts = invoice.transfers.filter(
     (transfer) => transfer.type === "Debit"
   );
   const activities = groupBy(
-    invoice.expenses.filter((expense) => expense.type !== "Acreage"),
+    invoice.expenses.filter(
+      (expense) => expense.type !== "Acreage" && expense.type !== "Adjustment"
+    ),
     (expense) => expense.activity || "Activity"
   );
 
