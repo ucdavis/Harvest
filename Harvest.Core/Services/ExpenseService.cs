@@ -25,6 +25,7 @@ namespace Harvest.Core.Services
         private readonly AppDbContext _dbContext;
         private readonly IProjectHistoryService _historyService;
         private readonly IDateTimeService _dateTimeService;
+        private readonly string _adjustmentType = "A-Adjustment";
 
         public ExpenseService(AppDbContext dbContext, IProjectHistoryService historyService, IDateTimeService dateTimeService)
         {
@@ -49,7 +50,7 @@ namespace Harvest.Core.Services
             //So, if I look back 1 year, less a week (or maybe 14 days), that will not find the one at the start of the month.
             //If it was created Jan 3, and this is running Dec 1-7, it will find it and not create the fee
             var compareDate = now.Date.AddYears(-1).AddDays(7); 
-            if (await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
+            if (await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.Type != _adjustmentType && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
             {
                 Log.Information("Project {projectId} found an acreage expense within the last year, skipping", project.Id);
                 return;
@@ -90,6 +91,7 @@ namespace Harvest.Core.Services
             }
 
             var expense = CreateExpense(project, amountToCharge, extraAcres);
+            expense.Type = _adjustmentType;
 
             await _dbContext.Expenses.AddAsync(expense);
             await _historyService.AcreageExpenseCreated(project.Id, expense);
@@ -104,7 +106,7 @@ namespace Harvest.Core.Services
 
             var expense = new Expense
             {
-                Type = project.AcreageRate.Type,
+                Type = project.AcreageRate.Type, //This gets changed for adjustments
                 Description = project.AcreageRate.Description,
                 Price = project.AcreageRate.Price,
                 Quantity = acres,

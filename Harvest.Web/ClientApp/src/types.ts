@@ -5,7 +5,12 @@ export interface Crop {
   name: string;
 }
 
-export type RateType = "Acreage" | "Equipment" | "Labor" | "Other";
+export type RateType =
+  | "Acreage"
+  | "Equipment"
+  | "Labor"
+  | "Other"
+  | "A-Adjustment";
 export type RoleName =
   | "System"
   | "FieldManager"
