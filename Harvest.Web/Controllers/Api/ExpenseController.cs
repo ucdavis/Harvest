@@ -70,7 +70,8 @@ namespace Harvest.Web.Controllers.Api
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> CreateAcreage(int projectId, [FromQuery] decimal amount)
         {
-            await _expenseService.CreateAcreageExpense(projectId, amount);
+            //TODO: Change closeout container so this isn't called
+            //await _expenseService.CreateAcreageExpense(projectId, amount);
 
             return Ok();
         }

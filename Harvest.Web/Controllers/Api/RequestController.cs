@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
@@ -24,14 +25,22 @@ namespace Harvest.Web.Controllers.Api
         private readonly StorageSettings _storageSettings;
         private readonly IFileService _fileService;
         private readonly IEmailService _emailService;
+        private readonly IExpenseService _expenseService;
 
-        public RequestController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings, IFileService fileService, IProjectHistoryService historyService, IEmailService emailService)
+        public RequestController(AppDbContext dbContext, 
+            IUserService userService, 
+            IOptions<StorageSettings> storageSettings, 
+            IFileService fileService, 
+            IProjectHistoryService historyService, 
+            IEmailService emailService, 
+            IExpenseService expenseService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _storageSettings = storageSettings.Value;
             _fileService = fileService;
             _emailService = emailService;
+            _expenseService = expenseService;
             _historyService = historyService;
         }
 
@@ -97,6 +106,13 @@ namespace Harvest.Web.Controllers.Api
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
                 var originalQuote =
                     await _dbContext.Quotes.SingleAsync(a => a.ProjectId == changeRequestProject.OriginalProjectId);
+
+                //Try to get acreage 
+                var originalDetail = originalQuote.Text.DeserializeWithGeoJson<QuoteDetail>();
+                var newQuoteDetail = quote.Text.DeserializeWithGeoJson<QuoteDetail>();
+                var acreageDiff = (Decimal) (newQuoteDetail.Acres - originalDetail.Acres );
+
+
                 originalQuote.Status = Quote.Statuses.Superseded;
                 originalQuote.ProjectId = changeRequestProject.Id; //Assign the original quote to the change request project
 
@@ -140,6 +156,9 @@ namespace Harvest.Web.Controllers.Api
                         attachment.Project = project;
                     }
                 }
+
+                //TODO: Do this here? Or lower down outside of the if (and save the acreageDiff/flag to call it.
+                await _expenseService.CreateChangeRequestAdjustment(project, acreageDiff); //If it is <= 0 acres it will not create the expanse.
             }
             else
             {
