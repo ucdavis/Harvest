@@ -9,7 +9,8 @@ import { ShowFor } from "../Shared/ShowFor";
 import { ticketSchema } from "../schemas";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { useInputValidator } from "../FormValidation/UseInputValidator";
+import { useInputValidator } from "use-input-validator";
+import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -34,7 +35,7 @@ export const TicketCreate = () => {
     formErrorCount,
     formIsTouched,
     validateAll,
-  } = useInputValidator(ticketSchema, ticket);
+  } = useInputValidator(ticketSchema, ticket, validatorOptions);
 
   const [notification, setNotification] = usePromiseNotification();
 

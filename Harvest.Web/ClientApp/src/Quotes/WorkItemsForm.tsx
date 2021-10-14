@@ -15,7 +15,7 @@ import { Typeahead } from "react-bootstrap-typeahead";
 
 import { Rate, RateType, WorkItem } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { useInputValidator } from "../FormValidation";
+import { useInputValidator } from "use-input-validator";
 import { workItemSchema } from "../schemas";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -84,6 +84,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         total: 0,
         isPassthrough: false,
       });
+      resetLocalFields();
     }
   };
 
@@ -114,6 +115,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         total: 0,
         isPassthrough: false,
       });
+      resetLocalFields();
     }
   };
 
@@ -210,6 +212,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
               })
             )}
             onBlur={onBlur("quantity")}
+            disabled={!workItem.rateId}
           />
         </InputGroup>
         <InputErrorMessage name="quantity" />

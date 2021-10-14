@@ -14,7 +14,7 @@ import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import { Activity, Rate, RateType, WorkItem, WorkItemImpl } from "../types";
 
 import { WorkItemsForm } from "./WorkItemsForm";
-import { useInputValidator } from "../FormValidation";
+import { useInputValidator } from "use-input-validator";
 import { activitySchema } from "../schemas";
 import { calculateAdjustedTotal } from "../Util/Calculations";
 
