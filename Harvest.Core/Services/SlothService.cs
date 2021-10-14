@@ -217,13 +217,14 @@ namespace Harvest.Core.Services
                 var debitTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode).Select(a => a.Amount).Sum();
                 if (expenseGroup.total != debitTotal)
                 {
+                    Log.Information("Debit Total doesn't match. Attempting to fix. ExpenseTotal {expenseTotal} DebitTotal {debitTotal}", expenseGroup.total, debitTotal);
                     var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode);
                     lastTransfer.Amount = lastTransfer.Amount + (expenseGroup.total - debitTotal);
                     if (lastTransfer.Amount <= 0 || expenseGroup.total != model.Transfers
                         .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == _financialService.Parse(expenseGroup.account).ObjectCode)
                         .Select(a => a.Amount).Sum())
                     {
-                        return Result.Error("Couldn't get Debits to balance for invoice {invoiceId}", invoice.Id);
+                        return Result.Error("Couldn't get Debits to balance for invoice {invoiceId} objectCode {objectCode}", invoice.Id, _financialService.Parse(expenseGroup.account).ObjectCode);
                     }
                     Log.Information("Adjusted debit expense amount to get everything to balance. {exTotal} {dbTotal}", expenseGroup.total, debitTotal);
                 }
