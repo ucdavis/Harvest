@@ -45,9 +45,7 @@ describe("Quote Container", () => {
       render(
         <MemoryRouter initialEntries={["/quote/create/1"]}>
           <Route path="/quote/create/:projectId">
-            <ValidationProvider>
-              <QuoteContainer />
-            </ValidationProvider>
+            <QuoteContainer />
           </Route>
         </MemoryRouter>,
         container
@@ -79,9 +77,7 @@ describe("Quote Container", () => {
       render(
         <MemoryRouter initialEntries={["/quote/create/3"]}>
           <Route path="/quote/create/:projectId">
-            <ValidationProvider>
-              <QuoteContainer />
-            </ValidationProvider>
+            <QuoteContainer />
           </Route>
         </MemoryRouter>,
         container
