@@ -1,28 +1,38 @@
-﻿import React, { ReactNode, useRef } from "react";
+﻿import React, {
+  ReactNode,
+  useRef,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from "react";
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button } from "reactstrap";
 import { useModal } from "react-modal-hook";
+import { isFunction } from "../Util/TypeChecks";
 
-interface Props {
+interface Props<T> {
   title: ReactNode;
-  message: ReactNode;
+  message:
+    | ReactNode
+    | ((setReturnValue: Dispatch<SetStateAction<T | undefined>>) => ReactNode);
   canConfirm?: boolean;
 }
 
-export const useConfirmationDialog = (
-  props: Props,
+export const useConfirmationDialog = <T extends any = undefined>(
+  props: Props<T>,
   dependencies: any[] = []
 ) => {
-  const promiseRef = useRef<Promise<boolean>>();
-  const resolveRef = useRef<(value: boolean) => void>();
+  const promiseRef = useRef<Promise<[boolean, T]>>();
+  const resolveRef = useRef<(value: [boolean, T]) => void>();
+  const [returnValue, setReturnValue] = useState<T>();
 
   const confirm = () => {
-    resolveRef.current && resolveRef.current(true);
+    resolveRef.current && resolveRef.current([true, returnValue as T]);
     promiseRef.current = undefined;
     resolveRef.current = undefined;
   };
 
   const dismiss = () => {
-    resolveRef.current && resolveRef.current(false);
+    resolveRef.current && resolveRef.current([false, undefined as T]);
     promiseRef.current = undefined;
     resolveRef.current = undefined;
   };
@@ -31,7 +41,11 @@ export const useConfirmationDialog = (
     () => (
       <Modal isOpen={true}>
         <ModalHeader>{props.title}</ModalHeader>
-        <ModalBody>{props.message}</ModalBody>
+        <ModalBody>
+          {isFunction(props.message)
+            ? props.message(setReturnValue)
+            : props.message}
+        </ModalBody>
         <ModalFooter>
           <Button
             color="primary"
@@ -57,13 +71,13 @@ export const useConfirmationDialog = (
         </ModalFooter>
       </Modal>
     ),
-    dependencies
+    [...dependencies, returnValue, setReturnValue]
   );
 
   const getConfirmation = () => {
     let promise =
       promiseRef.current ||
-      new Promise<boolean>((resolve) => {
+      new Promise<[boolean, T]>((resolve) => {
         resolveRef.current = resolve;
         showModal();
       });

@@ -16,10 +16,10 @@ export const RejectQuote = (props: Props) => {
 
   const [notification, setNotification] = usePromiseNotification();
 
-  const [getConfirmation] = useConfirmationDialog(
+  const [getConfirmation] = useConfirmationDialog<string>(
     {
       title: "RejectQuote",
-      message: (
+      message: (setReturn) => (
         <div className="form-group">
           <label htmlFor="fieldName">Reason</label>
           <textarea
@@ -28,7 +28,10 @@ export const RejectQuote = (props: Props) => {
             rows={3}
             required
             value={reason}
-            onChange={(e) => setReason(e.target.value)}
+            onChange={(e) => {
+              setReason(e.target.value);
+              setReturn(e.target.value);
+            }}
           />
           <small id="fieldNameHelp" className="form-text text-muted">
             Let us know what issues you have with this quote.
@@ -41,7 +44,8 @@ export const RejectQuote = (props: Props) => {
   );
 
   const reject = async () => {
-    if (!(await getConfirmation())) {
+    const [confirmed, reason] = await getConfirmation();
+    if (!confirmed) {
       return;
     }
 

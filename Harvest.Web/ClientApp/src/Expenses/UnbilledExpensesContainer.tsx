@@ -75,7 +75,8 @@ export const UnbilledExpensesContainer = (props: Props) => {
   }
 
   const deleteExpense = async (expense: Expense) => {
-    if (!(await confirmRemoveExpense())) {
+    const [confirmed] = await confirmRemoveExpense();
+    if (!confirmed) {
       return;
     }
 
