@@ -6,9 +6,12 @@ import { Progress } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import {
+  DatePickerFilter,
   SelectColumnFilter,
   SelectColumnFilterRange,
   progressFilter,
+  startDateFilter,
+  endDateFilter,
 } from "../Shared/Filtering";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -71,6 +74,8 @@ export const ProjectTable = (props: Props) => {
           `${row.start} ${new Date(row.start).toLocaleDateString()}`,
         Cell: (data: Cell<Project>) =>
           new Date(data.row.original.start).toLocaleDateString(),
+        Filter: DatePickerFilter,
+        filter: "startDate",
       },
       {
         id: "endDate",
@@ -79,6 +84,8 @@ export const ProjectTable = (props: Props) => {
           `${row.end} ${new Date(row.end).toLocaleDateString()}`,
         Cell: (data: Cell<Project>) =>
           new Date(data.row.original.end).toLocaleDateString(),
+        Filter: DatePickerFilter,
+        filter: "endDate",
       },
       {
         Header: "Status",
@@ -105,7 +112,11 @@ export const ProjectTable = (props: Props) => {
       columns={columns}
       data={projectData}
       initialState={initialState}
-      filterTypes={{ progress: progressFilter }}
+      filterTypes={{
+        progress: progressFilter,
+        startDate: startDateFilter,
+        endDate: endDateFilter,
+      }}
     />
   );
 };

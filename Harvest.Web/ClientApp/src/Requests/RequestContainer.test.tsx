@@ -65,7 +65,7 @@ describe("Request Container", () => {
     });
 
     const dates = container.getElementsByClassName(
-      "react-date-picker__inputGroup"
+      "react-datepicker__input-container"
     );
     const startDate = dates[0].querySelector("input");
     const endDate = dates[1].querySelector("input");
@@ -75,8 +75,8 @@ describe("Request Container", () => {
     const vegetable = container.querySelector(".rbt-input-wrapper");
     const PI = container.querySelectorAll("input.rbt-input-main");
 
-    expect(startDate?.value).toContain("2021-03-15");
-    expect(endDate?.value).toContain("2021-03-29");
+    expect(startDate?.value).toContain("03/15/2021");
+    expect(endDate?.value).toContain("03/29/2021");
     expect(cropType?.innerHTML).toContain("checked");
     expect(vegetable?.textContent).toContain("Tomato");
     expect(PI[1]?.value).toContain(
@@ -102,7 +102,7 @@ describe("Request Container", () => {
     });
 
     const dates = container.getElementsByClassName(
-      "react-date-picker__inputGroup"
+      "react-datepicker__input-container"
     );
     const startDate = dates[0].querySelector("input");
     const endDate = dates[1].querySelector("input");

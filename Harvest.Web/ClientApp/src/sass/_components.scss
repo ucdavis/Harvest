@@ -127,6 +127,12 @@
     color: $secondary-font;
     font-size: 0.9rem;
     text-transform: uppercase;
+    &:nth-child(4),
+    &:nth-child(1),
+    &:nth-child(3),
+    &:nth-child(2) {
+      width: 10%;
+    }
     svg {
       width: 12px !important;
       color: $primary-color;
@@ -142,6 +148,9 @@
   td {
     padding: 0.5rem;
     vertical-align: middle;
+    p {
+      margin-bottom: 0;
+    }
   }
   tr {
     background-color: #fff !important;

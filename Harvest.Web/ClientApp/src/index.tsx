@@ -5,6 +5,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 
 import "react-bootstrap-typeahead/css/Typeahead.css";
+import "react-datepicker/dist/react-datepicker.css";
 import "./sass/harvest.scss";
 
 const rootElement = document.getElementById("root");
