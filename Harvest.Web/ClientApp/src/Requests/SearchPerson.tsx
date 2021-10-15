@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import {
+  ClearButton,
   AsyncTypeahead,
   Highlighter,
   TypeaheadProps,
@@ -50,7 +51,6 @@ export const SearchPerson = (props: Props) => {
       id="searchPeople" // for accessibility
       isLoading={isSearchLoading}
       minLength={3}
-      clearButton
       defaultSelected={props.user ? [props.user] : []}
       placeholder="Search for person by email or kerberos"
       labelKey={(option: User) => `${option.name} (${option.email})`}
@@ -73,6 +73,13 @@ export const SearchPerson = (props: Props) => {
       onChange={onSelect}
       options={users}
       onBlur={props.onBlur}
-    />
+      disabled={props.user != undefined}
+      >
+        {({onClear, selected} : { onClear : any, selected : any}) => (
+          <div className="searchPersonsClearButton">
+            {!!selected.length && <ClearButton onClick={onClear} />}
+          </div>
+        )}
+    </AsyncTypeahead>
   );
 };
