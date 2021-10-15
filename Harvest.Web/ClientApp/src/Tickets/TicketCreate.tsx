@@ -142,7 +142,7 @@ export const TicketCreate = () => {
                     >
                       <DatePicker
                         className={
-                          "form-control" +
+                          "form-control " +
                           getClassName("dueDate", "react-date-picker__wrapper")
                         }
                         selected={ticket.dueDate}
