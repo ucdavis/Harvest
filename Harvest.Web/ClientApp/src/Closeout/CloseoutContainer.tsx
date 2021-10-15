@@ -105,7 +105,8 @@ export const CloseoutContainer = () => {
   });
 
   const closeoutProject = async () => {
-    if (!(await getConfirmation())) {
+    const [confirmed] = await getConfirmation();
+    if (!confirmed) {
       return;
     }
 
