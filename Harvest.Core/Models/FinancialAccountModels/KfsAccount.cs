@@ -22,24 +22,25 @@ namespace Harvest.Core.Models.FinancialAccountModels
         public string SubAccountName { get; set; } //Different Lookup
         public string SubAccount { get; set; } //Added for harvest
         public string Project { get; set; } //Added for harvest
+        public string ObjectCode { get; set; } // added for harvest
         public KfsUser AccountManager { get; set; }
         public KfsUser FiscalOfficer { get; set; }
 
         public override string ToString()
         {
-            var extraAccountInfo = string.Empty;
-            if (!string.IsNullOrWhiteSpace(SubAccount) || !string.IsNullOrWhiteSpace(Project))
+            //No format space for project. If we allow project, this needs to be changed
+            if (!string.IsNullOrWhiteSpace(ObjectCode))
             {
-                if (!string.IsNullOrWhiteSpace(Project))
-                {
-                    extraAccountInfo = $"-{SubAccount}-{Project}";
-                }
-                else
-                {
-                    extraAccountInfo = $"-{SubAccount}";
-                }
+                return $"{ChartOfAccountsCode}-{AccountNumber}-{SubAccount}-{ObjectCode}";
             }
-            return $"{ChartOfAccountsCode}-{AccountNumber}{extraAccountInfo}";
+
+            if (!string.IsNullOrWhiteSpace(SubAccount))
+            {
+                return $"{ChartOfAccountsCode}-{AccountNumber}-{SubAccount}";
+            }
+
+            return $"{ChartOfAccountsCode}-{AccountNumber}";
+
         }
 
         public static implicit operator KfsAccount(string v)

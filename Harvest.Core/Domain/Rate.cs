@@ -84,10 +84,11 @@ namespace Harvest.Core.Domain
 
         public class Types
         {
-            public const string Acreage   = "Acreage";
-            public const string Labor     = "Labor";
-            public const string Equipment = "Equipment";
-            public const string Other     = "Other";
+            public const string Acreage    = "Acreage";
+            public const string Labor      = "Labor";
+            public const string Equipment  = "Equipment";
+            public const string Other      = "Other";
+            public const string Adjustment = "Adjustment"; //Don't include this in the TypeList below or it will get added toi the UI dropdown
 
             public static List<string> TypeList = new List<string>
             {

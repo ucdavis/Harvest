@@ -73,7 +73,7 @@ namespace Test.TestsServices
             MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
             MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
             MockEmailService.Setup(a => a.InvoiceExceedsQuote(It.IsAny<Project>(), It.IsAny<decimal>(), It.IsAny<decimal>())).ReturnsAsync(true);
-            MockExpenseService.Setup(a => a.CreateMonthlyAcreageExpense(Projects[0]));
+            MockExpenseService.Setup(a => a.CreateYearlyAcreageExpense(Projects[0]));
             MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(2021, 01, 01));
         }
 
@@ -450,7 +450,7 @@ namespace Test.TestsServices
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
-            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(Projects[0]), Times.Once); 
+            MockExpenseService.Verify(a => a.CreateYearlyAcreageExpense(Projects[0]), Times.Once); 
 
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
@@ -506,7 +506,7 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe("An invoice already exists for current month: 1");
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
-            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(Projects[0]), Times.Never);
+            MockExpenseService.Verify(a => a.CreateYearlyAcreageExpense(Projects[0]), Times.Never);
 
             MockEmailService.Verify(a => a.InvoiceCreated(It.IsAny<Invoice>()), Times.Never);
         }
@@ -747,7 +747,7 @@ namespace Test.TestsServices
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeFalse();
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
-            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(It.IsAny<Project>()),Times.Once);
+            MockExpenseService.Verify(a => a.CreateYearlyAcreageExpense(It.IsAny<Project>()),Times.Once);
 
             MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
             addedInvoice.ShouldNotBeNull();
@@ -801,7 +801,7 @@ namespace Test.TestsServices
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeFalse();
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
-            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(It.IsAny<Project>()), Times.Once);
+            MockExpenseService.Verify(a => a.CreateYearlyAcreageExpense(It.IsAny<Project>()), Times.Once);
 
             MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
             
@@ -855,7 +855,7 @@ namespace Test.TestsServices
             
             rtValue.ShouldBe(1);
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
-            MockExpenseService.Verify(a => a.CreateMonthlyAcreageExpense(It.IsAny<Project>()), Times.Once);
+            MockExpenseService.Verify(a => a.CreateYearlyAcreageExpense(It.IsAny<Project>()), Times.Once);
 
             MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
             addedInvoice.ShouldNotBeNull();

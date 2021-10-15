@@ -28,6 +28,7 @@ namespace Harvest.Core.Services
 
         Task<AccountValidationModel> IsValid(string account);
         Task<AccountValidationModel> IsValid(KfsAccount account);
+        KfsAccount Parse(string account);
     }
 
     public class FinancialService : IFinancialService
@@ -249,7 +250,12 @@ namespace Harvest.Core.Services
                 {
                     rtValue.KfsAccount.SubAccount = accountArray[2].ToUpper();
                 }
-                //TODO: Maybe a project?
+                //TODO: Maybe a project? or leave a placeholder for project?
+                if (accountArray.Length > 3)
+                {
+                    rtValue.KfsAccount.ObjectCode = accountArray[3].Trim().ToUpper();
+                }
+                
 
                 rtValue = await IsValid(rtValue.KfsAccount);
             }
@@ -297,6 +303,24 @@ namespace Harvest.Core.Services
                 }
             }
 
+            if (!string.IsNullOrWhiteSpace(account.ObjectCode))
+            {
+                if (account.ObjectCode.Trim().Length > 4)
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Field = "ObjectCode";
+                    rtValue.Message = "Object Code is too long";
+                    return rtValue;
+                }
+                if (!await IsObjectValid(account.ChartOfAccountsCode, account.ObjectCode))
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Field = "ObjectCode";
+                    rtValue.Message = "Object Code is not valid";
+                    return rtValue;
+                }
+            }
+
             var accountLookup = await GetAccount(account.ChartOfAccountsCode, account.AccountNumber);
             rtValue.KfsAccount.AccountName = accountLookup.AccountName;
             rtValue.KfsAccount.OrganizationCode = accountLookup.OrganizationCode;
@@ -326,6 +350,39 @@ namespace Harvest.Core.Services
             //}
 
 
+            return rtValue;
+        }
+
+        /// <summary>
+        /// Note This doesn't validate
+        /// This is just to get the KFS account parts without calling the KFS api each time.
+        /// </summary>
+        /// <param name="account"></param>
+        /// <returns></returns>
+        public KfsAccount Parse(string account)
+        {
+            var rtValue = new KfsAccount();
+
+            account = account.Trim();
+            var delimiter = new string[] { "-" };
+            var accountArray = account.Split(delimiter, StringSplitOptions.None);
+            if (accountArray.Length < 2)
+            {
+                throw new Exception("Invalid Account format");
+            }
+
+            rtValue.ChartOfAccountsCode = accountArray[0].ToUpper();
+            rtValue.AccountNumber = accountArray[1].ToUpper();
+            if (accountArray.Length > 2)
+            {
+                rtValue.SubAccount = accountArray[2].ToUpper();
+            }
+            //TODO: Maybe a project? or leave a placeholder for project?
+            if (accountArray.Length > 3)
+            {
+                rtValue.ObjectCode = accountArray[3].Trim().ToUpper();
+            }
+            
             return rtValue;
         }
     }

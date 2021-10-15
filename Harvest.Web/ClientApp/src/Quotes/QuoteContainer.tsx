@@ -16,11 +16,12 @@ import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
 import { usePromiseNotification } from "../Util/Notifications";
-import { useInputValidator, ValidationProvider } from "../FormValidation";
+import { useInputValidator, ValidationProvider } from "use-input-validator";
 import { quoteContentSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ShowFor } from "../Shared/ShowFor";
+import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -39,7 +40,8 @@ export const QuoteContainer = () => {
 
   const { formErrorCount, context, validateAll } = useInputValidator(
     quoteContentSchema,
-    quote
+    quote,
+    validatorOptions
   );
 
   const [editFields, setEditFields] = useState(false);
@@ -148,9 +150,10 @@ export const QuoteContainer = () => {
     });
   }, [quote.activities, quote.acreageRate, quote.acres]);
 
-  const cropArray = useMemo(() => (project ? project.crop.split(",") : []), [
-    project,
-  ]);
+  const cropArray = useMemo(
+    () => (project ? project.crop.split(",") : []),
+    [project]
+  );
 
   const save = async (submit: boolean) => {
     const errors = await validateAll();

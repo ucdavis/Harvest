@@ -65,7 +65,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Acreage,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES",
+                        Account = "3-RRACRES--RAS5",
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -76,7 +76,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Equipment,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -87,7 +87,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Labor,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -98,7 +98,7 @@ namespace Test.Helpers
                         Type = Harvest.Core.Domain.Rate.Types.Other,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -109,7 +109,7 @@ namespace Test.Helpers
                         Type = type,
                         Description = $"Description{counter}",
                         BillingUnit = $"BillingUnit{counter}",
-                        Account = "3-RRACRES", //Use different account?
+                        Account = "3-RRACRES--RAS5", //Use different account?
                         Price = 1150.00m,
                         Unit = $"Unit{counter}"
                     };
@@ -162,7 +162,7 @@ namespace Test.Helpers
             rtValue.Description = $"Description{counter}";
             rtValue.Rate = Rate(3);
             rtValue.RateId = 3;
-            rtValue.Rate.Account = "3-FRMRATE";
+            rtValue.Rate.Account = "3-FRMRATE--RAY9";
             rtValue.Quantity = 2.00m;
             rtValue.Total = rtValue.Quantity * rtValue.Rate.Price;
             rtValue.Price = rtValue.Rate.Price;

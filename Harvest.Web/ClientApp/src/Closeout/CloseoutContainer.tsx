@@ -9,12 +9,13 @@ import { UnbilledExpensesContainer } from "../Expenses/UnbilledExpensesContainer
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "../Projects/ProjectProgress";
-import { useInputValidator } from "../FormValidation";
+import { useInputValidator } from "use-input-validator";
 import { roundToTwo } from "../Util/Calculations";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
 import { finalAcreageExpenseSchema } from "../schemas";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -35,7 +36,11 @@ export const CloseoutContainer = () => {
   const [closeoutRequested, setCloseoutRequested] = useState(false);
 
   const { onChange, InputErrorMessage, getClassName, onBlur, formErrorCount } =
-    useInputValidator<FinalAcreageExpense>(finalAcreageExpenseSchema);
+    useInputValidator<FinalAcreageExpense>(
+      finalAcreageExpenseSchema,
+      null,
+      validatorOptions
+    );
 
   const getIsMounted = useIsMounted();
   useEffect(() => {

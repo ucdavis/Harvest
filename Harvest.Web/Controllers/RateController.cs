@@ -84,6 +84,13 @@ namespace Harvest.Web.Controllers
             {
                 ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
             }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(accountValidation.KfsAccount.ObjectCode))
+                {
+                    ModelState.AddModelError("Rate.Account", $"Object Code is missing from the account.");
+                }
+            }
 
             if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
             {
@@ -110,7 +117,15 @@ namespace Harvest.Web.Controllers
             {
                 await _dbContext.Rates.AddAsync(rateToCreate);
                 await _dbContext.SaveChangesAsync();
-                Message = "Rate Created";
+                if (rateToCreate.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
+                {
+                    Message = "Rate Created -- WARNING! Passthrough object code is not 80RS";
+                }
+                else
+                {
+                    Message = "Rate Created";
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -148,6 +163,13 @@ namespace Harvest.Web.Controllers
             {
                 ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
             }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(accountValidation.KfsAccount.ObjectCode))
+                {
+                    ModelState.AddModelError("Rate.Account", $"Object Code is missing from the account.");
+                }
+            }
 
             if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
             {
@@ -170,7 +192,15 @@ namespace Harvest.Web.Controllers
             try
             {
                 await _dbContext.SaveChangesAsync();
-                Message = "Rate Updated";
+                if (rateToEdit.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
+                {
+                    Message = "Rate Created -- WARNING! Passthrough object code is not 80RS";
+                }
+                else
+                {
+                    Message = "Rate Updated";
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch

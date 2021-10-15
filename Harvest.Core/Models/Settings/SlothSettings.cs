@@ -5,7 +5,7 @@
         public string ApiUrl { get; set; }
         public string ApiKey { get; set; }
         public string CreditObjectCode { get; set; }
-        public string DebitObjectCode { get; set; }
+        public string CreditPassthroughObjectCode { get; set; }
         public string MerchantTrackingUrl { get; set; }
     }
 }

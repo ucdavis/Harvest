@@ -26,6 +26,7 @@ namespace Harvest.Web.Controllers.Api
             var validationModel = await _financialService.IsValid(account);
             if (validationModel.IsValid)
             {
+                validationModel.KfsAccount.ObjectCode = null; // Don't allow object code on PI lookup
                 // want to grab the account info and also fiscal officer
                 return Ok(new Account
                 {

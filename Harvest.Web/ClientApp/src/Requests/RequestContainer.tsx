@@ -13,7 +13,8 @@ import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { useInputValidator, ValidationProvider } from "../FormValidation";
+import { useInputValidator, ValidationProvider } from "use-input-validator";
+import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -42,7 +43,7 @@ export const RequestContainer = () => {
     onBlurValue,
     InputErrorMessage,
     propertyHasErrors,
-  } = useInputValidator(requestSchema, project);
+  } = useInputValidator(requestSchema, project, validatorOptions);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -265,8 +266,13 @@ export const RequestContainer = () => {
                       )}
                       onBlur={() => onBlurValue("principalInvestigator")}
                     />
-                    {propertyHasErrors("principalInvestigator") ? (<InputErrorMessage name="principalInvestigator" />) :
-                    (<small id="PIHelp" className="form-text text-muted">Enter PI Email or Kerberos. Click [x] to clear out an existing PI.</small>)}
+                    <InputErrorMessage name="principalInvestigator" />
+                    {!propertyHasErrors("principalInvestigator") && (
+                      <small id="PIHelp" className="form-text text-muted">
+                        Enter PI Email or Kerberos. Click [x] to clear out an
+                        existing PI.
+                      </small>
+                    )}
                   </FormGroup>
 
                   <FormGroup>
