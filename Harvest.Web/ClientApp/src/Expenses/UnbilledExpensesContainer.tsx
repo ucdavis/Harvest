@@ -114,10 +114,14 @@ export const UnbilledExpensesContainer = (props: Props) => {
       <div className="card-content">
         <div className="row justify-content-between mb-3">
           <div className="col">
-            <h3>
-              Un-billed Expenses
-              <small> (${formatCurrency(total)} total)</small>
-            </h3>
+            {expenses.length ? (
+              <h3>
+                Unbilled Expenses
+                <small> (${formatCurrency(total)} total)</small>
+              </h3>
+            ) : (
+              <h3>No Unbilled Expenses</h3>
+            )}
           </div>
           <div className="col text-right">
             <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
@@ -131,11 +135,13 @@ export const UnbilledExpensesContainer = (props: Props) => {
           </div>
         </div>
 
-        <ExpenseTable
-          expenses={expenses}
-          deleteExpense={deleteExpense}
-          canDeleteExpense={!notification.pending}
-        ></ExpenseTable>
+        {expenses.length > 0 && (
+          <ExpenseTable
+            expenses={expenses}
+            deleteExpense={deleteExpense}
+            canDeleteExpense={!notification.pending}
+          ></ExpenseTable>
+        )}
       </div>
     </div>
   );
