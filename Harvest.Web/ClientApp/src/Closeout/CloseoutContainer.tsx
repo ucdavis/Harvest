@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Label, Input, Button, UncontrolledTooltip } from "reactstrap";
+import { Button, UncontrolledTooltip } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { Project, Result } from "../types";
 import { UnbilledExpensesContainer } from "../Expenses/UnbilledExpensesContainer";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "../Projects/ProjectProgress";
-import { useInputValidator } from "use-input-validator";
 import { roundToTwo } from "../Util/Calculations";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
-import { finalAcreageExpenseSchema } from "../schemas";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
@@ -28,19 +25,11 @@ interface FinalAcreageExpense {
 export const CloseoutContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
-  const [newExpenseCount, setNewExpenseCount] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
   const [finalAcreageExpense, setFinalAcreageExpense] =
     useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
   const [closeoutRequested, setCloseoutRequested] = useState(false);
-
-  const { onChange, InputErrorMessage, getClassName, onBlur, formErrorCount } =
-    useInputValidator<FinalAcreageExpense>(
-      finalAcreageExpenseSchema,
-      null,
-      validatorOptions
-    );
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -76,20 +65,6 @@ export const CloseoutContainer = () => {
       history.push(`/project/details/${projectId}`);
     }
   }, [closeoutRequested, history, projectId]);
-
-  const addAcreageExpense = async () => {
-    const request = fetch(
-      `/Expense/CreateAcreage/${projectId}?amount=${finalAcreageExpense.amount}`,
-      {
-        method: "POST",
-      }
-    );
-    setNotification(request, "Adding Acreage Expense", "Acreage Expense Added");
-    const response = await request;
-    if (response.ok) {
-      getIsMounted() && setNewExpenseCount(newExpenseCount + 1);
-    }
-  };
 
   const [getConfirmation] = useConfirmationDialog({
     title: "Closeout Project",
@@ -140,52 +115,8 @@ export const CloseoutContainer = () => {
       ></ProjectHeader>
       <div className="card-content">
         <div className="row">
-          <div className="col-md-8">
-            <h2>Prepare final invoice for project closeout</h2>
-
-            {project.acres === 0 && (
-              <>
-                <Label for="amount">
-                  Final Acreage Expense (defaults to monthly)
-                </Label>
-                <Input
-                  className={getClassName("amount")}
-                  type="number"
-                  id="amount"
-                  value={finalAcreageExpense.amount}
-                  onChange={onChange("amount", (e) =>
-                    setFinalAcreageExpense({
-                      amount: parseFloat(e.target.value),
-                    })
-                  )}
-                  onBlur={onBlur("amount")}
-                />
-                <InputErrorMessage name="amount" />
-
-                <Button
-                  color="link btn-sm"
-                  disabled={notification.pending || formErrorCount > 0}
-                  onClick={addAcreageExpense}
-                >
-                  Add Acreage Expense <FontAwesomeIcon icon={faPlus} />
-                </Button>
-              </>
-            )}
-          </div>
-
-          <div className="col-md-8 mt-4">
-            <ProjectProgress project={project} />
-          </div>
-        </div>
-      </div>
-
-      <div className="card-content">
-        <div className="row">
           <div className="col-md-12">
-            <UnbilledExpensesContainer
-              newExpenseCount={newExpenseCount}
-              hideProjectHeader={true}
-            />
+            <UnbilledExpensesContainer hideProjectHeader={true} />
             <br />
             <Button
               id="CloseoutButton"
