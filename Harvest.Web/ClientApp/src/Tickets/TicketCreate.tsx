@@ -141,10 +141,10 @@ export const TicketCreate = () => {
                       onBlur={() => onBlurValue("dueDate", ticket.dueDate)}
                     >
                       <DatePicker
-                        className={getClassName(
-                          "dueDate",
-                          "react-date-picker__wrapper"
-                        )}
+                        className={
+                          "form-control " +
+                          getClassName("dueDate", "react-date-picker__wrapper")
+                        }
                         selected={ticket.dueDate}
                         onChange={onChangeValue("dueDate", (date: Date) =>
                           setTicket({ ...ticket, dueDate: date })

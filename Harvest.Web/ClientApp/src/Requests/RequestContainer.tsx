@@ -170,6 +170,7 @@ export const RequestContainer = () => {
                           onBlur={() => onBlurValue("start")}
                         >
                           <DatePicker
+                            className="form-control"
                             selected={project.start}
                             onChange={onChangeValue("start", (date: Date) =>
                               setProject({ ...project, start: date })
@@ -189,6 +190,7 @@ export const RequestContainer = () => {
                           onBlur={() => onBlurValue("end")}
                         >
                           <DatePicker
+                            className="form-control"
                             selected={project.end}
                             onChange={onChangeValue("end", (date: Date) =>
                               setProject({ ...project, end: date })
