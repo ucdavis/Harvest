@@ -330,10 +330,12 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Crop")
+                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CropType")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
@@ -376,6 +378,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 

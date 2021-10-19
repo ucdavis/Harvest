@@ -24,9 +24,11 @@ namespace Harvest.Core.Domain
         public DateTime End { get; set; }
 
         [StringLength(512)]
+        [Required]
         public string Crop { get; set; }
 
         [StringLength(50)]
+        [Required]
         public string CropType { get; set; }
 
         [MaxLength]
@@ -69,6 +71,7 @@ namespace Harvest.Core.Domain
         public DateTime CreatedOn { get; set; }
 
         [StringLength(50)]
+        [Required]
         public string Status { get; set; }
 
         [Required]
