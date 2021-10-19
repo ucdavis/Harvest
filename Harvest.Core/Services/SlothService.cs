@@ -95,15 +95,13 @@ namespace Harvest.Core.Services
             }
             var absGrandTotal = Math.Round(invoice.Expenses.Select(a => Math.Abs(a.Total)).Sum(), 2);
 
-            if (invoice.Expenses.Any(a => a.Total < 0))
+
+            if (!(ProcessRefunds(model, invoice)).Value)
             {
-                if (!(ProcessRefunds(model, invoice)).Value)
-                {
-                    return Result.Error("ProcessRefunds Failed");
-                }
+                return Result.Error("ProcessRefunds Failed");
             }
 
-            if (!(await ProcessDebits(model, absGrandTotal, invoice)).Value)
+                if (!(await ProcessDebits(model, absGrandTotal, invoice)).Value)
             {
                 return Result.Error("ProcessDebits Failed");
             }
@@ -177,8 +175,12 @@ namespace Harvest.Core.Services
         private Result<bool> ProcessRefunds(TransactionViewModel model, Invoice invoice)
         {
             var refundAmount = invoice.Expenses.Where(a => a.Total < 0).Sum(a => a.Total);
-            Log.Information("Refund amount should be negative here {refundAmount}", refundAmount);
             refundAmount = Math.Abs(refundAmount);
+            if (refundAmount <= 0)
+            {
+                //No refunds
+                return Result.Value(true);
+            }
 
             //Credits (Previously debits)
             var debExpenseGroups = invoice.Expenses.Where(a => a.Total < 0)
@@ -266,7 +268,7 @@ namespace Harvest.Core.Services
                 return Result.Error("Couldn't get refund Credits to balance for invoice {invoiceId}", invoice.Id);
             }
 
-            return Result.Value(true); ;
+            return Result.Value(true);
         }
 
         private async Task<Result<bool>> ProcessDebits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
