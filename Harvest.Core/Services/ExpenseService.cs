@@ -227,7 +227,7 @@ namespace Harvest.Core.Services
                 InvoiceId = null,
                 CreatedOn = now,
                 CreatedBy = null,
-                Account = project.AcreageRate.Account,
+                Account = rate.Account,
             };
             return expense;
         }
