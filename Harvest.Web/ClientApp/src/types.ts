@@ -118,6 +118,7 @@ export interface Transfer {
   type: string;
   account: string;
   total: number;
+  isProjectAccount: boolean;
 }
 
 // TODO: should this be a different name or is it ok?  Do we even need an interface?

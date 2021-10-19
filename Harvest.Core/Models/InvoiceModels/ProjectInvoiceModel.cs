@@ -46,13 +46,15 @@ namespace Harvest.Core.Models.InvoiceModels
         public string Type { get; set; }
         public string Account { get; set; }
         public decimal Total { get; set; }
+        public bool IsProjectAccount { get; set; }
 
         public TransferModel(Transfer transfer)
         {
-            Id = transfer.Id;
-            Type = transfer.Type;
-            Account = transfer.Account;
-            Total = transfer.Total;
+            Id               = transfer.Id;
+            Type             = transfer.Type;
+            Account          = transfer.Account;
+            Total            = transfer.Type == Transfer.Types.Credit ? transfer.Total * -1 : transfer.Total;
+            IsProjectAccount = transfer.IsProjectAccount;
         }
     }
 
