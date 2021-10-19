@@ -342,10 +342,12 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Crop")
+                        .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
                     b.Property<string>("CropType")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -388,6 +390,7 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
