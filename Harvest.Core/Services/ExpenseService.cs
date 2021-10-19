@@ -114,7 +114,7 @@ namespace Harvest.Core.Services
         {
             var now = _dateTimeService.DateTimeUtcNow();
             var compareDate = now.Date.AddYears(-1);
-            if (await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.Type != Rate.Types.Adjustment && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
+            if (!await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.Type != Rate.Types.Adjustment && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
             {
                 Log.Information("Invoice adjustment not needed as an acreage expense wasn't found within the last year for project {id}", project.Id);
                 return;
@@ -135,6 +135,7 @@ namespace Harvest.Core.Services
                 var refundExpense = CreateExpense(project, amount, (decimal)oldQuote.Acres, oldRate);
                 refundExpense.Type = Rate.Types.Adjustment;
                 refundExpense.Description = $"Acreage Adjustment (Refund) -- {oldRate.Description}".Truncate(250);
+                refundExpense.Price *= -1; //Make the price negative as well
                 await _dbContext.Expenses.AddAsync(refundExpense);
                 await _historyService.AcreageExpenseCreated(project.Id, refundExpense);
                 didWeDoAnything = true;
@@ -154,6 +155,7 @@ namespace Harvest.Core.Services
                         var refundExpense = CreateExpense(project, amount, acres, rate);
                         refundExpense.Type = Rate.Types.Adjustment;
                         refundExpense.Description = $"Acreage Adjustment (Partial Refund) -- {rate.Description}".Truncate(250);
+                        refundExpense.Price *= -1; //Make the price negative as well
                         await _dbContext.Expenses.AddAsync(refundExpense);
                         await _historyService.AcreageExpenseCreated(project.Id, refundExpense);
                         didWeDoAnything = true;
@@ -167,16 +169,12 @@ namespace Harvest.Core.Services
 
             if (newQuote.Acres > 0)
             {
-                if (project.AcreageRate == null) //I guess this is ok. Might want to call it later in the change request when it should have it?
-                {
-                    var project1 = project;
-                    project = await _dbContext.Projects.Include(a => a.AcreageRate).SingleAsync(a => a.Id == project1.Id);
-                }
+                var rate = await _dbContext.Rates.SingleAsync(a => a.Id == newQuote.AcreageRateId);
 
                 var acres = 0.0m;
                 if (rateChanged)
                 {
-                    acres = (decimal)project.Acres;
+                    acres = (decimal)newQuote.Acres;
 
                 }
                 else if (newQuote.Acres > oldQuote.Acres)
@@ -187,14 +185,14 @@ namespace Harvest.Core.Services
 
                 if (acres > 0) //Only want to do this if the rate changed (we did a full refund) or we have more acres
                 {
-                    var amountToCharge = Math.Round(acres * project.AcreageRate.Price, 2, MidpointRounding.ToZero); //TODO: How to round this?
+                    var amountToCharge = Math.Round(acres * rate.Price, 2, MidpointRounding.ToZero); //TODO: How to round this?
                     if (amountToCharge < 0.01m)
                     {
                         Log.Error("Adjustment Project  would have an acreage amount less than 0.01. Skipping. Project {id}", project.Id);
                         return;
                     }
 
-                    var expense = CreateExpense(project, amountToCharge, acres, project.AcreageRate);
+                    var expense = CreateExpense(project, amountToCharge, acres, rate);
                     expense.Type = Rate.Types.Adjustment;
                     expense.Description = $"Acreage Adjustment -- {expense.Description}".Truncate(250);
 
@@ -219,13 +217,13 @@ namespace Harvest.Core.Services
 
             var expense = new Expense
             {
-                Type = project.AcreageRate.Type, //This gets changed for adjustments
-                Description = project.AcreageRate.Description,
-                Price = project.AcreageRate.Price,
+                Type = rate.Type, //This gets changed for adjustments
+                Description = rate.Description,
+                Price = rate.Price,
                 Quantity = acres,
                 Total = Math.Round(amountToCharge,2, MidpointRounding.ToZero),
                 ProjectId = project.Id,
-                RateId = project.AcreageRate.Id,
+                RateId = rate.Id,
                 InvoiceId = null,
                 CreatedOn = now,
                 CreatedBy = null,
