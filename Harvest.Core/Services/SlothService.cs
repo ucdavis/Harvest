@@ -181,33 +181,46 @@ namespace Harvest.Core.Services
             refundAmount = Math.Abs(refundAmount);
 
             //Credits (Previously debits)
+            var debExpenseGroups = invoice.Expenses.Where(a => a.Total < 0)
+                .GroupBy(a => _financialService.Parse(a.Account).ObjectCode)
+                .Select(a => new { objectCode = a.Key, total = a.Sum(s => Math.Abs(s.Total)) })
+                .ToArray(); //This should only have 1 value
             var localTransfers = new List<TransferViewModel>();
-            foreach (var projectAccount in invoice.Project.Accounts)
+            foreach (var debExpenseGroup in debExpenseGroups)
             {
-                var account = _financialService.Parse(projectAccount.Number);
+                
+                foreach (var projectAccount in invoice.Project.Accounts)
+                {
+                    var account = _financialService.Parse(projectAccount.Number);
 
-                var tvm = new TransferViewModel
-                {
-                    Account = account.AccountNumber,
-                    Amount = Math.Round(refundAmount * (projectAccount.Percentage / 100), 2),
-                    Chart = account.ChartOfAccountsCode,
-                    SubAccount = account.SubAccount,
-                    Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
-                    Direction = TransferViewModel.Directions.Credit,
-                    ObjectCode = account.ObjectCode,
-                };
-                if (tvm.Amount >= 0.01m)
-                {
-                    //Only create this if the amount if 0.01 or greater (sloth requirement)
-                    model.Transfers.Add(tvm);
-                    localTransfers.Add(tvm);
-                }
-                else
-                {
-                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
+                    var tvm = new TransferViewModel
+                    {
+                        Account = account.AccountNumber,
+                        Amount = Math.Round(debExpenseGroup.total * (projectAccount.Percentage / 100), 2),
+                        Chart = account.ChartOfAccountsCode,
+                        SubAccount = account.SubAccount,
+                        Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                        Direction = TransferViewModel.Directions.Credit,
+                        ObjectCode = debExpenseGroup.objectCode,
+                    };
+                    if (tvm.Amount >= 0.01m)
+                    {
+                        //Only create this if the amount if 0.01 or greater (sloth requirement)
+                        model.Transfers.Add(tvm);
+                        localTransfers.Add(tvm);
+                    }
+                    else
+                    {
+                        Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}",
+                            invoice.Id);
+                    }
                 }
             }
 
+            if (localTransfers.Sum(a => a.Amount) != refundAmount)
+            {
+                Log.Information("Refund debit total didn't match for invoice {id}", invoice.Id);
+            }
 
             //Debit (Previously Credit)
             var expenseGroups = invoice.Expenses.Where(a => a.Total < 0).GroupBy(a => new { a.Account });
