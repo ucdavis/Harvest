@@ -237,16 +237,16 @@ namespace Harvest.Core.Services
             }
 
             //Ok, so this should happen before anything else...
-            var debAmount = model.Transfers.Where(a => a.Description == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
-            var credAmount = model.Transfers.Where(a => a.Description == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
+            var debAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
+            var credAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
             if ( debAmount != credAmount)
             {
                 Log.Information("Refunds don't balance invoice {id} Deb {deb} Cred {crd}", invoice.Id, debAmount, credAmount);
                 var lastCredTmv = model.Transfers.Last(a => a.Description == TransferViewModel.Directions.Credit);
                 lastCredTmv.Amount = lastCredTmv.Amount + (debAmount - credAmount);
             }
-            debAmount = model.Transfers.Where(a => a.Description == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
-            credAmount = model.Transfers.Where(a => a.Description == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
+            debAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
+            credAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
             if (debAmount != credAmount)
             {
                 return Result.Error("Couldn't get refund Credits to balance for invoice {invoiceId}", invoice.Id);
