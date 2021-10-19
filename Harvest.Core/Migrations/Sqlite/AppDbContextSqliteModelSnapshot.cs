@@ -767,6 +767,11 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<int>("InvoiceId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsProjectAccount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
                     b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
