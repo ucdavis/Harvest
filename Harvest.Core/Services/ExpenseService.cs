@@ -17,7 +17,6 @@ namespace Harvest.Core.Services
     public interface IExpenseService
     {
         Task CreateYearlyAcreageExpense(Project project);
-        Task CreateChangeRequestAdjustment(Project project, decimal extraAcres);
         Task CreateChangeRequestAdjustmentMaybe(Project project, QuoteDetail newQuote, QuoteDetail oldQuote);
     }
 
@@ -64,35 +63,6 @@ namespace Harvest.Core.Services
             }
 
             var expense = CreateExpense(project, amountToCharge, (decimal)project.Acres, project.AcreageRate);
-
-            await _dbContext.Expenses.AddAsync(expense);
-            await _historyService.AcreageExpenseCreated(project.Id, expense);
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task CreateChangeRequestAdjustment(Project project, decimal extraAcres)
-        {
-            if (extraAcres <= 0)
-            {
-                return;
-            }
-
-            if (project.AcreageRate == null) //I guess this is ok. Might want to call it later in the change request when it should have it?
-            {
-                var project1 = project;
-                project = await _dbContext.Projects.Include(a => a.AcreageRate).SingleAsync(a => a.Id == project1.Id);
-            }
-
-            var amountToCharge = Math.Round(extraAcres * project.AcreageRate.Price, 2, MidpointRounding.ToZero); //TODO: How to round this?
-            if (amountToCharge < 0.01m)
-            {
-                Log.Error("Adjustment Project {projectId} would have an acreage amount less than 0.01. Skipping.", project.Id);
-                return;
-            }
-
-            var expense = CreateExpense(project, amountToCharge, extraAcres, project.AcreageRate);
-            expense.Type = Rate.Types.Adjustment;
-            expense.Description = $"Acreage Adjustment -- {expense.Description}".Truncate(250);
 
             await _dbContext.Expenses.AddAsync(expense);
             await _historyService.AcreageExpenseCreated(project.Id, expense);

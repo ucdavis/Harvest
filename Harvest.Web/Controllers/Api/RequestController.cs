@@ -157,8 +157,6 @@ namespace Harvest.Web.Controllers.Api
                     }
                 }
 
-                //TODO: Do this here? Or lower down outside of the if (and save the acreageDiff/flag to call it.
-                // await _expenseService.CreateChangeRequestAdjustment(project, acreageDiff); //If it is <= 0 acres it will not create the expanse.
                 await _expenseService.CreateChangeRequestAdjustmentMaybe(project, newQuoteDetail, originalDetail);
             }
             else
