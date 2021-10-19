@@ -93,21 +93,22 @@ namespace Harvest.Core.Services
                 Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
                 invoice.Total = grandTotal;
             }
+            var absGrandTotal = Math.Round(invoice.Expenses.Select(a => Math.Abs(a.Total)).Sum(), 2);
 
             if (invoice.Expenses.Any(a => a.Total < 0))
             {
-                if (!(ProcessRefunds(model, grandTotal, invoice)).Value)
+                if (!(ProcessRefunds(model, invoice)).Value)
                 {
                     return Result.Error("ProcessRefunds Failed");
                 }
             }
 
-            if (!(await ProcessDebits(model, grandTotal, invoice)).Value)
+            if (!(await ProcessDebits(model, absGrandTotal, invoice)).Value)
             {
                 return Result.Error("ProcessDebits Failed");
             }
 
-            if (!(await ProcessCredits(model, grandTotal, invoice)).Value)
+            if (!(await ProcessCredits(model, absGrandTotal, invoice)).Value)
             {
                 return Result.Error("ProcessCredits Failed");
             }
@@ -173,7 +174,7 @@ namespace Harvest.Core.Services
             return Result.Error("Sloth Response didn't have a success code for moneyTransfer id {transferId}: {data}", invoice.Id, data);
         }
 
-        private Result<bool> ProcessRefunds(TransactionViewModel model, decimal grandTotal, Invoice invoice)
+        private Result<bool> ProcessRefunds(TransactionViewModel model, Invoice invoice)
         {
             var refundAmount = invoice.Expenses.Where(a => a.Total < 0).Sum(a => a.Total);
             Log.Information("Refund amount should be negative here {refundAmount}", refundAmount);
