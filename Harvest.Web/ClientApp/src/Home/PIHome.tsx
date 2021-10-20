@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Project } from "../types";
+import { Project, Ticket } from "../types";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 export const PIHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -19,6 +20,18 @@ export const PIHome = () => {
     };
 
     getProjectsWaitingForMe();
+  }, [getIsMounted]);
+
+  useEffect(() => {
+    const getTicketsWaitingForMe = async () => {
+      const response = await fetch("/ticket/RequiringPIAttention");
+      if (getIsMounted()) {
+        const tickets: Ticket[] = await response.json();
+        getIsMounted() && setTickets(tickets);
+      }
+    };
+
+    getTicketsWaitingForMe();
   }, [getIsMounted]);
 
   return (
@@ -38,6 +51,13 @@ export const PIHome = () => {
               <span className="badge badge-light">
                 {StatusToActionRequired(project.status)}
               </span>
+            </Link>
+          </li>
+        ))}
+        {tickets.map((ticket) => (
+          <li key={ticket.id} className="list-group-item">
+            <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
+              View ticket: "{ticket.name}"
             </Link>
           </li>
         ))}
