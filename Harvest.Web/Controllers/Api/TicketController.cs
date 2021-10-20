@@ -65,11 +65,15 @@ namespace Harvest.Web.Controllers.Api
             return View("React");
         }
 
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public ActionResult NeedsAttention()
         {
             return View("React");
         }
 
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Mine()
         {
             return View("React");
