@@ -36,7 +36,15 @@ namespace Harvest.Core.Models.InvoiceModels
             Notes = invoice.Notes;
             Status = invoice.Status;
             Expenses = (invoice.Expenses?.Select(e => new ExpenseModel(e)) ?? Enumerable.Empty<ExpenseModel>()).ToList();
-            Transfers = (invoice.Transfers?.Select(a => new TransferModel(a)) ?? Enumerable.Empty<TransferModel>()).ToList();
+            Transfers = (invoice.Transfers?.Select(a => new TransferModel(a)) ?? Enumerable.Empty<TransferModel>()).ToList().GroupBy(a => a.Account).Select(a => new TransferModel
+            {
+                Account = a.Key,
+                Total = a.Sum(s => s.Total),
+                IsProjectAccount = a.First().IsProjectAccount,
+                Id = a.First().Id,
+                Type = a.First().Type
+            }).ToList();
+
         }
     }
 
@@ -46,13 +54,20 @@ namespace Harvest.Core.Models.InvoiceModels
         public string Type { get; set; }
         public string Account { get; set; }
         public decimal Total { get; set; }
+        public bool IsProjectAccount { get; set; }
+
+        public TransferModel()
+        {
+        }
+
 
         public TransferModel(Transfer transfer)
         {
-            Id = transfer.Id;
-            Type = transfer.Type;
-            Account = transfer.Account;
-            Total = transfer.Total;
+            Id               = transfer.Id;
+            Type             = transfer.Type;
+            Account          = transfer.Account;
+            Total            = transfer.Type == Transfer.Types.Credit ? transfer.Total * -1 : transfer.Total;
+            IsProjectAccount = transfer.IsProjectAccount;
         }
     }
 

@@ -21,6 +21,8 @@ namespace Harvest.Core.Domain
         [Range(0.01, Double.MaxValue, ErrorMessage = "Total must be greater than 0.01")] //Actually, sloth does have a max value...
         public decimal Total { get; set; }
 
+        public bool IsProjectAccount { get; set; }
+
         [Required]
         public int InvoiceId { get; set; }
 
@@ -31,6 +33,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Transfer>().HasIndex(a => a.InvoiceId);
 
             modelBuilder.Entity<Transfer>().Property(a => a.Total).HasPrecision(18, 2);
+            modelBuilder.Entity<Transfer>().Property(a => a.IsProjectAccount).HasDefaultValue(true); //Just so migration will work
         }
 
         public class Types

@@ -132,10 +132,17 @@ namespace Harvest.Core.Services
                     {
                         extraAccountInfo = $"-{transferViewModel.SubAccount}";
                     }
+
+                    var account = new KfsAccount()
+                    {
+                        ChartOfAccountsCode = transferViewModel.Chart, AccountNumber = transferViewModel.Account,
+                        SubAccount = transferViewModel.SubAccount
+                    }; //Don't put in object code. Project accounts don't have them, they are on the rate accounts
                     var transfer = new Transfer();
-                    transfer.Account = $"{transferViewModel.Chart}-{transferViewModel.Account}{extraAccountInfo}";
+                    transfer.Account = account.ToString();
                     transfer.Total = transferViewModel.Amount;
                     transfer.Type = transferViewModel.Direction;
+                    transfer.IsProjectAccount = invoice.Project.Accounts.Select(a => _financialService.Parse(a.Number)).Contains(transfer.Account);
 
                     invoice.Transfers.Add(transfer);
                 }
