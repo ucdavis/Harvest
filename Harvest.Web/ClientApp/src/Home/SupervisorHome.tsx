@@ -5,7 +5,7 @@ import { StatusToActionRequired } from "../Util/MessageHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 export const SupervisorHome = () => {
-  const [projects, setProjects] = useState<Project[]>();
+  const [projects, setProjects] = useState<Project[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const getIsMounted = useIsMounted();
@@ -44,26 +44,18 @@ export const SupervisorHome = () => {
         <li className="list-group-item">
           <Link to="/expense/entry">Enter Expenses</Link>
         </li>
-        {projects !== undefined && projects.length > 0 && (
+        {projects.slice(0, 3).map((project) => (
           <li className="list-group-item">
-            <Link to={`/project/details/${projects[0].id}`}>
-              Quick jump to {projects[0].name}{" "}
-              <span className="badge badge-primary">
-                {StatusToActionRequired(projects[0].status)}
+            <Link to={`/project/details/${project.id}`}>
+              Quick jump to {project.name}{" "}
+              <span
+                className={`badge badge-primary badge-status-${project.status}`}
+              >
+                {StatusToActionRequired(project.status)}
               </span>
             </Link>
           </li>
-        )}
-        {projects !== undefined && projects.length > 1 && (
-          <li className="list-group-item">
-            <Link to={`/project/details/${projects[1].id}`}>
-              Quick jump to {projects[1].name}{" "}
-              <span className="badge badge-primary">
-                {StatusToActionRequired(projects[1].status)}
-              </span>
-            </Link>
-          </li>
-        )}
+        ))}
         {tickets.map((ticket) => (
           <li key={ticket.id} className="list-group-item">
             <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>

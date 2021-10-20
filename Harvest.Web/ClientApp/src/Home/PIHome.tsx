@@ -48,7 +48,9 @@ export const PIHome = () => {
           <li key={project.id} className="list-group-item">
             <Link to={`/project/details/${project.id}`}>
               View project {project.name}{" "}
-              <span className="badge badge-light">
+              <span
+                className={`badge badge-primary badge-status-${project.status}`}
+              >
                 {StatusToActionRequired(project.status)}
               </span>
             </Link>
