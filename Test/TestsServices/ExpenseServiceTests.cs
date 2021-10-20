@@ -35,6 +35,8 @@ namespace Test.TestsServices
         public List<Expense> Expenses { get; set; }
         public Expense AddedExpense { get; set; } = null;
 
+        public List<Rate> Rates { get; set; }
+
         public ExpenseServiceTests()
         {
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
@@ -61,17 +63,29 @@ namespace Test.TestsServices
                 Expenses.Add(CreateValidEntities.Expense(i+1, Projects[1].Id));
             }
 
+            Rates = new List<Rate>();
+            for (int i = 0; i < 5; i++)
+            {
+                Rates.Add(CreateValidEntities.Rate(i+1));
+            }
+            Rates.Add(CreateValidEntities.Rate(6, Rate.Types.Equipment));
+            Rates.Add(CreateValidEntities.Rate(7, Rate.Types.Labor));
+            Rates.Add(CreateValidEntities.Rate(8, Rate.Types.Other));
+            Rates[0].Account = "3-RRACRES-CNTRY-RAS5";
+            Rates[0].Price = 3281.00m;
+
+
             var specificExpense = CreateValidEntities.Expense(9, Projects[0].Id);
             specificExpense.CreatedOn = new DateTime(2020, 01, 01).FromPacificTime();
             specificExpense.Type = Rate.Types.Acreage;
-            specificExpense.Rate = CreateValidEntities.Rate(9);
+            specificExpense.Rate = Rates[0];
 
             Expenses.Add(specificExpense);
 
             var specificAdjustment = CreateValidEntities.Expense(10, Projects[0].Id);
             specificAdjustment.CreatedOn = new DateTime(2021, 01, 01).FromPacificTime();
             specificAdjustment.Type = Rate.Types.Adjustment; //This one should be ignored
-            specificAdjustment.Rate = CreateValidEntities.Rate(9);
+            specificAdjustment.Rate = Rates[1];
 
             Expenses.Add(specificAdjustment);
         }
@@ -80,6 +94,7 @@ namespace Test.TestsServices
         {
             MockDbContext.Setup(a => a.Projects).Returns(Projects.AsQueryable().MockAsyncDbSet().Object);
             MockDbContext.Setup(a => a.Expenses).Returns(Expenses.AsQueryable().MockAsyncDbSet().Object);
+            MockDbContext.Setup(a => a.Rates).Returns(Rates.AsQueryable().MockAsyncDbSet().Object);
             MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
 
             MockDbContext.Setup(a => a.Expenses.Add(It.IsAny<Expense>())).Callback<Expense>(a => AddedExpense = a);
@@ -210,29 +225,76 @@ namespace Test.TestsServices
             AddedExpense.Account.ShouldBe(Projects[0].AcreageRate.Account);
         }
 
-        //re-write these for the new method
-        [Theory]
+        //re-write these for the new method        [Theory]
         [InlineData(2021, 01, 02)]
         [InlineData(2021, 01, 03)]
         [InlineData(2021, 01, 04)]
         [InlineData(2021, 01, 05)]
         [InlineData(2021, 02, 01)]
         [InlineData(2021, 02, 02)]
-        public async Task CreateChangeRequestAdjustmentReturnsEarly(int year, int month, int day)
+        public async Task CreateChangeRequestAdjustmentReturnsEarlyIfNoAcerageExpenseInAYear(int year, int month, int day)
         {
             SetupData();
             MockData();
             MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(year,month, day).FromPacificTime());
             AddedExpense.ShouldBeNull();
 
+            var newQuote = CreateValidEntities.QuoteDetail();
+            newQuote.AcreageRateId = 2;
+            newQuote.Acres = 4;
+            var originalQuote = CreateValidEntities.QuoteDetail();
+            originalQuote.AcreageRateId = 1;
+            originalQuote.Acres = 3;
+
             var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
                 MockDateTimeService.Object);
 
-            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], new QuoteDetail(), new QuoteDetail() );
+            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], newQuote, originalQuote );
             AddedExpense.ShouldBeNull();
             MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 12, 01)]
+        [InlineData(2020, 12, 31)]
+        [InlineData(2021, 01, 01)]
+        [InlineData(2021, 01, 02, Skip = "This one fails because it returns early (No expense within the year)")]
+        public async Task CreateChangeRequestAdjustmentCreatesAdjustmentIfNewAcresIsZero(int year, int month, int day)
+        {
+            //Expense is created on new DateTime(2020, 01, 01).FromPacificTime()new DateTime(2020, 01, 01).FromPacificTime()
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(year, month, day).FromPacificTime());
+            AddedExpense.ShouldBeNull();
+
+            var newQuote = CreateValidEntities.QuoteDetail();
+            newQuote.AcreageRateId = null;
+            newQuote.Acres = 0;
+            var originalQuote = CreateValidEntities.QuoteDetail();
+            originalQuote.AcreageRateId = 1;
+            originalQuote.Acres = 3;
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            var oldRate = Rates.Single(a => a.Id == 1);
+
+            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], newQuote, originalQuote);
+            AddedExpense.ShouldNotBeNull();
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            //MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            AddedExpense.CreatedBy.ShouldBeNull();
+            AddedExpense.CreatedOn.ShouldBe(new DateTime(year, month, day).FromPacificTime());
+            AddedExpense.Type.ShouldBe(Rate.Types.Adjustment);
+            AddedExpense.RateId.ShouldBe(1); //The old rateId
+            AddedExpense.Account.ShouldBe(oldRate.Account);
+            AddedExpense.Description.ShouldBe($"Acreage Adjustment (Refund) -- {oldRate.Description}");
+            AddedExpense.Price.ShouldBe((oldRate.Price * -1));
         }
 
         //[Theory]

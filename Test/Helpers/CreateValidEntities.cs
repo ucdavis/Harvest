@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs.Models;
 using Harvest.Core.Domain;
+using Harvest.Core.Models;
 
 namespace Test.Helpers
 {
@@ -139,6 +140,17 @@ namespace Test.Helpers
             rtValue.InitiatedById = 1;
             rtValue.InitiatedBy = CreateValidEntities.User(1);
             rtValue.CreatedDate = DateTime.UtcNow;
+
+            return rtValue;
+        }
+
+        public static QuoteDetail QuoteDetail()
+        {
+            var rtValue = new QuoteDetail();
+            rtValue.AcreageRateId = 1;
+            rtValue.Acres = 3;
+
+            //So far, don't need more info for tests
 
             return rtValue;
         }
