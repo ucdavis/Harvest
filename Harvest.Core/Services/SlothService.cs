@@ -82,10 +82,10 @@ namespace Harvest.Core.Services
                 return Result.Error("No expenses found for invoice: {invoiceId}", invoiceId);
             }
 
-            if (!invoice.Expenses.All(e => e.Total > 0))
-            {
-                return Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
-            }
+            //if (!invoice.Expenses.All(e => e.Total > 0))
+            //{
+            //    return Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
+            //}
 
             var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
             if (invoice.Total != grandTotal)
@@ -93,13 +93,20 @@ namespace Harvest.Core.Services
                 Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
                 invoice.Total = grandTotal;
             }
+            var absGrandTotal = Math.Round(invoice.Expenses.Select(a => Math.Abs(a.Total)).Sum(), 2);
 
-            if (!(await ProcessDebits(model, grandTotal, invoice)).Value)
+
+            if (!(ProcessRefunds(model, invoice)).Value)
+            {
+                return Result.Error("ProcessRefunds Failed");
+            }
+
+                if (!(await ProcessDebits(model, absGrandTotal, invoice)).Value)
             {
                 return Result.Error("ProcessDebits Failed");
             }
 
-            if (!(await ProcessCredits(model, grandTotal, invoice)).Value)
+            if (!(await ProcessCredits(model, absGrandTotal, invoice)).Value)
             {
                 return Result.Error("ProcessCredits Failed");
             }
@@ -125,10 +132,17 @@ namespace Harvest.Core.Services
                     {
                         extraAccountInfo = $"-{transferViewModel.SubAccount}";
                     }
+
+                    var account = new KfsAccount()
+                    {
+                        ChartOfAccountsCode = transferViewModel.Chart, AccountNumber = transferViewModel.Account,
+                        SubAccount = transferViewModel.SubAccount
+                    }; //Don't put in object code. Project accounts don't have them, they are on the rate accounts
                     var transfer = new Transfer();
-                    transfer.Account = $"{transferViewModel.Chart}-{transferViewModel.Account}{extraAccountInfo}";
+                    transfer.Account = account.ToString();
                     transfer.Total = transferViewModel.Amount;
                     transfer.Type = transferViewModel.Direction;
+                    transfer.IsProjectAccount = invoice.Project.Accounts.Select(a => _financialService.Parse(a.Number)).Contains(transfer.Account);
 
                     invoice.Transfers.Add(transfer);
                 }
@@ -165,10 +179,109 @@ namespace Harvest.Core.Services
             return Result.Error("Sloth Response didn't have a success code for moneyTransfer id {transferId}: {data}", invoice.Id, data);
         }
 
+        private Result<bool> ProcessRefunds(TransactionViewModel model, Invoice invoice)
+        {
+            var refundAmount = invoice.Expenses.Where(a => a.Total < 0).Sum(a => a.Total);
+            refundAmount = Math.Abs(refundAmount);
+            if (refundAmount <= 0)
+            {
+                //No refunds
+                return Result.Value(true);
+            }
+
+            //Credits (Previously debits)
+            var debExpenseGroups = invoice.Expenses.Where(a => a.Total < 0)
+                .GroupBy(a => _financialService.Parse(a.Account).ObjectCode)
+                .Select(a => new { objectCode = a.Key, total = a.Sum(s => Math.Abs(s.Total)) })
+                .ToArray(); //This should only have 1 value
+            var localTransfers = new List<TransferViewModel>();
+            foreach (var debExpenseGroup in debExpenseGroups)
+            {
+                
+                foreach (var projectAccount in invoice.Project.Accounts)
+                {
+                    var account = _financialService.Parse(projectAccount.Number);
+
+                    var tvm = new TransferViewModel
+                    {
+                        Account = account.AccountNumber,
+                        Amount = Math.Round(debExpenseGroup.total * (projectAccount.Percentage / 100), 2),
+                        Chart = account.ChartOfAccountsCode,
+                        SubAccount = account.SubAccount,
+                        Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                        Direction = TransferViewModel.Directions.Credit,
+                        ObjectCode = debExpenseGroup.objectCode,
+                    };
+                    if (tvm.Amount >= 0.01m)
+                    {
+                        //Only create this if the amount if 0.01 or greater (sloth requirement)
+                        model.Transfers.Add(tvm);
+                        localTransfers.Add(tvm);
+                    }
+                    else
+                    {
+                        Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}",
+                            invoice.Id);
+                    }
+                }
+            }
+
+            if (localTransfers.Sum(a => a.Amount) != refundAmount)
+            {
+                Log.Information("Refund debit total didn't match for invoice {id}", invoice.Id);
+            }
+
+            //Debit (Previously Credit)
+            var expenseGroups = invoice.Expenses.Where(a => a.Total < 0).GroupBy(a => new { a.Account });
+            foreach (var expenseGroup in expenseGroups) //Probably only 1, but just in case
+            {
+                var account = _financialService.Parse(expenseGroup.Key.Account);
+                var amount = Math.Round(expenseGroup.Sum(a => a.Total), 2);
+                amount = Math.Abs(amount);
+                var tvm = new TransferViewModel
+                {
+                    Account = account.AccountNumber,
+                    Amount = amount,
+                    Chart = account.ChartOfAccountsCode,
+                    SubAccount = account.SubAccount,
+                    Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
+                    Direction = TransferViewModel.Directions.Debit,
+                    ObjectCode = _slothSettings.CreditObjectCode,
+                };
+                if (tvm.Amount >= 0.01m)
+                {
+                    //Only create this if the amount if 0.01 or greater (sloth requirement)
+                    model.Transfers.Add(tvm);
+                }
+                else
+                {
+                    Log.Information("Amount of zero detected. Skipping sloth transfer. Invoice {invoiceId}", invoice.Id);
+                }
+            }
+
+            //Ok, so this should happen before anything else...
+            var debAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
+            var credAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
+            if ( debAmount != credAmount)
+            {
+                Log.Information("Refunds don't balance invoice {id} Deb {deb} Cred {crd}", invoice.Id, debAmount, credAmount);
+                var lastCredTmv = model.Transfers.Last(a => a.Description == TransferViewModel.Directions.Credit);
+                lastCredTmv.Amount = lastCredTmv.Amount + (debAmount - credAmount);
+            }
+            debAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
+            credAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
+            if (debAmount != credAmount)
+            {
+                return Result.Error("Couldn't get refund Credits to balance for invoice {invoiceId}", invoice.Id);
+            }
+
+            return Result.Value(true);
+        }
+
         private async Task<Result<bool>> ProcessDebits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
         {
             //Don't need to group by IsPassthrough here because the account will have the expenseObject code in it.
-            var expenseGroups = invoice.Expenses
+            var expenseGroups = invoice.Expenses.Where(a => a.Total > 0)
                 .GroupBy(a => _financialService.Parse(a.Account).ObjectCode)
                 .Select(a => new {objectCode = a.Key, total = a.Sum(s => s.Total)})
                 .ToArray();
@@ -188,6 +301,7 @@ namespace Harvest.Core.Services
             //Go through all the grouped expenses (by the expense account)
             foreach (var expenseGroup in expenseGroups)
             {
+                var localTransfers = new List<TransferViewModel>();
                 foreach (var projectAccount in validatedProjectAccounts)
                 {
                     //Debits
@@ -206,6 +320,7 @@ namespace Harvest.Core.Services
                     {
                         //Only create this if the amount if 0.01 or greater (sloth requirement)
                         model.Transfers.Add(tvm);
+                        localTransfers.Add(tvm);
                     }
                     else
                     {
@@ -214,13 +329,14 @@ namespace Harvest.Core.Services
                 }
 
                 //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
-                var debitTotal = model.Transfers
+                var debitTotal = localTransfers
                     .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode)
                     .Select(a => a.Amount).Sum();
                 if (expenseGroup.total != debitTotal)
                 {
+                    var lastAmount = localTransfers.Last().Amount;
                     Log.Information("Debit Total doesn't match. Attempting to fix. ExpenseTotal {expenseTotal} DebitTotal {debitTotal}", expenseGroup.total, debitTotal);
-                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode);
+                    var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode && a.Amount == lastAmount);
                     lastTransfer.Amount = lastTransfer.Amount + (expenseGroup.total - debitTotal);
                     if (lastTransfer.Amount <= 0 || expenseGroup.total != model.Transfers
                         .Where(a => a.Direction == TransferViewModel.Directions.Debit && a.ObjectCode == expenseGroup.objectCode)
@@ -247,7 +363,7 @@ namespace Harvest.Core.Services
         private async Task<Result<bool>> ProcessCredits(TransactionViewModel model, decimal grandTotal, Invoice invoice)
         {
             //For the Credits, we need to group by account and IsPassthrough... 
-            var expenseGroups = invoice.Expenses.GroupBy(a => new { a.Account, a.IsPassthrough });
+            var expenseGroups = invoice.Expenses.Where(a => a.Total > 0).GroupBy(a => new { a.Account, a.IsPassthrough });
             foreach (var expenseGroup in expenseGroups)
             {
                 //Credits

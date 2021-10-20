@@ -17,7 +17,7 @@ namespace Harvest.Core.Services
     public interface IExpenseService
     {
         Task CreateYearlyAcreageExpense(Project project);
-        Task CreateChangeRequestAdjustment(Project project, decimal extraAcres);
+        Task CreateChangeRequestAdjustmentMaybe(Project project, QuoteDetail newQuote, QuoteDetail oldQuote);
     }
 
     public class ExpenseService : IExpenseService
@@ -62,61 +62,142 @@ namespace Harvest.Core.Services
                 return;
             }
 
-            var expense = CreateExpense(project, amountToCharge, (decimal)project.Acres);
+            var expense = CreateExpense(project, amountToCharge, (decimal)project.Acres, project.AcreageRate);
 
             await _dbContext.Expenses.AddAsync(expense);
             await _historyService.AcreageExpenseCreated(project.Id, expense);
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task CreateChangeRequestAdjustment(Project project, decimal extraAcres)
+        /// <summary>
+        /// Did an invoice get created that we have to do anything?
+        /// Did the rate Account change?
+        /// Did the acreage decrease?
+        /// Did the acreage increase?
+        /// Do we need to create
+        /// </summary>
+        /// <param name="project"></param>
+        /// <param name="newQuote"></param>
+        /// <param name="oldQuote"></param>
+        /// <returns></returns>
+        public async Task CreateChangeRequestAdjustmentMaybe(Project project, QuoteDetail newQuote, QuoteDetail oldQuote)
         {
-            if (extraAcres <= 0)
+            var now = _dateTimeService.DateTimeUtcNow();
+            var compareDate = now.Date.AddYears(-1);
+            if (!await _dbContext.Expenses.AnyAsync(a => a.ProjectId == project.Id && a.Type != Rate.Types.Adjustment && a.CreatedOn >= compareDate && a.Rate.Type == Rate.Types.Acreage))
             {
+                Log.Information("Invoice adjustment not needed as an acreage expense wasn't found within the last year for project {id}", project.Id);
                 return;
             }
 
-            if (project.AcreageRate == null) //I guess this is ok. Might want to call it later in the change request when it should have it?
+            var rateChanged = false; //If true, we need to charge the new rate if there are any acres
+            var didWeDoAnything = false;
+
+
+            //Ok, we found an acreage expense within the last year. Do we need to refund it?
+            if (oldQuote.AcreageRateId != newQuote.AcreageRateId && oldQuote.AcreageRateId != null)
             {
-                var project1 = project;
-                project = await _dbContext.Projects.Include(a => a.AcreageRate).SingleAsync(a => a.Id == project1.Id);
+                //Create refund for old rate
+                Log.Information("Acreage expense refund created for Project {id}", project.Id);
+                rateChanged = true;
+                var oldRate = await _dbContext.Rates.SingleAsync(a => a.Id == oldQuote.AcreageRateId);
+                var amount = Math.Round((decimal)oldQuote.Acres * oldRate.Price, 2, MidpointRounding.ToZero) * -1; //Negative amount
+                var refundExpense = CreateExpense(project, amount, (decimal)oldQuote.Acres, oldRate);
+                refundExpense.Type = Rate.Types.Adjustment;
+                refundExpense.Description = $"Acreage Adjustment (Refund) -- {oldRate.Description}".Truncate(250);
+                refundExpense.Price *= -1; //Make the price negative as well
+                await _dbContext.Expenses.AddAsync(refundExpense);
+                await _historyService.AcreageExpenseCreated(project.Id, refundExpense);
+                didWeDoAnything = true;
             }
 
-            var amountToCharge = Math.Round(extraAcres * project.AcreageRate.Price, 2, MidpointRounding.ToZero); //TODO: How to round this?
-            if (amountToCharge < 0.01m)
+            if (!rateChanged)
             {
-                Log.Error("Adjustment Project {projectId} would have an acreage amount less than 0.01. Skipping.", project.Id);
-                return;
+                //Do we need to do a partial refund?
+                if (oldQuote.Acres > newQuote.Acres)
+                {
+                    var rate = await _dbContext.Rates.SingleAsync(a => a.Id == newQuote.AcreageRateId);
+                    var acres = (decimal) (newQuote.Acres - oldQuote.Acres);
+                    var amount = Math.Round(acres * rate.Price, 2, MidpointRounding.ToZero); //Negative amount
+                    if (amount < 0) //Hey maybe some rounding issue
+                    {
+                        Log.Information("Creating new acreage refund expense because acres decreased. Project {id}", project.Id);
+                        var refundExpense = CreateExpense(project, amount, acres, rate);
+                        refundExpense.Type = Rate.Types.Adjustment;
+                        refundExpense.Description = $"Acreage Adjustment (Partial Refund) -- {rate.Description}".Truncate(250);
+                        refundExpense.Price *= -1; //Make the price negative as well
+                        await _dbContext.Expenses.AddAsync(refundExpense);
+                        await _historyService.AcreageExpenseCreated(project.Id, refundExpense);
+                        didWeDoAnything = true;
+                    }
+                    else
+                    {
+                        Log.Error("Adjustment Project refund {projectId} would have an acreage amount greater than 0. Skipping.", project.Id);
+                    }
+                }
             }
 
-            var expense = CreateExpense(project, amountToCharge, extraAcres);
-            expense.Type = Rate.Types.Adjustment;
-            expense.Description = $"Acreage Adjustment -- {expense.Description}".Truncate(250);
+            if (newQuote.Acres > 0)
+            {
+                var rate = await _dbContext.Rates.SingleAsync(a => a.Id == newQuote.AcreageRateId);
 
-            await _dbContext.Expenses.AddAsync(expense);
-            await _historyService.AcreageExpenseCreated(project.Id, expense);
-            await _dbContext.SaveChangesAsync();
+                var acres = 0.0m;
+                if (rateChanged)
+                {
+                    acres = (decimal)newQuote.Acres;
+
+                }
+                else if (newQuote.Acres > oldQuote.Acres)
+                {
+                    //We just need to charge the new acres
+                    acres = (decimal) (newQuote.Acres - oldQuote.Acres);
+                }
+
+                if (acres > 0) //Only want to do this if the rate changed (we did a full refund) or we have more acres
+                {
+                    var amountToCharge = Math.Round(acres * rate.Price, 2, MidpointRounding.ToZero); //TODO: How to round this?
+                    if (amountToCharge < 0.01m)
+                    {
+                        Log.Error("Adjustment Project  would have an acreage amount less than 0.01. Skipping. Project {id}", project.Id);
+                        return;
+                    }
+
+                    var expense = CreateExpense(project, amountToCharge, acres, rate);
+                    expense.Type = Rate.Types.Adjustment;
+                    expense.Description = $"Acreage Adjustment -- {expense.Description}".Truncate(250);
+
+                    await _dbContext.Expenses.AddAsync(expense);
+                    await _historyService.AcreageExpenseCreated(project.Id, expense);
+                    didWeDoAnything = true;
+                }
+            }
+
+            if (didWeDoAnything)
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+
         }
 
 
-        private Expense CreateExpense(Project project, decimal amountToCharge, decimal acres)
+        private Expense CreateExpense(Project project, decimal amountToCharge, decimal acres, Rate rate)
         {
             //If we populate the user, then this will have the PI's user because it is done in the request approval for change requests.
             var now = _dateTimeService.DateTimeUtcNow();
 
             var expense = new Expense
             {
-                Type = project.AcreageRate.Type, //This gets changed for adjustments
-                Description = project.AcreageRate.Description,
-                Price = project.AcreageRate.Price,
+                Type = rate.Type, //This gets changed for adjustments
+                Description = rate.Description,
+                Price = rate.Price,
                 Quantity = acres,
                 Total = Math.Round(amountToCharge,2, MidpointRounding.ToZero),
                 ProjectId = project.Id,
-                RateId = project.AcreageRate.Id,
+                RateId = rate.Id,
                 InvoiceId = null,
                 CreatedOn = now,
                 CreatedBy = null,
-                Account = project.AcreageRate.Account,
+                Account = rate.Account,
             };
             return expense;
         }

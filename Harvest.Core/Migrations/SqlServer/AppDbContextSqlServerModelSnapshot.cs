@@ -792,6 +792,11 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int>("InvoiceId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsProjectAccount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
                     b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");

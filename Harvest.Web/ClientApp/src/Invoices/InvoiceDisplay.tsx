@@ -17,7 +17,7 @@ export const InvoiceDisplay = (props: Props) => {
     (expense) => expense.type === "Acreage" || expense.type === "Adjustment"
   );
   const accounts = invoice.transfers.filter(
-    (transfer) => transfer.type === "Debit"
+    (transfer) => transfer.isProjectAccount === true
   );
   const activities = groupBy(
     invoice.expenses.filter(
