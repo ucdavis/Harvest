@@ -140,11 +140,8 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //11
             methodName = "RequiringPIAttention";
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
 
             //12
             methodName = "RequiringManagerAttention";
@@ -164,11 +161,8 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //14
             methodName = "Mine";
-            getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 2);
+            getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 1);
             getAttributes.ShouldNotBeNull();
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
         }
     }
 }

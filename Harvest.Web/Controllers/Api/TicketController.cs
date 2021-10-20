@@ -73,14 +73,12 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public ActionResult Mine()
         {
             return View("React");
         }
 
         [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> RequiringPIAttention(int? limit)
         {
             var user = await _userService.GetCurrentUser();
