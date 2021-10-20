@@ -35,11 +35,6 @@ export const TicketListContainer = (props: Props) => {
         <div className="col">
           <h1>Open Tickets</h1>
         </div>
-        <div className="col text-right">
-          <Link to="/request/create" className="btn btn-sm btn-primary ">
-            Create New <FontAwesomeIcon icon={faPlus} />
-          </Link>
-        </div>
       </div>
 
       {tickets.length > 0 ? (
