@@ -22,7 +22,7 @@ namespace Harvest.Web.Controllers.Api
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly StorageSettings storageSettings;
-        private readonly IFileService fileService; 
+        private readonly IFileService fileService;
         private readonly IProjectHistoryService _historyService;
 
         public TicketController(AppDbContext dbContext, IUserService userService, IEmailService emailService,
@@ -37,7 +37,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        [Authorize(policy:AccessCodes.PrincipalInvestigator)]
+        [Authorize(policy: AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
         {
             var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
@@ -63,6 +63,32 @@ namespace Harvest.Web.Controllers.Api
         public ActionResult Create()
         {
             return View("React");
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        public async Task<ActionResult> RequiringPIAttention()
+        {
+            var user = await _userService.GetCurrentUser();
+
+            // Get list of top N open tickets in PI projects
+            var openTickets = await _dbContext.Tickets
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id).OrderByDescending(a => a.UpdatedOn)
+                .Take(3).ToArrayAsync();
+
+            return Ok(openTickets);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> RequiringManagerAttention()
+        {
+            // Get list of top N open tickets in all projects
+            var openTickets = await _dbContext.Tickets
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive).OrderByDescending(a => a.UpdatedOn)
+                .Take(3).ToArrayAsync();
+
+            return Ok(openTickets);
         }
 
         [HttpPost]
@@ -178,8 +204,8 @@ namespace Harvest.Web.Controllers.Api
 
             var ticketMessageToCreate = new TicketMessage
             {
-                Message = ticketMessage.Message, 
-                CreatedBy = currentUser, 
+                Message = ticketMessage.Message,
+                CreatedBy = currentUser,
                 CreatedOn = DateTime.UtcNow,
                 TicketId = ticket.Id
             };
@@ -187,7 +213,7 @@ namespace Harvest.Web.Controllers.Api
             ticket.Messages.Add(ticketMessageToCreate);
             ticket.UpdatedBy = currentUser;
             ticket.UpdatedOn = DateTime.UtcNow;
-            ticket.Status = "Updated";
+            ticket.Status = Ticket.Statuses.Updated;
 
             _dbContext.Tickets.Update(ticket);
             await _historyService.TicketReplyCreated(ticket.ProjectId, ticketMessageToCreate);
@@ -230,7 +256,7 @@ namespace Harvest.Web.Controllers.Api
 
             ticket.UpdatedBy = currentUser;
             ticket.UpdatedOn = DateTime.UtcNow;
-            ticket.Status = "Updated";
+            ticket.Status = Ticket.Statuses.Updated;
 
             _dbContext.Tickets.Update(ticket);
             await _historyService.TicketFilesAttached(projectId, ticketAttachmentsToCreate);
@@ -258,11 +284,11 @@ namespace Harvest.Web.Controllers.Api
             var currentUser = await _userService.GetCurrentUser();
             var ticket = await _dbContext.Tickets.Include(a => a.Project).ThenInclude(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
 
-            ticket.Status = "Complete";
+            ticket.Status = Ticket.Statuses.Complete;
             ticket.UpdatedBy = currentUser;
             ticket.UpdatedOn = DateTime.UtcNow;
             ticket.Completed = true;
-            
+
 
             _dbContext.Tickets.Update(ticket);
             await _dbContext.SaveChangesAsync();
