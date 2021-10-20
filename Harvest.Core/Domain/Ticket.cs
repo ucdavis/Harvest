@@ -41,7 +41,7 @@ namespace Harvest.Core.Domain
 
         public string WorkNotes { get; set; } //For the person doing the Task
         [StringLength(25)]
-        public string Status { get; set; } = "Created";
+        public string Status { get; set; } = Statuses.Created;
         public bool Completed { get; set; } = false;
         [JsonIgnore]
         public List<TicketMessage> Messages { get; set; }
@@ -74,5 +74,11 @@ namespace Harvest.Core.Domain
                 .OnDelete(DeleteBehavior.Restrict);
         }
 
+        public class Statuses
+        {
+            public const string Created = "Created";
+            public const string Updated = "Updated";
+            public const string Complete = "Complete";
+        }
     }
 }

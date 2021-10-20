@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { StatusToActionRequired } from "../Util/MessageHelpers";
-import { Project } from "../types";
+import { Project, Ticket } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 export const FieldManagerHome = () => {
-  const [projects, setProjects] = useState<Project[]>();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -22,6 +23,18 @@ export const FieldManagerHome = () => {
     getProjects();
   }, [getIsMounted]);
 
+  useEffect(() => {
+    const getTicketsWaitingForMe = async () => {
+      const response = await fetch("/ticket/RequiringManagerAttention?limit=3");
+      if (getIsMounted()) {
+        const tickets: Ticket[] = await response.json();
+        getIsMounted() && setTickets(tickets);
+      }
+    };
+
+    getTicketsWaitingForMe();
+  }, [getIsMounted]);
+
   return (
     <>
       <h5>Quick Actions</h5>
@@ -31,7 +44,7 @@ export const FieldManagerHome = () => {
             <Link to="/project/needsAttention">
               View Projects Requiring Attention{" "}
               <span className="badge badge-pill badge-primary">
-                {projects.length}
+                {projects.length > 3 ? "3+" : projects.length}
               </span>
             </Link>
           </li>
@@ -42,27 +55,37 @@ export const FieldManagerHome = () => {
         <li className="list-group-item">
           <Link to="/expense/entry">Enter Project Expenses</Link>
         </li>
-        {projects !== undefined && projects.length > 0 && (
+        {projects.slice(0, 3).map((project) => (
           <li className="list-group-item">
-            <Link to={`/project/details/${projects[0].id}`}>
-              Quick jump to {projects[0].name}{" "}
-              <span className="badge badge-primary">
-                {StatusToActionRequired(projects[0].status)}
+            <Link to={`/project/details/${project.id}`}>
+              Quick jump to {project.name}{" "}
+              <span
+                className={`badge badge-primary badge-status-${project.status}`}
+              >
+                {StatusToActionRequired(project.status)}
               </span>
             </Link>
           </li>
-        )}
-        {projects !== undefined && projects.length > 1 && (
-          <li className="list-group-item">
-            <Link to={`/project/details/${projects[1].id}`}>
-              Quick jump to {projects[1].name}{" "}
-              <span className="badge badge-primary">
-                {StatusToActionRequired(projects[1].status)}
-              </span>
-            </Link>
-          </li>
-        )}
+        ))}
       </ul>
+      {tickets.length > 0 && (
+        <>
+          <br />
+          <h5>Tickets</h5>
+          <ul className="list-group quick-actions">
+            <li className="list-group-item">
+              <Link to="/ticket/needsAttention">View Open Tickets</Link>
+            </li>
+            {tickets.map((ticket) => (
+              <li key={ticket.id} className="list-group-item">
+                <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
+                  View ticket: "{ticket.name}"
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </>
   );
 };

@@ -21,6 +21,7 @@ import { ProjectFields } from "./Projects/ProjectFields";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
+import { TicketListContainer } from "./Tickets/TicketListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
@@ -96,6 +97,16 @@ function App() {
           path="/ticket/create/:projectId"
           component={TicketCreate}
         />
+        <ConditionalRoute
+          exact
+          roles={["FieldManager", "Supervisor"]}
+          path="/ticket/needsAttention"
+        >
+          <TicketListContainer projectSource="/ticket/RequiringManagerAttention" />
+        </ConditionalRoute>
+        <ConditionalRoute exact roles={["PI"]} path="/ticket/mine">
+          <TicketListContainer projectSource="/ticket/RequiringPIAttention" />
+        </ConditionalRoute>
         <Route path="/ticket/list/:projectId" component={TicketsContainer} />
         <Route
           path="/ticket/details/:projectId/:ticketId"
