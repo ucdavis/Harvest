@@ -44,7 +44,7 @@ export const FieldManagerHome = () => {
             <Link to="/project/needsAttention">
               View Projects Requiring Attention{" "}
               <span className="badge badge-pill badge-primary">
-                {projects.length}
+                {projects.length > 3 ? "3+" : projects.length}
               </span>
             </Link>
           </li>
@@ -67,14 +67,22 @@ export const FieldManagerHome = () => {
             </Link>
           </li>
         ))}
-        {tickets.map((ticket) => (
-          <li key={ticket.id} className="list-group-item">
-            <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
-              View ticket: "{ticket.name}"
-            </Link>
-          </li>
-        ))}
       </ul>
+      {tickets.length > 0 && (
+        <>
+          <br />
+          <h5>Tickets</h5>
+          <ul className="list-group quick-actions">
+            {tickets.map((ticket) => (
+              <li key={ticket.id} className="list-group-item">
+                <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
+                  View ticket: "{ticket.name}"
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </>
   );
 };
