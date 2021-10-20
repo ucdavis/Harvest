@@ -86,7 +86,7 @@ namespace Harvest.Web.Controllers.Api
             var user = await _userService.GetCurrentUser();
 
             // Get list of top N open tickets in PI projects
-            var openTickets = _dbContext.Tickets.Include(t => t.Project)
+            var openTickets = _dbContext.Tickets
                 .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id);
 
             if (limit.HasValue) { openTickets = openTickets.Take(limit.Value); }
@@ -99,7 +99,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> RequiringManagerAttention(int? limit)
         {
             // Get list of top N open tickets in all projects
-            var openTickets = _dbContext.Tickets.Include(t => t.Project)
+            var openTickets = _dbContext.Tickets
                 .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive);
 
             if (limit.HasValue) { openTickets = openTickets.Take(limit.Value); }
