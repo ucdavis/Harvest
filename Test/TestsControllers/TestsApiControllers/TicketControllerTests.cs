@@ -42,7 +42,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(10);
+            ControllerReflection.ControllerPublicMethods(12);
         }
 
         [Fact]
@@ -136,6 +136,22 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+
+            //11
+            methodName = "RequiringPIAttention";
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+
+            //12
+            methodName = "RequiringManagerAttention";
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
         }
     }
