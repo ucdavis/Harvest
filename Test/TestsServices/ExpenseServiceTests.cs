@@ -13,6 +13,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Harvest.Core.Extensions;
+using Harvest.Core.Models;
 using Serilog;
 using Test.Helpers;
 using TestHelpers.Helpers;
@@ -59,6 +60,20 @@ namespace Test.TestsServices
                 //Just assign to project not being used at the moment.
                 Expenses.Add(CreateValidEntities.Expense(i+1, Projects[1].Id));
             }
+
+            var specificExpense = CreateValidEntities.Expense(9, Projects[0].Id);
+            specificExpense.CreatedOn = new DateTime(2020, 01, 01).FromPacificTime();
+            specificExpense.Type = Rate.Types.Acreage;
+            specificExpense.Rate = CreateValidEntities.Rate(9);
+
+            Expenses.Add(specificExpense);
+
+            var specificAdjustment = CreateValidEntities.Expense(10, Projects[0].Id);
+            specificAdjustment.CreatedOn = new DateTime(2021, 01, 01).FromPacificTime();
+            specificAdjustment.Type = Rate.Types.Adjustment; //This one should be ignored
+            specificAdjustment.Rate = CreateValidEntities.Rate(9);
+
+            Expenses.Add(specificAdjustment);
         }
 
         private void MockData()
@@ -196,27 +211,29 @@ namespace Test.TestsServices
         }
 
         //re-write these for the new method
-        //[Theory]
-        //[InlineData(-10.0)]
-        //[InlineData(-0.0001)]
-        //[InlineData(0.0)]
-        //[InlineData(0.000001)] //This causes the amount to be less than 1 cent
-        //public async Task CreateChangeRequestAdjustmentReturnsEarly(decimal acres)
-        //{
-        //    SetupData();
-        //    MockData();
-        //    MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(DateTime.UtcNow);
-        //    AddedExpense.ShouldBeNull();
+        [Theory]
+        [InlineData(2021, 01, 02)]
+        [InlineData(2021, 01, 03)]
+        [InlineData(2021, 01, 04)]
+        [InlineData(2021, 01, 05)]
+        [InlineData(2021, 02, 01)]
+        [InlineData(2021, 02, 02)]
+        public async Task CreateChangeRequestAdjustmentReturnsEarly(int year, int month, int day)
+        {
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(year,month, day).FromPacificTime());
+            AddedExpense.ShouldBeNull();
 
-        //    var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
-        //        MockDateTimeService.Object);
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
 
-        //    await expenseServ.CreateChangeRequestAdjustment(Projects[0], acres);
-        //    AddedExpense.ShouldBeNull();
-        //    MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
-        //    MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
-        //    MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
-        //}
+            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], new QuoteDetail(), new QuoteDetail() );
+            AddedExpense.ShouldBeNull();
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+        }
 
         //[Theory]
         //[InlineData(0.01, 11.50)]
