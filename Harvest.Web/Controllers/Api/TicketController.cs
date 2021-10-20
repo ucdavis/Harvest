@@ -65,30 +65,42 @@ namespace Harvest.Web.Controllers.Api
             return View("React");
         }
 
+        public ActionResult NeedsAttention()
+        {
+            return View("React");
+        }
+
+        public ActionResult Mine()
+        {
+            return View("React");
+        }
+
         [HttpGet]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public async Task<ActionResult> RequiringPIAttention()
+        public async Task<ActionResult> RequiringPIAttention(int? limit)
         {
             var user = await _userService.GetCurrentUser();
 
             // Get list of top N open tickets in PI projects
-            var openTickets = await _dbContext.Tickets
-                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id).OrderByDescending(a => a.UpdatedOn)
-                .Take(3).ToArrayAsync();
+            var openTickets = _dbContext.Tickets.Include(t => t.Project)
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id);
 
-            return Ok(openTickets);
+            if (limit.HasValue) { openTickets = openTickets.Take(limit.Value); }
+
+            return Ok(await openTickets.OrderByDescending(a => a.UpdatedOn).ToArrayAsync());
         }
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> RequiringManagerAttention()
+        public async Task<ActionResult> RequiringManagerAttention(int? limit)
         {
             // Get list of top N open tickets in all projects
-            var openTickets = await _dbContext.Tickets
-                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive).OrderByDescending(a => a.UpdatedOn)
-                .Take(3).ToArrayAsync();
+            var openTickets = _dbContext.Tickets.Include(t => t.Project)
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive);
 
-            return Ok(openTickets);
+            if (limit.HasValue) { openTickets = openTickets.Take(limit.Value); }
+
+            return Ok(await openTickets.OrderByDescending(a => a.UpdatedOn).ToArrayAsync());
         }
 
         [HttpPost]

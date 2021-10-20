@@ -24,7 +24,7 @@ export const PIHome = () => {
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
-      const response = await fetch("/ticket/RequiringPIAttention");
+      const response = await fetch("/ticket/RequiringPIAttention?limit=3");
       if (getIsMounted()) {
         const tickets: Ticket[] = await response.json();
         getIsMounted() && setTickets(tickets);
@@ -62,6 +62,9 @@ export const PIHome = () => {
           <br />
           <h5>Tickets</h5>
           <ul className="list-group quick-actions">
+            <li className="list-group-item">
+              <Link to="/ticket/mine">View My Open Tickets</Link>
+            </li>
             {tickets.map((ticket) => (
               <li key={ticket.id} className="list-group-item">
                 <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
