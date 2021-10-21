@@ -465,6 +465,119 @@ namespace Test.TestsServices
             addedExpense.InvoiceId.ShouldBeNull();
         }
 
+        //Test old rate was null/no acres and acres added
+        [Theory]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 12, 01)]
+        [InlineData(2020, 12, 31)]
+        [InlineData(2021, 01, 01)]
+        public async Task CreateChangeRequestAdjustmentCreatesAdjustmentWhenAcresIncreasedFromZero(int year, int month, int day)
+        {
+            //Expense is created on new DateTime(2020, 01, 01).FromPacificTime()new DateTime(2020, 01, 01).FromPacificTime()
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(year, month, day).FromPacificTime());
+            AddedExpenses.Count.ShouldBe(0);
+
+            var newQuote = CreateValidEntities.QuoteDetail();
+            newQuote.AcreageRateId = 1;
+            newQuote.Acres = 4.23456; //increase just a little
+            var originalQuote = CreateValidEntities.QuoteDetail();
+            originalQuote.AcreageRateId = null;
+            originalQuote.Acres = 0;
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            var rate = Rates.Single(a => a.Id == 1);
+
+
+            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], newQuote, originalQuote);
+            AddedExpenses.Count.ShouldBe(1);
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Exactly(1));
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), AddedExpenses[0]), times: Times.Once);
+            //MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            var addedExpense = AddedExpenses.First();
+            addedExpense.CreatedBy.ShouldBeNull();
+            addedExpense.CreatedOn.ShouldBe(new DateTime(year, month, day).FromPacificTime());
+            addedExpense.Type.ShouldBe(Rate.Types.Adjustment);
+            addedExpense.RateId.ShouldBe(1); //The old rateId
+            addedExpense.Account.ShouldBe(rate.Account);
+            addedExpense.Description.ShouldBe($"Acreage Adjustment -- {rate.Description}");
+            addedExpense.Price.ShouldBe((rate.Price));
+            addedExpense.Quantity.ShouldBe(4.23456m);
+            addedExpense.Total.ShouldBe(13893.59m); //3281.00 * 4.23456 = 13893.59136 
+            addedExpense.ProjectId.ShouldBe(Projects[0].Id);
+            addedExpense.InvoiceId.ShouldBeNull();
+        }
+
+
+
+        //Test nothing happened: rate is null
+        [Theory]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 12, 01)]
+        [InlineData(2020, 12, 31)]
+        [InlineData(2021, 01, 01)]
+        public async Task CreateChangeRequestAdjustmentNothingHappensBothRatesNull(int year, int month, int day)
+        {
+            //Expense is created on new DateTime(2020, 01, 01).FromPacificTime()new DateTime(2020, 01, 01).FromPacificTime()
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(year, month, day).FromPacificTime());
+            AddedExpenses.Count.ShouldBe(0);
+
+            var newQuote = CreateValidEntities.QuoteDetail();
+            newQuote.AcreageRateId = null;
+            newQuote.Acres = 0;
+            var originalQuote = CreateValidEntities.QuoteDetail();
+            originalQuote.AcreageRateId = null;
+            originalQuote.Acres = 0;
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], newQuote, originalQuote);
+            AddedExpenses.Count.ShouldBe(0);
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+        }
+
+        //Test nothing happened: rate is same, acres don't change
+        [Theory]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 12, 01)]
+        [InlineData(2020, 12, 31)]
+        [InlineData(2021, 01, 01)]
+        public async Task CreateChangeRequestAdjustmentNothingHappensBothRatesSame(int year, int month, int day)
+        {
+            //Expense is created on new DateTime(2020, 01, 01).FromPacificTime()new DateTime(2020, 01, 01).FromPacificTime()
+            SetupData();
+            MockData();
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(new DateTime(year, month, day).FromPacificTime());
+            AddedExpenses.Count.ShouldBe(0);
+
+            var newQuote = CreateValidEntities.QuoteDetail();
+            newQuote.AcreageRateId = 1;
+            newQuote.Acres = 1;
+            var originalQuote = CreateValidEntities.QuoteDetail();
+            originalQuote.AcreageRateId = 1;
+            originalQuote.Acres = 1;
+
+            var expenseServ = new ExpenseService(MockDbContext.Object, MockProjectHistoryService.Object,
+                MockDateTimeService.Object);
+
+            await expenseServ.CreateChangeRequestAdjustmentMaybe(Projects[0], newQuote, originalQuote);
+            AddedExpenses.Count.ShouldBe(0);
+            MockProjectHistoryService.Verify(a => a.AcreageExpenseCreated(It.IsAny<int>(), It.IsAny<Expense>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+        }
 
         #region theory
         [Theory]
