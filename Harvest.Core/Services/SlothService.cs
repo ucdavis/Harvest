@@ -71,21 +71,17 @@ namespace Harvest.Core.Services
                 return Result.Error("No accounts found for invoice: {invoiceId}", invoiceId);
             }
 
+            if (invoice.Expenses.Count == 0)
+            {
+                return Result.Error("No expenses found for invoice: {invoiceId}", invoiceId);
+            }
+
             var model = new TransactionViewModel
             {
                 MerchantTrackingNumber = invoiceId.ToString(),
                 MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoice.ProjectId}/{invoiceId}" //Invoice/Details/ but maybe instead an admin page view of the invoice
             };
 
-            if (invoice.Expenses.Count == 0)
-            {
-                return Result.Error("No expenses found for invoice: {invoiceId}", invoiceId);
-            }
-
-            //if (!invoice.Expenses.All(e => e.Total > 0))
-            //{
-            //    return Result.Error("Expenses found with a Total of 0 or less for invoice: {invoiceId}", invoiceId);
-            //}
 
             var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
             if (invoice.Total != grandTotal)
@@ -101,7 +97,7 @@ namespace Harvest.Core.Services
                 return Result.Error("ProcessRefunds Failed");
             }
 
-                if (!(await ProcessDebits(model, absGrandTotal, invoice)).Value)
+            if (!(await ProcessDebits(model, absGrandTotal, invoice)).Value)
             {
                 return Result.Error("ProcessDebits Failed");
             }
