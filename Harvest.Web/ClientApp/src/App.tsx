@@ -80,17 +80,17 @@ function App() {
           roles={["FieldManager", "Supervisor"]}
           path="/project"
         >
-          <ProjectListContainer projectSource="/Project/All" />
+          <ProjectListContainer projectSource="/api/Project/All" />
         </ConditionalRoute>
         <ConditionalRoute
           exact
           roles={["FieldManager", "Supervisor"]}
           path="/project/needsAttention"
         >
-          <ProjectListContainer projectSource="/Project/RequiringManagerAttention" />
+          <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
         </ConditionalRoute>
         <ConditionalRoute exact roles={["PI"]} path="/project/mine">
-          <ProjectListContainer projectSource="/Project/GetMine" />
+          <ProjectListContainer projectSource="/api/Project/GetMine" />
         </ConditionalRoute>
         <ConditionalRoute
           roles={["FieldManager", "Supervisor", "PI"]}
@@ -102,10 +102,10 @@ function App() {
           roles={["FieldManager", "Supervisor"]}
           path="/ticket/needsAttention"
         >
-          <TicketListContainer projectSource="/ticket/RequiringManagerAttention" />
+          <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
         </ConditionalRoute>
         <ConditionalRoute exact roles={["PI"]} path="/ticket/mine">
-          <TicketListContainer projectSource="/ticket/RequiringPIAttention" />
+          <TicketListContainer projectSource="/api/ticket/RequiringPIAttention" />
         </ConditionalRoute>
         <Route path="/ticket/list/:projectId" component={TicketsContainer} />
         <Route
