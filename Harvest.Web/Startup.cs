@@ -220,13 +220,21 @@ namespace Harvest.Web
                     name: "API",
                     pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
 
-                // any other nonfile route should be handled by the spa, except leave the sockjs route alone (could be dev only)
-                endpoints.MapControllerRoute(
-                    name: "react",
-                    pattern: "{*path:nonfile}",
-                    defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { path = new RegexRouteConstraint("^(?!sockjs-node).*$") }
-                );
+                // any other nonfile route should be handled by the spa, except leave the sockjs route alone if we are in dev mode (hot reloading)
+                if (env.IsDevelopment()) {
+                    endpoints.MapControllerRoute(
+                        name: "react",
+                        pattern: "{*path:nonfile}",
+                        defaults: new { controller = "Home", action = "Index" },
+                        constraints: new { path = new RegexRouteConstraint("^(?!sockjs-node).*$") }
+                    );
+                } else {
+                    endpoints.MapControllerRoute(
+                        name: "react",
+                        pattern: "{*path:nonfile}",
+                        defaults: new { controller = "Home", action = "Index" }
+                    );
+                }
             });
 
             // SPA needs to kick in for all paths during development
