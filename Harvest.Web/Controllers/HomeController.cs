@@ -8,6 +8,7 @@ namespace Harvest.Web.Controllers
     {
         public ActionResult Index()
         {
+            System.Console.WriteLine(HttpContext.Request.Protocol);
             return View("React");
         }
     }

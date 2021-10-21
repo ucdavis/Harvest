@@ -219,10 +219,13 @@ namespace Harvest.Web
                     name: "API",
                     pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
 
-                // Everything else routes to react (served from home controller)
-                endpoints.MapFallbackToController("Index", "Home");
-
-                // 404 errors will be handled by react/SPA
+                // any other nonfile route should be handled by the spa, except leave the sockjs route alone (could be dev only)
+                endpoints.MapControllerRoute(
+                    name: "react",
+                    pattern: "{*path:nonfile}",
+                    defaults: new { controller = "Home", action = "Index" },
+                    constraints: new { path = new RegexRouteConstraint("^(?!sockjs-node).*$") }
+                );
             });
 
             // SPA needs to kick in for all paths during development
