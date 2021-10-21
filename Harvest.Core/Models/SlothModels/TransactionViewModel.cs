@@ -10,7 +10,7 @@ namespace Harvest.Core.Models.SlothModels
         {
             TransactionDate = DateTime.UtcNow; //DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
             Transfers = new List<TransferViewModel>(2);
-            AutoApprove = false; //This should be settable here. It defaults to false in sloth
+            AutoApprove = false; //This should be settable here. It defaults to false in sloth If we ever set to true, maybe change to false if there are refunds
         }
         public string MerchantTrackingNumber { get; set; }
 
