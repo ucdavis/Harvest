@@ -1,5 +1,5 @@
 ﻿using Harvest.Core.Models;
-using Harvest.Web.Controllers;
+using Harvest.Web.Controllers.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
