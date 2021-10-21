@@ -28,16 +28,6 @@ namespace Harvest.Web.Controllers.Api
             _expenseService = expenseService;
         }
 
-        public ActionResult Entry()
-        {
-            return View("React");
-        }
-
-        public ActionResult Unbilled(int id)
-        {
-            return View("React");
-        }
-
         [HttpPost]
         [Authorize(Policy = AccessCodes.WorkerAccess)]
         [Consumes(MediaTypeNames.Application.Json)]

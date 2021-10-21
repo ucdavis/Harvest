@@ -59,20 +59,6 @@ namespace Harvest.Web.Controllers.Api
             return Ok(model);
         }
 
-        // Create a quote for project ID
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        [HttpGet]
-        public ActionResult Create(int projectId)
-        {
-            return View("React");
-        }
-
-        [HttpGet]
-        public ActionResult Details(int projectId)
-        {
-            return View("React");
-        }
-
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
         [HttpPost]
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
