@@ -23,7 +23,7 @@ export const QuoteDisplayContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await fetch(`/Quote/GetApproved/${projectId}`);
+      const quoteResponse = await fetch(`/api/Quote/GetApproved/${projectId}`);
 
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();

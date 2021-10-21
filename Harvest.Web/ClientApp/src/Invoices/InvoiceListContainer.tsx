@@ -19,7 +19,7 @@ export const InvoiceListContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(`/Invoice/List/?projectId=${projectId}`);
+      const response = await fetch(`/api/Invoice/List/?projectId=${projectId}`);
 
       if (response.ok) {
         getIsMounted() && setInvoices(await response.json());
@@ -32,7 +32,7 @@ export const InvoiceListContainer = () => {
   }, [projectId, getIsMounted]);
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/Project/Get/${projectId}`);
+      const response = await fetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();

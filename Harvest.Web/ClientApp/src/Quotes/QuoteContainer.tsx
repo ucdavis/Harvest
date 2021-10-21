@@ -51,8 +51,8 @@ export const QuoteContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await fetch(`/Quote/Get/${projectId}`);
-      const pricingResponse = await fetch("/Rate/Active");
+      const quoteResponse = await fetch(`/api/Quote/Get/${projectId}`);
+      const pricingResponse = await fetch("/api/Rate/Active");
 
       if (quoteResponse.ok && pricingResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
@@ -177,7 +177,7 @@ export const QuoteContainer = () => {
       }
     }
 
-    const request = fetch(`/Quote/Save/${projectId}?submit=${submit}`, {
+    const request = fetch(`/api/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

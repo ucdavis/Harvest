@@ -49,7 +49,7 @@ export const RejectQuote = (props: Props) => {
       return;
     }
 
-    const request = fetch(`/Request/RejectQuote/${props.project.id}`, {
+    const request = fetch(`/api/Request/RejectQuote/${props.project.id}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

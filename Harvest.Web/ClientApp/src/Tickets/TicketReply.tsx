@@ -23,7 +23,7 @@ export const TicketReply = (props: Props) => {
     // TODO: validation
 
     const request = fetch(
-      `/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
+      `/api/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
         headers: {

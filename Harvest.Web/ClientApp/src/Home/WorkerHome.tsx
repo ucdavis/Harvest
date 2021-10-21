@@ -10,7 +10,7 @@ export const WorkerHome = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
-      const response = await fetch("/expense/GetRecentExpensedProjects");
+      const response = await fetch("/api/expense/GetRecentExpensedProjects");
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
         getIsMounted() && setProjects(projects);
