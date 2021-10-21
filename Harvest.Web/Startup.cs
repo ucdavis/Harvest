@@ -206,6 +206,7 @@ namespace Harvest.Web
 
             app.UseEndpoints(endpoints =>
             {
+                // default for MVC server-side endpoints
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
@@ -213,20 +214,18 @@ namespace Harvest.Web
                     constraints: new { controller = "(rate|permissions|crop)" }
                 );
 
+                // API routes map to all other controllers
                 endpoints.MapControllerRoute(
-                    name: "Projects",
-                    pattern: "{controller=Home}/{action=Index}/{projectId?}");
+                    name: "API",
+                    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
 
-                // Handle 404 errors, but only in production.  In dev we want to let some requests fallthrough for webpack.
-                if (!env.IsDevelopment())
-                {
-                    //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
-                    endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
-                }
+                // Everything else routes to react (served from home controller)
+                endpoints.MapFallbackToController("Index", "Home");
+
+                // 404 errors will be handled by react/SPA
             });
 
             // SPA needs to kick in for all paths during development
-            // TODO: create SPA 404 page or have SPA redirect back to MVC app on invalid route
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";

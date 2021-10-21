@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace Harvest.Web.Controllers
+namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
     public class ProjectController : SuperController
