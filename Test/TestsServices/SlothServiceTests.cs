@@ -153,7 +153,23 @@ namespace Test.TestsServices
             rtValue.Message.ShouldBe($"No expenses found for invoice: {invoice.Id}");
         }
 
+        [Fact]
+        public async Task MoveMoneyUpdatesInvoice()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = 10.00m;
+            invoice.Expenses.Add(expense);
+            MockData();
 
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"No expenses found for invoice: {invoice.Id}");
+        }
 
         //Test that the invoice total gets updated if it is different.
         //Test specific Expense scenarios that pass. Refund, refund with multiple accounts, refund with other expenses
