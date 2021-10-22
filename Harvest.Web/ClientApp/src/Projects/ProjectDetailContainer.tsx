@@ -265,12 +265,10 @@ export const ProjectDetailContainer = () => {
       </div>
       <div>
         {project.status !== "ChangeRequested" && (
-          <div className="row card-content project-detail-tables">
-            <div className="col">
-              <RecentTicketsContainer compact={true} projectId={projectId} />
+          <div className="card-content">
+            <RecentTicketsContainer compact={true} projectId={projectId} />
 
-              <RecentInvoicesContainer compact={true} projectId={projectId} />
-            </div>
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
           </div>
         )}
       </div>
