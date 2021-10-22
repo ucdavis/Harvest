@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Harvest.Core.Domain;
 using Harvest.Core.Models.FinancialAccountModels;
+using Harvest.Core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Moq.Protected;
 using Shouldly;
@@ -53,7 +54,7 @@ namespace Test.TestsServices
             
             MockSlothSettings.Setup(a => a.Value).Returns(SlothSettings);
 
-            JsonSerializerOptions = new JsonSerializerOptions();
+            JsonSerializerOptions = JsonOptions.Standard.WithStandard().WithGeoJson();
 
             MockMessageHandler.Protected().Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
