@@ -32,7 +32,7 @@ export const RecentInvoicesContainer = (props: Props) => {
 
   return (
     <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
-      <div className="card-content">
+      <div>
         <div className="row justify-content-between">
           <h3>Recent Invoices</h3>
           <Link to={`/project/invoices/${props.projectId}`}>View All</Link>

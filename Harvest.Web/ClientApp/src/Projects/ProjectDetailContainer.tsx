@@ -212,7 +212,7 @@ export const ProjectDetailContainer = () => {
       <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
           <div className="row">
-            <div className="col-md-6 align-content-center">
+            <div className="col-md-6">
               <h2>Project Attachements</h2>
               <FileUpload
                 disabled={notification.pending}
@@ -256,7 +256,7 @@ export const ProjectDetailContainer = () => {
                 ))}
               </ul>
             </div>
-            <div className="col-md-6 justify-content-center">
+            <div className="col-md-6 text-center">
               {" "}
               <ProjectUnbilledButton projectId={project.id} />
             </div>
@@ -265,8 +265,8 @@ export const ProjectDetailContainer = () => {
       </div>
       <div>
         {project.status !== "ChangeRequested" && (
-          <div className="row project-detail-tables">
-            <div className="col-12">
+          <div className="row card-content project-detail-tables">
+            <div className="col">
               <RecentTicketsContainer compact={true} projectId={projectId} />
 
               <RecentInvoicesContainer compact={true} projectId={projectId} />
