@@ -33,7 +33,6 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Transfer>().HasIndex(a => a.InvoiceId);
 
             modelBuilder.Entity<Transfer>().Property(a => a.Total).HasPrecision(18, 2);
-            modelBuilder.Entity<Transfer>().Property(a => a.IsProjectAccount).HasDefaultValue(true); //Just so migration will work
         }
 
         public class Types
