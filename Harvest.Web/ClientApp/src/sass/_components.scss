@@ -339,3 +339,6 @@ input[type="radio" i] {
 .react-date-picker__button svg {
   stroke: $primary-color;
 }
+.react-datepicker__close-icon::after {
+  background-color: $primary-color;
+}
