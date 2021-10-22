@@ -36,9 +36,10 @@ namespace Harvest.Core.Services
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly IProjectHistoryService _historyService;
         private readonly IEmailService _emailService;
+        private readonly HttpClient _passedClient;
 
         public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService,
-            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService, IEmailService emailService)
+            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService, IEmailService emailService, HttpClient passedClient = null )
         {
             _dbContext = dbContext;
             _slothSettings = slothSettings.Value;
@@ -46,6 +47,7 @@ namespace Harvest.Core.Services
             _serializerOptions = serializerOptions;
             _historyService = historyService;
             _emailService = emailService;
+            _passedClient = passedClient;
         }
 
 
@@ -107,7 +109,12 @@ namespace Harvest.Core.Services
                 return Result.Error("ProcessCredits Failed");
             }
 
-            using var client = new HttpClient { BaseAddress = new Uri(url) };
+            if (model.Transfers.Count == 0)
+            {
+                return Result.Error("No Transfers Generated for invoice: {id}", invoice.Id);
+            }
+
+            using var client = _passedClient ?? new HttpClient { BaseAddress = new Uri(url) };
             client.DefaultRequestHeaders.Add("X-Auth-Token", token);
 
             Log.Information(JsonSerializer.Serialize(model, _serializerOptions));
