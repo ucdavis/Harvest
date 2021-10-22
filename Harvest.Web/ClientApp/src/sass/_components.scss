@@ -120,19 +120,24 @@
   background-color: $primary-color;
 }
 // tables
-
+.projectlisttable-wrapper {
+  .harvest-table {
+    th {
+      &:nth-child(4),
+      &:nth-child(1),
+      &:nth-child(3),
+      &:nth-child(2) {
+        width: 10%;
+      }
+    }
+  }
+}
 .harvest-table {
   th {
     background-color: $primary-light;
     color: $secondary-font;
     font-size: 0.9rem;
     text-transform: uppercase;
-    &:nth-child(4),
-    &:nth-child(1),
-    &:nth-child(3),
-    &:nth-child(2) {
-      width: 10%;
-    }
     svg {
       width: 12px !important;
       color: $primary-color;

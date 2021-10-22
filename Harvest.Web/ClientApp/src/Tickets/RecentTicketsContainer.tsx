@@ -30,7 +30,7 @@ export const RecentTicketsContainer = (props: Props) => {
   }, [props.projectId, getIsMounted]);
 
   return (
-    <div className="card-content">
+    <div className="card-content tickets-table">
       <div className="row justify-content-between">
         <h3>Recent Tickets</h3>
         <div>
