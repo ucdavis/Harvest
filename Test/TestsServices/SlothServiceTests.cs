@@ -176,7 +176,7 @@ namespace Test.TestsServices
         }
 
         [Fact]
-        public async Task MoveMoneyReturnsErrorWhenRefundAmountIsTooSmall()
+        public async Task MoveMoneyReturnsErrorWhenAmountResultsInZeroTransfers()
         {
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);

@@ -109,10 +109,10 @@ namespace Harvest.Core.Services
                 return Result.Error("ProcessCredits Failed");
             }
 
-            //if (model.Transfers.Count == 0)
-            //{
-            //    return Result.Error("No Transfers Generated for invoice: {id}", invoice.Id);
-            //}
+            if (model.Transfers.Count == 0)
+            {
+                return Result.Error("No Transfers Generated for invoice: {id}", invoice.Id);
+            }
 
             using var client = _passedClient ?? new HttpClient { BaseAddress = new Uri(url) };
             client.DefaultRequestHeaders.Add("X-Auth-Token", token);
