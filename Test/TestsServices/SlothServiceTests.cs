@@ -45,7 +45,7 @@ namespace Test.TestsServices
 
         public SlothServiceTests()
         {
-            MockMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+            MockMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Default);
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
             MockProjectHistoryService = new Mock<IProjectHistoryService>();
             MockEmailService = new Mock<IEmailService>();
@@ -205,10 +205,20 @@ namespace Test.TestsServices
             invoice.Expenses.Add(expense);
             MockData();
 
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
             var rtValue = await SlothService.MoveMoney(invoice.Id);
             rtValue.ShouldNotBeNull();
-            rtValue.IsError.ShouldBeTrue();
-            rtValue.Message.ShouldBe($"No expenses found for invoice: {invoice.Id}");
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.Count.ShouldBe(2);
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+
         }
 
         //Test that the invoice total gets updated if it is different.
