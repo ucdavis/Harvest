@@ -25,7 +25,7 @@ body {
     border-top: 8px solid rgba(0, 0, 0, 0.03);
   }
   .card-content {
-    padding: 16px 24px;
+    padding: 1% 2%;
   }
   h2 {
     color: $primary-color;
@@ -42,16 +42,16 @@ body {
 }
 .container {
   padding: 0;
-  width: 85%;
+  width: 98%;
   max-width: 1440px;
   @include breakpoint(sm) {
-    width: 86%;
+    width: 96%;
   }
   @include breakpoint(md) {
-    width: 87%;
+    width: 90%;
   }
   @include breakpoint(lg) {
-    width: 90%;
+    width: 86%;
   }
 }
 header {

@@ -97,8 +97,8 @@ export const ActivityForm = (props: Props) => {
         <div className="row justify-content-between align-items-end">
           <div className="col-md-12">
             <div className="row justify-content-between mb-2">
-              <div className="col-md-6">
-                <label> Activity Name</label>
+              <div className="col">
+                <label>Activity Name</label>
                 {props.years !== undefined && props.years > 1 && (
                   <Dropdown
                     className="adjust-chooser"
@@ -127,8 +127,7 @@ export const ActivityForm = (props: Props) => {
                   </Dropdown>
                 )}
               </div>
-
-              <div className="col-md-6 text-right">
+              <div className="col text-right">
                 {props.years !== undefined && props.years > 1 && (
                   <button
                     className="btn btn-link btn-sm"

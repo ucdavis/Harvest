@@ -25,7 +25,7 @@ export const HomeContainer = () => {
 
   return (
     <div className="row mt-3">
-      <div className="col">
+      <div className="col-12 col-md-6">
         <h1>Welcome to Harvest, {userInfo.user.detail.name}</h1>
         {userInfo.user.roles.length > 0 && (
           <p>You have the following roles: {userInfo.user.roles.join(", ")}.</p>
@@ -35,7 +35,7 @@ export const HomeContainer = () => {
           {ShowCustomActions(userInfo.user.roles)}
         </div>
       </div>
-      <div className="col text-center">
+      <div className="col-12 col-md-6 text-center">
         <img
           className="img-fluid"
           src="/media/studentfarmer.svg"

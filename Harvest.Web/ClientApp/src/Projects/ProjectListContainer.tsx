@@ -39,7 +39,7 @@ export const ProjectListContainer = (props: Props) => {
   }, [props.projectSource, getIsMounted]);
 
   return (
-    <div>
+    <div className="projectlisttable-wrapper">
       <div className="row justify-content-between mb-3">
         <div className="col">
           <h1>{getListTitle(props.projectSource)}</h1>
@@ -51,7 +51,11 @@ export const ProjectListContainer = (props: Props) => {
         </div>
       </div>
 
-      {projects.length > 0 ? <ProjectTable projects={projects}></ProjectTable> : <div className="alert alert-info">No projects found</div>}
+      {projects.length > 0 ? (
+        <ProjectTable projects={projects}></ProjectTable>
+      ) : (
+        <div className="alert alert-info">No projects found</div>
+      )}
     </div>
   );
 };

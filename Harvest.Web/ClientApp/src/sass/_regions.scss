@@ -25,7 +25,7 @@
   .quote-info-box {
     border: 1px solid $borders;
     padding: 24px;
-    padding-bottom:8px;
+    padding-bottom: 8px;
   }
 }
 .card-project-totals {
@@ -75,6 +75,10 @@
 .activity-line {
   margin-top: 2%;
   margin-bottom: 2%;
+}
+.activity-entry-titles {
+  border-bottom: 1px solid $primary-light;
+  margin-bottom: 1%;
 }
 .activity-line-item {
   .form-group {
