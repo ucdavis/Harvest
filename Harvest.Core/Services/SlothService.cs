@@ -127,12 +127,6 @@ namespace Harvest.Core.Services
                 invoice.Transfers = new List<Transfer>();
                 foreach (var transferViewModel in model.Transfers)
                 {
-                    var extraAccountInfo = string.Empty;
-                    if (!string.IsNullOrWhiteSpace(transferViewModel.SubAccount))
-                    {
-                        extraAccountInfo = $"-{transferViewModel.SubAccount}";
-                    }
-
                     var account = new KfsAccount()
                     {
                         ChartOfAccountsCode = transferViewModel.Chart, AccountNumber = transferViewModel.Account,
@@ -142,7 +136,7 @@ namespace Harvest.Core.Services
                     transfer.Account = account.ToString();
                     transfer.Total = transferViewModel.Amount;
                     transfer.Type = transferViewModel.Direction;
-                    transfer.IsProjectAccount = invoice.Project.Accounts.Select(a => _financialService.Parse(a.Number)).Contains(transfer.Account);
+                    transfer.IsProjectAccount = invoice.Project.Accounts.Select(a => a.Number).Contains(transfer.Account);
 
                     invoice.Transfers.Add(transfer);
                 }
