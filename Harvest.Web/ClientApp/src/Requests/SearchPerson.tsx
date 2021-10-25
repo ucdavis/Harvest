@@ -23,7 +23,7 @@ export const SearchPerson = (props: Props) => {
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
-    const response = await fetch(`/people/search?query=${query}`);
+    const response = await fetch(`/api/people/search?query=${query}`);
 
     if (response.ok) {
       if (response.status === 204) {

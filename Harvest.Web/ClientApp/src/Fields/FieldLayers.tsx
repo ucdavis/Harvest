@@ -18,7 +18,7 @@ export const FieldLayers = (props: Props) => {
       const endDate = new Date(props.project.end);
 
       const activeFieldResponse = await fetch(
-        `/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}`
+        `/api/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}`
       );
 
       if (activeFieldResponse.ok) {

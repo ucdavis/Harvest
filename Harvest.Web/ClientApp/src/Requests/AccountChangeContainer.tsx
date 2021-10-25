@@ -23,7 +23,7 @@ export const AccountChangeContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/Project/Get/${projectId}`);
+      const response = await fetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -41,7 +41,7 @@ export const AccountChangeContainer = () => {
 
   //TODO: require PI or supervisor access after updating auth policies
   const changeAccounts = async () => {
-    const request = fetch(`/Request/ChangeAccount/${projectId}`, {
+    const request = fetch(`/api/Request/ChangeAccount/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

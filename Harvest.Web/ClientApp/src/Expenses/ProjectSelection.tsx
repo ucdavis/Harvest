@@ -16,7 +16,7 @@ export const ProjectSelection = (props: Props) => {
   useEffect(() => {
     // get list of projects
     const cb = async () => {
-      const response = await fetch(`/Project/Active`);
+      const response = await fetch(`/api/Project/Active`);
 
       if (response.ok) {
         const projects = await response.json();

@@ -42,7 +42,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(14);
+            ControllerReflection.ControllerPublicMethods(9);
         }
 
         [Fact]
@@ -64,20 +64,6 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
             //2
-            methodName = "List";
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 2);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-
-            //3
-            methodName = "Create";
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 2);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-
-            //4
             methodName = "UpdateWorkNotes";
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
@@ -85,34 +71,25 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
-            //5 (Create Post)
+            //3 (Create Post)
             methodName = "Create";
-            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3, isSecondMethod: true);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3, isSecondMethod: true);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3, isSecondMethod: true);
-
-            //6
-            methodName = "Details";
-            var getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 2);
-            getAttributes.ShouldNotBeNull();
-            getAttributes.ElementAt(0).Template.ShouldBe("[controller]/[action]/{projectId}/{ticketId}");
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-
-            //7
-            methodName = "Get";
-            getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
-            getAttributes.ShouldNotBeNull();
-            getAttributes.ElementAt(0).Template.ShouldBe("[controller]/[action]/{projectId}/{ticketId}");
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
-            //8
+            //4
+            methodName = "Get";
+            var getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
+            getAttributes.ShouldNotBeNull();
+            getAttributes.ElementAt(0).Template.ShouldBe("/api/[controller]/[action]/{projectId}/{ticketId}");
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+
+            //5
             methodName = "Reply";
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
@@ -120,17 +97,17 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
-            //9
+            //6
             methodName = "UploadFiles";
             var postAttributes = ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
             postAttributes.ShouldNotBeNull();
-            postAttributes.ElementAt(0).Template.ShouldBe("[controller]/[action]/{projectId}/{ticketId}");
+            postAttributes.ElementAt(0).Template.ShouldBe("/api/[controller]/[action]/{projectId}/{ticketId}");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
-            //10
+            //7
             methodName = "Close";
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
@@ -138,31 +115,18 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
-            //11
+            //8
             methodName = "RequiringPIAttention";
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 2);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
 
-            //12
+            //9
             methodName = "RequiringManagerAttention";
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
-
-            //13
-            methodName = "NeedsAttention";
-            getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 2);
-            getAttributes.ShouldNotBeNull();
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
-
-            //14
-            methodName = "Mine";
-            getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, 1);
-            getAttributes.ShouldNotBeNull();
         }
     }
 }

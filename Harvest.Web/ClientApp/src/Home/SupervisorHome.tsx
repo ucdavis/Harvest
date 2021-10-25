@@ -12,7 +12,7 @@ export const SupervisorHome = () => {
   useEffect(() => {
     // get info on projects requiring approval
     const getProjects = async () => {
-      const response = await fetch("/project/RequiringManagerAttention");
+      const response = await fetch("/api/project/RequiringManagerAttention");
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
         getIsMounted() && setProjects(projects);
@@ -24,7 +24,7 @@ export const SupervisorHome = () => {
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
-      const response = await fetch("/ticket/RequiringManagerAttention?limit=3");
+      const response = await fetch("/api/ticket/RequiringManagerAttention?limit=3");
       if (getIsMounted()) {
         const tickets: Ticket[] = await response.json();
         getIsMounted() && setTickets(tickets);

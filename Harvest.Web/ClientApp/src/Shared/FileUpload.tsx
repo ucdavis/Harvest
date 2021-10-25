@@ -44,7 +44,7 @@ export const FileUpload = (props: Props) => {
   useEffect(() => {
     // grab the sas token right away
     const cb = async () => {
-      const response = await fetch(`/File/GetUploadDetails`);
+      const response = await fetch(`/api/File/GetUploadDetails`);
 
       if (response.ok) {
         const url = await response.text();

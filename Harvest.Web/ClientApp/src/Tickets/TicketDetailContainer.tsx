@@ -27,7 +27,7 @@ export const TicketDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/Project/Get/${projectId}`);
+      const response = await fetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -40,7 +40,7 @@ export const TicketDetailContainer = () => {
 
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/Ticket/Get/${projectId}/${ticketId}`);
+      const response = await fetch(`/api/Ticket/Get/${projectId}/${ticketId}`);
 
       if (response.ok) {
         const tick: TicketDetails = await response.json();
@@ -57,7 +57,7 @@ export const TicketDetailContainer = () => {
 
   const closeTicket = async () => {
     const request = fetch(
-      `/Ticket/Close?projectId=${projectId}&ticketId=${ticketId}`,
+      `/api/Ticket/Close?projectId=${projectId}&ticketId=${ticketId}`,
       {
         method: "POST",
         headers: {

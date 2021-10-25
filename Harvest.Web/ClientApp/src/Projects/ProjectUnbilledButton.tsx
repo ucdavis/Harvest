@@ -15,7 +15,7 @@ export const ProjectUnbilledButton = (props: Props) => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await fetch(
-        `/expense/getunbilledtotal/${props.projectId}`
+        `/api/expense/getunbilledtotal/${props.projectId}`
       );
 
       if (response.ok) {

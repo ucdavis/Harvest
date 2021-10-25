@@ -22,7 +22,7 @@ export const InvoiceDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const invoiceResponse = await fetch(`/Invoice/Get/${projectId}?invoiceId=${invoiceId}`);
+      const invoiceResponse = await fetch(`/api/Invoice/Get/${projectId}?invoiceId=${invoiceId}`);
 
       if (invoiceResponse.ok) {
         const projectWithInvoice: ProjectWithInvoice =

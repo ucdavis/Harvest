@@ -59,13 +59,6 @@ namespace Harvest.Web.Controllers.Api
                 .ToArrayAsync());
         }
 
-        // Get react view, whose router should choose InvoiceDetailContainer
-        [HttpGet("invoice/details/{projectId}/{invoiceId}")]
-        public ActionResult Details(int projectId, int invoiceId)
-        {
-            return View("React");
-        }
-
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> DoCloseout(int projectId)

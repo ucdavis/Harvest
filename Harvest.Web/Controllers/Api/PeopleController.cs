@@ -21,7 +21,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Search people based on kerb or email
-        [HttpGet("/people/search")]
+        [HttpGet("/api/people/search")]
         public async Task<ActionResult> Search(string query)
         {
             User user;
