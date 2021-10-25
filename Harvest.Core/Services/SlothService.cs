@@ -36,10 +36,10 @@ namespace Harvest.Core.Services
         private readonly JsonSerializerOptions _serializerOptions;
         private readonly IProjectHistoryService _historyService;
         private readonly IEmailService _emailService;
-        private readonly HttpClient _passedClient;
+        private readonly IHttpClientFactory _clientFactory;
 
         public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService,
-            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService, IEmailService emailService, HttpClient passedClient = null )
+            JsonSerializerOptions serializerOptions, IProjectHistoryService historyService, IEmailService emailService, IHttpClientFactory clientFactory)
         {
             _dbContext = dbContext;
             _slothSettings = slothSettings.Value;
@@ -47,7 +47,7 @@ namespace Harvest.Core.Services
             _serializerOptions = serializerOptions;
             _historyService = historyService;
             _emailService = emailService;
-            _passedClient = passedClient;
+            _clientFactory = clientFactory;
         }
 
 
@@ -114,7 +114,9 @@ namespace Harvest.Core.Services
                 return Result.Error("No Transfers Generated for invoice: {id}", invoice.Id);
             }
 
-            using var client = _passedClient ?? new HttpClient { BaseAddress = new Uri(url) };
+
+            using var client = _clientFactory.CreateClient();
+            client.BaseAddress = new Uri(url);
             client.DefaultRequestHeaders.Add("X-Auth-Token", token);
 
             Log.Information(JsonSerializer.Serialize(model, _serializerOptions));
