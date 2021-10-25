@@ -84,7 +84,7 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const ticketTable = document.querySelectorAll("tbody")[1];
+    const ticketTable = document.querySelectorAll("tbody")[0];
     const rows = ticketTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(4);
