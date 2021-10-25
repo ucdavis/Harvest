@@ -104,7 +104,7 @@
             </div>
         </nav>
         
-        </div>*@
+        </div> *@
         @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
         {
             <div class="container">
@@ -125,10 +125,7 @@
                 </div>
             </div>
         }
-
-        <main role="main" class="main-content-wrapper container">
             @RenderBody()
-        </main>
     </div>
     <footer class="container footer">
         <p>Copyright &copy; <span id="copywrite-year"></span> The Regents of the University of California, Davis campus.
