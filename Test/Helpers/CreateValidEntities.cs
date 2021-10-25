@@ -154,13 +154,13 @@ namespace Test.Helpers
 
             return rtValue;
         }
-        public static Account Account(int? counter)
+        public static Account Account(int? counter, string acctNumber = "3-CRU9033")
         {
             var rtValue = new Account();
             rtValue.Id = counter ?? 99;
             rtValue.Name = $"Name{counter}";
             rtValue.ProjectId = 1;
-            rtValue.Number = "3-CRU9033";
+            rtValue.Number = acctNumber;
             rtValue.Percentage = 100.00m;
 
             return rtValue;

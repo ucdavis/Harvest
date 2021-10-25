@@ -194,6 +194,50 @@ namespace Test.TestsServices
         }
 
         [Fact]
+        public async Task MoveMoneyRefundCreditAdjustmentWorks()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = -1.00m;
+            invoice.Expenses.Add(expense);
+            invoice.Project.Accounts = new List<Account>();
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(1, "3-CRU9033"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(2, "3-CRU9034"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(3, "3-CRU9035"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(4, "3-CRU9036"));
+
+            invoice.Project.Accounts[0].Percentage = 98m;
+            invoice.Project.Accounts[1].Percentage = 1m;
+            invoice.Project.Accounts[2].Percentage = 0.5m; //These last two have a zero amount so are ignored. The extra 1% gets added to the account above
+            invoice.Project.Accounts[3].Percentage = 0.5m;
+
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.ShouldNotBeNull();
+            invoice.Transfers.Count.ShouldBe(3);
+            invoice.Transfers.Count(a => a.IsProjectAccount).ShouldBe(2);
+            invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[0].Number).Total.ShouldBe(0.98m);
+            invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[1].Number).Total.ShouldBe(0.02m);
+            invoice.Transfers.Single(a => a.Account == expense.Account.Substring(0,9)).Total.ShouldBe(1m);
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+        }
+
+        [Fact]
         public async Task MoveMoneyUpdatesInvoice()
         {
             SetupGenericData();
@@ -222,6 +266,40 @@ namespace Test.TestsServices
         }
 
         //Test that the invoice total gets updated if it is different.
+        [Fact]
+        public async Task MoveMoneyUpdatesProjectTotalAndFixesInvoiceTotal()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = 990.00m;
+            invoice.Expenses.Add(expense);
+            invoice.Project.ChargedTotal = 5.00m;
+            invoice.Total = 1.00m;
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.ShouldNotBeNull();
+            invoice.Transfers.Count.ShouldBe(2);
+            invoice.Project.ChargedTotal.ShouldBe(995.00m);
+            invoice.Total.ShouldBe(990.00m);
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+
+        }
+
+        
         //Test specific Expense scenarios that pass. Refund, refund with multiple accounts, refund with other expenses
         //Test passthrough
         //Test Expense grouping
