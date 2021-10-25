@@ -262,7 +262,7 @@ namespace Harvest.Core.Services
             if ( debAmount != credAmount)
             {
                 Log.Information("Refunds don't balance invoice {id} Deb {deb} Cred {crd}", invoice.Id, debAmount, credAmount);
-                var lastCredTmv = model.Transfers.Last(a => a.Description == TransferViewModel.Directions.Credit);
+                var lastCredTmv = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
                 lastCredTmv.Amount = lastCredTmv.Amount + (debAmount - credAmount);
             }
             debAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
