@@ -193,6 +193,17 @@ export const fakeTickets: Ticket[] = [
     status: "Requested",
     createdOn: new Date("2021-01-15T00:00:00"),
   },
+  {
+    id: 4,
+    projectId: 3,
+    name: "Ticket 4",
+    requirements: "none",
+    dueDate: new Date("2021-03-15T00:00:00"),
+    updatedOn: new Date("2021-04-15T00:00:00"),
+    attachments: [],
+    status: "Requested",
+    createdOn: new Date("2021-01-15T00:00:00"),
+  },
 ];
 
 export const sampleRates: Rate[] = [
