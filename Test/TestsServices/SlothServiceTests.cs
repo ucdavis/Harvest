@@ -70,7 +70,7 @@ namespace Test.TestsServices
                 .Verifiable();
             var httpClient = new HttpClient(MockMessageHandler.Object)
             {
-                BaseAddress = new Uri("http://test.com/"),
+                BaseAddress = new Uri("http://sloth-fake.ucdavis.edu/"),
             };
 
             SlothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
