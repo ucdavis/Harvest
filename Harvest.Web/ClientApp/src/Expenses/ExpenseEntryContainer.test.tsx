@@ -79,7 +79,7 @@ describe("Expense Entry Container", () => {
       "#typeahead-Labor-item-0"
     ) as HTMLElement;
     Simulate.click(link);
-    const price = container.querySelectorAll(".col-2")[1] as HTMLElement;
+    const price = container.querySelector(".rate-3") as HTMLElement;
 
     expect(price?.textContent).toContain("$60.00");
   });

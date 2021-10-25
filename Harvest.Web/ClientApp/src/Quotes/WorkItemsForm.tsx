@@ -221,7 +221,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         <InputErrorMessage name="quantity" />
       </div>
 
-      <div className="col-2">
+      <div className={`col-2 rate-${workItem.rateId}`}>
         ${formatCurrency(workItem.rate || 0)}
         {props.adjustment > 0 && (
           <span className="primary-color">
