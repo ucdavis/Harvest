@@ -85,10 +85,10 @@ describe("Project Detail Container", () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse))
         .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
         .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse));
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
@@ -111,10 +111,10 @@ describe("Project Detail Container", () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse))
         .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
         .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse));
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
