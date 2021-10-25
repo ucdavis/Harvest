@@ -8,7 +8,7 @@ import AppContext from "./Shared/AppContext";
 import { AppContextShape } from "./types";
 import { ConditionalRoute } from "./ConditionalRoute";
 
-import { AppNavBar } from ".Shared/AppNavBar";
+import { AppNavBar } from "./Shared/AppNavBar";
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
@@ -36,6 +36,7 @@ function App() {
   return (
     <AppContext.Provider value={Harvest}>
       <ModalProvider>
+        <AppNavBar />
         <Toaster />
         <Route exact path="/" component={HomeContainer} />
         <Route

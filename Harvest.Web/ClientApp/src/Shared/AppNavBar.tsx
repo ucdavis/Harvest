@@ -14,13 +14,13 @@ import {
   NavbarText,
 } from "reactstrap";
 
-export const AppNavBar = (props) => {
+export const AppNavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = () => setIsOpen(!isOpen);
 
   return (
-    <div>
+    <div className="nav-wrapper">
       <Navbar color="light" light expand="md">
         <NavbarBrand href="/">reactstrap</NavbarBrand>
         <NavbarToggler onClick={toggle} />
