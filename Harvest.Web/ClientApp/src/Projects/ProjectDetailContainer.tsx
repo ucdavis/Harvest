@@ -32,7 +32,7 @@ export const ProjectDetailContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(`/Project/Get/${projectId}`);
+      const response = await fetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -50,7 +50,7 @@ export const ProjectDetailContainer = () => {
   }
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const request = fetch(`/Request/Files/${projectId}`, {
+    const request = fetch(`/api/Request/Files/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -75,7 +75,7 @@ export const ProjectDetailContainer = () => {
 
   //cancel the project
   const cancelProject = async () => {
-    const request = fetch(`/Request/Cancel/${projectId}`, {
+    const request = fetch(`/api/Request/Cancel/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

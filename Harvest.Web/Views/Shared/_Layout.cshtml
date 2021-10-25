@@ -88,7 +88,7 @@
                     @if (await UserService.HasAccess(AccessCodes.WorkerAccess))
                     {
                         <li class="nav-item">
-                            <a asp-controller="Expense" asp-action="Entry" class="nav-link">Expenses</a>
+                            <a href="/expense/entry" class="nav-link">Expenses</a>
                         </li>
                     }
                     <li class="nav-item">

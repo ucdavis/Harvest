@@ -19,7 +19,7 @@ export const RecentInvoicesContainer = (props: Props) => {
     const cb = async () => {
       // TODO: only fetch first 5 instead of chopping off client-side
       const response = await fetch(
-        `/Invoice/List/?projectId=${props.projectId}`
+        `/api/Invoice/List/?projectId=${props.projectId}`
       );
 
       if (response.ok) {

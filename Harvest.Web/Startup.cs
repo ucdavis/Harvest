@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +51,7 @@ namespace Harvest.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddHttpClient();
 
             services.AddControllersWithViews(options =>
             {
@@ -206,27 +208,37 @@ namespace Harvest.Web
 
             app.UseEndpoints(endpoints =>
             {
+                // default for MVC server-side endpoints
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(rate|permissions|crop)" }
+                    constraints: new { controller = "(rate|permissions|crop|home|system|help)" }
                 );
 
+                // API routes map to all other controllers
                 endpoints.MapControllerRoute(
-                    name: "Projects",
-                    pattern: "{controller=Home}/{action=Index}/{projectId?}");
+                    name: "API",
+                    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
 
-                // Handle 404 errors, but only in production.  In dev we want to let some requests fallthrough for webpack.
-                if (!env.IsDevelopment())
-                {
-                    //similar to MapFallbackToController("Index", "Error"), but adds a statusCode value of 404
-                    endpoints.MapDynamicControllerRoute<RewriteError404>("{*path:nonfile}");
+                // any other nonfile route should be handled by the spa, except leave the sockjs route alone if we are in dev mode (hot reloading)
+                if (env.IsDevelopment()) {
+                    endpoints.MapControllerRoute(
+                        name: "react",
+                        pattern: "{*path:nonfile}",
+                        defaults: new { controller = "Home", action = "Index" },
+                        constraints: new { path = new RegexRouteConstraint("^(?!sockjs-node).*$") }
+                    );
+                } else {
+                    endpoints.MapControllerRoute(
+                        name: "react",
+                        pattern: "{*path:nonfile}",
+                        defaults: new { controller = "Home", action = "Index" }
+                    );
                 }
             });
 
             // SPA needs to kick in for all paths during development
-            // TODO: create SPA 404 page or have SPA redirect back to MVC app on invalid route
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";

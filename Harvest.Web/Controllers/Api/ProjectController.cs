@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace Harvest.Web.Controllers
+namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
     public class ProjectController : SuperController
@@ -34,31 +34,6 @@ namespace Harvest.Web.Controllers
             _fileService = fileService;
             _historyService = historyService;
             _invoiceService = invoiceService;
-        }
-
-        public ActionResult Index()
-        {
-            return View("React");
-        }
-
-        public ActionResult Mine()
-        {
-            return View("React");
-        }
-
-        public ActionResult Map()
-        {
-            return View("React");
-        }
-
-        public ActionResult NeedsAttention()
-        {
-            return View("React");
-        }
-
-        public ActionResult Invoices()
-        {
-            return View("React");
         }
 
         [Authorize(Policy = AccessCodes.WorkerAccess)]
@@ -133,21 +108,6 @@ namespace Harvest.Web.Controllers
                 .Include(p => p.PrincipalInvestigator)
                 .Where(p => p.IsActive && p.PrincipalInvestigatorId == user.Id)
                 .ToArrayAsync());
-        }
-
-
-
-        public ActionResult Details(int projectId)
-        {
-            // TODO: move routes so react handles this natively and place API stuff in own controller
-            return View("React");
-        }
-
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public ActionResult Closeout(int projectId)
-        {
-            // TODO: move routes so react handles this natively and place API stuff in own controller
-            return View("React");
         }
 
         // Returns JSON info of the project

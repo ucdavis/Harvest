@@ -29,7 +29,7 @@ export const TicketAttachments = (props: Props) => {
   const getIsMounted = useIsMounted();
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = fetch(
-      `/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
+      `/api/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
       {
         method: "POST",
         headers: {

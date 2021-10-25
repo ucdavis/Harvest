@@ -51,34 +51,6 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public ActionResult List(int id)
-        {
-            return View("React");
-        }
-
-        // create a new ticket via react
-        [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public ActionResult Create()
-        {
-            return View("React");
-        }
-
-        [HttpGet]
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public ActionResult NeedsAttention()
-        {
-            return View("React");
-        }
-
-        [HttpGet]
-        public ActionResult Mine()
-        {
-            return View("React");
-        }
-
-        [HttpGet]
         public async Task<ActionResult> RequiringPIAttention(int? limit)
         {
             var user = await _userService.GetCurrentUser();
@@ -169,14 +141,8 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(project);
         }
-        [HttpGet("[controller]/[action]/{projectId}/{ticketId}")]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public ActionResult Details(int projectId, int ticketId)
-        {
-            return View("React");
-        }
 
-        [HttpGet("[controller]/[action]/{projectId}/{ticketId}")]
+        [HttpGet("/api/[controller]/[action]/{projectId}/{ticketId}")]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Get(int projectId, int ticketId)
         {
@@ -245,7 +211,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        [HttpPost("[controller]/[action]/{projectId}/{ticketId}")]
+        [HttpPost("/api/[controller]/[action]/{projectId}/{ticketId}")]
         public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();

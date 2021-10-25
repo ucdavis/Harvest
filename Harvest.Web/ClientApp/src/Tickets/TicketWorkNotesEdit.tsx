@@ -17,7 +17,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
     // TODO: validation
 
     const request = fetch(
-      `/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
+      `/api/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
         headers: {

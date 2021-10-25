@@ -51,7 +51,7 @@ export const RequestContainer = () => {
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
-      const response = await fetch(`/Project/Get/${projectId}`);
+      const response = await fetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -82,7 +82,7 @@ export const RequestContainer = () => {
       return;
     }
 
-    const request = fetch(`/Request/Create`, {
+    const request = fetch(`/api/Request/Create`, {
       method: "POST",
       headers: {
         Accept: "application/json",

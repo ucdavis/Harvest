@@ -18,7 +18,7 @@ export const RecentTicketsContainer = (props: Props) => {
   useEffect(() => {
     const cb = async () => {
       const response = await fetch(
-        `/Ticket/GetList?projectId=${props.projectId}&maxRows=${maxRows}`
+        `/api/Ticket/GetList?projectId=${props.projectId}&maxRows=${maxRows}`
       );
 
       if (response.ok) {

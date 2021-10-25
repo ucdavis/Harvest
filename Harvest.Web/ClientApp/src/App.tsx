@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Route } from "react-router-dom";
+import { Route, Switch, useLocation } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { ModalProvider } from "react-modal-hook";
 
@@ -37,8 +37,7 @@ function App() {
     <AppContext.Provider value={Harvest}>
       <ModalProvider>
         <Toaster />
-        <AppNavBar />
-        <div className="main-content-wrapper container">
+        <Switch>
           <Route exact path="/" component={HomeContainer} />
           <Route
             exact
@@ -84,17 +83,17 @@ function App() {
             roles={["FieldManager", "Supervisor"]}
             path="/project"
           >
-            <ProjectListContainer projectSource="/Project/All" />
+            <ProjectListContainer projectSource="/api/Project/All" />
           </ConditionalRoute>
           <ConditionalRoute
             exact
             roles={["FieldManager", "Supervisor"]}
             path="/project/needsAttention"
           >
-            <ProjectListContainer projectSource="/Project/RequiringManagerAttention" />
+            <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
           </ConditionalRoute>
           <ConditionalRoute exact roles={["PI"]} path="/project/mine">
-            <ProjectListContainer projectSource="/Project/GetMine" />
+            <ProjectListContainer projectSource="/api/Project/GetMine" />
           </ConditionalRoute>
           <ConditionalRoute
             roles={["FieldManager", "Supervisor", "PI"]}
@@ -106,10 +105,10 @@ function App() {
             roles={["FieldManager", "Supervisor"]}
             path="/ticket/needsAttention"
           >
-            <TicketListContainer projectSource="/ticket/RequiringManagerAttention" />
+            <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
           </ConditionalRoute>
           <ConditionalRoute exact roles={["PI"]} path="/ticket/mine">
-            <TicketListContainer projectSource="/ticket/RequiringPIAttention" />
+            <TicketListContainer projectSource="/api/ticket/RequiringPIAttention" />
           </ConditionalRoute>
           <Route path="/ticket/list/:projectId" component={TicketsContainer} />
           <Route
@@ -135,10 +134,25 @@ function App() {
             path="/project/map"
             component={ProjectFields}
           />
-        </div>
+          <Route path="*">
+            <NoMatch />
+          </Route>
+        </Switch>
       </ModalProvider>
     </AppContext.Provider>
   );
 }
+
+const NoMatch = () => {
+  let location = useLocation();
+
+  return (
+    <div>
+      <h3>
+        Page not found: <code>{location.pathname}</code>
+      </h3>
+    </div>
+  );
+};
 
 export default App;

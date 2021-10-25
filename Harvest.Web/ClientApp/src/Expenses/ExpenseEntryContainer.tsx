@@ -67,7 +67,7 @@ export const ExpenseEntryContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch("/Rate/Active");
+      const response = await fetch("/api/Rate/Active");
 
       if (response.ok) {
         const rates: Rate[] = await response.json();
@@ -123,7 +123,7 @@ export const ExpenseEntryContainer = () => {
         )
     );
 
-    const request = fetch(`/Expense/Create/${projectId}`, {
+    const request = fetch(`/api/Expense/Create/${projectId}`, {
       method: "POST",
       headers: {
         Accept: "application/json",

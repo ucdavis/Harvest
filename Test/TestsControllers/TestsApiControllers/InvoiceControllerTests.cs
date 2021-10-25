@@ -42,7 +42,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(4);
+            ControllerReflection.ControllerPublicMethods(3);
         }
 
         [Fact]
@@ -63,11 +63,6 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("List", countAdjustment + 2);
 
             //3
-            var getAttribute = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", countAdjustment + 0);
-            getAttribute.ShouldNotBeNull();
-            getAttribute.ElementAt(0).Template.ShouldBe("invoice/details/{projectId}/{invoiceId}");
-
-            //4
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("DoCloseout", countAdjustment + 3);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("DoCloseout", countAdjustment + 3);
             var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("DoCloseout", countAdjustment + 3);

@@ -41,7 +41,7 @@ export const Crops = (props: Props) => {
     const onSearch = async () => {
       setIsSearchLoading(true);
 
-      const response = await fetch(`/Crop/Search?type=${props.cropType}`);
+      const response = await fetch(`/api/Crop/Search?type=${props.cropType}`);
 
       if (response.ok) {
         if (response.status === 204) {

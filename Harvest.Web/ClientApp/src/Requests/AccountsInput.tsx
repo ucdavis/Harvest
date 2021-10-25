@@ -56,7 +56,7 @@ export const AccountsInput = (props: Props) => {
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
-    const response = await fetch(`/financialaccount/get?account=${query}`);
+    const response = await fetch(`/api/financialaccount/get?account=${query}`);
 
     if (response.ok) {
       if (response.status === 204) {

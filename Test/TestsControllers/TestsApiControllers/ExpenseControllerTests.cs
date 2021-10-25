@@ -44,7 +44,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(8);
+            ControllerReflection.ControllerPublicMethods(6);
         }
 
         [Fact]
@@ -57,12 +57,6 @@ namespace Test.TestsControllers.TestsApiControllers
 #endif
 
             //1
-            ControllerReflection.MethodExpectedNoAttribute("Entry");
-
-            //2
-            ControllerReflection.MethodExpectedNoAttribute("Unbilled");
-
-            //3
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Create", countAdjustment + 4, showListOfAttributes:true);
             var authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", countAdjustment + 4);
             authAttribute.ShouldNotBeNull();
@@ -73,7 +67,7 @@ namespace Test.TestsControllers.TestsApiControllers
             consumesAtt.ElementAt(0).ContentTypes[0].ShouldBe(MediaTypeNames.Application.Json);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Create", countAdjustment + 4);
 
-            //4
+            //2
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("CreateAcreage", countAdjustment + 4);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("CreateAcreage", countAdjustment + 4);
             authAttribute.ShouldNotBeNull();
@@ -84,25 +78,25 @@ namespace Test.TestsControllers.TestsApiControllers
             consumesAtt.ElementAt(0).ContentTypes[0].ShouldBe(MediaTypeNames.Application.Json);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("CreateAcreage", countAdjustment + 4);
 
-            //5
+            //3
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Delete", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Delete", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 3);
 
-            //6 This should probably do PI auth... 
+            //4 This should probably do PI auth... 
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilled", countAdjustment + 3);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilled", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetUnbilled", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
 
-            //7 
+            //5
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilledTotal", countAdjustment + 2);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilledTotal", countAdjustment + 2);
 
-            //8
+            //6
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetRecentExpensedProjects", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetRecentExpensedProjects", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();

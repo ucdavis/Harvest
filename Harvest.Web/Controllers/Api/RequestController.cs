@@ -44,28 +44,6 @@ namespace Harvest.Web.Controllers.Api
             _historyService = historyService;
         }
 
-        // create a new request via react
-        [HttpGet]
-        public ActionResult Create()
-        {
-            return View("React");
-        }
-
-        // Approve a quote for the project
-        [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public ActionResult Approve(int projectId)
-        {
-            return View("React");
-        }
-
-        [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        public ActionResult ChangeAccount(int projectId)
-        {
-            return View("React");
-        }
-
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Cancel(int projectId)

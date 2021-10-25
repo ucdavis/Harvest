@@ -22,7 +22,7 @@ export const ProjectFields = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getFields = async () => {
-      const response = await fetch("/Project/GetFields");
+      const response = await fetch("/api/Project/GetFields");
 
       if (response.ok) {
         const result = await response.json();
