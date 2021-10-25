@@ -10,5 +10,6 @@ namespace Harvest.Web.Controllers
         {
             return View("React");
         }
+        
     }
 }
