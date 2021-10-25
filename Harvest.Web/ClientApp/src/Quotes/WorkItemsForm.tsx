@@ -231,7 +231,9 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         )}
       </div>
 
-      <div className="col-1">${formatCurrency(workItem.total)}</div>
+      <div className={`col-1 total-${workItem.rateId}`}>
+        ${formatCurrency(workItem.total)}
+      </div>
 
       <Col className="col-1 trash-col">
         <button

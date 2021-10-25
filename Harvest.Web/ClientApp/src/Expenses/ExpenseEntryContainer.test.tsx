@@ -111,7 +111,7 @@ describe("Expense Entry Container", () => {
 
     const unitsInput = container.querySelector("#units") as HTMLElement;
     Simulate.change(unitsInput, { target: { value: "3" } });
-    const total = container.querySelector(".col-1");
+    const total = container.querySelector(".total-3");
 
     expect(total?.textContent).toContain("$180.00");
   });
