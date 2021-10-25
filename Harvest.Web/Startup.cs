@@ -51,6 +51,7 @@ namespace Harvest.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpContextAccessor();
+            services.AddHttpClient();
 
             services.AddControllersWithViews(options =>
             {

@@ -35,7 +35,7 @@ namespace Test.TestsServices
         public Mock<IOptions<SlothSettings>> MockSlothSettings { get; set; }
         public SlothSettings SlothSettings { get; set; } = new SlothSettings()
         {
-            ApiKey = "Fake", ApiUrl = "FakeUrl", CreditObjectCode = "3900", CreditPassthroughObjectCode = "3918",
+            ApiKey = "Fake", ApiUrl = "http://sloth-fake.ucdavis.edu/", CreditObjectCode = "3900", CreditPassthroughObjectCode = "3918",
             MerchantTrackingUrl = "UnitTest//"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
@@ -68,13 +68,15 @@ namespace Test.TestsServices
                     Content = new StringContent("{\r\n  \"id\": \"dfb39437-e604-4518-bc72-af89ea933684\",\r\n  \"status\": \"PendingApproval\",\r\n  \"sourceName\": \"Harvest Recharge\",\r\n  \"sourceType\": \"Recharge\",\r\n  \"merchantTrackingNumber\": \"1006\",\r\n  \"merchantTrackingUrl\": \"https://localhost:44308/Invoice/Details/6/1006\",\r\n  \"originCode\": \"CP\",\r\n  \"documentNumber\": \"000000254\",\r\n  \"documentType\": \"GLIB\",\r\n  \"kfsTrackingNumber\": \"0000000192\",\r\n  \"transactionDate\": \"2021-10-22T20:40:31.8700177Z\",\r\n  \"transfers\": [\r\n    {\r\n      \"id\": \"6dea5ce6-e2dc-4870-9ad9-08a7f47eb94a\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"CRU9033\",\r\n      \"objectCode\": \"RAS5\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Debit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    },\r\n    {\r\n      \"id\": \"e56518c5-fb99-402d-ace7-4317d29aef94\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"RRACRES\",\r\n      \"subAccount\": \"CNTRY\",\r\n      \"objectCode\": \"3900\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Credit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    }\r\n  ],\r\n  \"isReversal\": false,\r\n  \"hasReversal\": false,\r\n  \"statusEvents\": [\r\n    {\r\n      \"id\": \"3efaebae-a2de-4dc1-8be7-2cef5f9624fc\",\r\n      \"status\": \"PendingApproval\",\r\n      \"eventDate\": \"2021-10-22T20:40:45.5049293Z\",\r\n      \"eventDetails\": \"File: TransactionsController.cs, Member: Post, Line: 211\",\r\n      \"transactionId\": \"dfb39437-e604-4518-bc72-af89ea933684\"\r\n    }\r\n  ]\r\n}"), //sloth content
                 })
                 .Verifiable();
-            var httpClient = new HttpClient(MockMessageHandler.Object)
-            {
-                BaseAddress = new Uri("http://sloth-fake.ucdavis.edu/"),
-            };
+
+            var httpClient = new HttpClient(MockMessageHandler.Object);
+
+            // create a moq of IHttpClientFactory to return a httpclient
+            var httpClientFactory = new Mock<IHttpClientFactory>();
+            httpClientFactory.Setup(a => a.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
             SlothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClient);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
         }
 
         private void SetupGenericData()
