@@ -42,7 +42,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(5);
+            ControllerReflection.ControllerPublicMethods(3);
         }
 
         [Fact]
@@ -59,24 +59,15 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
 
             //2
-            var authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", 2);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Create", 2);
-
-            //3
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Save", countAdjustment + 3);
+            var authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Save", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Save", countAdjustment + 3);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Save", countAdjustment + 3);
 
-            //4
+            //3
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetApproved", countAdjustment + 2);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetApproved", countAdjustment + 2);
-
-            //5
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", 1);
         }
     }
 }

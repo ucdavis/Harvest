@@ -57,7 +57,7 @@ namespace Test.TestsControllers.TestsApiControllers
             //1
             var getAttribute = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Search", countAdjustment + 2);
             getAttribute.ShouldNotBeNull();
-            getAttribute.ElementAt(0).Template.ShouldBe("/people/search");
+            getAttribute.ElementAt(0).Template.ShouldBe("/api/people/search");
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Search", countAdjustment + 2);
         }
     }
