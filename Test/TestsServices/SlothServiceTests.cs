@@ -1,23 +1,21 @@
-﻿using System;
+﻿using Harvest.Core.Data;
+using Harvest.Core.Domain;
+using Harvest.Core.Models.FinancialAccountModels;
+using Harvest.Core.Models.Settings;
+using Harvest.Core.Services;
+using Harvest.Core.Utilities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Moq;
+using Moq.Protected;
+using Shouldly;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Harvest.Core.Data;
-using Harvest.Core.Models.Settings;
-using Harvest.Core.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Moq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Harvest.Core.Domain;
-using Harvest.Core.Models.FinancialAccountModels;
-using Harvest.Core.Utilities;
-using Microsoft.AspNetCore.Http;
-using Moq.Protected;
-using Shouldly;
 using Test.Helpers;
 using TestHelpers.Helpers;
 using Xunit;
@@ -116,17 +114,21 @@ namespace Test.TestsServices
                 .Callback<string>(a => rtval = realFinancialService.Parse(a)).Returns(() => rtval);
 
 
-            var isValidRtn = new AccountValidationModel();
+            //var isValidRtn = new AccountValidationModel();
             MockFinancialService.Setup(a => a.IsValid(It.IsAny<string>()))
                 .Callback<string>(a => rtval = realFinancialService.Parse(a)).Returns(async () => await SetValidAccount(rtval));
 
         }
 
-        private Task<AccountValidationModel> SetValidAccount(KfsAccount kfsAccount)
+        private Task<AccountValidationModel> SetValidAccount(KfsAccount kfsAccount, bool setIsValid = true)
         {
             var rtValue = new AccountValidationModel();
             rtValue.KfsAccount = kfsAccount;
-            rtValue.IsValid = true;
+            rtValue.IsValid = setIsValid;
+            if (!setIsValid)
+            { 
+                rtValue.Message = "Fake Message";
+            }
             return Task.FromResult(rtValue);
         }
 
@@ -193,6 +195,33 @@ namespace Test.TestsServices
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe($"No Transfers Generated for invoice: {invoice.Id}");
+        }
+
+        [Fact]
+        public async Task MoveMoneyReturnsErrorWhenDebitAccountInvalid()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = 10.00m;
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            var mockFinancialSettings = new Mock<IOptions<FinancialLookupSettings>>();
+            var realFinancialService = new FinancialService(mockFinancialSettings.Object, JsonSerializerOptions);
+            KfsAccount rtval = new KfsAccount();
+            MockFinancialService.Setup(a => a.IsValid(It.IsAny<string>()))
+                .Callback<string>(a => rtval = realFinancialService.Parse(a)).Returns(async () => await SetValidAccount(rtval, false));
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("ProcessDebits Failed");
         }
 
         [Fact]
