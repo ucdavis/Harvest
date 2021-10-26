@@ -57,7 +57,7 @@ export const AppNavBar = () => {
                 </UncontrolledDropdown>
               </ShowFor>
             </Nav>
-            <NavbarText>Welcome @User.GetNameClaim()</NavbarText>
+            <NavbarText>Some Simple Text </NavbarText>
           </Collapse>
         </Navbar>
       </div>
