@@ -54,6 +54,7 @@ namespace Harvest.Jobs.Invoice
                 o.EnableSensitiveDataLogging();
 #endif
             });
+            services.AddHttpClient();
 
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
