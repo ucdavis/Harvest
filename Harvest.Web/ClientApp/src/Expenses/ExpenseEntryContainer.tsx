@@ -89,6 +89,11 @@ export const ExpenseEntryContainer = () => {
   const submit = async () => {
     // TODO: some sort of full screen processing UI
 
+    const inputErrors = await context.validateAll();
+    if (inputErrors.length > 0) {
+      return;
+    }
+
     const workItems = activities.flatMap((activity) =>
       activity.workItems.filter((w) => w.rateId !== 0 && w.total > 0)
     );
