@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ShowFor } from "../Shared/ShowFor";
 import {
   Collapse,
   Navbar,
@@ -23,31 +24,40 @@ export const AppNavBar = () => {
     <div className="nav-wrapper">
       <div className="container">
         <Navbar color="light" light expand="md">
-          <NavbarBrand href="/">reactstrap</NavbarBrand>
+          <NavbarBrand href="/">Home</NavbarBrand>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar>
               <NavItem>
-                <NavLink href="/components/">Components</NavLink>
+                <NavLink href="/project">My Projects</NavLink>
               </NavItem>
-              <NavItem>
-                <NavLink href="https://github.com/reactstrap/reactstrap">
-                  GitHub
-                </NavLink>
-              </NavItem>
-              <UncontrolledDropdown nav inNavbar>
-                <DropdownToggle nav caret>
-                  Options
-                </DropdownToggle>
-                <DropdownMenu right>
-                  <DropdownItem>Option 1</DropdownItem>
-                  <DropdownItem>Option 2</DropdownItem>
-                  <DropdownItem divider />
-                  <DropdownItem>Reset</DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
+              <ShowFor roles={["FieldManager", "Supervisor"]}>
+                {" "}
+                <NavItem>
+                  <NavLink href="/project/mine">All Projects</NavLink>
+                </NavItem>
+              </ShowFor>
+              <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
+                <NavItem>
+                  <NavLink href="/expense/entry">Expenses</NavLink>
+                </NavItem>
+              </ShowFor>
+              <ShowFor roles={["FieldManager", "Supervisor"]}>
+                <UncontrolledDropdown nav inNavbar>
+                  <DropdownToggle nav caret>
+                    Admin
+                  </DropdownToggle>
+                  <DropdownMenu right>
+                    <DropdownItem href="/Permissions/Index">
+                      Permissions
+                    </DropdownItem>
+                    <DropdownItem href="/Rate/Index">Rates</DropdownItem>
+                    <DropdownItem href="/Crop/Index">Crops</DropdownItem>
+                  </DropdownMenu>
+                </UncontrolledDropdown>
+              </ShowFor>
             </Nav>
-            <NavbarText>Simple Text</NavbarText>
+            <NavbarText>Welcome @User.GetNameClaim()</NavbarText>
           </Collapse>
         </Navbar>
       </div>
