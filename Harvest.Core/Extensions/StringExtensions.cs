@@ -104,7 +104,7 @@ namespace Harvest.Core.Extensions
             }
 
             var i = 0;
-            return Regex.Replace(messageTemplate, "{.*?}", _ => objects[i++].ToString());
+            return Regex.Replace(messageTemplate, "{.*?}", _ => objects[i++]?.ToString() ?? string.Empty);
         }
 
     }
