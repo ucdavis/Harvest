@@ -527,7 +527,7 @@ namespace Harvest.Core.Services
         {
             try
             {
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/Request/ChangeAccount/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
                 var project = await GetProjectAndPiFromInvoice(invoice);
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
@@ -543,6 +543,7 @@ namespace Harvest.Core.Services
                     ProjectName = project.Name,
                     Title = $"Your project has one or more invalid accounts preventing Invoice {invoice.Id} from being processed.",
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonProjectText = "Update Accounts",
                     ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
                     PiName = project.PrincipalInvestigator.Name,
                     AccountsList = new List<AccountsInProjectModel>()
@@ -581,7 +582,7 @@ namespace Harvest.Core.Services
             var project = invoice.Project;
             if (project?.PrincipalInvestigator == null)
             {
-                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator)
+                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == invoice.ProjectId);
             }
 
