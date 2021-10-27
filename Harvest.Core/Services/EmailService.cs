@@ -565,7 +565,7 @@ namespace Harvest.Core.Services
             }
             catch (Exception ex)
             {
-                Log.Error("Error emailing invoice created", ex);
+                Log.Error("Error emailing invoice error", ex);
                 return false;
             }
 
