@@ -42,18 +42,21 @@ namespace Harvest.Core.Services
 
         Task<bool> InvoiceCreated(Invoice invoice);
         Task<bool> InvoiceDone(Invoice invoice, string status);
+        Task<bool> InvoiceError(Invoice invoice);
     }
 
     public class EmailService : IEmailService
     {
         private readonly AppDbContext _dbContext;
         private readonly INotificationService _notificationService;
+        private readonly IFinancialService _financialService;
         private readonly EmailSettings _emailSettings;
 
-        public EmailService(AppDbContext dbContext, INotificationService notificationService, IOptions<EmailSettings> emailSettings)
+        public EmailService(AppDbContext dbContext, INotificationService notificationService, IOptions<EmailSettings> emailSettings, IFinancialService financialService)
         {
             _dbContext = dbContext;
             _notificationService = notificationService;
+            _financialService = financialService;
             _emailSettings = emailSettings.Value;
         }
         public async Task<bool> ProfessorQuoteReady(Project project, Quote quote)
@@ -514,6 +517,54 @@ namespace Harvest.Core.Services
             catch (Exception ex)
             {
                 Log.Error("Error emailing invoice done", ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> InvoiceError(Invoice invoice)
+        {
+            try
+            {
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
+                var project = await GetProjectAndPiFromInvoice(invoice);
+                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var ccEmails = await FieldManagersEmails();
+
+
+                var model = new InvoiceErrorModel()
+                {
+                    InvoiceAmount = invoice.Total.ToString("C"),
+                    InvoiceStatus = invoice.Status.SafeHumanizeTitle(),
+                    InvoiceId = invoice.Id,
+                    InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
+                    ProjectName = project.Name,
+                    Title = $"Your project has one or more invalid accounts preventing Invoice {invoice.Id} from being processed.",
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
+                    PiName = project.PrincipalInvestigator.Name,
+                    AccountsList = new List<AccountsInProjectModel>()
+                };
+
+                foreach (var projectAccount in project.Accounts)
+                {
+                    var account = await _financialService.IsValid(projectAccount.Number);
+                    model.AccountsList.Add(new AccountsInProjectModel
+                    {
+                        Account = projectAccount.Number,
+                        Message = account.IsValid ? "Valid" : account.Message
+                    });
+                }
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceErrors.cshtml", model);
+                var textVersion = $"Invoice for project {model.ProjectName} has account Errors.";
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Invoice Account Errors");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing invoice created", ex);
                 return false;
             }
 
