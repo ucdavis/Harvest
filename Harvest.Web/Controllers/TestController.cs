@@ -9,6 +9,7 @@ using Razor.Templating.Core;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Harvest.Email.Models.Invoice;
 
 namespace Harvest.Web.Controllers
 {
@@ -34,7 +35,7 @@ namespace Harvest.Web.Controllers
 
 
 
-            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated_mjml.cshtml", model);
+            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceCreated_mjml.cshtml", model);
 
             return Content(results);
         }
