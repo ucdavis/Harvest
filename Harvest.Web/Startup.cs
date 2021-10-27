@@ -206,6 +206,8 @@ namespace Harvest.Web
             app.UseMiddleware<LogUserNameMiddleware>();
             app.UseSerilogRequestLogging();
 
+            app.UseMiddleware<EnsureUserMiddleware>();
+            
             app.UseEndpoints(endpoints =>
             {
                 // default for MVC server-side endpoints
