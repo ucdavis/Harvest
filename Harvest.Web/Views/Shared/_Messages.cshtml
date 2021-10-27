@@ -1,0 +1,20 @@
+@if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
+{
+    <div class="container">
+    <div class="alert alert-danger">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="far fa-times-circle"></i>
+        </button> @TempData["ErrorMessage"]
+    </div>
+</div>
+}
+@if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
+{
+    <div class="container">
+    <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert">
+            <i class="far fa-times-circle"></i>
+        </button> @TempData["Message"]
+    </div>
+</div>
+}

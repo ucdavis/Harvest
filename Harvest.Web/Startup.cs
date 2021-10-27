@@ -206,6 +206,8 @@ namespace Harvest.Web
             app.UseMiddleware<LogUserNameMiddleware>();
             app.UseSerilogRequestLogging();
 
+            app.UseMiddleware<EnsureUserMiddleware>();
+            
             app.UseEndpoints(endpoints =>
             {
                 // default for MVC server-side endpoints
@@ -213,7 +215,7 @@ namespace Harvest.Web
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(rate|permissions|crop|home|system|help)" }
+                    constraints: new { controller = "(account|rate|permissions|crop|home|system|help)" }
                 );
 
                 // API routes map to all other controllers
