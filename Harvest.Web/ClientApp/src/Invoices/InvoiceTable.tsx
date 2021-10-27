@@ -4,6 +4,7 @@ import { Cell, Column, TableState } from "react-table";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { Invoice } from "../types";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   invoices: Invoice[];
@@ -17,7 +18,9 @@ export const InvoiceTable = (props: Props) => {
       {
         Cell: (data: Cell<Invoice>) => (
           <div>
-            <Link to={`/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}>
+            <Link
+              to={`/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}
+            >
               #{data.row.original.id}
             </Link>
           </div>
@@ -38,11 +41,7 @@ export const InvoiceTable = (props: Props) => {
       },
       {
         Header: "Total",
-        accessor: (row) => row.total,
-      },
-      {
-        Header: "Notes",
-        accessor: (row) => row.notes,
+        accessor: (row) => "$" + formatCurrency(row.total),
       },
     ],
     []
