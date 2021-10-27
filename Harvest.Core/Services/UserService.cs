@@ -66,9 +66,25 @@ namespace Harvest.Core.Services
                     Kerberos = username
                 };
 
-                _dbContext.Users.Add(newUser);
+                try
+                {
+                    _dbContext.Users.Add(newUser);
 
-                await _dbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync();
+                }
+                catch
+                {
+                    var user = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
+                    if (user == null)
+                    {
+                        throw new Exception("Error adding user");
+                    }
+                    else
+                    {
+                        return user;
+                    }
+                }
+
 
                 return newUser;
             }
