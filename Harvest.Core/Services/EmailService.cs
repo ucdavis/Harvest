@@ -8,6 +8,7 @@ using Harvest.Core.Extensions;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
+using Harvest.Email.Models.Invoice;
 using Harvest.Email.Models.Ticket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -260,7 +261,7 @@ namespace Harvest.Core.Services
 
             try
             {
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceExceedsRemainingAmount.cshtml", model);
 
                 await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
             }
@@ -470,7 +471,7 @@ namespace Harvest.Core.Services
                     PiName = project.PrincipalInvestigator.Name,
                 };
 
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceCreated.cshtml", model);
                 var textVersion = $"Invoice for project {model.ProjectName} has been created.";
                 await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Created");
             }
@@ -506,7 +507,7 @@ namespace Harvest.Core.Services
                     PiName = project.PrincipalInvestigator.Name,
                 }; 
 
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceCreated.cshtml", model);
                 var textVersion = $"Invoice for project {model.ProjectName} has been processed.";
                 await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Processed");
             }
