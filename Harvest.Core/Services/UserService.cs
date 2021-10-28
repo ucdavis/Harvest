@@ -10,6 +10,7 @@ using Harvest.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace Harvest.Core.Services
@@ -26,12 +27,14 @@ namespace Harvest.Core.Services
     public class UserService : IUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
         private readonly AppDbContext _dbContext;
         private readonly RoleResolver _roleResolver;
 
-        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, RoleResolver roleResolver)
+        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, RoleResolver roleResolver)
         {
             _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
             _dbContext = dbContext;
             _roleResolver = roleResolver;
         }
@@ -49,29 +52,36 @@ namespace Harvest.Core.Services
             var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
             string iamId = userClaims.Single(c => c.Type == IamIdClaimType).Value;
 
-            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
+            return await _memoryCache.GetOrCreateAsync(iamId, async entry =>
+            {
+                // cache for sliding 20 minutes
+                entry.SlidingExpiration = TimeSpan.FromMinutes(20);
 
-            if (dbUser != null)
-            {
-                return dbUser;
-            }
-            else
-            {
-                var newUser = new User
+                var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
+
+                if (dbUser != null)
                 {
-                    FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
-                    LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
-                    Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
-                    Iam = iamId,
-                    Kerberos = username
-                };
+                    return dbUser; // already in the db, just return straight away
+                }
+                else
+                {
+                    // not in the db yet, create new user and return
+                    var newUser = new User
+                    {
+                        FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
+                        LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
+                        Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
+                        Iam = iamId,
+                        Kerberos = username
+                    };
 
-                _dbContext.Users.Add(newUser);
+                    _dbContext.Users.Add(newUser);
 
-                await _dbContext.SaveChangesAsync();
+                    await _dbContext.SaveChangesAsync();
        
-                return newUser;
-            }
+                    return newUser;
+                }
+            });
         }
 
         public async Task<IEnumerable<string>> GetCurrentRoles()
@@ -91,7 +101,7 @@ namespace Harvest.Core.Services
             {
                 return userRoles.Append(Role.Codes.PI);
             }
-            
+
             return userRoles;
         }
 
@@ -112,7 +122,7 @@ namespace Harvest.Core.Services
             var userRoles = await userService.GetCurrentRoles();
             return userRoles.Any(roles.Contains);
         }
-        
+
         public static Task<bool> HasAnyRoles(this IUserService userService, string role, params string[] additionalRoles)
         {
             return HasAnyRoles(userService, additionalRoles.Append(role));
