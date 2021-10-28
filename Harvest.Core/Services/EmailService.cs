@@ -580,7 +580,7 @@ namespace Harvest.Core.Services
         private async Task<Project> CheckForMissingDataForInvoice(Invoice invoice)
         {
             var project = invoice.Project;
-            if (project?.PrincipalInvestigator == null || project.Accounts == null)
+            if (project == null || project.PrincipalInvestigator == null || project.Accounts == null)
             {
                 project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == invoice.ProjectId);
