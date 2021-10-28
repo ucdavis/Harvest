@@ -1,4 +1,4 @@
-﻿namespace Harvest.Email.Models
+﻿namespace Harvest.Email.Models.Invoice
 {
     /// <summary>
     /// Use for Invoice created and processed in sloth

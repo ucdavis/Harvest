@@ -292,6 +292,8 @@ namespace Harvest.Core.Services
                 var account = await _financialService.IsValid(projectAccount.Number);
                 if (!account.IsValid)
                 {
+                    await _emailService.InvoiceError(invoice);
+
                     return Result.Error("Unable to validate debit account {debitAccount}: {debitMessage}", projectAccount.Number, account.Message);
                 }
                 validatedProjectAccounts.Add(projectAccount, account);

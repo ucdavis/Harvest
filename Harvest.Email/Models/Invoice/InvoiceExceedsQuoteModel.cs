@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Harvest.Email.Models
+namespace Harvest.Email.Models.Invoice
 {
     public class InvoiceExceedsQuoteModel
     {

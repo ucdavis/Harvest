@@ -35,7 +35,7 @@ namespace Harvest.Core.Services
             {
                 return;
             }
-            using (var message = new MailMessage { From = new MailAddress("harvest@notify.ucdavis.edu", "Harvest Notification"), Subject = "Harvest Notification" })
+            using (var message = new MailMessage { From = new MailAddress(_emailSettings.FromEmail, _emailSettings.FromName), Subject = "Harvest Notification" })
             {
                 message.To.Add(new MailAddress(email, email));
 
@@ -55,7 +55,7 @@ namespace Harvest.Core.Services
             {
                 return;
             }
-            using (var message = new MailMessage { From = new MailAddress("harvest@notify.ucdavis.edu", "Harvest Notification"), Subject = subject })
+            using (var message = new MailMessage { From = new MailAddress(_emailSettings.FromEmail, _emailSettings.FromName), Subject = subject })
             {
                 foreach (var email in emails)
                 {
@@ -68,6 +68,11 @@ namespace Harvest.Core.Services
                     {
                         message.CC.Add(new MailAddress(ccEmail));
                     }
+                }
+
+                if (!string.IsNullOrWhiteSpace(_emailSettings.BccEmail))
+                {
+                    message.Bcc.Add(new MailAddress(_emailSettings.BccEmail));
                 }
 
                 // body is our fallback text and we'll add an HTML view as an alternate.

@@ -8,6 +8,7 @@ using Harvest.Core.Extensions;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
+using Harvest.Email.Models.Invoice;
 using Harvest.Email.Models.Ticket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -41,18 +42,21 @@ namespace Harvest.Core.Services
 
         Task<bool> InvoiceCreated(Invoice invoice);
         Task<bool> InvoiceDone(Invoice invoice, string status);
+        Task<bool> InvoiceError(Invoice invoice);
     }
 
     public class EmailService : IEmailService
     {
         private readonly AppDbContext _dbContext;
         private readonly INotificationService _notificationService;
+        private readonly IFinancialService _financialService;
         private readonly EmailSettings _emailSettings;
 
-        public EmailService(AppDbContext dbContext, INotificationService notificationService, IOptions<EmailSettings> emailSettings)
+        public EmailService(AppDbContext dbContext, INotificationService notificationService, IOptions<EmailSettings> emailSettings, IFinancialService financialService)
         {
             _dbContext = dbContext;
             _notificationService = notificationService;
+            _financialService = financialService;
             _emailSettings = emailSettings.Value;
         }
         public async Task<bool> ProfessorQuoteReady(Project project, Quote quote)
@@ -260,7 +264,7 @@ namespace Harvest.Core.Services
 
             try
             {
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceExceedsRemainingAmount.cshtml", model);
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceExceedsRemainingAmount.cshtml", model);
 
                 await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
             }
@@ -453,7 +457,7 @@ namespace Harvest.Core.Services
             {
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
-                var project = await GetProjectAndPiFromInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice);
                 var emailTo = new string[] {project.PrincipalInvestigator.Email};
                 //CC field managers? I'd say no....
 
@@ -470,7 +474,7 @@ namespace Harvest.Core.Services
                     PiName = project.PrincipalInvestigator.Name,
                 };
 
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceCreated.cshtml", model);
                 var textVersion = $"Invoice for project {model.ProjectName} has been created.";
                 await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Created");
             }
@@ -489,7 +493,7 @@ namespace Harvest.Core.Services
             {
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
-                var project = await GetProjectAndPiFromInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice);
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
                 //CC field managers? I'd say no....
 
@@ -506,7 +510,7 @@ namespace Harvest.Core.Services
                     PiName = project.PrincipalInvestigator.Name,
                 }; 
 
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/InvoiceCreated.cshtml", model);
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceCreated.cshtml", model);
                 var textVersion = $"Invoice for project {model.ProjectName} has been processed.";
                 await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Invoice Processed");
             }
@@ -519,17 +523,66 @@ namespace Harvest.Core.Services
             return true;
         }
 
+        public async Task<bool> InvoiceError(Invoice invoice)
+        {
+            try
+            {
+                var projectUrl = $"{_emailSettings.BaseUrl}/Request/ChangeAccount/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
+                var project = await CheckForMissingDataForInvoice(invoice);
+                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var ccEmails = await FieldManagersEmails();
+
+
+                var model = new InvoiceErrorModel()
+                {
+                    InvoiceAmount = invoice.Total.ToString("C"),
+                    InvoiceStatus = invoice.Status.SafeHumanizeTitle(),
+                    InvoiceId = invoice.Id,
+                    InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
+                    ProjectName = project.Name,
+                    Title = $"Your project has one or more invalid accounts preventing Invoice {invoice.Id} from being processed.",
+                    ButtonUrlForProject = $"{projectUrl}{project.Id}",
+                    ButtonProjectText = "Update Accounts",
+                    ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
+                    PiName = project.PrincipalInvestigator.Name,
+                    AccountsList = new List<AccountsInProjectModel>()
+                };
+
+                foreach (var projectAccount in project.Accounts)
+                {
+                    var account = await _financialService.IsValid(projectAccount.Number);
+                    model.AccountsList.Add(new AccountsInProjectModel
+                    {
+                        Account = projectAccount.Number,
+                        Message = account.IsValid ? "Valid" : account.Message
+                    });
+                }
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceErrors.cshtml", model);
+                var textVersion = $"Invoice for project {model.ProjectName} has account Errors.";
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Invoice Account Errors");
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing invoice error", ex);
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Gets missing info if it wasn't included in the initial call
         /// </summary>
         /// <param name="invoice"></param>
         /// <returns></returns>
-        private async Task<Project> GetProjectAndPiFromInvoice(Invoice invoice)
+        private async Task<Project> CheckForMissingDataForInvoice(Invoice invoice)
         {
             var project = invoice.Project;
-            if (project?.PrincipalInvestigator == null)
+            if (project == null || project.PrincipalInvestigator == null || project.Accounts == null)
             {
-                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator)
+                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == invoice.ProjectId);
             }
 
