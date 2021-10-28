@@ -771,9 +771,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsProjectAccount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(true);
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Total")
                         .HasPrecision(18, 2)
@@ -824,7 +822,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasIndex("Email");
 
-                    b.HasIndex("Iam");
+                    b.HasIndex("Iam")
+                        .IsUnique();
 
                     b.HasIndex("Kerberos");
 
