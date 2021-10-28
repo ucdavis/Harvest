@@ -457,7 +457,7 @@ namespace Harvest.Core.Services
             {
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
-                var project = await GetProjectAndPiFromInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice);
                 var emailTo = new string[] {project.PrincipalInvestigator.Email};
                 //CC field managers? I'd say no....
 
@@ -493,7 +493,7 @@ namespace Harvest.Core.Services
             {
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
-                var project = await GetProjectAndPiFromInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice);
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
                 //CC field managers? I'd say no....
 
@@ -529,7 +529,7 @@ namespace Harvest.Core.Services
             {
                 var projectUrl = $"{_emailSettings.BaseUrl}/Request/ChangeAccount/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
-                var project = await GetProjectAndPiFromInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice);
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
                 var ccEmails = await FieldManagersEmails();
 
@@ -577,10 +577,10 @@ namespace Harvest.Core.Services
         /// </summary>
         /// <param name="invoice"></param>
         /// <returns></returns>
-        private async Task<Project> GetProjectAndPiFromInvoice(Invoice invoice)
+        private async Task<Project> CheckForMissingDataForInvoice(Invoice invoice)
         {
             var project = invoice.Project;
-            if (project?.PrincipalInvestigator == null)
+            if (project?.PrincipalInvestigator == null || project.Accounts == null)
             {
                 project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == invoice.ProjectId);
