@@ -13,6 +13,8 @@ namespace Harvest.Core.Models.Settings
         public string Host { get; set; }
         public int Port { get; set; }
         public string BccEmail { get; set; }
+        public string FromEmail { get; set; } = "harvest@notify.ucdavis.edu";
+        public string FromName { get; set; } = "Harvest Notification";
 
     }
 }
