@@ -78,7 +78,7 @@ namespace Harvest.Core.Services
                     _dbContext.Users.Add(newUser);
 
                     await _dbContext.SaveChangesAsync();
-       
+
                     return newUser;
                 }
             });
