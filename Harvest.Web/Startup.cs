@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Elastic.Apm.NetCoreAll;
@@ -83,6 +85,17 @@ namespace Harvest.Web
                 oidc.TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+                };
+                oidc.Events.OnTicketReceived = async context => {
+                    var identity = (ClaimsIdentity)context.Principal.Identity;
+                    if (identity == null)
+                    {
+                        return;
+                    }
+
+                    // Ensure user exists in the db
+                    var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                    await userService.GetUser(identity.Claims.ToArray());
                 };
             });
 
@@ -205,8 +218,6 @@ namespace Harvest.Web
 
             app.UseMiddleware<LogUserNameMiddleware>();
             app.UseSerilogRequestLogging();
-
-            app.UseMiddleware<EnsureUserMiddleware>();
             
             app.UseEndpoints(endpoints =>
             {

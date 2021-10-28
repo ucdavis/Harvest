@@ -19,6 +19,7 @@ namespace Harvest.Core.Services
 
     public interface IUserService
     {
+        Task<User> GetUser(Claim[] userClaims);
         Task<User> GetCurrentUser();
         Task<IEnumerable<string>> GetCurrentRoles();
         Task<bool> HasAccess(string accessCode);
@@ -39,7 +40,38 @@ namespace Harvest.Core.Services
             _roleResolver = roleResolver;
         }
 
-        // Get the current user, creating them if necessary
+        // Get any user based on their claims, creating if necessary
+        public async Task<User> GetUser(Claim[] userClaims)
+        {
+            string iamId = userClaims.Single(c => c.Type == IamIdClaimType).Value;
+
+            var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
+
+            if (dbUser != null)
+            {
+                return dbUser; // already in the db, just return straight away
+            }
+            else
+            {
+                // not in the db yet, create new user and return
+                var newUser = new User
+                {
+                    FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
+                    LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
+                    Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
+                    Iam = iamId,
+                    Kerberos = userClaims.Single(c=>c.Type == ClaimTypes.NameIdentifier).Value
+                };
+
+                _dbContext.Users.Add(newUser);
+
+                await _dbContext.SaveChangesAsync();
+
+                return newUser;
+            }
+        }
+
+        // Get the current user, creating if necessary
         public async Task<User> GetCurrentUser()
         {
             if (_httpContextAccessor.HttpContext == null)
@@ -48,54 +80,23 @@ namespace Harvest.Core.Services
                 return null;
             }
 
-            var username = _httpContextAccessor.HttpContext.User.Identity.Name;
             var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
-            string iamId = userClaims.Single(c => c.Type == IamIdClaimType).Value;
 
-            return await _memoryCache.GetOrCreateAsync(iamId, async entry =>
-            {
-                // cache for sliding 20 minutes
-                entry.SlidingExpiration = TimeSpan.FromMinutes(20);
-
-                var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
-
-                if (dbUser != null)
-                {
-                    return dbUser; // already in the db, just return straight away
-                }
-                else
-                {
-                    // not in the db yet, create new user and return
-                    var newUser = new User
-                    {
-                        FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
-                        LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
-                        Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
-                        Iam = iamId,
-                        Kerberos = username
-                    };
-
-                    _dbContext.Users.Add(newUser);
-
-                    await _dbContext.SaveChangesAsync();
-
-                    return newUser;
-                }
-            });
+            return await GetUser(userClaims);
         }
 
         public async Task<IEnumerable<string>> GetCurrentRoles()
         {
             var projectId = _httpContextAccessor.GetProjectId();
+            string iamId = _httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == IamIdClaimType).Value;
 
-            var user = await GetCurrentUser();
             var userRoles = await _dbContext.Permissions
-                .Where(p => p.UserId == user.Id)
+                .Where(p => p.User.Iam == iamId)
                 .Select(p => p.Role.Name)
                 .ToArrayAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
-            var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigatorId == user.Id);
+            var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigator.Iam == iamId);
 
             if (isPrincipalInvestigator)
             {

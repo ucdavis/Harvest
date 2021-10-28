@@ -23,23 +23,4 @@ namespace Harvest.Web.Middleware
             }
         }
     }
-
-    public class EnsureUserMiddleware
-    {
-        private readonly RequestDelegate _next;
-
-        public EnsureUserMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task Invoke(HttpContext context)
-        {
-            var userService = context.RequestServices.GetRequiredService<IUserService>();
-
-            await userService.GetCurrentUser();
-            
-            await _next(context);
-        }
-    }
 }
