@@ -70,6 +70,11 @@ namespace Harvest.Core.Services
                     }
                 }
 
+                if (!string.IsNullOrWhiteSpace(_emailSettings.BccEmail))
+                {
+                    message.Bcc.Add(new MailAddress(_emailSettings.BccEmail));
+                }
+
                 // body is our fallback text and we'll add an HTML view as an alternate.
                 message.Body = textVersion;
 
