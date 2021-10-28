@@ -14,43 +14,43 @@ export const QuoteTotals = (props: Props) => {
       <CardHeader>Project Totals</CardHeader>
       <CardBody>
         <div id="total">
-          <Row>
-            <Col xs="10" sm="10">
+          <div className="row justify-content-between">
+            <Col xs="6">
               <div>Acreage Fees</div>
             </Col>
-            <Col xs="2" sm="2">
+            <Col xs="4" className="text-right">
               ${formatCurrency(props.quote.acreageTotal)}
             </Col>
-          </Row>
-          <Row>
-            <Col xs="10" sm="10">
+          </div>
+          <div className="row justify-content-between">
+            <Col xs="6">
               <div>Labor</div>
             </Col>
-            <Col xs="2" sm="2">
+            <Col xs="4" className="text-right">
               ${formatCurrency(props.quote.laborTotal)}
             </Col>
-          </Row>
-          <Row>
-            <Col xs="10" sm="10">
+          </div>
+          <div className="row justify-content-between">
+            <Col xs="6">
               <div>Equipment</div>
             </Col>
-            <Col xs="2" sm="2">
+            <Col xs="4" className="text-right">
               ${formatCurrency(props.quote.equipmentTotal)}
             </Col>
-          </Row>
-          <Row>
-            <Col xs="10" sm="10">
+          </div>
+          <div className="row justify-content-between">
+            <Col xs="6">
               <div>Materials / Other</div>
             </Col>
-            <Col xs="2" sm="2">
+            <Col xs="4" className="text-right">
               ${formatCurrency(props.quote.otherTotal)}
             </Col>
-          </Row>
-          <Row className="total-row">
-            <Col xs="10" sm="10">
+          </div>
+          <Row className="total-row justify-content-between">
+            <Col xs="6">
               <h6>Total Cost</h6>
             </Col>
-            <Col xs="2" sm="2">
+            <Col xs="4" className="text-right">
               <span>${formatCurrency(props.quote.grandTotal)}</span>
             </Col>
           </Row>

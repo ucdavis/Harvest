@@ -233,7 +233,7 @@ export const ExpenseEntryContainer = () => {
         <div className="card-content">
           <div className="col">
             <button
-              className="btn btn-primary btn-lg"
+              className="btn btn-primary btn-lg btn-block"
               onClick={submit}
               disabled={
                 notification.pending || !isValid() || context.formErrorCount > 0

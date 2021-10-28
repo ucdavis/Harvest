@@ -44,16 +44,24 @@ namespace Harvest.Web.Controllers
             var user = await  _dbContext.Users.SingleOrDefaultAsync(u => u.Email == lookupVal || u.Kerberos == lookupVal);
             if (user == null)
             {
+                // not found in db, look up user in IAM
                 user = model.Search.Contains("@")
                     ? await _identityService.GetByEmail(model.Search)
                     : await _identityService.GetByKerberos(model.Search);
+
+                if (user != null) {
+                    // user found in IAM but not in our db, add them and save before we continue
+                    _dbContext.Users.Add(user);
+                    await _dbContext.SaveChangesAsync();
+                }
             }
+
             if (user == null)
             {
+                // user not found in db or IAM
                 return View(model);
             }
             
-
             var identity = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Kerberos),

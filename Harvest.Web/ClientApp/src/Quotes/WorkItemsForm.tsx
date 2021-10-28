@@ -142,7 +142,10 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
   return (
     <Row className="activity-line-item">
-      <Col xs={props.category === "Other" ? 4 : 5}>
+      <Col
+        xs={props.category === "Other" ? 3 : 4}
+        md={props.category === "Other" ? 3 : 5}
+      >
         <FormGroup>
           <Typeahead
             id={`typeahead-${props.category}`}
@@ -180,7 +183,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
       </Col>
 
       {props.category === "Other" && (
-        <Col className="col-sm-1 text-center">
+        <div className="col-1 col-md-2">
           <CustomInput
             type="switch"
             id="markup"
@@ -192,10 +195,10 @@ const WorkItemForm = (props: WorkItemFormProps) => {
               });
             }}
           />
-        </Col>
+        </div>
       )}
 
-      <Col className="col-sm-2">
+      <div className="col-4 col-md-3">
         <InputGroup>
           <InputGroupAddon addonType="prepend">
             <InputGroupText>{workItem.unit || ""}</InputGroupText>
@@ -216,9 +219,9 @@ const WorkItemForm = (props: WorkItemFormProps) => {
           />
         </InputGroup>
         <InputErrorMessage name="quantity" />
-      </Col>
+      </div>
 
-      <Col className="col-sm-2 offset-sm-1">
+      <div className={`col-2 rate-${workItem.rateId}`}>
         ${formatCurrency(workItem.rate || 0)}
         {props.adjustment > 0 && (
           <span className="primary-color">
@@ -226,11 +229,13 @@ const WorkItemForm = (props: WorkItemFormProps) => {
             + ${formatCurrency(workItem.rate * (props.adjustment / 100))}
           </span>
         )}
-      </Col>
+      </div>
 
-      <Col xs="1">${formatCurrency(workItem.total)}</Col>
+      <div className={`col-1 total-${workItem.rateId}`}>
+        ${formatCurrency(workItem.total)}
+      </div>
 
-      <Col xs="1" className="trash-col">
+      <Col className="col-1 trash-col">
         <button
           className="btn btn-link mt-0"
           onClick={() => {
@@ -248,34 +253,34 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 export const WorkItemsForm = (props: WorkItemsFormProps) => {
   return (
     <div className="activity-line">
-      <Row>
+      <div className="row activity-entry-titles">
         {props.category === "Other" ? (
           <>
-            <Col xs="4">
+            <div className="col-2 col-md-3">
               <label>{props.category}</label>
-            </Col>
-            <Col xs="1">
+            </div>
+            <div className="col-2 col-md-2">
               <label id="markupLabel">Markup</label>
               <UncontrolledTooltip placement="right" target="markupLabel">
                 Adds a 20% parts markup to the total price
               </UncontrolledTooltip>
-            </Col>
+            </div>
           </>
         ) : (
-          <Col xs="5">
+          <div className="col-4 col-md-5">
             <label>{props.category}</label>
-          </Col>
+          </div>
         )}
-        <Col xs="3">
+        <div className="col-4 col-md-3">
           <label>{props.category === "Labor" ? "Time" : "Unit"}</label>
-        </Col>
-        <Col xs="2">
+        </div>
+        <div className="col-2">
           <label>Rate</label>
-        </Col>
-        <Col xs="2">
+        </div>
+        <div className="col-1">
           <label>Total</label>
-        </Col>
-      </Row>
+        </div>
+      </div>
       {props.workItems.map((workItem) => (
         <WorkItemForm
           key={`workItem-${workItem.id}-activity-${workItem.activityId}`}

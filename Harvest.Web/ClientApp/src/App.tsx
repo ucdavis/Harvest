@@ -6,6 +6,7 @@ import { ModalProvider } from "react-modal-hook";
 
 import AppContext from "./Shared/AppContext";
 import { AppContextShape } from "./types";
+import { AppNav } from "./AppNav";
 import { ConditionalRoute } from "./ConditionalRoute";
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
@@ -35,107 +36,118 @@ function App() {
     <AppContext.Provider value={Harvest}>
       <ModalProvider>
         <Toaster />
-        <Switch>
-          <Route exact path="/" component={HomeContainer} />
-          <Route
-            exact
-            path="/request/create/:projectId?"
-            component={RequestContainer}
-          />
-          <ConditionalRoute
-            roles={["PI"]}
-            path="/request/approve/:projectId"
-            component={ApprovalContainer}
-          />
-          <ConditionalRoute
-            roles={["PI"]}
-            path="/request/changeAccount/:projectId"
-            component={AccountChangeContainer}
-          />
-          <Route
-            path="/project/invoices/:projectId"
-            component={InvoiceListContainer}
-          />
-          <ConditionalRoute
-            roles={["FieldManager", "PI"]}
-            path="/invoice/details/:projectId/:invoiceId"
-            component={InvoiceDetailContainer}
-          />
-          <ConditionalRoute
-            roles={["FieldManager", "Supervisor"]}
-            path="/quote/create/:projectId"
-            component={QuoteContainer}
-          />
-          <ConditionalRoute
-            roles={["PI"]}
-            path="/quote/details/:projectId"
-            component={QuoteDisplayContainer}
-          />
-          <ConditionalRoute
-            roles={["FieldManager"]}
-            path="/project/closeout/:projectId"
-            component={CloseoutContainer}
-          />
-          <ConditionalRoute
-            exact
-            roles={["FieldManager", "Supervisor"]}
-            path="/project"
-          >
-            <ProjectListContainer projectSource="/api/Project/All" />
-          </ConditionalRoute>
-          <ConditionalRoute
-            exact
-            roles={["FieldManager", "Supervisor"]}
-            path="/project/needsAttention"
-          >
-            <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
-          </ConditionalRoute>
-          <ConditionalRoute exact roles={["PI"]} path="/project/mine">
-            <ProjectListContainer projectSource="/api/Project/GetMine" />
-          </ConditionalRoute>
-          <ConditionalRoute
-            roles={["FieldManager", "Supervisor", "PI"]}
-            path="/ticket/create/:projectId"
-            component={TicketCreate}
-          />
-          <ConditionalRoute
-            exact
-            roles={["FieldManager", "Supervisor"]}
-            path="/ticket/needsAttention"
-          >
-            <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
-          </ConditionalRoute>
-          <ConditionalRoute exact roles={["PI"]} path="/ticket/mine">
-            <TicketListContainer projectSource="/api/ticket/RequiringPIAttention" />
-          </ConditionalRoute>
-          <Route path="/ticket/list/:projectId" component={TicketsContainer} />
-          <Route
-            path="/ticket/details/:projectId/:ticketId"
-            component={TicketDetailContainer}
-          />
-          <Route
-            path="/project/details/:projectId"
-            component={ProjectDetailContainer}
-          />
-          <ConditionalRoute
-            roles={["FieldManager", "Supervisor", "Worker"]}
-            path="/expense/entry/:projectId?"
-            component={ExpenseEntryContainer}
-          />
-          <Route
-            path="/expense/unbilled/:projectId"
-            component={UnbilledExpensesContainer}
-          />
-          <ConditionalRoute
-            roles={["FieldManager", "Supervisor"]}
-            exact
-            path="/project/map"
-            component={ProjectFields}
-          />
-          <Route path="*">
-            <NoMatch />
-          </Route>
-        </Switch>
+        <AppNav />
+        <main role="main" className="main-content-wrapper container">
+          <Switch>
+            {/* Match any server-side routes and send empty content to let MVC return the view details */}
+            <Route
+              path="/(account|rate|permissions|crop|home|system|help)"
+              component={Empty}
+            />
+            <Route exact path="/" component={HomeContainer} />
+            <Route
+              exact
+              path="/request/create/:projectId?"
+              component={RequestContainer}
+            />
+            <ConditionalRoute
+              roles={["PI"]}
+              path="/request/approve/:projectId"
+              component={ApprovalContainer}
+            />
+            <ConditionalRoute
+              roles={["PI"]}
+              path="/request/changeAccount/:projectId"
+              component={AccountChangeContainer}
+            />
+            <Route
+              path="/project/invoices/:projectId"
+              component={InvoiceListContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager", "PI"]}
+              path="/invoice/details/:projectId/:invoiceId"
+              component={InvoiceDetailContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor"]}
+              path="/quote/create/:projectId"
+              component={QuoteContainer}
+            />
+            <ConditionalRoute
+              roles={["PI"]}
+              path="/quote/details/:projectId"
+              component={QuoteDisplayContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager"]}
+              path="/project/closeout/:projectId"
+              component={CloseoutContainer}
+            />
+            <ConditionalRoute
+              exact
+              roles={["FieldManager", "Supervisor"]}
+              path="/project"
+            >
+              <ProjectListContainer projectSource="/api/Project/All" />
+            </ConditionalRoute>
+            <ConditionalRoute
+              exact
+              roles={["FieldManager", "Supervisor"]}
+              path="/project/needsAttention"
+            >
+              <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
+            </ConditionalRoute>
+            <ConditionalRoute exact roles={["PI"]} path="/project/mine">
+              <ProjectListContainer projectSource="/api/Project/GetMine" />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor", "PI"]}
+              path="/ticket/create/:projectId"
+              component={TicketCreate}
+            />
+            <ConditionalRoute
+              exact
+              roles={["FieldManager", "Supervisor"]}
+              path="/ticket/needsAttention"
+            >
+              <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
+            </ConditionalRoute>
+            <ConditionalRoute exact roles={["PI"]} path="/ticket/mine">
+              <TicketListContainer projectSource="/api/ticket/RequiringPIAttention" />
+            </ConditionalRoute>
+            <Route
+              path="/ticket/list/:projectId"
+              component={TicketsContainer}
+            />
+            <Route
+              path="/ticket/details/:projectId/:ticketId"
+              component={TicketDetailContainer}
+            />
+            <Route
+              path="/project/details/:projectId"
+              component={ProjectDetailContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor", "Worker"]}
+              path="/expense/entry/:projectId?"
+              component={ExpenseEntryContainer}
+            />
+            <Route
+              path="/expense/unbilled/:projectId"
+              component={UnbilledExpensesContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor"]}
+              exact
+              path="/project/map"
+              component={ProjectFields}
+            />
+            <Route path="*">
+              <NoMatch />
+            </Route>
+          </Switch>
+        </main>
       </ModalProvider>
     </AppContext.Provider>
   );
@@ -152,5 +164,8 @@ const NoMatch = () => {
     </div>
   );
 };
+
+// Non-react routes can return nothing since the content will come from the server
+const Empty = () => <></>;
 
 export default App;

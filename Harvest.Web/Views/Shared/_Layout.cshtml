@@ -1,7 +1,5 @@
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Configuration
 @using Harvest.Core.Services
-@using Harvest.Core.Models
 @inject IConfiguration Configuration
 @inject IUserService UserService
 <!DOCTYPE html>
@@ -52,83 +50,19 @@
                 </div>
         </div>
         </header>
-        <div class="nav-wrapper">
-        <nav class="navbar navbar-expand-md nav container">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
-                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav mr-auto">
-                    @if (await UserService.HasAccess(AccessCodes.SupervisorAccess))
-                    {
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/project">Projects</a>
-                    </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item active">
-                            <a class="nav-link" href="/project/mine">My Projects</a>
-                        </li>
-                    }
-                    
-                    @if (await UserService.HasAccess(AccessCodes.FieldManagerAccess))
-                    {
-                        <li class="nav-item">
-                            <a asp-controller="Permissions" asp-action="Index" class="nav-link">Permissions</a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Rate" asp-action="Index" class="nav-link">Rates</a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Crop" asp-action="Index" class="nav-link">Crops</a>
-                        </li>
-                    }
-                    @if (await UserService.HasAccess(AccessCodes.WorkerAccess))
-                    {
-                        <li class="nav-item">
-                            <a href="/expense/entry" class="nav-link">Expenses</a>
-                        </li>
-                    }
-                    <li class="nav-item">
-                        <a asp-controller="Help" asp-action="Index" class="nav-link">Help</a>
-                    </li>
-                </ul>
-                <div class="row align-items-center">
-                    Welcome @User.GetNameClaim()
-                    <form class="flexer" asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
-                        <button class="btn btn-link btn-sm" type="submit">Sign out</button>
-                    </form>
-                </div>
-            </div>
-        </nav>
-        </div>
-        @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
-        {
-            <div class="container">
-                <div class="alert alert-danger">
-                    <button type="button" class="close" data-dismiss="alert">
-                        <i class="far fa-times-circle"></i>
-                    </button> @TempData["ErrorMessage"]
-                </div>
-            </div>
-        }
-        @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
-        {
-            <div class="container">
-                <div class="alert alert-info">
-                    <button type="button" class="close" data-dismiss="alert">
-                        <i class="far fa-times-circle"></i>
-                    </button> @TempData["Message"]
-                </div>
-            </div>
-        }
 
+        @await Html.PartialAsync("_Messages")
+
+        @* Inject React *@
+        <div id="root"></div>
+
+        @* Main Content Area for non-react routes *@
         <main role="main" class="main-content-wrapper container">
             @RenderBody()
         </main>
     </div>
+
+
     <footer class="container footer">
         <p>Copyright &copy; <span id="copywrite-year"></span> The Regents of the University of California, Davis campus.
             All rights reserved.</p>

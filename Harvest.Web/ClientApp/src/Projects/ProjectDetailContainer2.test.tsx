@@ -67,10 +67,10 @@ describe("Project Detail Container", () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse))
         .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
         .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse));
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
@@ -84,10 +84,10 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const ticketTable = document.querySelectorAll("tbody")[1];
+    const ticketTable = document.querySelectorAll("tbody")[0];
     const rows = ticketTable?.querySelectorAll(".rt-tr-group");
 
-    expect(rows?.length).toBe(3);
+    expect(rows?.length).toBe(4);
   });
 
   it("Display correct number of recent invoices", async () => {
@@ -95,10 +95,10 @@ describe("Project Detail Container", () => {
       global.fetch = jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve(projectResponse))
+        .mockImplementationOnce(() => Promise.resolve(fileResponse))
         .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
         .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+        .mockImplementationOnce(() => Promise.resolve(invoiceResponse));
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
@@ -112,7 +112,7 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const invoiceTable = document.querySelectorAll("tbody")[0];
+    const invoiceTable = document.querySelectorAll("tbody")[1];
     const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(3);

@@ -10,6 +10,7 @@ using Harvest.Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
 namespace Harvest.Core.Services
@@ -18,6 +19,7 @@ namespace Harvest.Core.Services
 
     public interface IUserService
     {
+        Task<User> GetUser(Claim[] userClaims);
         Task<User> GetCurrentUser();
         Task<IEnumerable<string>> GetCurrentRoles();
         Task<bool> HasAccess(string accessCode);
@@ -26,44 +28,39 @@ namespace Harvest.Core.Services
     public class UserService : IUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
         private readonly AppDbContext _dbContext;
         private readonly RoleResolver _roleResolver;
 
-        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, RoleResolver roleResolver)
+        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, RoleResolver roleResolver)
         {
             _httpContextAccessor = httpContextAccessor;
+            _memoryCache = memoryCache;
             _dbContext = dbContext;
             _roleResolver = roleResolver;
         }
 
-        // Get the current user, creating them if necessary
-        public async Task<User> GetCurrentUser()
+        // Get any user based on their claims, creating if necessary
+        public async Task<User> GetUser(Claim[] userClaims)
         {
-            if (_httpContextAccessor.HttpContext == null)
-            {
-                Log.Warning("No HttpContext found. Unable to retrieve or create User.");
-                return null;
-            }
-
-            var username = _httpContextAccessor.HttpContext.User.Identity.Name;
-            var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
             string iamId = userClaims.Single(c => c.Type == IamIdClaimType).Value;
 
             var dbUser = await _dbContext.Users.SingleOrDefaultAsync(a => a.Iam == iamId);
 
             if (dbUser != null)
             {
-                return dbUser;
+                return dbUser; // already in the db, just return straight away
             }
             else
             {
+                // not in the db yet, create new user and return
                 var newUser = new User
                 {
                     FirstName = userClaims.Single(c => c.Type == ClaimTypes.GivenName).Value,
                     LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
                     Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
                     Iam = iamId,
-                    Kerberos = username
+                    Kerberos = userClaims.Single(c=>c.Type == ClaimTypes.NameIdentifier).Value
                 };
 
                 _dbContext.Users.Add(newUser);
@@ -74,24 +71,38 @@ namespace Harvest.Core.Services
             }
         }
 
+        // Get the current user, creating if necessary
+        public async Task<User> GetCurrentUser()
+        {
+            if (_httpContextAccessor.HttpContext == null)
+            {
+                Log.Warning("No HttpContext found. Unable to retrieve or create User.");
+                return null;
+            }
+
+            var userClaims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
+
+            return await GetUser(userClaims);
+        }
+
         public async Task<IEnumerable<string>> GetCurrentRoles()
         {
             var projectId = _httpContextAccessor.GetProjectId();
+            string iamId = _httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == IamIdClaimType).Value;
 
-            var user = await GetCurrentUser();
             var userRoles = await _dbContext.Permissions
-                .Where(p => p.UserId == user.Id)
+                .Where(p => p.User.Iam == iamId)
                 .Select(p => p.Role.Name)
                 .ToArrayAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
-            var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigatorId == user.Id);
+            var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigator.Iam == iamId);
 
             if (isPrincipalInvestigator)
             {
                 return userRoles.Append(Role.Codes.PI);
             }
-            
+
             return userRoles;
         }
 
@@ -112,7 +123,7 @@ namespace Harvest.Core.Services
             var userRoles = await userService.GetCurrentRoles();
             return userRoles.Any(roles.Contains);
         }
-        
+
         public static Task<bool> HasAnyRoles(this IUserService userService, string role, params string[] additionalRoles)
         {
             return HasAnyRoles(userService, additionalRoles.Append(role));

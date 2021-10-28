@@ -211,70 +211,66 @@ export const ProjectDetailContainer = () => {
       </div>
       <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
-            <ProjectUnbilledButton projectId={project.id} />
+          <div className="row">
+            <div className="col-md-6">
+              <h2>Project Attachements</h2>
+              <FileUpload
+                disabled={notification.pending}
+                files={newFiles}
+                setFiles={(f) => {
+                  let files = f.slice(newFiles.length);
+                  if (newFiles.length === 0) {
+                    files = f;
+                  }
+
+                  setNewFiles([...f]);
+                  updateFiles(files);
+                }}
+                updateFile={(f) => {
+                  setNewFiles((oldFiles) => {
+                    if (oldFiles) {
+                      oldFiles[
+                        oldFiles.findIndex(
+                          (file) => file.identifier === f.identifier
+                        )
+                      ] = { ...f };
+                      return [...oldFiles];
+                    }
+
+                    return oldFiles;
+                  });
+                }}
+              />
+              <ul className="no-list-style attached-files-list">
+                {project.attachments.map((attachment, i) => (
+                  <li key={`attachment-${i}`}>
+                    <a
+                      href={attachment.sasLink}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <FontAwesomeIcon icon={faDownload} />
+                      {attachment.fileName}
+                    </a>{" "}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="col-md-6 text-center">
+              {" "}
+              <ProjectUnbilledButton projectId={project.id} />
+            </div>
+          </div>
         </div>
       </div>
       <div>
         {project.status !== "ChangeRequested" && (
-          <div className="row project-detail-tables">
-            <div className="col-md-6">
-              <RecentTicketsContainer compact={true} projectId={projectId} />
-            </div>
-            <div className="col-md-6">
-              <RecentInvoicesContainer compact={true} projectId={projectId} />
-            </div>
+          <div className="card-content">
+            <RecentTicketsContainer compact={true} projectId={projectId} />
+
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
           </div>
         )}
-        <div className="row justify-content-center">
-          <div className="col-md-5">
-            <div className="card-wrapper no-green mt-4 mb-4">
-              <div className="card-content">
-                <h2>Project Attachements</h2>
-                <FileUpload
-                  disabled={notification.pending}
-                  files={newFiles}
-                  setFiles={(f) => {
-                    let files = f.slice(newFiles.length);
-                    if (newFiles.length === 0) {
-                      files = f;
-                    }
-
-                    setNewFiles([...f]);
-                    updateFiles(files);
-                  }}
-                  updateFile={(f) => {
-                    setNewFiles((oldFiles) => {
-                      if (oldFiles) {
-                        oldFiles[
-                          oldFiles.findIndex(
-                            (file) => file.identifier === f.identifier
-                          )
-                        ] = { ...f };
-                        return [...oldFiles];
-                      }
-
-                      return oldFiles;
-                    });
-                  }}
-                />
-                <ul className="no-list-style attached-files-list">
-                  {project.attachments.map((attachment, i) => (
-                    <li key={`attachment-${i}`}>
-                      <a
-                        href={attachment.sasLink}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        <FontAwesomeIcon icon={faDownload} />
-                        {attachment.fileName}
-                      </a>{" "}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

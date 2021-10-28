@@ -23,7 +23,7 @@ describe("Request Container", () => {
         <App />
       </Router>
     );
-    const linkElement = screen.getByText(/Welcome/i);
+    const linkElement = screen.getByText(/You have the following roles:/i);
     expect(linkElement).toBeInTheDocument();
   })
 })

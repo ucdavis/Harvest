@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
+using Harvest.Core.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog.Context;
 
 namespace Harvest.Web.Middleware
