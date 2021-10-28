@@ -312,7 +312,7 @@ export const RequestContainer = () => {
                 </FormGroup>
                 <div className="row justify-content-center">
                   <Button
-                    className="btn-lg"
+                    className="btn-lg mb-2"
                     color="primary"
                     onClick={create}
                     disabled={

@@ -117,7 +117,7 @@ namespace Harvest.Core.Services
                 Details = detailsSerialized,
                 ProjectId = projectId,
                 ActionDate = DateTime.UtcNow,
-                Actor = await _userService.GetCurrentUser(),
+                ActorId = (await _userService.GetCurrentUser())?.Id,
             };
             _dbContext.Add(projectHistory);
             return projectHistory;
@@ -133,7 +133,7 @@ namespace Harvest.Core.Services
                 Details = detailsSerialized,
                 Project = project,
                 ActionDate = DateTime.UtcNow,
-                Actor = await _userService.GetCurrentUser(),
+                ActorId = (await _userService.GetCurrentUser())?.Id,
             };
             _dbContext.Add(projectHistory);
             return projectHistory;
