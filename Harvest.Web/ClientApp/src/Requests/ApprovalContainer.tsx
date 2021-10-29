@@ -129,16 +129,18 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="text-right mt-5">
-                <RejectQuote project={projectAndQuote.project}></RejectQuote>
-                <button
-                  className="btn btn-primary"
-                  disabled={disabled || notification.pending}
-                  onClick={approve}
-                >
-                  Approve Quote
-                </button>
-              </div>
+            </div>
+          </div>
+          <div className="row justify-content-center">
+            <div className="mt-5">
+              <RejectQuote project={projectAndQuote.project}></RejectQuote>
+              <button
+                className="btn btn-primary"
+                disabled={disabled || notification.pending}
+                onClick={approve}
+              >
+                Approve Quote
+              </button>
             </div>
           </div>
         </div>
