@@ -19,7 +19,7 @@ export const RecentInvoicesContainer = (props: Props) => {
     const cb = async () => {
       // TODO: only fetch first 5 instead of chopping off client-side
       const response = await fetch(
-        `/api/Invoice/List/?projectId=${props.projectId}`
+        `/api/Invoice/List/?projectId=${props.projectId}&maxRows=5`
       );
 
       if (response.ok) {
@@ -41,7 +41,7 @@ export const RecentInvoicesContainer = (props: Props) => {
         <div className="row justify-content-center">
           <InvoiceTable
             compact={props.compact}
-            invoices={invoices.slice(0, 5)}
+            invoices={invoices}
           ></InvoiceTable>
         </div>
       </div>

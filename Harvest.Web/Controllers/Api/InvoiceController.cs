@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.InvoiceModels;
 using Harvest.Core.Services;
@@ -49,14 +50,20 @@ namespace Harvest.Web.Controllers.Api
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
         [HttpGet]
-        public async Task<ActionResult> List(int projectId)
+        public async Task<ActionResult> List(int projectId, int? maxRows)
         {
             var user = await _userService.GetCurrentUser();
             var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
-            return Ok(await _dbContext.Invoices.Where(a =>
+
+            var invoiceQuery = _dbContext.Invoices.Where(a =>
                     a.ProjectId == projectId
                     && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
-                .ToArrayAsync());
+                    .OrderByDescending(a => a.CreatedOn);
+
+            if (maxRows.HasValue) {
+                invoiceQuery = (IOrderedQueryable<Invoice>)invoiceQuery.Take(maxRows.Value);
+            }
+            return Ok(await invoiceQuery.ToListAsync());
         }
 
         [HttpPost]

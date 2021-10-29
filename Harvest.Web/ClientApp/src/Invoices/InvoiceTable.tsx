@@ -33,6 +33,7 @@ export const InvoiceTable = (props: Props) => {
         accessor: (row) => row.status,
       },
       {
+        id: "createdOn",
         Header: "Created",
         accessor: (row) =>
           `${row.createdOn} ${new Date(row.createdOn).toLocaleDateString()}`,
@@ -48,7 +49,7 @@ export const InvoiceTable = (props: Props) => {
   );
 
   const initialState: Partial<TableState<any>> = {
-    sortBy: [{ id: "name" }],
+    sortBy: [{ id: "createdOn", desc: true }],
     pageSize: ReactTableUtil.getPageSize(),
   };
 
