@@ -58,7 +58,9 @@ namespace Harvest.Jobs.Notifications
 
             services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
+            services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
 
+            services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>(); //Don't know if I need this or the user stuff.
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton(provder => JsonOptions.Standard);
