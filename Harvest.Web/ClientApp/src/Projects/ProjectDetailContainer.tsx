@@ -258,7 +258,10 @@ export const ProjectDetailContainer = () => {
             </div>
             <div className="col-md-6 text-center">
               {" "}
-                          <ProjectUnbilledButton projectId={project.id} remaining={project.quoteTotal - project.chargedTotal}/>
+              <ProjectUnbilledButton
+                projectId={project.id}
+                remaining={project.quoteTotal - project.chargedTotal}
+              />
             </div>
           </div>
         </div>
