@@ -28,14 +28,12 @@ namespace Harvest.Core.Services
     public class UserService : IUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMemoryCache _memoryCache;
         private readonly AppDbContext _dbContext;
         private readonly RoleResolver _roleResolver;
 
-        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, IMemoryCache memoryCache, RoleResolver roleResolver)
+        public UserService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, RoleResolver roleResolver)
         {
             _httpContextAccessor = httpContextAccessor;
-            _memoryCache = memoryCache;
             _dbContext = dbContext;
             _roleResolver = roleResolver;
         }
