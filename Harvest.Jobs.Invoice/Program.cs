@@ -7,6 +7,7 @@ using Harvest.Core.Utilities;
 using Harvest.Jobs.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -74,6 +75,7 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddTransient<IDateTimeService, DateTimeService>();
+            services.AddScoped<IMemoryCache, MemoryCache>();
 
             return services.BuildServiceProvider();
         }
