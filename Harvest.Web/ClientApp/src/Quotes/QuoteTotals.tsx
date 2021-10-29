@@ -10,9 +10,11 @@ interface Props {
 
 export const QuoteTotals = (props: Props) => {
   return (
-    <Card className="card-project-totals box-shadow mt-4">
-      <CardHeader>Project Totals</CardHeader>
-      <CardBody>
+    <div className="card-wrapper gray-top mt-4">
+      <div className="card-header">
+        <h4 className="primary-color bold-font">Project Totals</h4>
+      </div>
+      <div className="card-content">
         <div id="total">
           <div className="row justify-content-between">
             <Col xs="6">
@@ -55,7 +57,7 @@ export const QuoteTotals = (props: Props) => {
             </Col>
           </Row>
         </div>
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };

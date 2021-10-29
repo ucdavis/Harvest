@@ -122,7 +122,7 @@ export const ProjectHeader = (props: Props) => {
                 </div>
 
                 <Progress
-                  style={{ width: "100%", height: "10px" }}
+                  style={{ width: "100%", height: "14px" }}
                   value={(project.chargedTotal / project.quoteTotal) * 100}
                 />
               </div>

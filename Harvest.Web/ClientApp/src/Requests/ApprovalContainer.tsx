@@ -113,7 +113,7 @@ export const ApprovalContainer = () => {
               <h4>
                 <b>Terms and Conditions</b>
               </h4>
-              <ol>
+              <ol className="margin-left-fixer">
                 <li>
                   This estimate is approximate based on the information provided
                   by the client. A change order is required if substantial

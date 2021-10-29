@@ -133,6 +133,7 @@
   }
 }
 .harvest-table {
+  margin-bottom: 3rem;
   th {
     background-color: $primary-light;
     color: $secondary-font;
@@ -341,4 +342,10 @@ input[type="radio" i] {
 }
 .react-datepicker__close-icon::after {
   background-color: $primary-color;
+}
+.margin-left-fixer {
+  margin-left: -15px;
+}
+.float-right {
+  float: right;
 }

@@ -10,10 +10,10 @@ export const ReturnToProject = (props: Props) => (
   <div className="card-green-bg green-bg-border">
     <div className="card-content">
       <div className="row justify-content-between">
-        <div className="col-12">
+        <div className="col-12 margin-left-fixer">
           <Link
             to={`/project/details/${props.projectId}`}
-            className="btn btn-sm btn-primary"
+            className="btn btn-sm btn-link"
           >
             Back to project details <FontAwesomeIcon icon={faArrowLeft} />
           </Link>

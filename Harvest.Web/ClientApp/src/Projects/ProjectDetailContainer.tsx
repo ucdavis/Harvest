@@ -139,7 +139,7 @@ export const ProjectDetailContainer = () => {
                 }
               >
                 <button
-                  className="btn btn-danger btn-sm mr-4"
+                  className="btn btn-danger btn-sm mr-4 float-right"
                   onClick={() => cancelProject()}
                 >
                   Cancel Request
