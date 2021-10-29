@@ -69,8 +69,8 @@ export const InvoiceTotals = (props: Props) => {
             <Col xs="6">
               <h6>Total Cost</h6>
             </Col>
-            <Col xs="4" className="text-right">
-              <span>${formatCurrency(grandTotal)}</span>
+            <Col xs="6" className="text-right">
+              <p className="lede">${formatCurrency(grandTotal)}</p>
             </Col>
           </Row>
         </div>

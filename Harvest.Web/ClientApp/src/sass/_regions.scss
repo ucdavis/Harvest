@@ -41,14 +41,19 @@
 }
 .total-row {
   // background-color: transparentize($primary-color, 0.75);
-  padding: 12px 0 8px 0;
-  border-top: 3px solid $borders;
-  margin: 12px -13px 0 -13px;
-  h6,
-  span {
+  padding-top: 1%;
+  .col-6 {
+    border-top: 2px solid #dee2e6;
+    padding-top: 1%;
+  }
+  h6 {
     font-size: 1.1rem;
     font-weight: bold;
     padding-bottom: 0;
+    margin-bottom: 0;
+  }
+  p.lede {
+    margin-bottom: 0;
   }
 }
 .rbt-token {
@@ -59,6 +64,7 @@
   margin-bottom: 1.5rem;
 }
 .navbar {
+  padding-left: 0;
   .nav-item {
     .nav-link {
       font-size: 1.2rem;
@@ -135,7 +141,11 @@
     padding: 0;
   }
 }
-
+.attached-files-list {
+  li {
+    margin: 1.5% 0;
+  }
+}
 // #logoutForm {
 //   display: inline-block;
 // }

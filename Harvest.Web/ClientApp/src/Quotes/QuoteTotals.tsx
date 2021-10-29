@@ -52,8 +52,8 @@ export const QuoteTotals = (props: Props) => {
             <Col xs="6">
               <h6>Total Cost</h6>
             </Col>
-            <Col xs="4" className="text-right">
-              <span>${formatCurrency(props.quote.grandTotal)}</span>
+            <Col xs="6" className="text-right">
+              <p className="lede">${formatCurrency(props.quote.grandTotal)}</p>
             </Col>
           </Row>
         </div>

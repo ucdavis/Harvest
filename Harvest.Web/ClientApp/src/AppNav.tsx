@@ -28,7 +28,7 @@ export const AppNav = () => {
           <Collapse isOpen={isOpen} navbar>
             <Nav className="mr-auto" navbar>
               <ShowFor roles={["FieldManager", "Supervisor"]}>
-                <NavItem className="margin-left-fixer">
+                <NavItem>
                   <NavLink href="/project">All Projects</NavLink>
                 </NavItem>
               </ShowFor>

@@ -29,6 +29,7 @@ export const InvoiceDisplay = (props: Props) => {
   return (
     <div>
       <h1>Invoice</h1>
+      <br />
       {acreageExpenses.map((expense) => (
         <p key={"expense_" + expense.id}>
           <b>
@@ -60,9 +61,11 @@ export const InvoiceDisplay = (props: Props) => {
         );
       })}
 
-      <Card className="card-project-totals mt-4">
-        <CardHeader>Account(s)</CardHeader>
-        <CardBody>
+      <div className="card-wrapper gray-top mt-4">
+        <div className="card-header">
+          <h4 className="primary-color bold-font">Account(s)</h4>
+        </div>
+        <div className="card-content">
           <div id="accounts123">
             {accounts.map((transfers) => (
               <Row key={"transfer_" + transfers.id}>
@@ -75,8 +78,8 @@ export const InvoiceDisplay = (props: Props) => {
               </Row>
             ))}
           </div>
-        </CardBody>
-      </Card>
+        </div>
+      </div>
       <InvoiceTotals invoice={props.invoice}></InvoiceTotals>
     </div>
   );
