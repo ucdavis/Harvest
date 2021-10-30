@@ -59,6 +59,16 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> GetCompleted()
+        {
+            return Ok(await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Where(p => p.IsActive && p.Status == Project.Statuses.Completed)
+                .OrderBy(p => p.Name)
+                .ToArrayAsync());
+        }
+
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public async Task<ActionResult> RequiringManagerAttention()
         {
             // return basic info on projects which are waiting for manager attention

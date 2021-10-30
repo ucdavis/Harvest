@@ -98,6 +98,13 @@ function App() {
             >
               <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
             </ConditionalRoute>
+            <ConditionalRoute
+              exact
+              roles={["FieldManager", "Supervisor"]}
+              path="/project/completed"
+            >
+              <ProjectListContainer projectSource="/api/Project/GetCompleted" />
+            </ConditionalRoute>
             <ConditionalRoute exact roles={["PI"]} path="/project/mine">
               <ProjectListContainer projectSource="/api/Project/GetMine" />
             </ConditionalRoute>

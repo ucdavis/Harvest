@@ -14,8 +14,10 @@ interface Props {
 
 const getListTitle = (projectSource: string) => {
   switch (projectSource) {
-    case "/Project/RequiringManagerAttention":
+    case "/api/Project/RequiringManagerAttention":
       return "Projects Requiring Manager Attention";
+    case "/api/Project/GetCompleted":
+      return "Completed Projects";
     default:
       return "Projects";
   }
