@@ -40,18 +40,7 @@ body {
     border-bottom: 1px solid $borders;
   }
 }
-.card-project-status {
-  h4 {
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    color: $secondary-font;
-    font-family: $sans-bold;
-  }
-  p {
-    font-size: 1.1rem;
-  }
-  border-top: 1px solid $borders;
-}
+
 .container {
   padding: 0;
   width: 98%;

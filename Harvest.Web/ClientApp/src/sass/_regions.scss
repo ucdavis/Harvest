@@ -125,9 +125,27 @@
   padding: 2% 0 3% 0;
 }
 .project-actions {
+  h4 {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: $secondary-font;
+    font-family: $sans-bold;
+  }
   .btn {
     margin-top: 6px;
   }
+}
+.card-project-status {
+  h4 {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: $secondary-font;
+    font-family: $sans-bold;
+  }
+  p {
+    font-size: 1.1rem;
+  }
+  border-top: 1px solid $borders;
 }
 .project-header {
   border-bottom: 1px solid $borders;

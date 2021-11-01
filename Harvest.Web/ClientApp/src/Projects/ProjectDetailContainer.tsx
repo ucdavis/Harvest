@@ -137,6 +137,7 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col-md-12 project-actions">
+              <h4>Project actions</h4>
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
                 condition={
