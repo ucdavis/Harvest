@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -15,12 +15,15 @@ import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
+import { userInfo } from "os";
+import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
   projectId?: string;
 }
 
 export const ProjectDetailContainer = () => {
+  const user1 = useContext(AppContext).user;
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -172,7 +175,13 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
 
-              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+              <ShowFor
+                roles={["PI"]}
+                condition={
+                  project.status === "Active" &&
+                  project.principalInvestigator.id === user1.detail.id
+                }
+              >
                 <Link
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/changeAccount/${project.id}`}
@@ -180,7 +189,10 @@ export const ProjectDetailContainer = () => {
                   Change Accounts
                 </Link>
               </ShowFor>
-              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+              <ShowFor
+                roles={["PI", "FieldManager"]}
+                condition={project.status === "Active"}
+              >
                 <Link
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/create/${project.id}`}
