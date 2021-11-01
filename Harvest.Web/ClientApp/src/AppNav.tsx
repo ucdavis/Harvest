@@ -53,6 +53,10 @@ export const AppNav = () => {
                     </DropdownItem>
                     <DropdownItem href="/Rate/Index">Rates</DropdownItem>
                     <DropdownItem href="/Crop/Index">Crops</DropdownItem>
+                    <DropdownItem divider />
+                    <DropdownItem href="/Project/Completed">
+                      Completed Projects
+                    </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </ShowFor>
