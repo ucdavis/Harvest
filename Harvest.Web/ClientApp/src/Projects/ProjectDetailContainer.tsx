@@ -161,8 +161,8 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
 
-              <ShowFor
-                roles={["PI"]}
+              <ShowForPiOnly
+                project={project}
                 condition={project.status === "PendingApproval"}
               >
                 <Link
@@ -171,7 +171,7 @@ export const ProjectDetailContainer = () => {
                 >
                   View Quote
                 </Link>
-              </ShowFor>
+              </ShowForPiOnly>
               <ShowForPiOnly
                 project={project}
                 condition={project.status === "Active"}
@@ -195,7 +195,7 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
               <ShowFor
-                roles={["PI"]}
+                roles={["PI", "FieldManager"]}
                 condition={
                   // all statuses with approved quotes
                   project.status === "Active" ||
