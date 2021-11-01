@@ -158,6 +158,8 @@ export interface QuoteContent {
   otherTotal: number;
   grandTotal: number;
   fields: Field[];
+  approvedBy?: User;
+  approvedOn?: Date;
 }
 
 export interface Field {

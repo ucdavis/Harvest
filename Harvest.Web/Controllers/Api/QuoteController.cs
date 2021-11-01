@@ -44,7 +44,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> GetApproved(int projectId)
         {
             var project = await _dbContext.Projects
-                .Include(p => p.Quote)
+                .Include(p => p.Quote).ThenInclude(a => a.ApprovedBy)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Accounts)
                 .Include(p => p.CreatedBy)
@@ -53,8 +53,13 @@ namespace Harvest.Web.Controllers.Api
             var model = new QuoteModel
             {
                 Project = project,
-                Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null
+                Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null,
             };
+            if (project.Quote != null)
+            {
+                model.Quote.ApprovedBy = project.Quote?.ApprovedBy;
+                model.Quote.ApprovedOn = project.Quote?.ApprovedOn;
+            }
 
             return Ok(model);
         }

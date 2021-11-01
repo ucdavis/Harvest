@@ -14,6 +14,21 @@ export const QuoteDisplay = (props: Props) => {
   return (
     <div>
       <h1>Quote</h1>
+      {quote.approvedBy && (
+        <div>
+          <h2>Approved By</h2>
+          <p>
+            {quote.approvedBy.firstName} {quote.approvedBy.lastName}
+          </p>
+        </div>
+      )}
+      {quote.approvedOn && (
+        <div>
+          <h2>Approved On</h2>
+          <p>{new Date(quote.approvedOn).toDateString()}</p>
+        </div>
+      )}
+
       <p>
         {quote.acreageTotal ? (
           <b>
