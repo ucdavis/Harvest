@@ -44,7 +44,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> GetApproved(int projectId)
         {
             var project = await _dbContext.Projects
-                .Include(p => p.Quote)
+                .Include(p => p.Quote).ThenInclude(a => a.ApprovedBy)
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Accounts)
                 .Include(p => p.CreatedBy)
