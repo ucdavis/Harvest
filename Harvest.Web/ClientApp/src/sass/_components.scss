@@ -41,12 +41,34 @@
     border-color: lighten($primary-color, 7);
   }
 }
-.btn-danger {
-  background-color: $danger;
-  border-color: $danger;
+.btn-secondary {
+  background-color: $california;
+  border-color: $california;
+  color: #fff;
   &:hover {
-    background-color: lighten($danger, 7);
-    border-color: lighten($danger, 7);
+    background-color: lighten($california, 7);
+    border-color: lighten($california, 7);
+    color: #fff;
+  }
+}
+.btn-sunflower {
+  background-color: #d5b804;
+  border-color: #d5b804;
+  color: #fff;
+  &:hover {
+    background-color: lighten(#d5b804, 7);
+    border-color: lighten(#d5b804, 7);
+    color: #fff;
+  }
+}
+.btn-danger {
+  background-color: $merlot;
+  border-color: $merlot;
+  color: #fff;
+  &:hover {
+    background-color: lighten($merlot, 7);
+    border-color: lighten($merlot, 7);
+    color: #fff;
   }
 }
 .btn-sm {
@@ -216,7 +238,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $sunflower;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -227,7 +249,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $sunflower;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -238,7 +260,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 2px;
   }
 }
@@ -249,7 +271,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $merlot;
     margin-right: 2px;
   }
 }
@@ -271,7 +293,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 2px;
   }
 }
@@ -282,7 +304,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $tahoe;
+    background-color: $bodega;
     margin-right: 2px;
   }
 }
@@ -293,7 +315,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 2px;
   }
 }
@@ -304,7 +326,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 6px;
   }
 }
@@ -348,4 +370,13 @@ input[type="radio" i] {
 }
 .float-right {
   float: right;
+}
+.california-bg {
+  background-color: transparentize($california, 0.9);
+}
+.sunflower-bg {
+  background-color: transparentize(#d5b804, 0.9);
+}
+.merlot-bg {
+  background-color: transparentize($merlot, 0.9);
 }
