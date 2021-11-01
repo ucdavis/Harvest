@@ -15,7 +15,6 @@ import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
-import { userInfo } from "os";
 import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
