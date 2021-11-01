@@ -7,8 +7,8 @@ import { Project } from "../types";
 
 interface Props {
   children: any;
-  condition?: boolean | (() => boolean);
   project: Project;
+  condition?: boolean | (() => boolean);
 }
 
 export const ShowForPiOnly = (props: Props) => {
@@ -17,8 +17,10 @@ export const ShowForPiOnly = (props: Props) => {
     <ShowFor
       roles={["PI"]}
       condition={
-        props.project.principalInvestigator.iam === user.detail.iam &&
-        props.project.status === "Active"
+        props.condition
+          ? props.condition &&
+            props.project.principalInvestigator.iam === user.detail.iam
+          : props.project.principalInvestigator.iam === user.detail.iam
       }
     >
       {props.children}
