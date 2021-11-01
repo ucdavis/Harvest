@@ -53,8 +53,13 @@ namespace Harvest.Web.Controllers.Api
             var model = new QuoteModel
             {
                 Project = project,
-                Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null
+                Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null,
             };
+            if (model.Quote != null)
+            {
+                model.Quote.ApprovedBy = project.Quote?.ApprovedBy;
+                model.Quote.ApprovedOn = project.Quote?.ApprovedOn;
+            }
 
             return Ok(model);
         }
