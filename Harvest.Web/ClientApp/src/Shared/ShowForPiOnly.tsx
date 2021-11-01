@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 
 import AppContext from "./AppContext";
+import { ShowFor } from "../Shared/ShowFor";
 
-import { isBoolean, isFunction } from "../Util/TypeChecks";
 import { Project } from "../types";
 
 interface Props {
@@ -13,21 +13,17 @@ interface Props {
 
 export const ShowForPiOnly = (props: Props) => {
   const user = useContext(AppContext).user;
-  const { children } = props;
-  const userRoles = useContext(AppContext).user.roles;
-  const conditionSatisfied = isBoolean(props.condition)
-    ? props.condition
-    : isFunction(props.condition)
-    ? props.condition()
-    : true;
-
-  if (
-    conditionSatisfied &&
-    user.detail.iam === props.project.principalInvestigator.iam &&
-    (userRoles.includes("System") || userRoles.includes("PI"))
-  ) {
-    return <>{children}</>;
-  }
-
-  return null;
+  return (
+    <ShowFor
+      roles={["PI"]}
+      condition={
+        props.condition
+          ? props.condition &&
+            props.project.principalInvestigator.iam === user.detail.iam
+          : props.project.principalInvestigator.iam === user.detail.iam
+      }
+    >
+      {props.children}
+    </ShowFor>
+  );
 };
