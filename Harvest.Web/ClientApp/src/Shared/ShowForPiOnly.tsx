@@ -17,10 +17,8 @@ export const ShowForPiOnly = (props: Props) => {
     <ShowFor
       roles={["PI"]}
       condition={
-        props.condition
-          ? props.condition &&
-            props.project.principalInvestigator.iam === user.detail.iam
-          : props.project.principalInvestigator.iam === user.detail.iam
+        props.project.principalInvestigator.iam === user.detail.iam &&
+        props.project.status === "Active"
       }
     >
       {props.children}

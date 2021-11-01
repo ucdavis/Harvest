@@ -172,10 +172,7 @@ export const ProjectDetailContainer = () => {
                   View Quote
                 </Link>
               </ShowFor>
-              <ShowForPiOnly
-                project={project}
-                condition={project.status === "Active"}
-              >
+              <ShowForPiOnly project={project}>
                 <Link
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/changeAccount/${project.id}`}
