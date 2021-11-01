@@ -174,12 +174,11 @@ export const ProjectDetailContainer = () => {
                   View Quote
                 </Link>
               </ShowFor>
-
               <ShowFor
                 roles={["PI"]}
                 condition={
                   project.status === "Active" &&
-                  project.principalInvestigator.id === user1.detail.id
+                  project.principalInvestigator.iam === user1.detail.iam
                 }
               >
                 <Link
