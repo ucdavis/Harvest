@@ -43,6 +43,9 @@ namespace Harvest.Core.Services
         Task<bool> InvoiceCreated(Invoice invoice);
         Task<bool> InvoiceDone(Invoice invoice, string status);
         Task<bool> InvoiceError(Invoice invoice);
+
+        Task<bool> CloseoutConfirmation(Project project); //Project is awaiting PI to close it
+        Task<bool> ProjectClosed(Project project); //Project has been closed by PI
     }
 
     public class EmailService : IEmailService
@@ -566,6 +569,73 @@ namespace Harvest.Core.Services
             catch (Exception ex)
             {
                 Log.Error("Error emailing invoice error", ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> CloseoutConfirmation(Project project)
+        {
+            try
+            {
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var closeoutUrl = $"{_emailSettings.BaseUrl}/Project/CloseoutConfirmation/";
+                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var ccEmails = await FieldManagersEmails();
+
+                var model = new CloseoutConfirmationModel()
+                {
+                    PI = project.PrincipalInvestigator.NameAndEmail,
+                    ProjectName = project.Name,
+                    ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                    ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                    ButtonUrl1 = $"{projectUrl}{project.Id}",
+                    ButtonText1 = "View Project",
+                    ButtonUrl2 = $"{closeoutUrl}{project.Id}",
+                    ButtonText2 = "Approve Closeout",
+                };
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/CloseoutConfirmation.cshtml", model);
+                var textVersion = $"Project Closeout Confirmation Requested for {model.ProjectName}.";
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Project Closeout Confirmation Requested");
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing CloseoutConfirmation ", ex);
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<bool> ProjectClosed(Project project)
+        {
+            try
+            {
+                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var emailTo = await FieldManagersEmails();
+                var ccEmails = new string[] { project.PrincipalInvestigator.Email };
+
+                var model = new ProjectClosedModel()
+                {
+                    PI = project.PrincipalInvestigator.NameAndEmail,
+                    ProjectName = project.Name,
+                    ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                    ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                    ButtonUrl1 = $"{projectUrl}{project.Id}",
+                    ButtonText1 = "View Project",
+                };
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProjectClosed.cshtml", model);
+                var textVersion = $"Project {model.ProjectName} Closed.";
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Project Closed");
+
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Error emailing CloseoutConfirmation ", ex);
                 return false;
             }
 
