@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,18 +11,17 @@ import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { ShowFor } from "../Shared/ShowFor";
+import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
-import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
   projectId?: string;
 }
 
 export const ProjectDetailContainer = () => {
-  const user1 = useContext(AppContext).user;
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>();
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -173,12 +172,9 @@ export const ProjectDetailContainer = () => {
                   View Quote
                 </Link>
               </ShowFor>
-              <ShowFor
-                roles={["PI"]}
-                condition={
-                  project.status === "Active" &&
-                  project.principalInvestigator.iam === user1.detail.iam
-                }
+              <ShowForPiOnly
+                project={project}
+                condition={project.status === "Active"}
               >
                 <Link
                   className="btn btn-primary btn-sm mr-4"
@@ -186,7 +182,7 @@ export const ProjectDetailContainer = () => {
                 >
                   Change Accounts
                 </Link>
-              </ShowFor>
+              </ShowForPiOnly>
               <ShowFor
                 roles={["PI", "FieldManager"]}
                 condition={project.status === "Active"}
