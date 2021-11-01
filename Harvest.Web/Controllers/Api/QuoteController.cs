@@ -55,7 +55,7 @@ namespace Harvest.Web.Controllers.Api
                 Project = project,
                 Quote = !string.IsNullOrWhiteSpace(project.Quote?.Text) ? QuoteDetail.Deserialize(project.Quote.Text) : null,
             };
-            if (model.Quote != null)
+            if (project.Quote != null)
             {
                 model.Quote.ApprovedBy = project.Quote?.ApprovedBy;
                 model.Quote.ApprovedOn = project.Quote?.ApprovedOn;
