@@ -55,7 +55,8 @@ const getStatusDetail = (project: Project): StatusDetail => {
       return {
         showAlert: true,
         cardClass: "california-bg",
-        statusText: "This project is waiting for a quote. Create it now:",
+        statusText:
+          "This project is waiting for a quote. Use the edit quote button to create one.",
         actionText: "Create Quote",
         linkClass: "btn-secondary",
         linkTo: `/quote/create/${project.id}`,
@@ -65,7 +66,7 @@ const getStatusDetail = (project: Project): StatusDetail => {
         showAlert: true,
         cardClass: "sunflower-bg",
         statusText:
-          "This project has a quote waiting for your approval. View the quote now:",
+          "This project has a quote waiting for your approval. Use the view quote button to view it.",
         actionText: "View Quote",
         linkClass: "btn-sunflower",
         linkTo: `/request/approve/${project.id}`,
@@ -75,7 +76,7 @@ const getStatusDetail = (project: Project): StatusDetail => {
         showAlert: true,
         cardClass: "merlot-bg",
         statusText:
-          "The PI has rejected the quote and is waiting for an updated quote. Create it now:",
+          "The PI has rejected the quote and is waiting for an updated quote. Use the edit quote button to create one.",
         actionText: "Create Quote",
         linkClass: "btn-danger",
         linkTo: `/quote/create/${project.id}`,
