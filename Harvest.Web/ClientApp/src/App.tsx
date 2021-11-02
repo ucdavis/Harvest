@@ -76,7 +76,7 @@ function App() {
               component={QuoteContainer}
             />
             <ConditionalRoute
-              roles={["PI"]}
+              roles={["PI", "FieldManager"]}
               path="/quote/details/:projectId"
               component={QuoteDisplayContainer}
             />
