@@ -74,7 +74,6 @@ export const ExpenseTable = (props: Props) => {
                   <Button
                     color="link"
                     onClick={() => deleteExpense(data.row.original)}
-                    disabled={!canDeleteExpense}
                   >
                     Delete
                   </Button>
