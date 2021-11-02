@@ -181,6 +181,7 @@ namespace Harvest.Core.Domain
             public const string Active = "Active";
             public const string ChangeRequested = "ChangeRequested";
             public const string AwaitingCloseout = "AwaitingCloseout";
+            public const string PendingCloseoutApproval = "PendingCloseoutApproval";
             public const string FinalInvoicePending = "FinalInvoicePending";
             public const string Completed = "Completed";
             public const string Canceled = "Canceled";
@@ -195,6 +196,7 @@ namespace Harvest.Core.Domain
                 Active,
                 ChangeRequested,
                 AwaitingCloseout,
+                PendingCloseoutApproval,
                 FinalInvoicePending,
                 Completed,
                 Canceled,

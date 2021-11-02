@@ -13,7 +13,6 @@ import { BlobFile, Project } from "../types";
 import { ShowFor } from "../Shared/ShowFor";
 import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
-import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
 
@@ -106,7 +105,8 @@ export const ProjectDetailContainer = () => {
                 roles={["Supervisor", "FieldManager"]}
                 condition={
                   project.status === "Active" ||
-                  project.status === "AwaitingCloseout"
+                  project.status === "AwaitingCloseout" ||
+                  project.status === "PendingCloseoutApproval"
                 }
               >
                 <Link
@@ -160,6 +160,17 @@ export const ProjectDetailContainer = () => {
                   Close Out Project
                 </Link>
               </ShowFor>
+              <ShowForPiOnly
+                project={project}
+                condition={project.status === "PendingCloseoutApproval"}
+              >
+                <Link
+                  className="btn btn-primary btn-sm mr-4"
+                  to={`/project/closeoutconfirmation/${project.id}`}
+                >
+                  Confirm Close Out
+                </Link>
+              </ShowForPiOnly>
 
               <ShowForPiOnly
                 project={project}
@@ -201,6 +212,7 @@ export const ProjectDetailContainer = () => {
                   project.status === "Active" ||
                   project.status === "Completed" ||
                   project.status === "AwaitingCloseout" ||
+                  project.status === "PendingCloseoutApproval" ||
                   project.status === "FinalInvoicePending"
                 }
               >

@@ -27,6 +27,7 @@ import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { CloseoutContainer } from "./Closeout/CloseoutContainer";
+import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationContainer";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -83,6 +84,11 @@ function App() {
               roles={["FieldManager"]}
               path="/project/closeout/:projectId"
               component={CloseoutContainer}
+            />
+            <ConditionalRoute
+              roles={["PI"]}
+              path="/project/closeoutconfirmation/:projectId"
+              component={CloseoutConfirmationContainer}
             />
             <ConditionalRoute
               exact

@@ -65,7 +65,7 @@ export const fakeProject: Project = {
   quoteTotal: 0.0,
   chargedTotal: 0.0,
   createdOn: new Date("2021-03-15T00:00:00"),
-  status: "Requested",
+  status: "Active",
   currentAccountVersion: 0,
   isActive: false,
   createdBy: {

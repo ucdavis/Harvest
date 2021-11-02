@@ -26,6 +26,7 @@ export type ProjectStatus =
   | "ChangeRequested"
   | "Completed"
   | "AwaitingCloseout"
+  | "PendingCloseoutApproval"
   | "FinalInvoicePending";
 
 export interface Project {

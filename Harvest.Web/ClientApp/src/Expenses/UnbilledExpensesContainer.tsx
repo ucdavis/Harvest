@@ -20,6 +20,7 @@ interface RouteParams {
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
   hideProjectHeader?: boolean;
+  disableEdits?: boolean;
 }
 
 export const UnbilledExpensesContainer = (props: Props) => {
@@ -124,7 +125,10 @@ export const UnbilledExpensesContainer = (props: Props) => {
             )}
           </div>
           <div className="col text-right">
-            <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
+            <ShowFor
+              roles={["FieldManager", "Supervisor", "Worker"]}
+              condition={project.status !== "PendingCloseoutApproval"}
+            >
               <Link
                 to={`/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
                 className="btn btn btn-primary "
@@ -139,7 +143,10 @@ export const UnbilledExpensesContainer = (props: Props) => {
           <ExpenseTable
             expenses={expenses}
             deleteExpense={deleteExpense}
-            canDeleteExpense={!notification.pending}
+            canDeleteExpense={
+              !notification.pending &&
+              project?.status !== "PendingCloseoutApproval"
+            }
           ></ExpenseTable>
         )}
       </div>

@@ -27,6 +27,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> InvoiceCompleted(int projectId, Invoice invoice);
         Task<ProjectHistory> InvoiceCreated(int projectId, Invoice invoice);
         Task<ProjectHistory> MoveMoneyRequested(int projectId, Invoice invoice);
+        Task<ProjectHistory> ProjectCloseoutInitiated(int projectId, Project project);
         Task<ProjectHistory> ProjectCompleted(int projectId, Project project);
         Task<ProjectHistory> ProjectRequestCanceled(int projectId, Project project);
         Task<ProjectHistory> ProjectFilesAttached(int projectId, IEnumerable<ProjectAttachment> attachments);
@@ -69,11 +70,13 @@ namespace Harvest.Core.Services
             MakeHistory(projectId, nameof(InvoiceCancelled), new InvoiceModel(invoice));
         public Task<ProjectHistory> InvoiceCompleted(int projectId, Invoice invoice) =>
             MakeHistory(projectId, nameof(InvoiceCompleted), new InvoiceModel(invoice));
-        public Task<ProjectHistory> InvoiceCreated(int projectId, Invoice invoice) => 
+        public Task<ProjectHistory> InvoiceCreated(int projectId, Invoice invoice) =>
             MakeHistory(projectId, nameof(InvoiceCreated), new InvoiceModel(invoice));
         public Task<ProjectHistory> MoveMoneyRequested(int projectId, Invoice invoice) =>
             MakeHistory(projectId, nameof(MoveMoneyRequested), new InvoiceModel(invoice));
-        public Task<ProjectHistory> ProjectCompleted(int projectId, Project project) => 
+        public Task<ProjectHistory> ProjectCloseoutInitiated(int projectId, Project project) =>
+            MakeHistory(projectId, nameof(ProjectCloseoutInitiated), new ProjectHistoryModel(project));
+        public Task<ProjectHistory> ProjectCompleted(int projectId, Project project) =>
             MakeHistory(projectId, nameof(ProjectCompleted), new ProjectHistoryModel(project));
         public Task<ProjectHistory> ProjectRequestCanceled(int projectId, Project project) =>
             MakeHistory(projectId, nameof(ProjectRequestCanceled), new ProjectHistoryModel(project));

@@ -1,11 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Link, useHistory, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   Activity,
   Expense,
   Rate,
   WorkItemImpl,
   ExpenseQueryParams,
+  Project,
 } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
 import { ActivityForm } from "../Quotes/ActivityForm";
@@ -26,6 +28,7 @@ import * as yup from "yup";
 import { useQuery } from "../Shared/UseQuery";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { validatorOptions } from "../constants";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 interface RouteParams {
   projectId?: string;
@@ -51,6 +54,7 @@ export const ExpenseEntryContainer = () => {
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
   const context = useOrCreateValidationContext(validatorOptions);
+  const [project, setProject] = useState<Project>();
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([
@@ -63,6 +67,19 @@ export const ExpenseEntryContainer = () => {
 
   const query = useQuery();
   const getIsMounted = useIsMounted();
+
+  const leavePage = useCallback(() => {
+    // go to the project page unless you are a worker -- worker can't see the project page
+    if (roles.includes("Worker")) {
+      history.push("/");
+    } else {
+      if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
+        history.goBack();
+      } else {
+        history.push(`/project/details/${projectId}`);
+      }
+    }
+  }, [projectId, history, query, roles]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -80,6 +97,41 @@ export const ExpenseEntryContainer = () => {
 
     cb();
   }, [getIsMounted]);
+
+  useEffect(() => {
+    // get project in order to determine if it can accept new expenses
+    const cb = async () => {
+      const response = await fetch(`/api/Project/Get/${projectId}`);
+
+      if (response.ok) {
+        const project = (await response.json()) as Project;
+        getIsMounted() && setProject(project);
+      }
+    };
+
+    if (projectId) {
+      cb();
+    }
+  }, [projectId, getIsMounted]);
+
+  useEffect(() => {
+    if (!project) {
+      return;
+    }
+
+    if (
+      project.status !== "Active" &&
+      project.status !== "AwaitingCloseout" &&
+      project.status !== "PendingCloseoutApproval"
+    ) {
+      toast.error(
+        `Expenses cannot be entered for project with status of ${convertCamelCase(
+          project.status
+        )}`
+      );
+      leavePage();
+    }
+  }, [project, leavePage]);
 
   const changeProject = (projectId: number) => {
     // want to go to /expense/entry/[projectId]
@@ -142,16 +194,7 @@ export const ExpenseEntryContainer = () => {
     const response = await request;
 
     if (response.ok) {
-      // go to the project page unless you are a worker -- worker can't see the project page
-      if (roles.includes("Worker")) {
-        history.push("/");
-      } else {
-        if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
-          history.goBack();
-        } else {
-          history.push(`/project/details/${projectId}`);
-        }
-      }
+      leavePage();
     }
   };
 

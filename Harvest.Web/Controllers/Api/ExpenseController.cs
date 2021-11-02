@@ -33,7 +33,14 @@ namespace Harvest.Web.Controllers.Api
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
         {
-            // TODO: validation!
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            if (project.Status != Project.Statuses.Active
+                && project.Status != Project.Statuses.AwaitingCloseout
+                && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
+            }
+
             var user = await _userService.GetCurrentUser();
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
@@ -53,17 +60,6 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.SaveChangesAsync();
 
             return Ok(expenses);
-        }
-
-        [HttpPost]
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult> CreateAcreage(int projectId, [FromQuery] decimal amount)
-        {
-            //TODO: Change closeout container so this isn't called
-            //await _expenseService.CreateAcreageExpense(projectId, amount);
-
-            return Ok();
         }
 
         [HttpPost]
