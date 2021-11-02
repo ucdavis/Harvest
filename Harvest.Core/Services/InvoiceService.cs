@@ -60,6 +60,8 @@ namespace Harvest.Core.Services
 
             project.Status = Project.Statuses.PendingCloseoutApproval;
 
+            await _historyService.ProjectCloseoutInitiated(project.Id, project);
+
             await _dbContext.SaveChangesAsync();
 
             return Result.Value(true, "Closeout initiated. An approval request has been sent to project's PI.");
