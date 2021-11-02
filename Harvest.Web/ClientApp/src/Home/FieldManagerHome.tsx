@@ -25,7 +25,9 @@ export const FieldManagerHome = () => {
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
-      const response = await fetch("/api/ticket/RequiringManagerAttention?limit=3");
+      const response = await fetch(
+        "/api/ticket/RequiringManagerAttention?limit=3"
+      );
       if (getIsMounted()) {
         const tickets: Ticket[] = await response.json();
         getIsMounted() && setTickets(tickets);
@@ -56,7 +58,7 @@ export const FieldManagerHome = () => {
           <Link to="/expense/entry">Enter Project Expenses</Link>
         </li>
         {projects.slice(0, 3).map((project) => (
-          <li className="list-group-item">
+          <li key={project.id} className="list-group-item">
             <Link to={`/project/details/${project.id}`}>
               Quick jump to {project.name}{" "}
               <span
