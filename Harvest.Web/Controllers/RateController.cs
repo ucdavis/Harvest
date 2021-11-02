@@ -194,7 +194,7 @@ namespace Harvest.Web.Controllers
                 await _dbContext.SaveChangesAsync();
                 if (rateToEdit.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
                 {
-                    Message = "Rate Created -- WARNING! Passthrough object code is not 80RS";
+                    Message = "Rate Updated -- WARNING! Passthrough object code is not 80RS";
                 }
                 else
                 {
