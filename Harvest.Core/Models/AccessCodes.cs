@@ -11,5 +11,9 @@ namespace Harvest.Core.Models
         /// When using this Authentication, the projectId must be in the parameters.
         /// </summary>
         public const string PrincipalInvestigator = "PrincipalInvestigator";
+        /// <summary>
+        /// When using this Authentication, the projectId must be in the parameters.
+        /// </summary>
+        public const string PrincipalInvestigatorOnly = "PrincipalInvestigatorOnly ";
     }
 }
