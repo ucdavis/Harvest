@@ -67,7 +67,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
             Project project;
@@ -205,7 +205,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> RejectQuote(int projectId, [FromBody] QuoteRejectionModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Reason))
@@ -241,7 +241,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);

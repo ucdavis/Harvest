@@ -42,12 +42,13 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(3);
+            ControllerReflection.ControllerPublicMethods(4);
         }
 
         [Fact]
         public void TestControllerMethodAttributes()
         {
+            var methodName = "";
 #if DEBUG
             var countAdjustment = 1;
 #else
@@ -55,17 +56,28 @@ namespace Test.TestsControllers.TestsApiControllers
 #endif
 
             //1
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Get", countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
+            methodName = "Get";
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
 
             //2
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("List", countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("List", countAdjustment + 2);
+            methodName = "List";
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
 
             //3
-            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("DoCloseout", countAdjustment + 3);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("DoCloseout", countAdjustment + 3);
-            var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("DoCloseout", countAdjustment + 3);
+            methodName = "DoCloseout";
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+            var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
+            attribute.ShouldNotBeNull();
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
+
+            //4
+            methodName = "InitiateCloseout";
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
         }

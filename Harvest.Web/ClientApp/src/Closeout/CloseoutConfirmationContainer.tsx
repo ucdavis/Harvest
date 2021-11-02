@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { Button, UncontrolledTooltip } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,27 +8,22 @@ import { Project, Result } from "../types";
 import { UnbilledExpensesContainer } from "../Expenses/UnbilledExpensesContainer";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
-import { roundToTwo } from "../Util/Calculations";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
   projectId?: string;
 }
 
-interface FinalAcreageExpense {
-  amount: number;
-}
-
-export const CloseoutContainer = () => {
+export const CloseoutConfirmationContainer = () => {
   const { projectId } = useParams<RouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [notification, setNotification] = usePromiseNotification();
-  const [finalAcreageExpense, setFinalAcreageExpense] =
-    useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
   const [closeoutRequested, setCloseoutRequested] = useState(false);
+  const { detail: userDetail } = useContext(AppContext).user;
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -44,32 +39,16 @@ export const CloseoutContainer = () => {
   }, [projectId, getIsMounted]);
 
   useEffect(() => {
-    if (!project) {
-      return;
-    }
-
-    if (
-      finalAcreageExpense.amount === 0 &&
-      project.acreageRate &&
-      project.acres
-    ) {
-      setFinalAcreageExpense({
-        amount: roundToTwo(project.acres * (project.acreageRate.price / 12)),
-      });
-    }
-  }, [project, finalAcreageExpense, setFinalAcreageExpense]);
-
-  useEffect(() => {
     if (closeoutRequested) {
       history.push(`/project/details/${projectId}`);
     }
   }, [closeoutRequested, history, projectId]);
 
   const [getConfirmation] = useConfirmationDialog({
-    title: "Initiate Closeout",
+    title: "Approve Closeout",
     message: (
       <p>
-        Upon PI approval, closeout will result in...
+        Approval of closeout will result in...
         <ul>
           <li>Generating a final invoice if there are any unbilled expenses</li>
           <li>
@@ -81,19 +60,19 @@ export const CloseoutContainer = () => {
     ),
   });
 
-  const initiateCloseout = async () => {
+  const approveCloseout = async () => {
     const [confirmed] = await getConfirmation();
     if (!confirmed) {
       return;
     }
 
-    const request = fetch(`/api/Invoice/InitiateCloseout/${projectId}`, {
+    const request = fetch(`/api/Invoice/DoCloseout/${projectId}`, {
       method: "POST",
     });
 
     setNotification(
       request,
-      "Initiating Project Closeout",
+      "Closing Out Project",
       async (response: Response) => {
         const result = (await response.json()) as Result<number>;
         getIsMounted() && setCloseoutRequested(true);
@@ -107,7 +86,8 @@ export const CloseoutContainer = () => {
   }
 
   const canCloseout =
-    project.status === "AwaitingCloseout" || project.status === "Active";
+    project.status === "PendingCloseoutApproval" &&
+    project.principalInvestigator.iam === userDetail.iam;
 
   return (
     <div className="card-wrapper">
@@ -118,21 +98,20 @@ export const CloseoutContainer = () => {
       <div className="card-content">
         <div className="row">
           <div className="col-md-12">
-            <UnbilledExpensesContainer hideProjectHeader={true} />
+            <UnbilledExpensesContainer hideProjectHeader disableEdits />
             <br />
             <Button
               id="CloseoutButton"
               color="primary"
               disabled={!canCloseout || notification.pending}
-              onClick={initiateCloseout}
+              onClick={approveCloseout}
             >
-              Initiate Closeout <FontAwesomeIcon icon={faCheck} />
+              Approve Closeout <FontAwesomeIcon icon={faCheck} />
             </Button>
             <ShowFor condition={!canCloseout}>
               {/* Not sure if there's a better way to handle indicators as to why something is disabled */}
               <UncontrolledTooltip target="CloseoutButton">
-                Closeout can only be initiated when project is active or
-                awaiting closeout.
+                Closeout approval can only be performed by project's PI.
               </UncontrolledTooltip>
             </ShowFor>
           </div>
