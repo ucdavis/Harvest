@@ -86,7 +86,7 @@ function App() {
               component={CloseoutContainer}
             />
             <ConditionalRoute
-              roles={["FieldManager"]}
+              roles={["PI"]}
               path="/project/closeoutconfirmation/:projectId"
               component={CloseoutConfirmationContainer}
             />
