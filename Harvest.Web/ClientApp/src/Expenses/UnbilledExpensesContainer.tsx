@@ -127,7 +127,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
           <div className="col text-right">
             <ShowFor
               roles={["FieldManager", "Supervisor", "Worker"]}
-              condition={project?.status !== "PendingCloseoutApproval"}
+              condition={project.status !== "PendingCloseoutApproval"}
             >
               <Link
                 to={`/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
