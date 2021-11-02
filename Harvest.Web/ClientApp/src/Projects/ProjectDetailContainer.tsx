@@ -14,6 +14,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
+import { ProjectAlerts } from "./ProjectAlerts";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
 
@@ -98,42 +99,22 @@ export const ProjectDetailContainer = () => {
         title={"Field Request #" + (project?.id || "")}
         hideBack={true}
       />
-      <div className="card-project-status california-bg">
-        <div className="card-content">
-          <h4>Current Status: Requested</h4>
-          <p>This project is pending action x by the xyz</p>
-          <a href="#" className="btn btn-secondary btn-sm">
-            Do the thing
-          </a>
-        </div>
-      </div>
-      <div className="card-project-status sunflower-bg">
-        <div className="card-content">
-          <h4>Current Status: Pending Approval</h4>
-          <p>This project is pending action x by the xyz</p>
-          <a href="#" className="btn btn-sunflower btn-sm">
-            Do the thing
-          </a>
-        </div>
-      </div>
-      <div className="card-project-status california-bg">
-        <div className="card-content">
-          <h4>Current Status: Change Requested</h4>
-          <p>This project is pending action x by the xyz</p>
-          <a href="#" className="btn btn-secondary btn-sm">
-            Do the thing
-          </a>
-        </div>
-      </div>
-      <div className="card-project-status merlot-bg">
-        <div className="card-content">
-          <h4>Current Status: Rejected</h4>
-          <p>This project is pending action x by the xyz</p>
-          <a href="#" className="btn btn-danger btn-sm">
-            Do the thing
-          </a>
-        </div>
-      </div>
+      <ShowFor
+        roles={["FieldManager", "Supervisor"]}
+        condition={
+          project.status === "Requested" ||
+          project.status === "ChangeRequested" ||
+          project.status === "QuoteRejected"
+        }
+      >
+        <ProjectAlerts project={project} />
+      </ShowFor>
+      <ShowForPiOnly
+        project={project}
+        condition={project.status === "PendingApproval"}
+      >
+        <ProjectAlerts project={project} />
+      </ShowForPiOnly>
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
