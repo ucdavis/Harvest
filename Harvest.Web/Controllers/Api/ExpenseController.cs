@@ -38,11 +38,11 @@ namespace Harvest.Web.Controllers.Api
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
-                expense.CreatedBy     = user;
-                expense.CreatedOn     = DateTime.UtcNow;
-                expense.ProjectId     = projectId;
-                expense.InvoiceId     = null;
-                expense.Account       = allRates.Single(a => a.Id == expense.RateId).Account;
+                expense.CreatedBy = user;
+                expense.CreatedOn = DateTime.UtcNow;
+                expense.ProjectId = projectId;
+                expense.InvoiceId = null;
+                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                 expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
             }
 
@@ -53,17 +53,6 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.SaveChangesAsync();
 
             return Ok(expenses);
-        }
-
-        [HttpPost]
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult> CreateAcreage(int projectId, [FromQuery] decimal amount)
-        {
-            //TODO: Change closeout container so this isn't called
-            //await _expenseService.CreateAcreageExpense(projectId, amount);
-
-            return Ok();
         }
 
         [HttpPost]
