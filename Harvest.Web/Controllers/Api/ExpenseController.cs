@@ -33,7 +33,14 @@ namespace Harvest.Web.Controllers.Api
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
         {
-            // TODO: validation!
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            if (project.Status != Project.Statuses.Active
+                && project.Status != Project.Statuses.AwaitingCloseout
+                && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
+            }
+
             var user = await _userService.GetCurrentUser();
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
