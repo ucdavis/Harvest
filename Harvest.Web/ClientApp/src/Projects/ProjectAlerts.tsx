@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
+
 import { Project } from "../types";
 import { convertCamelCase } from "../Util/StringFormatting";
 
@@ -24,12 +27,12 @@ export const ProjectAlerts = (props: Props) => {
       <div className="card-content">
         <h4>Current Status: {convertCamelCase(project.status)}</h4>
         <p>{statusDetail.statusText}</p>
-        <Link
+        {/* <Link
           to={statusDetail.linkTo}
           className={`btn ${statusDetail.linkClass} btn-sm`}
         >
           {statusDetail.actionText}
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

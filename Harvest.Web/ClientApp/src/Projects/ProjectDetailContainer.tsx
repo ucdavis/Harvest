@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faDownload,
+  faEdit,
+  faExchangeAlt,
+  faEye,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -131,7 +138,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/expense/entry/${project.id}`}
                 >
-                  Enter Expenses
+                  Enter Expenses <FontAwesomeIcon icon={faEdit} />
                 </Link>
               </ShowFor>
               <ShowFor
@@ -146,7 +153,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/quote/create/${project.id}`}
                 >
-                  Edit Quote
+                  Edit Quote <FontAwesomeIcon icon={faEdit} />
                 </Link>
               </ShowFor>
               <ShowFor
@@ -161,7 +168,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-danger btn-sm mr-4 float-right"
                   onClick={() => cancelProject()}
                 >
-                  Cancel Request
+                  Cancel Request <FontAwesomeIcon icon={faTimes} />
                 </button>
               </ShowFor>
               <ShowFor
@@ -175,7 +182,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/project/closeout/${project.id}`}
                 >
-                  Close Out Project
+                  Close Out Project <FontAwesomeIcon icon={faCheck} />
                 </Link>
               </ShowFor>
 
@@ -187,7 +194,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/approve/${project.id}`}
                 >
-                  View Quote
+                  View Quote <FontAwesomeIcon icon={faEye} />
                 </Link>
               </ShowForPiOnly>
               <ShowForPiOnly
@@ -198,7 +205,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/changeAccount/${project.id}`}
                 >
-                  Change Accounts
+                  Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
                 </Link>
               </ShowForPiOnly>
               <ShowFor
@@ -209,7 +216,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/create/${project.id}`}
                 >
-                  Change Requirements
+                  Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
                 </Link>
               </ShowFor>
               <ShowFor
@@ -226,7 +233,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/quote/details/${project.id}`}
                 >
-                  View Quote
+                  View Quote <FontAwesomeIcon icon={faEye} />
                 </Link>
               </ShowFor>
             </div>

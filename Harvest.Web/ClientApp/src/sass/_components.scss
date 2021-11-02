@@ -41,6 +41,36 @@
     border-color: lighten($primary-color, 7);
   }
 }
+.btn-outline-disabled {
+  background-color: #fff;
+  border-color: $secondary-font;
+  color: $secondary-font;
+  &:hover {
+    background-color: #fff;
+    border-color: lighten($secondary-font, 7);
+    color: lighten($secondary-font, 7);
+  }
+}
+.btn-outline {
+  background-color: #fff;
+  border-color: $primary-color;
+  color: $primary-color;
+  &:hover {
+    background-color: #fff;
+    border-color: lighten($primary-color, 7);
+    color: lighten($primary-color, 7);
+  }
+}
+.btn-outline-danger {
+  background-color: #fff;
+  border-color: $merlot;
+  color: $merlot;
+  &:hover {
+    background-color: #fff;
+    border-color: lighten($merlot, 9);
+    color: lighten($merlot, 9);
+  }
+}
 .btn-secondary {
   background-color: $california;
   border-color: $california;
@@ -373,10 +403,30 @@ input[type="radio" i] {
 }
 .california-bg {
   background-color: transparentize($california, 0.9);
+  a {
+    color: $california;
+    &:hover {
+      color: transparentize($california, 0.9);
+    }
+  }
 }
 .sunflower-bg {
   background-color: transparentize(#d5b804, 0.9);
+  a {
+    color: #d5b804;
+
+    &:hover {
+      color: transparentize(#d5b804, 0.9);
+    }
+  }
 }
 .merlot-bg {
   background-color: transparentize($merlot, 0.9);
+  a {
+    color: $merlot;
+
+    &:hover {
+      color: transparentize($merlot, 0.9);
+    }
+  }
 }
