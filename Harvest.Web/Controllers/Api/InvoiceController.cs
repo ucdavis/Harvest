@@ -36,7 +36,8 @@ namespace Harvest.Web.Controllers.Api
                 .AsNoTracking()
                 .SingleAsync(i => i.Id == invoiceId);
 
-            if (invoice.ProjectId != projectId) {
+            if (invoice.ProjectId != projectId)
+            {
                 return BadRequest("Invoice not associated with the current project");
             }
 
@@ -60,7 +61,8 @@ namespace Harvest.Web.Controllers.Api
                     && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
                     .OrderByDescending(a => a.CreatedOn);
 
-            if (maxRows.HasValue) {
+            if (maxRows.HasValue)
+            {
                 invoiceQuery = (IOrderedQueryable<Invoice>)invoiceQuery.Take(maxRows.Value);
             }
             return Ok(await invoiceQuery.ToListAsync());
@@ -68,6 +70,14 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> InitiateCloseout(int projectId)
+        {
+            var result = await _invoiceService.InitiateCloseout(projectId);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> DoCloseout(int projectId)
         {
             var result = await _invoiceService.CreateInvoice(projectId, true);

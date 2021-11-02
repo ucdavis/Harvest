@@ -64,20 +64,25 @@ export const ExpenseTable = (props: Props) => {
             ? new Date(data.row.original.createdOn).toLocaleDateString()
             : "N/A",
       },
-      {
-        Header: "Delete",
-        Cell: (data: any) => (
-          <ShowFor roles={["FieldManager", "Supervisor"]}>
-            <Button
-              color="link"
-              onClick={() => deleteExpense(data.row.original)}
-              disabled={!canDeleteExpense}
-            >
-              Delete
-            </Button>
-          </ShowFor>
-        ),
-      },
+
+      ...(canDeleteExpense
+        ? [
+            {
+              Header: "Delete",
+              Cell: (data: any) => (
+                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                  <Button
+                    color="link"
+                    onClick={() => deleteExpense(data.row.original)}
+                    disabled={!canDeleteExpense}
+                  >
+                    Delete
+                  </Button>
+                </ShowFor>
+              ),
+            },
+          ]
+        : []),
     ],
     [deleteExpense, canDeleteExpense]
   );

@@ -296,6 +296,17 @@ $nchild-wide: 24%;
     margin-right: 2px;
   }
 }
+.project-status-PendingCloseoutApproval {
+  &:before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: $poppy;
+    margin-right: 2px;
+  }
+}
 .project-status-FinalInvoicePending {
   &:before {
     content: "";

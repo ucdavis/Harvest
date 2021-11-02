@@ -18,6 +18,7 @@ namespace Harvest.Core.Services
 {
     public interface IInvoiceService
     {
+        Task<Result<bool>> InitiateCloseout(int projectId);
         Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false);
         Task<int> CreateInvoices(bool manualOverride = false);
         Task<List<int>> GetCreatedInvoiceIds();
@@ -42,6 +43,28 @@ namespace Harvest.Core.Services
             _dateTimeService = dateTimeService;
             _devSettings = devSettings.Value;
         }
+
+        public async Task<Result<bool>> InitiateCloseout(int projectId)
+        {
+            var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+
+            if (project.Status != Project.Statuses.Active && project.Status != Project.Statuses.AwaitingCloseout)
+            {
+                return Result.Error("Project status is not Active or AwaitingCloseout");
+            }
+
+            if (!await _emailService.CloseoutConfirmation(project))
+            {
+                return Result.Error("Failed to send confirmation email");
+            }
+
+            project.Status = Project.Statuses.PendingCloseoutApproval;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Result.Value(true, "Closeout initiated. An approval request has been sent to project's PI.");
+        }
+
         public async Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false)
         {
             var now = _dateTimeService.DateTimeUtcNow();// DateTime.UtcNow;
@@ -51,7 +74,7 @@ namespace Harvest.Core.Services
                 .Where(a =>
                     a.IsActive &&
                     (a.Status == Project.Statuses.Active ||
-                        (isCloseout && a.Status == Project.Statuses.AwaitingCloseout)) &&
+                        (isCloseout && a.Status == Project.Statuses.PendingCloseoutApproval)) &&
                     a.Id == projectId).SingleOrDefaultAsync();
             if (project == null)
             {
@@ -76,7 +99,7 @@ namespace Harvest.Core.Services
                 {
                     return Result.Error("Project has not yet started in following month: {projectId}", projectId);
                 }
-                
+
                 //Don't create an invoice for project past its end date, and just mark it as AwaitingCloseout
                 if (project.End < now)
                 {
@@ -88,7 +111,7 @@ namespace Harvest.Core.Services
                 //Acreage fees are ignored for manually created invoices
                 await _expenseService.CreateYearlyAcreageExpense(project); //I don't think we want to call the acreage expense on closeout. It will be called on the yearly anniversary 
             }
-            else if(!isCloseout)
+            else if (!isCloseout)
             {
                 await _expenseService.CreateYearlyAcreageExpense(project); //Call it for the nightly invoices though.
             }
@@ -156,8 +179,8 @@ namespace Harvest.Core.Services
             }
 
             await _dbContext.SaveChangesAsync();
-            
-            await _emailService.InvoiceCreated(newInvoice); 
+
+            await _emailService.InvoiceCreated(newInvoice);
 
             return Result.Value(newInvoice.Id, resultMessage);
         }

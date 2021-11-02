@@ -105,7 +105,8 @@ export const ProjectDetailContainer = () => {
                 roles={["Supervisor", "FieldManager"]}
                 condition={
                   project.status === "Active" ||
-                  project.status === "AwaitingCloseout"
+                  project.status === "AwaitingCloseout" ||
+                  project.status === "PendingCloseoutApproval"
                 }
               >
                 <Link
@@ -195,6 +196,7 @@ export const ProjectDetailContainer = () => {
                   project.status === "Active" ||
                   project.status === "Completed" ||
                   project.status === "AwaitingCloseout" ||
+                  project.status === "PendingCloseoutApproval" ||
                   project.status === "FinalInvoicePending"
                 }
               >
