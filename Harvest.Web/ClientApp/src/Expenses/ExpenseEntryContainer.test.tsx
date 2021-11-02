@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act, Simulate } from "react-dom/test-utils";
 
 import { ExpenseEntryContainer } from "./ExpenseEntryContainer";
-import { fakeAppContext, sampleRates } from "../Test/mockData";
+import { fakeAppContext, sampleRates, fakeProject } from "../Test/mockData";
 
 let container: Element;
 
@@ -27,6 +27,11 @@ afterEach(() => {
 });
 
 describe("Expense Entry Container", () => {
+  const projectResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeProject),
+  };
   const rateResponse = {
     status: 200,
     ok: true,
@@ -36,7 +41,8 @@ describe("Expense Entry Container", () => {
   it("Generic Activity Default", async () => {
     global.fetch = jest
       .fn()
-      .mockImplementationOnce(() => Promise.resolve(rateResponse));
+      .mockImplementationOnce(() => Promise.resolve(rateResponse))
+      .mockImplementationOnce(() => Promise.resolve(projectResponse));
 
     await act(async () => {
       render(
@@ -59,7 +65,8 @@ describe("Expense Entry Container", () => {
     await act(async () => {
       global.fetch = jest
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(rateResponse));
+        .mockImplementationOnce(() => Promise.resolve(rateResponse))
+        .mockImplementationOnce(() => Promise.resolve(projectResponse));
 
       render(
         <MemoryRouter initialEntries={["/expense/entry/3"]}>
@@ -88,7 +95,8 @@ describe("Expense Entry Container", () => {
     await act(async () => {
       global.fetch = jest
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(rateResponse));
+        .mockImplementationOnce(() => Promise.resolve(rateResponse))
+        .mockImplementationOnce(() => Promise.resolve(projectResponse));
 
       render(
         <MemoryRouter initialEntries={["/expense/entry/3"]}>
