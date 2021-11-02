@@ -16,9 +16,10 @@ export const FieldLayers = (props: Props) => {
     const cb = async () => {
       const startDate = new Date(props.project.start);
       const endDate = new Date(props.project.end);
+      const projectId = props.project.id;
 
       const activeFieldResponse = await fetch(
-        `/api/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}`
+        `/api/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}&projectId=${projectId}`
       );
 
       if (activeFieldResponse.ok) {

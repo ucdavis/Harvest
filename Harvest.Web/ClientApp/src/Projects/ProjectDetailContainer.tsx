@@ -11,6 +11,7 @@ import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
 import { ShowFor } from "../Shared/ShowFor";
+import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectProgress } from "./ProjectProgress";
 import { useIsMounted } from "../Shared/UseIsMounted";
@@ -197,8 +198,8 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
 
-              <ShowFor
-                roles={["PI"]}
+              <ShowForPiOnly
+                project={project}
                 condition={project.status === "PendingApproval"}
               >
                 <Link
@@ -207,17 +208,22 @@ export const ProjectDetailContainer = () => {
                 >
                   View Quote
                 </Link>
-              </ShowFor>
-
-              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+              </ShowForPiOnly>
+              <ShowForPiOnly
+                project={project}
+                condition={project.status === "Active"}
+              >
                 <Link
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/changeAccount/${project.id}`}
                 >
                   Change Accounts
                 </Link>
-              </ShowFor>
-              <ShowFor roles={["PI"]} condition={project.status === "Active"}>
+              </ShowForPiOnly>
+              <ShowFor
+                roles={["PI", "FieldManager"]}
+                condition={project.status === "Active"}
+              >
                 <Link
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/create/${project.id}`}
@@ -226,7 +232,7 @@ export const ProjectDetailContainer = () => {
                 </Link>
               </ShowFor>
               <ShowFor
-                roles={["PI"]}
+                roles={["PI", "FieldManager"]}
                 condition={
                   // all statuses with approved quotes
                   project.status === "Active" ||
@@ -295,7 +301,10 @@ export const ProjectDetailContainer = () => {
             </div>
             <div className="col-md-6 text-center">
               {" "}
-              <ProjectUnbilledButton projectId={project.id} />
+              <ProjectUnbilledButton
+                projectId={project.id}
+                remaining={project.quoteTotal - project.chargedTotal}
+              />
             </div>
           </div>
         </div>

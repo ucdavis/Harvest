@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json;
 using Harvest.Core.Domain;
 using Harvest.Core.Utilities;
@@ -45,6 +46,9 @@ namespace Harvest.Core.Models
         public int Years { get; set; }
         public QuoteField[] Fields { get; set; }
         public Activity[] Activities { get; set; }
+
+        public User ApprovedBy { get; set; }
+        public DateTime? ApprovedOn { get; set; }
 
     }
 
