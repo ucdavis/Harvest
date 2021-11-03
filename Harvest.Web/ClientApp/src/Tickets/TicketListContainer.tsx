@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   projectSource: string;
