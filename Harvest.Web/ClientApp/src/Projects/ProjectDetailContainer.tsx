@@ -17,8 +17,8 @@ import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, Project } from "../types";
-import { ShowFor } from "../Shared/ShowFor";
-import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
+import { ShowFor, useFor } from "../Shared/ShowFor";
+import { ShowForPiOnly, useForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
@@ -98,7 +98,7 @@ export const ProjectDetailContainer = () => {
   };
 
   const projectActions = [
-    ShowFor({
+    useFor({
       roles: ["Supervisor", "FieldManager"],
       condition:
         project.status === "Active" ||
@@ -113,7 +113,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowFor({
+    useFor({
       roles: ["FieldManager", "Supervisor"],
       condition:
         project.status === "Requested" ||
@@ -128,7 +128,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowFor({
+    useFor({
       roles: ["FieldManager"],
       condition:
         project.status === "Requested" ||
@@ -143,7 +143,7 @@ export const ProjectDetailContainer = () => {
         </button>
       ),
     }),
-    ShowFor({
+    useFor({
       roles: ["FieldManager"],
       condition:
         project.status === "AwaitingCloseout" || project.status === "Active",
@@ -156,7 +156,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowForPiOnly({
+    useForPiOnly({
       project: project,
       condition: project.status === "PendingCloseoutApproval",
       children: (
@@ -168,7 +168,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowForPiOnly({
+    useForPiOnly({
       project: project,
       condition: project.status === "PendingApproval",
       children: (
@@ -180,7 +180,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowForPiOnly({
+    useForPiOnly({
       project: project,
       condition: project.status === "Active",
       children: (
@@ -192,7 +192,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowFor({
+    useFor({
       roles: ["PI", "FieldManager"],
       condition: project.status === "Active",
       children: (
@@ -204,7 +204,7 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
-    ShowFor({
+    useFor({
       roles: ["PI", "FieldManager"],
       condition:
         // all statuses with approved quotes

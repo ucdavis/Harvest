@@ -33,3 +33,7 @@ export const ShowForPiOnly = (props: Props) => {
 
   return null;
 };
+
+// Can be used as either a hook or a component. Exporting under
+// seperate name as a reminder that rules of hooks still apply.
+export const useForPiOnly = ShowForPiOnly;
