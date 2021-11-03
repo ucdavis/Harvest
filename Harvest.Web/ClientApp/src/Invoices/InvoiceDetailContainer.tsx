@@ -22,7 +22,9 @@ export const InvoiceDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const invoiceResponse = await fetch(`/api/Invoice/Get/${projectId}?invoiceId=${invoiceId}`);
+      const invoiceResponse = await fetch(
+        `/api/Invoice/Get/${projectId}?invoiceId=${invoiceId}`
+      );
 
       if (invoiceResponse.ok) {
         const projectWithInvoice: ProjectWithInvoice =
@@ -58,10 +60,12 @@ export const InvoiceDetailContainer = () => {
           <InvoiceDisplay invoice={projectAndInvoice.invoice}></InvoiceDisplay>
         </div>
         <Suspense fallback={<div>Generating PDF ...</div>}>
-          <InvoicePDFLink
-            invoice={projectAndInvoice.invoice}
-            fileName={`Invoice-${invoiceId}-Project-${projectAndInvoice.project.name}.pdf`}
-          ></InvoicePDFLink>
+          <div className="row justify-content-center pt-2 pb-2">
+            <InvoicePDFLink
+              invoice={projectAndInvoice.invoice}
+              fileName={`Invoice-${invoiceId}-Project-${projectAndInvoice.project.name}.pdf`}
+            ></InvoicePDFLink>
+          </div>
         </Suspense>
       </div>
     </div>

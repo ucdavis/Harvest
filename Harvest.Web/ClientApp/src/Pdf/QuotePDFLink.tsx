@@ -17,7 +17,7 @@ const QuotePdfLink = (props: Props) => (
     document={<QuotePDF quote={props.quote} />}
     fileName={props.fileName}
   >
-    <button className="btn btn-link btn-sm">
+    <button className="btn btn-link btn-sm margin-left-fixer">
       Download PDF <FontAwesomeIcon icon={faDownload} />
     </button>
   </PDFDownloadLink>

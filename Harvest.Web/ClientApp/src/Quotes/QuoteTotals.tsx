@@ -10,9 +10,11 @@ interface Props {
 
 export const QuoteTotals = (props: Props) => {
   return (
-    <Card className="card-project-totals box-shadow mt-4">
-      <CardHeader>Project Totals</CardHeader>
-      <CardBody>
+    <div className="card-wrapper gray-top mt-4">
+      <div className="card-header">
+        <h4 className="primary-color bold-font">Project Totals</h4>
+      </div>
+      <div className="card-content">
         <div id="total">
           <div className="row justify-content-between">
             <Col xs="6">
@@ -50,12 +52,12 @@ export const QuoteTotals = (props: Props) => {
             <Col xs="6">
               <h6>Total Cost</h6>
             </Col>
-            <Col xs="4" className="text-right">
-              <span>${formatCurrency(props.quote.grandTotal)}</span>
+            <Col xs="6" className="text-right">
+              <p className="lede">${formatCurrency(props.quote.grandTotal)}</p>
             </Col>
           </Row>
         </div>
-      </CardBody>
-    </Card>
+      </div>
+    </div>
   );
 };

@@ -113,7 +113,7 @@ export const ApprovalContainer = () => {
               <h4>
                 <b>Terms and Conditions</b>
               </h4>
-              <ol>
+              <ol className="margin-left-fixer">
                 <li>
                   This estimate is approximate based on the information provided
                   by the client. A change order is required if substantial
@@ -129,16 +129,18 @@ export const ApprovalContainer = () => {
                   job.
                 </li>
               </ol>
-              <div className="text-right mt-5">
-                <RejectQuote project={projectAndQuote.project}></RejectQuote>
-                <button
-                  className="btn btn-primary"
-                  disabled={disabled || notification.pending}
-                  onClick={approve}
-                >
-                  Approve Quote
-                </button>
-              </div>
+            </div>
+          </div>
+          <div className="row justify-content-center">
+            <div className="mt-5">
+              <RejectQuote project={projectAndQuote.project}></RejectQuote>
+              <button
+                className="btn btn-primary"
+                disabled={disabled || notification.pending}
+                onClick={approve}
+              >
+                Approve Quote
+              </button>
             </div>
           </div>
         </div>

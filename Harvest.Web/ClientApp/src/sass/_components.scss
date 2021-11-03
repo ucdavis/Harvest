@@ -41,12 +41,64 @@
     border-color: lighten($primary-color, 7);
   }
 }
-.btn-danger {
-  background-color: $danger;
-  border-color: $danger;
+.btn-outline-disabled {
+  background-color: #fff;
+  border-color: $secondary-font;
+  color: $secondary-font;
   &:hover {
-    background-color: lighten($danger, 7);
-    border-color: lighten($danger, 7);
+    background-color: #fff;
+    border-color: lighten($secondary-font, 7);
+    color: lighten($secondary-font, 7);
+  }
+}
+.btn-outline {
+  background-color: #fff;
+  border-color: $primary-color;
+  color: $primary-color;
+  &:hover {
+    background-color: #fff;
+    border-color: lighten($primary-color, 7);
+    color: lighten($primary-color, 7);
+  }
+}
+.btn-outline-danger {
+  background-color: #fff;
+  border-color: $merlot;
+  color: $merlot;
+  &:hover {
+    background-color: #fff;
+    border-color: lighten($merlot, 9);
+    color: lighten($merlot, 9);
+  }
+}
+.btn-secondary {
+  background-color: $california;
+  border-color: $california;
+  color: #fff;
+  &:hover {
+    background-color: lighten($california, 7);
+    border-color: lighten($california, 7);
+    color: #fff;
+  }
+}
+.btn-sunflower {
+  background-color: #d5b804;
+  border-color: #d5b804;
+  color: #fff;
+  &:hover {
+    background-color: lighten(#d5b804, 7);
+    border-color: lighten(#d5b804, 7);
+    color: #fff;
+  }
+}
+.btn-danger {
+  background-color: $merlot;
+  border-color: $merlot;
+  color: #fff;
+  &:hover {
+    background-color: lighten($merlot, 7);
+    border-color: lighten($merlot, 7);
+    color: #fff;
   }
 }
 .btn-sm {
@@ -133,6 +185,7 @@
   }
 }
 .harvest-table {
+  margin-bottom: 3rem;
   th {
     background-color: $primary-light;
     color: $secondary-font;
@@ -215,7 +268,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $sunflower;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -226,7 +279,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $sunflower;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -237,7 +290,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 2px;
   }
 }
@@ -248,7 +301,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $merlot;
     margin-right: 2px;
   }
 }
@@ -270,7 +323,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 2px;
   }
 }
@@ -281,7 +334,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $tahoe;
+    background-color: $bodega;
     margin-right: 2px;
   }
 }
@@ -292,7 +345,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 2px;
   }
 }
@@ -314,7 +367,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: $california;
     margin-right: 6px;
   }
 }
@@ -352,4 +405,39 @@ input[type="radio" i] {
 }
 .react-datepicker__close-icon::after {
   background-color: $primary-color;
+}
+.margin-left-fixer {
+  margin-left: -1.5%;
+}
+.float-right {
+  float: right;
+}
+.california-bg {
+  background-color: transparentize($california, 0.9);
+  a {
+    color: $california;
+    &:hover {
+      color: transparentize($california, 0.9);
+    }
+  }
+}
+.sunflower-bg {
+  background-color: transparentize(#d5b804, 0.9);
+  a {
+    color: #d5b804;
+
+    &:hover {
+      color: transparentize(#d5b804, 0.9);
+    }
+  }
+}
+.merlot-bg {
+  background-color: transparentize($merlot, 0.9);
+  a {
+    color: $merlot;
+
+    &:hover {
+      color: transparentize($merlot, 0.9);
+    }
+  }
 }

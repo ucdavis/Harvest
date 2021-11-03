@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDownload } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheck,
+  faDownload,
+  faEdit,
+  faExchangeAlt,
+  faEye,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -15,6 +22,8 @@ import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
+import { ProjectProgress } from "./ProjectProgress";
+import { ProjectAlerts } from "./ProjectAlerts";
 
 interface RouteParams {
   projectId?: string;
@@ -97,10 +106,27 @@ export const ProjectDetailContainer = () => {
         title={"Field Request #" + (project?.id || "")}
         hideBack={true}
       />
+      <ShowFor
+        roles={["FieldManager", "Supervisor"]}
+        condition={
+          project.status === "Requested" ||
+          project.status === "ChangeRequested" ||
+          project.status === "QuoteRejected"
+        }
+      >
+        <ProjectAlerts project={project} />
+      </ShowFor>
+      <ShowForPiOnly
+        project={project}
+        condition={project.status === "PendingApproval"}
+      >
+        <ProjectAlerts project={project} />
+      </ShowForPiOnly>
       <div className="card-green-bg">
         <div className="card-content">
           <div className="row justify-content-between">
             <div className="col-md-12 project-actions">
+              <h4>Project actions</h4>
               <ShowFor
                 roles={["Supervisor", "FieldManager"]}
                 condition={
@@ -113,7 +139,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/expense/entry/${project.id}`}
                 >
-                  Enter Expenses
+                  Enter Expenses <FontAwesomeIcon icon={faEdit} />
                 </Link>
               </ShowFor>
               <ShowFor
@@ -128,7 +154,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/quote/create/${project.id}`}
                 >
-                  Edit Quote
+                  Edit Quote <FontAwesomeIcon icon={faEdit} />
                 </Link>
               </ShowFor>
               <ShowFor
@@ -140,10 +166,10 @@ export const ProjectDetailContainer = () => {
                 }
               >
                 <button
-                  className="btn btn-danger btn-sm mr-4"
+                  className="btn btn-danger btn-sm mr-4 float-right"
                   onClick={() => cancelProject()}
                 >
-                  Cancel Request
+                  Cancel Request <FontAwesomeIcon icon={faTimes} />
                 </button>
               </ShowFor>
               <ShowFor
@@ -157,7 +183,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/project/closeout/${project.id}`}
                 >
-                  Close Out Project
+                  Close Out Project <FontAwesomeIcon icon={faCheck} />
                 </Link>
               </ShowFor>
               <ShowForPiOnly
@@ -180,7 +206,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/approve/${project.id}`}
                 >
-                  View Quote
+                  View Quote <FontAwesomeIcon icon={faEye} />
                 </Link>
               </ShowForPiOnly>
               <ShowForPiOnly
@@ -191,7 +217,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/changeAccount/${project.id}`}
                 >
-                  Change Accounts
+                  Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
                 </Link>
               </ShowForPiOnly>
               <ShowFor
@@ -202,7 +228,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/request/create/${project.id}`}
                 >
-                  Change Requirements
+                  Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
                 </Link>
               </ShowFor>
               <ShowFor
@@ -220,7 +246,7 @@ export const ProjectDetailContainer = () => {
                   className="btn btn-primary btn-sm mr-4"
                   to={`/quote/details/${project.id}`}
                 >
-                  View Quote
+                  View Quote <FontAwesomeIcon icon={faEye} />
                 </Link>
               </ShowFor>
             </div>

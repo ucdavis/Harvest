@@ -56,8 +56,8 @@ export const QuoteDisplayContainer = () => {
       <div className="card-green-bg">
         <div className="card-content">
           <QuoteDisplay quote={projectAndQuote.quote} />
-          <div className="row mt-4">
-            <div className="col-md-6">
+          <div className="row mt-4 justify-content-center">
+            <div className="col-md-6 text-center">
               <h2 className="primary-font bold-font">
                 Quote Total: ${formatCurrency(projectAndQuote.quote.grandTotal)}
               </h2>
