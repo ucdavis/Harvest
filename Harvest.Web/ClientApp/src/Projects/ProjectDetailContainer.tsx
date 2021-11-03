@@ -22,7 +22,6 @@ import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
-import { ProjectProgress } from "./ProjectProgress";
 import { ProjectAlerts } from "./ProjectAlerts";
 
 interface RouteParams {
@@ -31,7 +30,8 @@ interface RouteParams {
 
 export const ProjectDetailContainer = () => {
   const { projectId } = useParams<RouteParams>();
-  const [project, setProject] = useState<Project>();
+  const [project, setProject] = useState<Project>({} as Project);
+  const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
   const history = useHistory();
 
@@ -41,11 +41,13 @@ export const ProjectDetailContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
+      setIsLoading(true);
       const response = await fetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const project = (await response.json()) as Project;
         getIsMounted() && setProject(project);
+        setIsLoading(false);
       }
     };
 
@@ -53,10 +55,6 @@ export const ProjectDetailContainer = () => {
       cb();
     }
   }, [projectId, getIsMounted]);
-
-  if (project === undefined) {
-    return <div>Loading...</div>;
-  }
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = fetch(`/api/Request/Files/${projectId}`, {
@@ -72,7 +70,7 @@ export const ProjectDetailContainer = () => {
 
     const response = await request;
 
-    if (response.ok) {
+    if (response.ok && project) {
       const files = await response.json();
       getIsMounted() &&
         setProject({
@@ -99,6 +97,137 @@ export const ProjectDetailContainer = () => {
     }
   };
 
+  const projectActions = [
+    ShowFor({
+      roles: ["Supervisor", "FieldManager"],
+      condition:
+        project.status === "Active" ||
+        project.status === "AwaitingCloseout" ||
+        project.status === "PendingCloseoutApproval",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/expense/entry/${project.id}`}
+        >
+          Enter Expenses <FontAwesomeIcon icon={faEdit} />
+        </Link>
+      ),
+    }),
+    ShowFor({
+      roles: ["FieldManager", "Supervisor"],
+      condition:
+        project.status === "Requested" ||
+        project.status === "ChangeRequested" ||
+        project.status === "QuoteRejected",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/quote/create/${project.id}`}
+        >
+          Edit Quote <FontAwesomeIcon icon={faEdit} />
+        </Link>
+      ),
+    }),
+    ShowFor({
+      roles: ["FieldManager"],
+      condition:
+        project.status === "Requested" ||
+        project.status === "ChangeRequested" ||
+        project.status === "QuoteRejected",
+      children: (
+        <button
+          className="btn btn-danger btn-sm mr-4 float-right"
+          onClick={() => cancelProject()}
+        >
+          Cancel Request <FontAwesomeIcon icon={faTimes} />
+        </button>
+      ),
+    }),
+    ShowFor({
+      roles: ["FieldManager"],
+      condition:
+        project.status === "AwaitingCloseout" || project.status === "Active",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/project/closeout/${project.id}`}
+        >
+          Close Out Project <FontAwesomeIcon icon={faCheck} />
+        </Link>
+      ),
+    }),
+    ShowForPiOnly({
+      project: project,
+      condition: project.status === "PendingCloseoutApproval",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/project/closeoutconfirmation/${project.id}`}
+        >
+          Confirm Close Out
+        </Link>
+      ),
+    }),
+    ShowForPiOnly({
+      project: project,
+      condition: project.status === "PendingApproval",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/request/approve/${project.id}`}
+        >
+          View Quote <FontAwesomeIcon icon={faEye} />
+        </Link>
+      ),
+    }),
+    ShowForPiOnly({
+      project: project,
+      condition: project.status === "Active",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/request/changeAccount/${project.id}`}
+        >
+          Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
+        </Link>
+      ),
+    }),
+    ShowFor({
+      roles: ["PI", "FieldManager"],
+      condition: project.status === "Active",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/request/create/${project.id}`}
+        >
+          Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
+        </Link>
+      ),
+    }),
+    ShowFor({
+      roles: ["PI", "FieldManager"],
+      condition:
+        // all statuses with approved quotes
+        project.status === "Active" ||
+        project.status === "Completed" ||
+        project.status === "AwaitingCloseout" ||
+        project.status === "PendingCloseoutApproval" ||
+        project.status === "FinalInvoicePending",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/quote/details/${project.id}`}
+        >
+          View Quote <FontAwesomeIcon icon={faEye} />
+        </Link>
+      ),
+    }),
+  ].filter((a) => a !== null);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="card-wrapper">
       <ProjectHeader
@@ -122,137 +251,21 @@ export const ProjectDetailContainer = () => {
       >
         <ProjectAlerts project={project} />
       </ShowForPiOnly>
-      <div className="card-green-bg">
-        <div className="card-content">
-          <div className="row justify-content-between">
-            <div className="col-md-12 project-actions">
-              <h4>Project actions</h4>
-              <ShowFor
-                roles={["Supervisor", "FieldManager"]}
-                condition={
-                  project.status === "Active" ||
-                  project.status === "AwaitingCloseout" ||
-                  project.status === "PendingCloseoutApproval"
-                }
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/expense/entry/${project.id}`}
-                >
-                  Enter Expenses <FontAwesomeIcon icon={faEdit} />
-                </Link>
-              </ShowFor>
-              <ShowFor
-                roles={["FieldManager", "Supervisor"]}
-                condition={
-                  project.status === "Requested" ||
-                  project.status === "ChangeRequested" ||
-                  project.status === "QuoteRejected"
-                }
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/quote/create/${project.id}`}
-                >
-                  Edit Quote <FontAwesomeIcon icon={faEdit} />
-                </Link>
-              </ShowFor>
-              <ShowFor
-                roles={["FieldManager"]}
-                condition={
-                  project.status === "Requested" ||
-                  project.status === "ChangeRequested" ||
-                  project.status === "QuoteRejected"
-                }
-              >
-                <button
-                  className="btn btn-danger btn-sm mr-4 float-right"
-                  onClick={() => cancelProject()}
-                >
-                  Cancel Request <FontAwesomeIcon icon={faTimes} />
-                </button>
-              </ShowFor>
-              <ShowFor
-                roles={["FieldManager"]}
-                condition={
-                  project.status === "AwaitingCloseout" ||
-                  project.status === "Active"
-                }
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/project/closeout/${project.id}`}
-                >
-                  Close Out Project <FontAwesomeIcon icon={faCheck} />
-                </Link>
-              </ShowFor>
-              <ShowForPiOnly
-                project={project}
-                condition={project.status === "PendingCloseoutApproval"}
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/project/closeoutconfirmation/${project.id}`}
-                >
-                  Confirm Close Out
-                </Link>
-              </ShowForPiOnly>
-
-              <ShowForPiOnly
-                project={project}
-                condition={project.status === "PendingApproval"}
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/request/approve/${project.id}`}
-                >
-                  View Quote <FontAwesomeIcon icon={faEye} />
-                </Link>
-              </ShowForPiOnly>
-              <ShowForPiOnly
-                project={project}
-                condition={project.status === "Active"}
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/request/changeAccount/${project.id}`}
-                >
-                  Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
-                </Link>
-              </ShowForPiOnly>
-              <ShowFor
-                roles={["PI", "FieldManager"]}
-                condition={project.status === "Active"}
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/request/create/${project.id}`}
-                >
-                  Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
-                </Link>
-              </ShowFor>
-              <ShowFor
-                roles={["PI", "FieldManager"]}
-                condition={
-                  // all statuses with approved quotes
-                  project.status === "Active" ||
-                  project.status === "Completed" ||
-                  project.status === "AwaitingCloseout" ||
-                  project.status === "PendingCloseoutApproval" ||
-                  project.status === "FinalInvoicePending"
-                }
-              >
-                <Link
-                  className="btn btn-primary btn-sm mr-4"
-                  to={`/quote/details/${project.id}`}
-                >
-                  View Quote <FontAwesomeIcon icon={faEye} />
-                </Link>
-              </ShowFor>
+      {projectActions.length > 0 && (
+        <div className="card-green-bg">
+          <div className="card-content">
+            <div className="row justify-content-between">
+              <div className="col-md-12 project-actions">
+                <h4>Project actions</h4>
+                {projectActions.map((action, i) => ({
+                  ...action,
+                  key: `action_${i}`,
+                }))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       <div className="card-green-bg green-bg-border pt-3 pb-3">
         <div className="card-content">
           <div className="row">
