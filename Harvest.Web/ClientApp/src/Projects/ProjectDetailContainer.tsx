@@ -22,6 +22,8 @@ import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
+import { ProjectProgress } from "./ProjectProgress";
+import { ProjectAlerts } from "./ProjectAlerts";
 
 interface RouteParams {
   projectId?: string;
