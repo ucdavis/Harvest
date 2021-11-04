@@ -23,7 +23,14 @@ export const TicketMessages = (props: Props) => {
             </Col>
             <Col>
               <p className="ticket-timestamp text-right">
-                12:30 PST 11/31/2021
+                {new Date(ticketMessage.createdOn).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
               </p>
             </Col>
           </div>

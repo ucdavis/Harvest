@@ -162,7 +162,7 @@ namespace Harvest.Web.Controllers.Api
                     DueDate = a.DueDate,
                     Status = a.Status,
                     Completed = a.Completed,
-                    Messages = a.Messages.Select(b => new TicketMessage { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message }).ToList(),
+                    Messages = a.Messages.OrderByDescending(o => o.CreatedOn).Select(b => new TicketMessage { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, Message = b.Message }).ToList(),
                     Attachments = a.Attachments.Select(b => new TicketAttachment { Id = b.Id, CreatedBy = b.CreatedBy, CreatedOn = b.CreatedOn, FileName = b.FileName, Identifier = b.Identifier, SasLink = fileService.GetDownloadUrl(storageSettings.ContainerName, b.Identifier).AbsoluteUri }).ToList(),
                 })
                 .SingleAsync();
