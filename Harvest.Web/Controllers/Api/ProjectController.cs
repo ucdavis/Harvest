@@ -84,6 +84,7 @@ namespace Harvest.Web.Controllers.Api
 
                 return Ok(await _dbContext.Projects.AsNoTracking()
                     .Where(p => p.PrincipalInvestigatorId == user.Id && p.IsActive && attentionStatuses.Contains(p.Status))
+                    .OrderBy(a => a.CreatedOn) // Oldest first?
                     .Select(p => new { p.Id, p.Status, p.Name })
                     .Take(4)
                     .ToArrayAsync());

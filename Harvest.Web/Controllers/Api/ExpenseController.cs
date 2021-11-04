@@ -105,6 +105,7 @@ namespace Harvest.Web.Controllers.Api
             // get projects where user has entered an expense in the last month
             var projects = await _dbContext.Projects.AsNoTracking()
                 .Where(p => p.IsActive && p.Expenses.Any(e => e.CreatedById == user.Id && e.CreatedOn > DateTime.UtcNow.AddMonths(-1)))
+                .OrderByDescending(a => a.Expenses.Max(m => m.CreatedOn))
                 .Select(p => new { p.Id, p.Status, p.Name })
                 .Take(4) // limit to 4 projects
                 .ToArrayAsync();
