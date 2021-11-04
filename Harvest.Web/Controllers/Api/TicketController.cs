@@ -57,11 +57,15 @@ namespace Harvest.Web.Controllers.Api
 
             // Get list of top N open tickets in PI projects
             var openTickets = _dbContext.Tickets
-                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id);
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id)
+                .OrderByDescending(a => a.UpdatedOn);
 
-            if (limit.HasValue) { openTickets = openTickets.Take(limit.Value); }
+            if (limit.HasValue)
+            {
+                openTickets = (IOrderedQueryable<Ticket>)openTickets.Take(limit.Value);
+            }
 
-            return Ok(await openTickets.OrderByDescending(a => a.UpdatedOn).ToArrayAsync());
+            return Ok(await openTickets.ToArrayAsync());
         }
 
         [HttpGet]
@@ -70,11 +74,15 @@ namespace Harvest.Web.Controllers.Api
         {
             // Get list of top N open tickets in all projects
             var openTickets = _dbContext.Tickets
-                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive);
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive)
+                .OrderByDescending(a => a.UpdatedOn);
 
-            if (limit.HasValue) { openTickets = openTickets.Take(limit.Value); }
+            if (limit.HasValue)
+            {
+                openTickets = (IOrderedQueryable<Ticket>)openTickets.Take(limit.Value);
+            }
 
-            return Ok(await openTickets.OrderByDescending(a => a.UpdatedOn).ToArrayAsync());
+            return Ok(await openTickets.ToArrayAsync());
         }
 
         [HttpPost]
