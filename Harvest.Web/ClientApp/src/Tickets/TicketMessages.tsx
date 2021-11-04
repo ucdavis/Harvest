@@ -1,4 +1,5 @@
 ﻿import { useMemo } from "react";
+import { Col } from "reactstrap";
 import { TicketMessage } from "../types";
 
 interface Props {
@@ -15,9 +16,26 @@ export const TicketMessages = (props: Props) => {
         <p> No Messages Yet!!!</p>
       ) : null}
       {ticketMessages.map((ticketMessage) => (
-        <p key={`message-${ticketMessage.id}`}>
-          {ticketMessage.message} from {ticketMessage.createdBy?.name}
-        </p>
+        <div className="ticket-response-card">
+          <div className="row mb-2 justify-content-between">
+            <Col>
+              <p className="lede">{ticketMessage.createdBy?.name}</p>
+            </Col>
+            <Col>
+              <p className="ticket-timestamp text-right">
+                {new Date(ticketMessage.createdOn).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </p>
+            </Col>
+          </div>
+          <p>{ticketMessage.message}</p>
+        </div>
       ))}
     </div>
   );

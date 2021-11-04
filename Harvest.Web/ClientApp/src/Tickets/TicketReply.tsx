@@ -41,7 +41,7 @@ export const TicketReply = (props: Props) => {
     if (response.ok) {
       const data = await response.json();
       if (getIsMounted()) {
-        setTicket({ ...ticket, messages: [...ticket.messages, data] });
+        setTicket({ ...ticket, messages: [{ ...data }, ...ticket.messages] });
         setTicketMessage({
           message: "",
         } as TicketMessage);
@@ -51,8 +51,8 @@ export const TicketReply = (props: Props) => {
 
   return (
     <>
-      <h2>Reply</h2>
-      <FormGroup>
+      <h3>Reply</h3>
+      <FormGroup className="ticket-reply-form">
         <Input
           type="textarea"
           name="text"
@@ -63,15 +63,18 @@ export const TicketReply = (props: Props) => {
           }
         />
       </FormGroup>
-      <div className="row justify-content-center">
-        <Button
-          className="btn"
-          color="primary"
-          onClick={update}
-          disabled={ticket.completed || notification.pending}
-        >
-          Send
-        </Button>
+      <div className="row">
+        <div className="col text-right">
+          {" "}
+          <Button
+            className="btn btn-sm"
+            color="primary"
+            onClick={update}
+            disabled={ticket.completed || notification.pending}
+          >
+            Send
+          </Button>
+        </div>
       </div>
     </>
   );

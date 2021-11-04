@@ -164,6 +164,29 @@
     margin: 1.5% 0;
   }
 }
-// #logoutForm {
-//   display: inline-block;
-// }
+.ticket-response-list {
+  p {
+    margin-bottom: 0;
+  }
+  span.ticket-responder {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: $secondary-font;
+  }
+}
+.ticket-response-card {
+  background: #fff;
+  border: 1px solid $borders;
+  box-shadow: $box-shadow;
+  padding: 2%;
+  margin-bottom: 16px;
+  p.lede {
+    color: $secondary-font;
+  }
+}
+.ticket-reply-form {
+  margin-bottom: 1%;
+}
+.ticket-timestamp {
+  color: $tertiary-font;
+}
