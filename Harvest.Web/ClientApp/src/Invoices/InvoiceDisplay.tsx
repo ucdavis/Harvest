@@ -61,25 +61,29 @@ export const InvoiceDisplay = (props: Props) => {
         );
       })}
 
-      <div className="card-wrapper gray-top mt-4">
-        <div className="card-header">
-          <h4 className="primary-color bold-font">Account(s)</h4>
-        </div>
-        <div className="card-content">
-          <div id="accounts123">
-            {accounts.map((transfers) => (
-              <Row key={"transfer_" + transfers.id}>
-                <Col xs="10" sm="10">
-                  <div>{transfers.account}</div>
-                </Col>
-                <Col xs="2" sm="2">
-                  ${formatCurrency(transfers.total)}
-                </Col>
-              </Row>
-            ))}
+      {accounts?.length > 0 && (
+        <div className="card-wrapper gray-top mt-4">
+          <div className="card-header">
+            <h4 className="primary-color bold-font">Account(s)</h4>
+          </div>
+
+          <div className="card-content">
+            <div id="accounts123">
+              {accounts.map((transfers) => (
+                <Row key={"transfer_" + transfers.id}>
+                  <Col xs="10" sm="10">
+                    <div>{transfers.account}</div>
+                  </Col>
+                  <Col xs="2" sm="2">
+                    ${formatCurrency(transfers.total)}
+                  </Col>
+                </Row>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       <InvoiceTotals invoice={props.invoice}></InvoiceTotals>
     </div>
   );
