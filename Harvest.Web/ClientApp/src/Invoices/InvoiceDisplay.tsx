@@ -61,7 +61,7 @@ export const InvoiceDisplay = (props: Props) => {
         );
       })}
 
-      {accounts !== undefined && accounts.length > 0 ? (
+      {accounts?.length > 0 && (
         <div className="card-wrapper gray-top mt-4">
           <div className="card-header">
             <h4 className="primary-color bold-font">Account(s)</h4>
@@ -82,7 +82,7 @@ export const InvoiceDisplay = (props: Props) => {
             </div>
           </div>
         </div>
-      ) : null}
+      )}
 
       <InvoiceTotals invoice={props.invoice}></InvoiceTotals>
     </div>
