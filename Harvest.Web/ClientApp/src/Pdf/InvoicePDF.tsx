@@ -7,7 +7,6 @@ import { TotalSection } from "./TotalSection";
 import { Invoice } from "../types";
 import { groupBy } from "../Util/ArrayHelpers";
 import { formatCurrency } from "../Util/NumberFormatting";
-import { ensurePluginOrder } from "react-table";
 
 interface Props {
   invoice: Invoice;

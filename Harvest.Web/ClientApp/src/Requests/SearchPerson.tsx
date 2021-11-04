@@ -73,13 +73,13 @@ export const SearchPerson = (props: Props) => {
       onChange={onSelect}
       options={users}
       onBlur={props.onBlur}
-      disabled={props.user != undefined}
-      >
-        {({onClear, selected} : { onClear : any, selected : any}) => (
-          <div className="searchPersonsClearButton">
-            {!!selected.length && <ClearButton onClick={onClear} />}
-          </div>
-        )}
+      disabled={props.user !== undefined}
+    >
+      {({ onClear, selected }: { onClear: any; selected: any }) => (
+        <div className="searchPersonsClearButton">
+          {!!selected.length && <ClearButton onClick={onClear} />}
+        </div>
+      )}
     </AsyncTypeahead>
   );
 };

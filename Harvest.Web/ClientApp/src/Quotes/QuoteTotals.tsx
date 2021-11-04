@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardBody, CardHeader, Col, Row } from "reactstrap";
+import { Col, Row } from "reactstrap";
 
 import { QuoteContent } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";

@@ -29,7 +29,7 @@ export const FieldLayers = (props: Props) => {
     };
 
     cb();
-  }, [props.project.end, props.project.start, getIsMounted]);
+  }, [props.project.end, props.project.start, getIsMounted, props.project.id]);
 
   if (fields.length === 0) {
     return null;

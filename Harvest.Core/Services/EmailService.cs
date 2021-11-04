@@ -212,40 +212,40 @@ namespace Harvest.Core.Services
             return await QuoteDecision(project, reason, false);
         }
         [Obsolete("This was not implemented. If it is, the email has to be updated with new style.")]
-        public async Task<bool> ApproveAccounts(Project project, string[] emails)
+        public Task<bool> ApproveAccounts(Project project, string[] emails)
         {
             throw new NotImplementedException();
-            var url = $"{_emailSettings.BaseUrl}/Project/AccountApproval/";
+            // var url = $"{_emailSettings.BaseUrl}/Project/AccountApproval/";
 
-            var model = new AccountPendingApprovalModel()
-            {
-                PI = project.PrincipalInvestigator.NameAndEmail,
-                ProjectName = project.Name,
-                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
-                ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
-                AccountsList = new List<AccountsForApprovalModel>(),
-                ButtonUrl = $"{url}{project.Id}"
-            };
-            foreach (var account in project.Accounts.Where(a => a.ApprovedBy == null))
-            {
-                model.AccountsList.Add(new AccountsForApprovalModel(){Account = account.Number, Name = account.Name, Percent = $"{account.Percentage}%"});
-            }
+            // var model = new AccountPendingApprovalModel()
+            // {
+            //     PI = project.PrincipalInvestigator.NameAndEmail,
+            //     ProjectName = project.Name,
+            //     ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+            //     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+            //     AccountsList = new List<AccountsForApprovalModel>(),
+            //     ButtonUrl = $"{url}{project.Id}"
+            // };
+            // foreach (var account in project.Accounts.Where(a => a.ApprovedBy == null))
+            // {
+            //     model.AccountsList.Add(new AccountsForApprovalModel(){Account = account.Number, Name = account.Name, Percent = $"{account.Percentage}%"});
+            // }
 
-            var textVersion = $"Accounts require your approval for use in project {model.ProjectName} by {model.PI}";
+            // var textVersion = $"Accounts require your approval for use in project {model.ProjectName} by {model.PI}";
 
-            try
-            {
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/AccountPendingApproval.cshtml", model);
+            // try
+            // {
+            //     var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/AccountPendingApproval.cshtml", model);
 
-                await _notificationService.SendNotification(emails, null, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
-            }
-            catch (Exception e)
-            {
-                Log.Error("Error trying to email Quote", e);
-                return false;
-            }
+            //     await _notificationService.SendNotification(emails, null, emailBody, textVersion, $"Harvest Notification - Accounts need approval");
+            // }
+            // catch (Exception e)
+            // {
+            //     Log.Error("Error trying to email Quote", e);
+            //     return false;
+            // }
 
-            return true;
+            // return true;
         }
 
         public async Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining)
