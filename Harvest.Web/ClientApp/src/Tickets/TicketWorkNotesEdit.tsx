@@ -35,8 +35,8 @@ export const TicketWorkNotesEdit = (props: Props) => {
 
   return (
     <>
-      <h2>Work Notes</h2>
-      <FormGroup>
+      <h3>Work Notes</h3>
+      <FormGroup className="ticket-reply-form">
         <Input
           type="textarea"
           name="text"
@@ -45,15 +45,17 @@ export const TicketWorkNotesEdit = (props: Props) => {
           onChange={(e) => setNotes(e.target.value)}
         />
       </FormGroup>
-      <div className="row justify-content-center">
-        <Button
-          className="btn"
-          color="primary"
-          onClick={update}
-          disabled={notification.pending}
-        >
-          Update Work Notes
-        </Button>
+      <div className="row">
+        <div className="col text-right">
+          <Button
+            className="btn btn-sm"
+            color="primary"
+            onClick={update}
+            disabled={notification.pending}
+          >
+            Update Work Notes
+          </Button>
+        </div>
       </div>
     </>
   );

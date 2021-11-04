@@ -87,7 +87,7 @@ export const TicketDetailContainer = () => {
           <div className="ticket-details">
             <h2>Ticket Details</h2>
             <div className="row">
-              <div className="col-12 col-md-6">
+              <div className="col-12 col-md-8">
                 <p>
                   <b>
                     <p>{ticket.name}</p>
@@ -95,7 +95,7 @@ export const TicketDetailContainer = () => {
                 </p>
                 <p>{ticket.requirements}</p>
               </div>
-              <div className="col-12 col-md-3">
+              <div className="col-12 col-md-4">
                 <div className="row">
                   <div className="col">
                     <p>
@@ -130,21 +130,11 @@ export const TicketDetailContainer = () => {
                   </div>
                 </div>
               </div>
-              <div className="col-12 col-md-3">
-                <TicketAttachments
-                  ticket={ticket}
-                  projectId={projectId}
-                  setTicket={(ticket: TicketDetails) =>
-                    getIsMounted() && setTicket(ticket)
-                  }
-                  attachments={ticket.attachments}
-                />
-              </div>
             </div>
           </div>
           <div className="ticket-response-list">
             <div className="row mt-4">
-              <div className="col-12 col-md-9">
+              <div className="col-12 col-md-8">
                 <TicketReply
                   ticket={ticket}
                   projectId={projectId}
@@ -164,19 +154,29 @@ export const TicketDetailContainer = () => {
                 <br />
                 <TicketMessages messages={ticket.messages} />
               </div>
+              <div className="col-12 col-md-4">
+                <TicketAttachments
+                  ticket={ticket}
+                  projectId={projectId}
+                  setTicket={(ticket: TicketDetails) =>
+                    getIsMounted() && setTicket(ticket)
+                  }
+                  attachments={ticket.attachments}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="row justify-content-center pb-4">
-        <Button
-          className="btn-lg"
-          color="secondary"
-          onClick={closeTicket}
-          disabled={ticket.completed || notification.pending}
-        >
-          Close Ticket
-        </Button>
+        <div className="row justify-content-center pb-4">
+          <Button
+            className="btn-lg"
+            color="secondary"
+            onClick={closeTicket}
+            disabled={ticket.completed || notification.pending}
+          >
+            Close Ticket
+          </Button>
+        </div>
       </div>
     </div>
   );
