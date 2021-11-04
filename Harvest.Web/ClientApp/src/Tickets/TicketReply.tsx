@@ -41,7 +41,7 @@ export const TicketReply = (props: Props) => {
     if (response.ok) {
       const data = await response.json();
       if (getIsMounted()) {
-        setTicket({ ...ticket, messages: [...ticket.messages, data] });
+        setTicket({ ...ticket, messages: [{ ...data }, ...ticket.messages] });
         setTicketMessage({
           message: "",
         } as TicketMessage);
