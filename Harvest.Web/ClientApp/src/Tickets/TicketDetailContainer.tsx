@@ -82,84 +82,90 @@ export const TicketDetailContainer = () => {
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
 
-      <div>
+      <div className="card-green-bg">
         <div className="card-content">
-          <h2>Ticket Details</h2>
-          <div className="row">
-            <div className="col">
-              <p>
-                <b>Created</b> <br />
-                <p>{new Date(ticket.createdOn).toDateString()}</p>
-              </p>
-
-              <p>
-                <b>Due Date</b> <br />
-                {ticket.dueDate
-                  ? new Date(ticket.dueDate).toDateString()
-                  : "N/A"}
-              </p>
-              <p>
-                <b>Status</b> <br />
-                <p>{ticket.status}</p>
-              </p>
-            </div>
-            <div className="col">
-              {ticket.updatedOn ? (
-                <>
-                  <p>
-                    <b>Updated On</b> <br />
-                    {new Date(ticket.updatedOn).toDateString()}
-                  </p>
-
-                  <p>
-                    <b>Updated By</b> <br />
-                    {ticket.updatedBy ? ticket.updatedBy.name : "N/A"}
-                  </p>
-                </>
-              ) : null}
-            </div>
-          </div>
-          <div className="row">
-            <div className="col">
-              <p>
-                <b>Subject</b> <br />
-                <p>{ticket.name}</p>
-              </p>
-              <p>
-                <b>Details</b> <br />
+          <div className="ticket-details">
+            <h2>Ticket Details</h2>
+            <div className="row">
+              <div className="col-12 col-md-6">
+                <p>
+                  <b>
+                    <p>{ticket.name}</p>
+                  </b>
+                </p>
                 <p>{ticket.requirements}</p>
-              </p>
+              </div>
+              <div className="col-12 col-md-3">
+                <div className="row">
+                  <div className="col">
+                    <p>
+                      <b>Status</b> <br />
+                      <p>{ticket.status}</p>
+                    </p>
+                    <p>
+                      <b>Due Date</b> <br />
+                      {ticket.dueDate
+                        ? new Date(ticket.dueDate).toDateString()
+                        : "N/A"}
+                    </p>
+                    <p>
+                      <b>Created</b> <br />
+                      <p>{new Date(ticket.createdOn).toDateString()}</p>
+                    </p>
+                  </div>
+                  <div className="col">
+                    {ticket.updatedOn ? (
+                      <>
+                        <p>
+                          <b>Updated On</b> <br />
+                          {new Date(ticket.updatedOn).toDateString()}
+                        </p>
+
+                        <p>
+                          <b>Updated By</b> <br />
+                          {ticket.updatedBy ? ticket.updatedBy.name : "N/A"}
+                        </p>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+              <div className="col-12 col-md-3">
+                <TicketAttachments
+                  ticket={ticket}
+                  projectId={projectId}
+                  setTicket={(ticket: TicketDetails) =>
+                    getIsMounted() && setTicket(ticket)
+                  }
+                  attachments={ticket.attachments}
+                />
+              </div>
             </div>
           </div>
-
-          <ShowFor roles={["FieldManager", "Supervisor"]}>
-            <TicketWorkNotesEdit
-              ticket={ticket}
-              projectId={projectId}
-              setNotes={(notes: string) =>
-                setTicket({ ...ticket, workNotes: notes })
-              }
-            />
-          </ShowFor>
-          <hr />
-          <TicketAttachments
-            ticket={ticket}
-            projectId={projectId}
-            setTicket={(ticket: TicketDetails) =>
-              getIsMounted() && setTicket(ticket)
-            }
-            attachments={ticket.attachments}
-          />
-          <hr />
-
-          <TicketMessages messages={ticket.messages} />
-          <TicketReply
-            ticket={ticket}
-            projectId={projectId}
-            setTicket={(ticket: TicketDetails) =>
-              getIsMounted() && setTicket(ticket)
-            }
-          />
+          <div className="ticket-response-list">
+            <div className="row mt-4">
+              <div className="col-12 col-md-9">
+                <TicketReply
+                  ticket={ticket}
+                  projectId={projectId}
+                  setTicket={(ticket: TicketDetails) =>
+                    getIsMounted() && setTicket(ticket)
+                  }
+                />
+                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                  <TicketWorkNotesEdit
+                    ticket={ticket}
+                    projectId={projectId}
+                    setNotes={(notes: string) =>
+                      setTicket({ ...ticket, workNotes: notes })
+                    }
+                  />
+                </ShowFor>
+                <br />
+                <TicketMessages messages={ticket.messages} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div className="row justify-content-center pb-4">

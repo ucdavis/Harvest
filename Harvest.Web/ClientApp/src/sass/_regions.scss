@@ -167,3 +167,21 @@
 // #logoutForm {
 //   display: inline-block;
 // }
+//ticketing
+.ticket-response-list {
+  p {
+    margin-bottom: 0;
+  }
+  span.ticket-responder {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    color: $secondary-font;
+  }
+}
+.ticket-response-card {
+  background: #fff;
+  border: 1px solid $borders;
+  box-shadow: $box-shadow;
+  padding: 2%;
+  margin-bottom: 16px;
+}

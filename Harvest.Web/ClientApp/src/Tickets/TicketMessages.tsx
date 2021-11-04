@@ -15,9 +15,15 @@ export const TicketMessages = (props: Props) => {
         <p> No Messages Yet!!!</p>
       ) : null}
       {ticketMessages.map((ticketMessage) => (
-        <p key={`message-${ticketMessage.id}`}>
-          {ticketMessage.message} from {ticketMessage.createdBy?.name}
-        </p>
+        <div className="ticket-response-card">
+          <p key={`message-${ticketMessage.id}`}>
+            <span className="ticket-responder">
+              {ticketMessage.createdBy?.name}:
+            </span>{" "}
+            <br />
+            {ticketMessage.message}
+          </p>
+        </div>
       ))}
     </div>
   );
