@@ -48,6 +48,11 @@ namespace Harvest.Core.Services
         {
             var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
+            if (project.IsActive == false)
+            {
+                return Result.Error("Project is not Active");
+            }
+
             if (project.Status != Project.Statuses.Active && project.Status != Project.Statuses.AwaitingCloseout)
             {
                 return Result.Error("Project status is not Active or AwaitingCloseout");
