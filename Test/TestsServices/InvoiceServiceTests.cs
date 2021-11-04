@@ -124,6 +124,8 @@ namespace Test.TestsServices
             
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
+
+        //Test when active and closeout - error
         [Fact]
         public async Task ActiveProjectThatDoNotRunIfCloseout()
         {
@@ -968,10 +970,202 @@ namespace Test.TestsServices
 
         }
 
- 
-        //TODO: Write InitiateCloseout tests
-        //Test when active and closeout - error
         //Test when closeout for all dates
+        [Theory]
+        #region Bunch of dates
+        [InlineData(2020, 01, 01)]
+        [InlineData(2020, 01, 02)]
+        [InlineData(2020, 01, 03)]
+        [InlineData(2020, 01, 04)]
+        [InlineData(2020, 01, 05)]
+        [InlineData(2020, 01, 06)]
+        [InlineData(2020, 01, 07)]
+        [InlineData(2020, 01, 08)]
+        [InlineData(2020, 01, 09)]
+        [InlineData(2020, 01, 10)]
+        [InlineData(2020, 01, 11)]
+        [InlineData(2020, 01, 12)]
+        [InlineData(2020, 01, 13)]
+        [InlineData(2020, 01, 14)]
+        [InlineData(2020, 01, 15)]
+        [InlineData(2020, 01, 16)]
+        [InlineData(2020, 01, 17)]
+        [InlineData(2020, 01, 18)]
+        [InlineData(2020, 01, 19)]
+        [InlineData(2020, 01, 20)]
+        [InlineData(2020, 01, 21)]
+        [InlineData(2020, 01, 22)]
+        [InlineData(2020, 01, 23)]
+        [InlineData(2020, 01, 24)]
+        [InlineData(2020, 01, 25)]
+        [InlineData(2020, 01, 26)]
+        [InlineData(2020, 01, 27)]
+        [InlineData(2020, 01, 28)]
+        [InlineData(2020, 01, 29)]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 02, 03)]
+        [InlineData(2020, 02, 04)]
+        [InlineData(2020, 02, 05)]
+        [InlineData(2020, 02, 06)]
+        [InlineData(2020, 02, 07)]
+        [InlineData(2020, 02, 08)]
+        [InlineData(2020, 02, 09)]
+        [InlineData(2020, 02, 10)]
+        [InlineData(2020, 02, 11)]
+        [InlineData(2020, 02, 12)]
+        [InlineData(2020, 02, 13)]
+        [InlineData(2020, 02, 14)]
+        [InlineData(2020, 02, 15)]
+        [InlineData(2020, 02, 16)]
+        [InlineData(2020, 02, 17)]
+        [InlineData(2020, 02, 18)]
+        [InlineData(2020, 02, 19)]
+        [InlineData(2020, 02, 20)]
+        [InlineData(2020, 02, 21)]
+        [InlineData(2020, 02, 22)]
+        [InlineData(2020, 02, 23)]
+        [InlineData(2020, 02, 24)]
+        [InlineData(2020, 02, 25)]
+        [InlineData(2020, 02, 26)]
+        [InlineData(2020, 02, 27)]
+        [InlineData(2020, 02, 28)]
+        #endregion Bunch of dates
+        public async Task CreateInvoiceWithCloseoutRunsAnyDate(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id, true);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            addedInvoice.ShouldNotBeNull();
+            addedInvoice.Expenses.ShouldNotBeNull();
+            addedInvoice.Expenses.Any().ShouldBe(true);
+            addedInvoice.CreatedOn.ShouldBe(date);
+            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            addedInvoice.Status.ShouldBe(Invoice.Statuses.Created);
+            addedInvoice.Total.ShouldBe(4600.00m);
+
+            Projects[0].Status.ShouldBe(Project.Statuses.FinalInvoicePending);
+        }
+        //Test when closeout for all dates
+        [Theory]
+        #region Bunch of dates
+        [InlineData(2020, 01, 01)]
+        [InlineData(2020, 01, 02)]
+        [InlineData(2020, 01, 03)]
+        [InlineData(2020, 01, 04)]
+        [InlineData(2020, 01, 05)]
+        [InlineData(2020, 01, 06)]
+        [InlineData(2020, 01, 07)]
+        [InlineData(2020, 01, 08)]
+        [InlineData(2020, 01, 09)]
+        [InlineData(2020, 01, 10)]
+        [InlineData(2020, 01, 11)]
+        [InlineData(2020, 01, 12)]
+        [InlineData(2020, 01, 13)]
+        [InlineData(2020, 01, 14)]
+        [InlineData(2020, 01, 15)]
+        [InlineData(2020, 01, 16)]
+        [InlineData(2020, 01, 17)]
+        [InlineData(2020, 01, 18)]
+        [InlineData(2020, 01, 19)]
+        [InlineData(2020, 01, 20)]
+        [InlineData(2020, 01, 21)]
+        [InlineData(2020, 01, 22)]
+        [InlineData(2020, 01, 23)]
+        [InlineData(2020, 01, 24)]
+        [InlineData(2020, 01, 25)]
+        [InlineData(2020, 01, 26)]
+        [InlineData(2020, 01, 27)]
+        [InlineData(2020, 01, 28)]
+        [InlineData(2020, 01, 29)]
+        [InlineData(2020, 02, 01)]
+        [InlineData(2020, 02, 02)]
+        [InlineData(2020, 02, 03)]
+        [InlineData(2020, 02, 04)]
+        [InlineData(2020, 02, 05)]
+        [InlineData(2020, 02, 06)]
+        [InlineData(2020, 02, 07)]
+        [InlineData(2020, 02, 08)]
+        [InlineData(2020, 02, 09)]
+        [InlineData(2020, 02, 10)]
+        [InlineData(2020, 02, 11)]
+        [InlineData(2020, 02, 12)]
+        [InlineData(2020, 02, 13)]
+        [InlineData(2020, 02, 14)]
+        [InlineData(2020, 02, 15)]
+        [InlineData(2020, 02, 16)]
+        [InlineData(2020, 02, 17)]
+        [InlineData(2020, 02, 18)]
+        [InlineData(2020, 02, 19)]
+        [InlineData(2020, 02, 20)]
+        [InlineData(2020, 02, 21)]
+        [InlineData(2020, 02, 22)]
+        [InlineData(2020, 02, 23)]
+        [InlineData(2020, 02, 24)]
+        [InlineData(2020, 02, 25)]
+        [InlineData(2020, 02, 26)]
+        [InlineData(2020, 02, 27)]
+        [InlineData(2020, 02, 28)]
+        #endregion Bunch of dates
+        public async Task CreateInvoiceWithCloseoutRunsAnyDateNoExpenses(int year, int month, int day)
+        {
+            var date = new DateTime(year, month, day).FromPacificTime();
+            SetupData();
+            foreach (var expense in Expenses.Where(a => a.ProjectId == Projects[0].Id))
+            {
+                //Set the expenses as billed
+                expense.Invoice = CreateValidEntities.Invoice(9 + expense.Id, Projects[0].Id);
+            }
+            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
+            MockData();
+            var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
+            MockDevSettings.Setup(a => a.Value).Returns(devSet);
+            Projects[0].IsActive.ShouldBe(true);
+            Projects[0].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
+            Invoice addedInvoice = null;
+            MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
+            MockDateTimeService.Setup(a => a.DateTimeUtcNow()).Returns(date);
+
+            //Use this invoice because we changed the Dev Settings
+            var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+
+            var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id, true);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
+            addedInvoice.ShouldNotBeNull();
+            addedInvoice.Expenses.ShouldNotBeNull();
+            addedInvoice.Expenses.Any().ShouldBe(false);
+            addedInvoice.CreatedOn.ShouldBe(date);
+            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            addedInvoice.Status.ShouldBe(Invoice.Statuses.Completed);
+            addedInvoice.Total.ShouldBe(0);
+
+            Projects[0].Status.ShouldBe(Project.Statuses.Completed);
+        }
+        
 
     }
 }
