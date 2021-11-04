@@ -430,7 +430,7 @@ namespace Test.TestsServices
         }
 
         /// <summary>
-        /// Chck that a project past the end date sets the Awaiting Closeout status
+        /// Check that a project past the end date sets the Awaiting Closeout status
         /// </summary>
         /// <returns></returns>
         [Fact]
@@ -671,9 +671,11 @@ namespace Test.TestsServices
                 //Set the expenses as billed
                 expense.Invoice = CreateValidEntities.Invoice(9 + expense.Id, Projects[0].Id);
             }
+
+            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
             MockData();
             Projects[0].IsActive.ShouldBe(true);
-            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
             Invoice addedInvoice = null;
             MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
 
@@ -704,9 +706,10 @@ namespace Test.TestsServices
         public async Task WhenUnbilledExpensesAndCloseout()
         {
             SetupData();
+            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
             MockData();
             Projects[0].IsActive.ShouldBe(true);
-            Projects[0].Status.ShouldBe(Project.Statuses.Active);
+            Projects[0].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
             Invoice addedInvoice = null;
             MockDbContext.Setup(a => a.Invoices.Add(It.IsAny<Invoice>())).Callback<Invoice>(r => addedInvoice = r);
 
@@ -948,6 +951,8 @@ namespace Test.TestsServices
         }
 
         //TODO: Write InitiateCloseout tests
+        //Test when active and closeout - error
+        //Test when closeout for all dates
 
     }
 }
