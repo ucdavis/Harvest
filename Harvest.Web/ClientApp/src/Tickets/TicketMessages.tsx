@@ -28,14 +28,6 @@ export const TicketMessages = (props: Props) => {
             </Col>
           </div>
           <p>{ticketMessage.message}</p>
-          {/* <p key={`message-${ticketMessage.id}`}>
-            <span className="ticket-responder"></span> <br />
-            <span className="ticket-responder-timestamp">
-              12:30 PM 11/23/2021
-            </span>
-            <br />
-            <br />
-          </p> */}
         </div>
       ))}
     </div>

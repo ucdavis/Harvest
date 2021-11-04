@@ -164,10 +164,6 @@
     margin: 1.5% 0;
   }
 }
-// #logoutForm {
-//   display: inline-block;
-// }
-//ticketing
 .ticket-response-list {
   p {
     margin-bottom: 0;
@@ -184,6 +180,9 @@
   box-shadow: $box-shadow;
   padding: 2%;
   margin-bottom: 16px;
+  p.lede {
+    color: $secondary-font;
+  }
 }
 .ticket-reply-form {
   margin-bottom: 1%;
