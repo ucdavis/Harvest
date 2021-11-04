@@ -103,6 +103,10 @@ namespace Test.TestsServices
         [InlineData(Project.Statuses.PendingAccountApproval, true)]
         [InlineData(Project.Statuses.PendingApproval, false)]
         [InlineData(Project.Statuses.PendingApproval, true)]
+        [InlineData(Project.Statuses.PendingCloseoutApproval, false)]
+        [InlineData(Project.Statuses.PendingCloseoutApproval, true)]
+        [InlineData(Project.Statuses.ChangeApplied, false)]
+        [InlineData(Project.Statuses.ChangeApplied, true)]
         public async Task ProjectThatDoNotRun(string status, bool active)
         {
             SetupData();
@@ -118,6 +122,54 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe($"No active project found for given projectId: {Projects[1].Id}");
             
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        /// <summary>
+        /// Only Status of Active and Project.IsActive will run
+        /// </summary>
+        /// <param name="status"></param>
+        /// <param name="active"></param>
+        /// <returns></returns>
+        [Theory]
+        [InlineData(Project.Statuses.Active, false)]
+        [InlineData(Project.Statuses.Requested, false)]
+        [InlineData(Project.Statuses.Requested, true)]
+        [InlineData(Project.Statuses.Canceled, false)]
+        [InlineData(Project.Statuses.Canceled, true)]
+        [InlineData(Project.Statuses.ChangeRequested, false)]
+        [InlineData(Project.Statuses.ChangeRequested, true)]
+        [InlineData(Project.Statuses.QuoteRejected, false)]
+        [InlineData(Project.Statuses.QuoteRejected, true)]
+        [InlineData(Project.Statuses.AwaitingCloseout, false)]
+        [InlineData(Project.Statuses.AwaitingCloseout, true)]
+        [InlineData(Project.Statuses.Completed, false)]
+        [InlineData(Project.Statuses.Completed, true)]
+        [InlineData(Project.Statuses.FinalInvoicePending, false)]
+        [InlineData(Project.Statuses.FinalInvoicePending, true)]
+        [InlineData(Project.Statuses.PendingAccountApproval, false)]
+        [InlineData(Project.Statuses.PendingAccountApproval, true)]
+        [InlineData(Project.Statuses.PendingApproval, false)]
+        [InlineData(Project.Statuses.PendingApproval, true)]
+        [InlineData(Project.Statuses.PendingCloseoutApproval, false)]
+        //[InlineData(Project.Statuses.PendingCloseoutApproval, true)] //This one would fall through
+        [InlineData(Project.Statuses.ChangeApplied, false)]
+        [InlineData(Project.Statuses.ChangeApplied, true)]
+        public async Task ProjectThatDoNotRunIfCloseout(string status, bool active)
+        {
+            SetupData();
+            Projects[1].IsActive = active;
+            Projects[1].Status = status;
+            MockData();
+
+            Projects[1].IsActive.ShouldBe(active);
+            Projects[1].Status.ShouldBe(status);
+
+            var rtValue = await InvoiceServ.CreateInvoice(Projects[1].Id, true); //This is a closeout. 
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"No active project found for given projectId: {Projects[1].Id}");
+
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
 
@@ -894,6 +946,8 @@ namespace Test.TestsServices
             rtValue[0].ShouldBe(2);
 
         }
+
+        //TODO: Write InitiateCloseout tests
 
     }
 }
