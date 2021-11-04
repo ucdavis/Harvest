@@ -124,6 +124,24 @@ namespace Test.TestsServices
             
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
         }
+        [Fact]
+        public async Task ActiveProjectThatDoNotRunIfCloseout()
+        {
+            SetupData();
+            Projects[1].IsActive = true;
+            Projects[1].Status = Project.Statuses.Active;
+            MockData();
+
+            Projects[1].IsActive.ShouldBe(true);
+            Projects[1].Status.ShouldBe(Project.Statuses.Active);
+
+            var rtValue = await InvoiceServ.CreateInvoice(Projects[1].Id, true); //This is a closeout. 
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe($"Closeout can only happen for projects with the Pending Closeout Approval status projectId: {Projects[1].Id}");
+
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
 
         /// <summary>
         /// Only Status of Active and Project.IsActive will run
@@ -950,6 +968,7 @@ namespace Test.TestsServices
 
         }
 
+ 
         //TODO: Write InitiateCloseout tests
         //Test when active and closeout - error
         //Test when closeout for all dates
