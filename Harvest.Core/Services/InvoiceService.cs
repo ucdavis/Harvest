@@ -83,6 +83,11 @@ namespace Harvest.Core.Services
                 return Result.Error("No active project found for given projectId: {projectId}", projectId);
             }
 
+            if (isCloseout && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return Result.Error("Closeout can only happen for projects with the Pending Closeout Approval status projectId: {projectId}", projectId);
+            }
+
             if (!isCloseout && !_devSettings.NightlyInvoices)
             {
                 if (!now.IsBusinessDay())
