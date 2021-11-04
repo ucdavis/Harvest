@@ -211,7 +211,7 @@ namespace Harvest.Web.Controllers.Api
 
             await _emailService.TicketReplyAdded(project, ticket, ticketMessageToCreate);
 
-            var savedTm = await _dbContext.TicketMessages.Where(a => a.Id == ticketMessageToCreate.Id).Select(a => new TicketMessage { Id = a.Id, CreatedBy = a.CreatedBy, Message = a.Message }).SingleAsync();
+            var savedTm = await _dbContext.TicketMessages.Where(a => a.Id == ticketMessageToCreate.Id).Select(a => new TicketMessage { Id = a.Id, CreatedBy = a.CreatedBy, Message = a.Message, CreatedOn = a.CreatedOn}).SingleAsync();
 
             //Return message instead?
             return Ok(savedTm);
