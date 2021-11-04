@@ -1165,7 +1165,122 @@ namespace Test.TestsServices
 
             Projects[0].Status.ShouldBe(Project.Statuses.Completed);
         }
-        
 
+        #region InitiateCloseout tests
+
+        [Theory]
+        //[InlineData(Project.Statuses.Active)]
+        [InlineData(Project.Statuses.Requested              )]
+        [InlineData(Project.Statuses.Canceled               )]
+        [InlineData(Project.Statuses.ChangeRequested        )]
+        [InlineData(Project.Statuses.QuoteRejected          )]
+        //[InlineData(Project.Statuses.AwaitingCloseout     )]
+        [InlineData(Project.Statuses.Completed              )]
+        [InlineData(Project.Statuses.FinalInvoicePending    )]
+        [InlineData(Project.Statuses.PendingAccountApproval )]
+        [InlineData(Project.Statuses.PendingApproval        )]
+        [InlineData(Project.Statuses.PendingCloseoutApproval)]
+        [InlineData(Project.Statuses.ChangeApplied          )]
+        public async Task InitiateCloseoutReturnsErrorWhenProjectNotInCorrectStateAndActive(string status)
+        {
+            SetupData();
+            Projects[1].IsActive = true;
+            Projects[1].Status = status;
+            MockData();
+
+            Projects[1].IsActive.ShouldBe(true);
+            Projects[1].Status.ShouldBe(status);
+
+            var rtValue = await InvoiceServ.InitiateCloseout(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Project status is not Active or AwaitingCloseout");
+
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+        }
+
+        [Theory]
+        [InlineData(Project.Statuses.Active)]
+        [InlineData(Project.Statuses.Requested)]
+        [InlineData(Project.Statuses.Canceled)]
+        [InlineData(Project.Statuses.ChangeRequested)]
+        [InlineData(Project.Statuses.QuoteRejected)]
+        [InlineData(Project.Statuses.AwaitingCloseout     )]
+        [InlineData(Project.Statuses.Completed)]
+        [InlineData(Project.Statuses.FinalInvoicePending)]
+        [InlineData(Project.Statuses.PendingAccountApproval)]
+        [InlineData(Project.Statuses.PendingApproval)]
+        [InlineData(Project.Statuses.PendingCloseoutApproval)]
+        [InlineData(Project.Statuses.ChangeApplied)]
+        public async Task InitiateCloseoutReturnsErrorWhenProjectNotInCorrectStateAndNotActive(string status)
+        {
+            SetupData();
+            Projects[1].IsActive = false;
+            Projects[1].Status = status;
+            MockData();
+
+            Projects[1].IsActive.ShouldBe(false);
+            Projects[1].Status.ShouldBe(status);
+
+            var rtValue = await InvoiceServ.InitiateCloseout(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Project is not Active");
+
+            MockEmailService.Verify(a => a.CloseoutConfirmation(It.IsAny<Project>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(Project.Statuses.Active)]
+        [InlineData(Project.Statuses.AwaitingCloseout)]
+        public async Task InitiateCloseoutDoesNotSaveIfEmailFails(string status)
+        {
+            SetupData();
+            Projects[1].IsActive = true;
+            Projects[1].Status = status;
+            MockData();
+            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1])).ReturnsAsync(false);
+
+            Projects[1].IsActive.ShouldBe(true);
+            Projects[1].Status.ShouldBe(status);
+
+            var rtValue = await InvoiceServ.InitiateCloseout(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Failed to send confirmation email");
+            MockEmailService.Verify(a => a.CloseoutConfirmation(Projects[1]), times: Times.Once);
+
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(Project.Statuses.Active)]
+        [InlineData(Project.Statuses.AwaitingCloseout)]
+        public async Task InitiateCloseoutSucceeds(string status)
+        {
+            SetupData();
+            Projects[1].IsActive = true;
+            Projects[1].Status = status;
+            MockData();
+            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1])).ReturnsAsync(true);
+
+            Projects[1].IsActive.ShouldBe(true);
+            Projects[1].Status.ShouldBe(status);
+
+            var rtValue = await InvoiceServ.InitiateCloseout(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            rtValue.Message.ShouldBe("Closeout initiated. An approval request has been sent to project's PI.");
+
+            Projects[1].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
+            MockEmailService.Verify(a => a.CloseoutConfirmation(Projects[1]), times: Times.Once);
+
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Once);
+        }
+        #endregion InitiateCloseout tests
     }
 }
