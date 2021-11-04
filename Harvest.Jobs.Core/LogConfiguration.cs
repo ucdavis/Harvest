@@ -14,7 +14,7 @@ namespace Harvest.Jobs.Core
     {
         private static bool _loggingSetup;
 
-        private static IConfigurationRoot _configuration;
+        private static IConfigurationRoot _configuration = null!;
 
         public static void Setup(IConfigurationRoot configuration)
         {

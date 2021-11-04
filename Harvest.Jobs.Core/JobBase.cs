@@ -8,7 +8,7 @@ namespace Harvest.Jobs.Core
 {
     public abstract class JobBase
     {
-        public static IConfigurationRoot Configuration { get; set; }
+        public static IConfigurationRoot Configuration { get; set; } = null!;
 
         protected static void Configure()
         {

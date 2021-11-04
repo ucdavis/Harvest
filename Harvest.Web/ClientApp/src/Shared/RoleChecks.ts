@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from "react";
+import { useContext, useCallback } from "react";
 
 import AppContext from "./AppContext";
 import { RoleName } from "../types";
