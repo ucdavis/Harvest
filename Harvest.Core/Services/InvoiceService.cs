@@ -48,6 +48,11 @@ namespace Harvest.Core.Services
         {
             var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
 
+            if (project.IsActive == false)
+            {
+                return Result.Error("Project is not Active");
+            }
+
             if (project.Status != Project.Statuses.Active && project.Status != Project.Statuses.AwaitingCloseout)
             {
                 return Result.Error("Project status is not Active or AwaitingCloseout");
@@ -81,6 +86,11 @@ namespace Harvest.Core.Services
             if (project == null)
             {
                 return Result.Error("No active project found for given projectId: {projectId}", projectId);
+            }
+
+            if (isCloseout && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return Result.Error("Closeout can only happen for projects with the Pending Closeout Approval status projectId: {projectId}", projectId);
             }
 
             if (!isCloseout && !_devSettings.NightlyInvoices)
