@@ -88,43 +88,43 @@ export const TicketDetailContainer = () => {
             <h2>Ticket Details</h2>
             <div className="row">
               <div className="col-12 col-md-8">
-                <p>
+                <div>
                   <b>
                     <p>{ticket.name}</p>
                   </b>
-                </p>
+                </div>
                 <p>{ticket.requirements}</p>
               </div>
               <div className="col-12 col-md-4">
                 <div className="row">
                   <div className="col">
-                    <p>
+                    <div>
                       <b>Status</b> <br />
                       <p>{ticket.status}</p>
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       <b>Due Date</b> <br />
                       {ticket.dueDate
                         ? new Date(ticket.dueDate).toDateString()
                         : "N/A"}
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       <b>Created</b> <br />
                       <p>{new Date(ticket.createdOn).toDateString()}</p>
-                    </p>
+                    </div>
                   </div>
                   <div className="col">
                     {ticket.updatedOn ? (
                       <>
-                        <p>
+                        <div>
                           <b>Updated On</b> <br />
                           {new Date(ticket.updatedOn).toDateString()}
-                        </p>
+                        </div>
 
-                        <p>
+                        <div>
                           <b>Updated By</b> <br />
                           {ticket.updatedBy ? ticket.updatedBy.name : "N/A"}
-                        </p>
+                        </div>
                       </>
                     ) : null}
                   </div>

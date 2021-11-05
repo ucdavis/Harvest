@@ -1,6 +1,7 @@
 ﻿import { useMemo } from "react";
 import { Col } from "reactstrap";
 import { TicketMessage } from "../types";
+import { ensureUTC } from "../Util/DateHelper";
 
 interface Props {
   messages: TicketMessage[];
@@ -16,22 +17,25 @@ export const TicketMessages = (props: Props) => {
         <p> No Messages Yet!!!</p>
       ) : null}
       {ticketMessages.map((ticketMessage) => (
-        <div className="ticket-response-card">
+        <div className="ticket-response-card" key={ticketMessage.id}>
           <div className="row mb-2 justify-content-between">
             <Col>
-              <p className="lede">{ticketMessage.createdBy?.name}</p>
+              <div className="lede">{ticketMessage.createdBy?.name}</div>
             </Col>
             <Col>
-              <p className="ticket-timestamp text-right">
-                {new Date(ticketMessage.createdOn).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "2-digit",
-                  day: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                })}
-              </p>
+              <div className="ticket-timestamp text-right">
+                {ensureUTC(ticketMessage.createdOn).toLocaleDateString(
+                  "en-US",
+                  {
+                    year: "numeric",
+                    month: "2-digit",
+                    day: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  }
+                )}
+              </div>
             </Col>
           </div>
           <p>{ticketMessage.message}</p>
