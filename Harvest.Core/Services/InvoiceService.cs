@@ -58,6 +58,13 @@ namespace Harvest.Core.Services
                 return Result.Error("Project status is not Active or AwaitingCloseout");
             }
 
+            var unbilledExpenses = await _dbContext.Expenses.Where(
+                e => e.InvoiceId == null && e.ProjectId == projectId).SumAsync(e => e.Total);
+            if (unbilledExpenses + project.ChargedTotal > project.QuoteTotal)
+            {
+                return Result.Error("Project has unbilled expenses that exceed the quote total");
+            }
+
             if (!await _emailService.CloseoutConfirmation(project))
             {
                 return Result.Error("Failed to send confirmation email");

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Expense, ExpenseQueryParams, Project } from "../types";
@@ -21,6 +21,7 @@ interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
   hideProjectHeader?: boolean;
   disableEdits?: boolean;
+  setTotalUnbilled?: Dispatch<SetStateAction<number | undefined>>;
 }
 
 export const UnbilledExpensesContainer = (props: Props) => {
@@ -33,6 +34,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
     title: "Remove Expense",
     message: "Are you sure you want to remove this unbilled expense?",
   });
+  const { newExpenseCount, setTotalUnbilled } = props;
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -47,13 +49,15 @@ export const UnbilledExpensesContainer = (props: Props) => {
 
         if (getIsMounted()) {
           setExpenses(expenses);
-          setTotal(expenses.reduce((acc, cur) => acc + cur.total, 0));
+          const total = expenses.reduce((acc, cur) => acc + cur.total, 0);
+          setTotal(total);
+          setTotalUnbilled && setTotalUnbilled(total);
         }
       }
     };
 
     cb();
-  }, [projectId, props.newExpenseCount, getIsMounted]);
+  }, [projectId, newExpenseCount, getIsMounted, setTotalUnbilled]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -97,7 +101,9 @@ export const UnbilledExpensesContainer = (props: Props) => {
         expensesCopy.splice(index, 1);
 
         setExpenses(expensesCopy);
-        setTotal(expensesCopy.reduce((acc, cur) => acc + cur.total, 0));
+        const total = expenses.reduce((acc, cur) => acc + cur.total, 0);
+        setTotal(total);
+        setTotalUnbilled && setTotalUnbilled(total);
       }
       return "Expense Removed";
     });
