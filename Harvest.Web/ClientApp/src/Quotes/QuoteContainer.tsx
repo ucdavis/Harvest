@@ -73,7 +73,7 @@ export const QuoteContainer = () => {
           }
 
           if (projectWithQuote.quote) {
-            // TODO: remove once we standardize on new quote format
+            // quote already exists, so we'll just set it
             setQuote({
               ...projectWithQuote.quote,
               fields: projectWithQuote.quote.fields ?? [],
@@ -86,9 +86,11 @@ export const QuoteContainer = () => {
               setEditFields(true);
             }
           } else {
+            // quote doesn't exist, create and set default values
             const quoteToUse = new QuoteContentImpl();
             quoteToUse.acreageRate =
               rateJson.find((r) => r.type === "Acreage")?.price || 120;
+            quoteToUse.projectName = projectWithQuote.project.name;
 
             // alwyas at least 1 year worth of acreage, but use max in case there is more
             quoteToUse.years = Math.max(
