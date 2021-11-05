@@ -16,7 +16,7 @@ export const TicketMessages = (props: Props) => {
         <p> No Messages Yet!!!</p>
       ) : null}
       {ticketMessages.map((ticketMessage) => (
-        <div className="ticket-response-card">
+        <div className="ticket-response-card" key={ticketMessage.id}>
           <div className="row mb-2 justify-content-between">
             <Col>
               <div className="lede">{ticketMessage.createdBy?.name}</div>
