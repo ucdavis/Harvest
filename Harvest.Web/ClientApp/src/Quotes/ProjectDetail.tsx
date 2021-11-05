@@ -120,6 +120,8 @@ export const ProjectDetail = (props: Props) => {
             </Col>
           </Row>
         )}
+
+        <br />
       </Col>
 
       {/* Right Details */}
