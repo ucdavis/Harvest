@@ -7,6 +7,7 @@ import {
   QuoteContent,
   QuoteContentImpl,
   Rate,
+  WorkItemImpl,
 } from "../types";
 
 import { FieldContainer } from "../Fields/FieldContainer";
@@ -22,6 +23,7 @@ import { checkValidity } from "../Util/ValidationHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ShowFor } from "../Shared/ShowFor";
 import { validatorOptions } from "../constants";
+import { Button } from "reactstrap";
 
 interface RouteParams {
   projectId?: string;
@@ -155,6 +157,28 @@ export const QuoteContainer = () => {
     [project]
   );
 
+  const addActivity = () => {
+    const newActivityId = Math.max(...quote.activities.map((a) => a.id), 0) + 1;
+    setQuote({
+      ...quote,
+      activities: [
+        ...quote.activities,
+        {
+          id: newActivityId,
+          name: "Activity",
+          total: 0,
+          workItems: [
+            new WorkItemImpl(newActivityId, 1, "Labor"),
+            new WorkItemImpl(newActivityId, 2, "Equipment"),
+            new WorkItemImpl(newActivityId, 3, "Other"),
+          ],
+          year: 1, // default new activity to no adjustment
+          adjustment: 0,
+        },
+      ],
+    });
+  };
+
   const save = async (submit: boolean) => {
     const errors = await validateAll();
     if (errors.length > 0) {
@@ -283,6 +307,15 @@ export const QuoteContainer = () => {
                 rates={rates}
                 updateQuote={setQuote}
               />
+              <br />
+              <Button
+                className="mb-4"
+                color="primary"
+                size="lg"
+                onClick={addActivity}
+              >
+                Add Activity
+              </Button>
             </div>
             <QuoteTotals quote={quote}></QuoteTotals>
             <div className="row justify-content-center">

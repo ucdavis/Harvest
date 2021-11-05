@@ -122,7 +122,43 @@ export interface Transfer {
   isProjectAccount: boolean;
 }
 
-// TODO: should this be a different name or is it ok?  Do we even need an interface?
+export class WorkItemImpl implements WorkItem {
+  id;
+  activityId;
+  description;
+  type;
+  rate;
+  rateId = 0;
+  unit = "hr";
+  quantity;
+  markup = false;
+  total = 0;
+  isPassthrough = false;
+
+  constructor(activityId: number, id: number, type: RateType) {
+    this.activityId = activityId;
+    this.id = id;
+    this.type = type;
+    this.rate = 0;
+    this.quantity = 0;
+    this.description = "";
+    this.unit = "";
+    this.isPassthrough = false;
+  }
+}
+export interface WorkItem {
+  id: number;
+  activityId: number;
+  type: RateType;
+  rateId: number;
+  rate: number;
+  description: string;
+  quantity: number;
+  unit: string;
+  markup: boolean;
+  total: number;
+  isPassthrough: boolean;
+}
 
 // the dynamic content which will be stored in Quote.text
 export class QuoteContentImpl implements QuoteContent {
@@ -141,7 +177,20 @@ export class QuoteContentImpl implements QuoteContent {
   years = 1;
   fields = [];
 
-  activities = [] as Activity[];
+  activities = [
+    {
+      id: 1,
+      name: "Activity",
+      total: 0,
+      workItems: [
+        new WorkItemImpl(1, 1, "Labor"),
+        new WorkItemImpl(1, 2, "Equipment"),
+        new WorkItemImpl(1, 3, "Other"),
+      ],
+      year: 1, // default new activity to no adjustment
+      adjustment: 0,
+    },
+  ] as Activity[];
 }
 
 export interface QuoteContent {
@@ -209,44 +258,6 @@ export interface Action {
   type: ActionType;
   name: string;
   unit: MeasurementUnit;
-}
-
-export class WorkItemImpl implements WorkItem {
-  id;
-  activityId;
-  description;
-  type;
-  rate;
-  rateId = 0;
-  unit = "hr";
-  quantity;
-  markup = false;
-  total = 0;
-  isPassthrough = false;
-
-  constructor(activityId: number, id: number, type: RateType) {
-    this.activityId = activityId;
-    this.id = id;
-    this.type = type;
-    this.rate = 0;
-    this.quantity = 0;
-    this.description = "";
-    this.unit = "";
-    this.isPassthrough = false;
-  }
-}
-export interface WorkItem {
-  id: number;
-  activityId: number;
-  type: RateType;
-  rateId: number;
-  rate: number;
-  description: string;
-  quantity: number;
-  unit: string;
-  markup: boolean;
-  total: number;
-  isPassthrough: boolean;
 }
 
 export interface Activity {

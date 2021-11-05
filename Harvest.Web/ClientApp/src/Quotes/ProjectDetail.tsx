@@ -1,8 +1,8 @@
 import React from "react";
 
-import { QuoteContent, Rate, WorkItemImpl } from "../types";
+import { QuoteContent, Rate } from "../types";
 
-import { Button, Col, Input, Label, Row } from "reactstrap";
+import { Col, Input, Label, Row } from "reactstrap";
 
 import { formatCurrency } from "../Util/NumberFormatting";
 import { Location } from "../Fields/Location";
@@ -20,30 +20,6 @@ interface Props {
 export const ProjectDetail = (props: Props) => {
   const { onChange, InputErrorMessage, getClassName, onBlur } =
     useInputValidator(quoteContentSchema, props.quote, validatorOptions);
-
-  // TODO: should we do the work here or pass up to parent?
-  const addActivity = () => {
-    const newActivityId =
-      Math.max(...props.quote.activities.map((a) => a.id), 0) + 1;
-    props.updateQuote({
-      ...props.quote,
-      activities: [
-        ...props.quote.activities,
-        {
-          id: newActivityId,
-          name: "Activity",
-          total: 0,
-          workItems: [
-            new WorkItemImpl(newActivityId, 1, "Labor"),
-            new WorkItemImpl(newActivityId, 2, "Equipment"),
-            new WorkItemImpl(newActivityId, 3, "Other"),
-          ],
-          year: 1, // default new activity to no adjustment
-          adjustment: 0,
-        },
-      ],
-    });
-  };
 
   const setAcreageRate = (rate: Rate | undefined) => {
     if (rate) {
@@ -146,14 +122,6 @@ export const ProjectDetail = (props: Props) => {
         )}
 
         <br />
-        <Button
-          className="mb-4"
-          color="primary"
-          size="lg"
-          onClick={addActivity}
-        >
-          Add Activity
-        </Button>
       </Col>
 
       {/* Right Details */}
