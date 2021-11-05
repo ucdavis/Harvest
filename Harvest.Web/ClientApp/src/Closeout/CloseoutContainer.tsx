@@ -12,6 +12,7 @@ import { roundToTwo } from "../Util/Calculations";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
   projectId?: string;
@@ -29,6 +30,7 @@ export const CloseoutContainer = () => {
     useState<FinalAcreageExpense>({ amount: 0 } as FinalAcreageExpense);
   const history = useHistory();
   const [closeoutRequested, setCloseoutRequested] = useState(false);
+  const [totalUnbilled, setTotalUnbilled] = useState<number>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -106,8 +108,12 @@ export const CloseoutContainer = () => {
     return <div>Loading ...</div>;
   }
 
-  const canCloseout =
+  const isValidStatus =
     project.status === "AwaitingCloseout" || project.status === "Active";
+
+  const isValidTotal =
+    totalUnbilled !== undefined &&
+    project.quoteTotal >= project.chargedTotal + totalUnbilled;
 
   return (
     <div className="card-wrapper">
@@ -115,26 +121,42 @@ export const CloseoutContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
+      <ShowFor condition={!isValidTotal || !isValidStatus}>
+        <div className={`card-project-status sunflower-bg`}>
+          <div className="card-content">
+            <h4>Unable to close out</h4>
+            {!isValidStatus && (
+              <p>Project is not active or awaiting closeout.</p>
+            )}
+            {!isValidTotal && (
+              <p>
+                Charged total will exceed quote total by $
+                {formatCurrency(
+                  project.chargedTotal +
+                    (totalUnbilled || 0) -
+                    project.quoteTotal
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+      </ShowFor>
       <div className="card-content">
         <div className="row">
           <div className="col-md-12">
-            <UnbilledExpensesContainer hideProjectHeader={true} />
+            <UnbilledExpensesContainer
+              hideProjectHeader={true}
+              setTotalUnbilled={setTotalUnbilled}
+            />
             <br />
             <Button
               id="CloseoutButton"
               color="primary"
-              disabled={!canCloseout || notification.pending}
+              disabled={!isValidStatus || !isValidTotal || notification.pending}
               onClick={initiateCloseout}
             >
               Initiate Closeout <FontAwesomeIcon icon={faCheck} />
             </Button>
-            <ShowFor condition={!canCloseout}>
-              {/* Not sure if there's a better way to handle indicators as to why something is disabled */}
-              <UncontrolledTooltip target="CloseoutButton">
-                Closeout can only be initiated when project is active or
-                awaiting closeout.
-              </UncontrolledTooltip>
-            </ShowFor>
           </div>
         </div>
       </div>
