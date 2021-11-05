@@ -1,7 +1,7 @@
 ﻿import { useMemo } from "react";
 import { Col } from "reactstrap";
 import { TicketMessage } from "../types";
-import { EnsureUTC } from "../Util/DateHelper";
+import { ensureUTC } from "../Util/DateHelper";
 
 interface Props {
   messages: TicketMessage[];
@@ -24,7 +24,7 @@ export const TicketMessages = (props: Props) => {
             </Col>
             <Col>
               <div className="ticket-timestamp text-right">
-                {EnsureUTC(ticketMessage.createdOn).toLocaleDateString(
+                {ensureUTC(ticketMessage.createdOn).toLocaleDateString(
                   "en-US",
                   {
                     year: "numeric",
