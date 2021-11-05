@@ -42,11 +42,12 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(9);
+            ControllerReflection.ControllerPublicMethods(10);
         }
         [Fact]
         public void TestControllerMethodAttributes()
         {
+            var methodName = ""; //TODO: Use methodName for other tests below
 #if DEBUG
             var countAdjustment = 1;
 #else
@@ -108,6 +109,14 @@ namespace Test.TestsControllers.TestsApiControllers
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RefreshTotal", countAdjustment + 2);
+
+            //10
+            methodName = "GetCompleted";
+            attribute = null;
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 2);
+            attribute.ShouldNotBeNull();
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
 
         }
     }
