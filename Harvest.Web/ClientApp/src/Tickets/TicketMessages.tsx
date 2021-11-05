@@ -27,7 +27,6 @@ export const TicketMessages = (props: Props) => {
                 {EnsureUTC(ticketMessage.createdOn).toLocaleDateString(
                   "en-US",
                   {
-                    timeZone: "America/Los_Angeles",
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",
