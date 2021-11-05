@@ -57,6 +57,12 @@ export const AppNav = () => {
                     <DropdownItem href="/Project/Completed">
                       Completed Projects
                     </DropdownItem>
+                    <DropdownItem href="/Project/NeedsAttention">
+                      Projects Needing Attention
+                    </DropdownItem>
+                    <DropdownItem href="/Ticket/NeedsAttention">
+                      Open Tickets
+                    </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </ShowFor>
