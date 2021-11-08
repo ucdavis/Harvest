@@ -66,6 +66,9 @@ export const AppNav = () => {
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </ShowFor>
+              <NavItem>
+                <NavLink href="/Help">Help</NavLink>
+              </NavItem>
             </Nav>
             <div className="row align-items-center">
               Welcome {user.detail.name}
