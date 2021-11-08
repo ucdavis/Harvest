@@ -42,9 +42,6 @@ export const AppNav = () => {
                   <NavLink href="/expense/entry">Expenses</NavLink>
                 </NavItem>
               </ShowFor>
-              <NavItem>
-                <NavLink href="/Help">Help</NavLink>
-              </NavItem>
               <ShowFor roles={["FieldManager", "Supervisor"]}>
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>
@@ -69,6 +66,9 @@ export const AppNav = () => {
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </ShowFor>
+              <NavItem>
+                <NavLink href="/Help">Help</NavLink>
+              </NavItem>
             </Nav>
             <div className="row align-items-center">
               Welcome {user.detail.name}
