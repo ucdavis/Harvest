@@ -1235,6 +1235,33 @@ namespace Test.TestsServices
         [Theory]
         [InlineData(Project.Statuses.Active)]
         [InlineData(Project.Statuses.AwaitingCloseout)]
+        public async Task InitiateCloseoutReturnsErrorWhenUnbilledExpensesBig(string status)
+        {
+            SetupData();
+            Projects[1].IsActive = true;
+            Projects[1].Status = status;
+            Projects[1].ChargedTotal = Projects[1].QuoteTotal - 1; //1 dollar left
+
+            MockData();
+            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1])).ReturnsAsync(true);
+
+            Projects[1].IsActive.ShouldBe(true);
+            Projects[1].Status.ShouldBe(status);
+
+            var rtValue = await InvoiceServ.InitiateCloseout(Projects[1].Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Project has unbilled expenses that exceed the quote total");
+
+            MockEmailService.Verify(a => a.CloseoutConfirmation(It.IsAny<Project>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
+        }
+
+
+        [Theory]
+        [InlineData(Project.Statuses.Active)]
+        [InlineData(Project.Statuses.AwaitingCloseout)]
         public async Task InitiateCloseoutDoesNotSaveIfEmailFails(string status)
         {
             SetupData();
