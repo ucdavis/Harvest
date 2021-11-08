@@ -514,6 +514,9 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
             invoice.Transfers.Count.ShouldBe(2);
+            invoice.Transfers.ShouldAllBe(a => a.Total == 10);
+            invoice.Transfers.Single(a => a.IsProjectAccount).Type.ShouldBe("Credit");
+            invoice.Transfers.Single(a => !a.IsProjectAccount).Type.ShouldBe("Debit");
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
 
