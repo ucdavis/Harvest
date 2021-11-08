@@ -42,6 +42,9 @@ export const AppNav = () => {
                   <NavLink href="/expense/entry">Expenses</NavLink>
                 </NavItem>
               </ShowFor>
+              <NavItem>
+                <NavLink href="/Help">Help</NavLink>
+              </NavItem>
               <ShowFor roles={["FieldManager", "Supervisor"]}>
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>
