@@ -43,13 +43,21 @@ namespace Test.TestsServices
 
         public SlothServiceTests()
         {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK);
+
+            SlothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+        }
+
+        private Mock<IHttpClientFactory> BasicSetup(out HttpClient httpClient, HttpStatusCode statusCode, bool noContent = false)
+        {
             MockMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Default);
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
             MockProjectHistoryService = new Mock<IProjectHistoryService>();
             MockEmailService = new Mock<IEmailService>();
             MockFinancialService = new Mock<IFinancialService>();
             MockSlothSettings = new Mock<IOptions<SlothSettings>>();
-            
+
             MockSlothSettings.Setup(a => a.Value).Returns(SlothSettings);
 
             JsonSerializerOptions = JsonOptions.Standard.WithStandard().WithGeoJson();
@@ -62,19 +70,18 @@ namespace Test.TestsServices
                 // prepare the expected response of the mocked http call
                 .ReturnsAsync(new HttpResponseMessage()
                 {
-                    StatusCode = HttpStatusCode.OK,
-                    Content = new StringContent("{\r\n  \"id\": \"dfb39437-e604-4518-bc72-af89ea933684\",\r\n  \"status\": \"PendingApproval\",\r\n  \"sourceName\": \"Harvest Recharge\",\r\n  \"sourceType\": \"Recharge\",\r\n  \"merchantTrackingNumber\": \"1006\",\r\n  \"merchantTrackingUrl\": \"https://localhost:44308/Invoice/Details/6/1006\",\r\n  \"originCode\": \"CP\",\r\n  \"documentNumber\": \"000000254\",\r\n  \"documentType\": \"GLIB\",\r\n  \"kfsTrackingNumber\": \"0000000192\",\r\n  \"transactionDate\": \"2021-10-22T20:40:31.8700177Z\",\r\n  \"transfers\": [\r\n    {\r\n      \"id\": \"6dea5ce6-e2dc-4870-9ad9-08a7f47eb94a\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"CRU9033\",\r\n      \"objectCode\": \"RAS5\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Debit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    },\r\n    {\r\n      \"id\": \"e56518c5-fb99-402d-ace7-4317d29aef94\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"RRACRES\",\r\n      \"subAccount\": \"CNTRY\",\r\n      \"objectCode\": \"3900\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Credit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    }\r\n  ],\r\n  \"isReversal\": false,\r\n  \"hasReversal\": false,\r\n  \"statusEvents\": [\r\n    {\r\n      \"id\": \"3efaebae-a2de-4dc1-8be7-2cef5f9624fc\",\r\n      \"status\": \"PendingApproval\",\r\n      \"eventDate\": \"2021-10-22T20:40:45.5049293Z\",\r\n      \"eventDetails\": \"File: TransactionsController.cs, Member: Post, Line: 211\",\r\n      \"transactionId\": \"dfb39437-e604-4518-bc72-af89ea933684\"\r\n    }\r\n  ]\r\n}"), //sloth content
+                    StatusCode = statusCode,
+                    Content = noContent ? null : new StringContent(
+                        "{\r\n  \"id\": \"dfb39437-e604-4518-bc72-af89ea933684\",\r\n  \"status\": \"PendingApproval\",\r\n  \"sourceName\": \"Harvest Recharge\",\r\n  \"sourceType\": \"Recharge\",\r\n  \"merchantTrackingNumber\": \"1006\",\r\n  \"merchantTrackingUrl\": \"https://localhost:44308/Invoice/Details/6/1006\",\r\n  \"originCode\": \"CP\",\r\n  \"documentNumber\": \"000000254\",\r\n  \"documentType\": \"GLIB\",\r\n  \"kfsTrackingNumber\": \"0000000192\",\r\n  \"transactionDate\": \"2021-10-22T20:40:31.8700177Z\",\r\n  \"transfers\": [\r\n    {\r\n      \"id\": \"6dea5ce6-e2dc-4870-9ad9-08a7f47eb94a\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"CRU9033\",\r\n      \"objectCode\": \"RAS5\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Debit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    },\r\n    {\r\n      \"id\": \"e56518c5-fb99-402d-ace7-4317d29aef94\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"RRACRES\",\r\n      \"subAccount\": \"CNTRY\",\r\n      \"objectCode\": \"3900\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Credit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    }\r\n  ],\r\n  \"isReversal\": false,\r\n  \"hasReversal\": false,\r\n  \"statusEvents\": [\r\n    {\r\n      \"id\": \"3efaebae-a2de-4dc1-8be7-2cef5f9624fc\",\r\n      \"status\": \"PendingApproval\",\r\n      \"eventDate\": \"2021-10-22T20:40:45.5049293Z\",\r\n      \"eventDetails\": \"File: TransactionsController.cs, Member: Post, Line: 211\",\r\n      \"transactionId\": \"dfb39437-e604-4518-bc72-af89ea933684\"\r\n    }\r\n  ]\r\n}"), //sloth content
                 })
                 .Verifiable();
 
-            var httpClient = new HttpClient(MockMessageHandler.Object);
+            httpClient = new HttpClient(MockMessageHandler.Object);
 
             // create a moq of IHttpClientFactory to return a httpclient
             var httpClientFactory = new Mock<IHttpClientFactory>();
             httpClientFactory.Setup(a => a.CreateClient(It.IsAny<string>())).Returns(httpClient);
-
-            SlothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+            return httpClientFactory;
         }
 
         private void SetupGenericData()
@@ -384,19 +391,141 @@ namespace Test.TestsServices
 
         }
 
+        [Fact]
+        public async Task MoveMoneyReturnsStatusCodeNotFound()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.NotFound);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = 10.00m;
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await slothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldStartWith("Sloth Response didn't have a success code for moneyTransfer id 1: {\r\n  \"id\":");
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.KfsTrackingNumber.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task MoveMoneyReturnsStatusCodeNoContent()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.NoContent, true);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = 10.00m;
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await slothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldBe("Sloth Response didn't have a success code for moneyTransfer id 1: ");
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.KfsTrackingNumber.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task MoveMoneyReturnsStatusCodeBadRequest()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.BadRequest);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = 10.00m;
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await slothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeTrue();
+            rtValue.Message.ShouldStartWith("Sloth Response Bad Request for moneyTransfer id 1: {\r\n  \"id\":");
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.KfsTrackingNumber.ShouldBeNull();
+        }
 
         //Test specific Expense scenarios that pass. Refund, refund with multiple accounts, refund with other expenses
+        [Fact]
+        public async Task MoveMoneyUpdatesWhenThereIsARefund()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = -10.00m;
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.Count.ShouldBe(2);
+            invoice.Transfers.ShouldAllBe(a => a.Total == 10);
+            invoice.Transfers.Single(a => a.IsProjectAccount).Type.ShouldBe("Credit");
+            invoice.Transfers.Single(a => !a.IsProjectAccount).Type.ShouldBe("Debit");
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+
+        }
         //Test passthrough
         //Test Expense grouping
 
 
-        [Fact]
-        public async Task test()
-        {
-            SetupGenericData();
-            MockData();
 
-            await SlothService.MoveMoney(1);
-        }
+
     }
 }
