@@ -123,7 +123,7 @@ namespace Harvest.Core.Services
 
             var response = await client.PostAsync("Transactions", new StringContent(JsonSerializer.Serialize(model, _serializerOptions), System.Text.Encoding.UTF8, "application/json"));
 
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode && response.StatusCode != HttpStatusCode.NoContent)
             {
                 var content = await response.Content.ReadAsStringAsync();
                 Log.Information("Sloth Success Response", content);
