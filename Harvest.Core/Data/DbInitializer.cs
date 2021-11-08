@@ -69,16 +69,6 @@ namespace Harvest.Core.Data
                 Iam = "1000050298"
             };
             await CheckOrCreatePermission(systemRole, user);
-            user = new User
-            {
-                Email = "mxthu@ucdavis.edu",
-                Kerberos = "mhu313",
-                FirstName = "Michelle",
-                LastName = "Hu",
-                Iam = "1000313846"
-            };
-            await CheckOrCreatePermission(systemRole, user);
-            await _dbContext.SaveChangesAsync();
 
             await CheckCreateSampleRates();
             await _dbContext.SaveChangesAsync();
