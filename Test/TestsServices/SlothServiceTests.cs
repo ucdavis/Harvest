@@ -289,6 +289,7 @@ namespace Test.TestsServices
 
             invoice.Transfers.ShouldBeNull();
             invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.Project.ChargedTotal.ShouldBe(5000m);
 
             var rtValue = await SlothService.MoveMoney(invoice.Id);
             rtValue.ShouldNotBeNull();
@@ -300,6 +301,7 @@ namespace Test.TestsServices
             invoice.Transfers.Count.ShouldBe(2);
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
+            invoice.Project.ChargedTotal.ShouldBe(5010m);
 
         }
 
@@ -505,6 +507,7 @@ namespace Test.TestsServices
 
             invoice.Transfers.ShouldBeNull();
             invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.Project.ChargedTotal.ShouldBe(5000m);
 
             var rtValue = await SlothService.MoveMoney(invoice.Id);
             rtValue.ShouldNotBeNull();
@@ -519,7 +522,183 @@ namespace Test.TestsServices
             invoice.Transfers.Single(a => !a.IsProjectAccount).Type.ShouldBe("Debit");
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
+            invoice.Project.ChargedTotal.ShouldBe(4990m); //It subtracted the $10 refund.
+        }
 
+        [Fact]
+        public async Task MoveMoneyUpdatesWhenThereIsARefundWithTwoPiAccounts()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = -10.00m;
+            invoice.Expenses.Add(expense);
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts[0].Percentage = 75m;
+            invoice.Project.Accounts[1].Percentage = 25m;
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.Project.ChargedTotal.ShouldBe(5000m);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.Count.ShouldBe(3);
+            //invoice.Transfers.ShouldAllBe(a => a.Total == 10);
+            invoice.Transfers.Single(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).Type.ShouldBe("Credit");
+            invoice.Transfers.Single(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).Total.ShouldBe(7.5m);
+            invoice.Transfers.Single(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number).Total.ShouldBe(2.5m);
+            invoice.Transfers.Single(a => !a.IsProjectAccount).Type.ShouldBe("Debit");
+            invoice.Transfers.Single(a => !a.IsProjectAccount).Total.ShouldBe(10m);
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+            invoice.Project.ChargedTotal.ShouldBe(4990m); //It subtracted the $10 refund.
+        }
+
+        [Fact]
+        public async Task MoveMoneyUpdatesWhenThereIsARefundWithTwoPiAccountsAndTwoRefundAccounts()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = -10.00m;
+            invoice.Expenses.Add(expense);
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts[0].Percentage = 75m;
+            invoice.Project.Accounts[1].Percentage = 25m;
+
+            expense = CreateValidEntities.Expense(2, 1);
+            expense.Total = -20m;
+            expense.Account = "3-RRACRES--RAS5";
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.Project.ChargedTotal.ShouldBe(5000m);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.Count.ShouldBe(6);
+            //There are 4 credits because the expense object codes (2) and pi accounts (2)
+            var creditAccounts1 = invoice.Transfers
+                .Where(a=> a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).ToArray();
+            var creditAccounts2 = invoice.Transfers
+                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number).ToArray();
+            creditAccounts1.Length.ShouldBe(2);
+            creditAccounts1.ShouldAllBe(a => a.Type == "Credit");
+            creditAccounts1[0].Total.ShouldBe(7.5m);
+            creditAccounts1[1].Total.ShouldBe(15m);
+
+            creditAccounts2.Length.ShouldBe(2);
+            creditAccounts2.ShouldAllBe(a => a.Type == "Credit");
+            creditAccounts2[0].Total.ShouldBe(2.5m);
+            creditAccounts2[1].Total.ShouldBe(5m);
+
+            var debitAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
+            debitAccounts.Length.ShouldBe(2);
+            debitAccounts.ShouldAllBe(a => a.Type == "Debit");
+            debitAccounts[0].Total.ShouldBe(10m);
+            debitAccounts[0].Account.ShouldBe("3-FRMRATE");
+            debitAccounts[1].Total.ShouldBe(20m);
+            debitAccounts[1].Account.ShouldBe("3-RRACRES");
+
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+            invoice.Project.ChargedTotal.ShouldBe(4970m); //It subtracted the $10 refund.
+        }
+
+        [Fact]
+        public async Task MoveMoneyUpdatesWhenThereIsARefundWithTwoPiAccountsAndTwoRefundAccountsAndANormalExpense()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = -10.00m;
+            invoice.Expenses.Add(expense);
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts[0].Percentage = 75m;
+            invoice.Project.Accounts[1].Percentage = 25m;
+
+            expense = CreateValidEntities.Expense(2, 1);
+            expense.Total = -20m;
+            expense.Account = "3-RRACRES--RAS5";
+            invoice.Expenses.Add(expense);
+
+            expense = CreateValidEntities.Expense(3, 1);
+            expense.Total = 100m;
+            expense.Account = "3-APSNFLP--RAPB";
+            invoice.Expenses.Add(expense);
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.Project.ChargedTotal.ShouldBe(5000m);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.Count.ShouldBe(9);
+            //There are 4 credits because the expense object codes (2) and pi accounts (2)
+            var creditPiAccounts1 = invoice.Transfers
+                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number && a.Type == "Credit").ToArray();
+            var creditPiAccounts2 = invoice.Transfers
+                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number && a.Type == "Credit").ToArray();
+
+            var debitPiAccounts1 = invoice.Transfers
+                .Where(a => a.IsProjectAccount && a.Type == "Debit").ToArray();
+
+            creditPiAccounts1.Length.ShouldBe(2);
+            creditPiAccounts1[0].Total.ShouldBe(7.5m);
+            creditPiAccounts1[1].Total.ShouldBe(15m);
+      
+            creditPiAccounts2.Length.ShouldBe(2);
+            creditPiAccounts2[0].Total.ShouldBe(2.5m);
+            creditPiAccounts2[1].Total.ShouldBe(5m);
+
+            debitPiAccounts1.Length.ShouldBe(2);
+            debitPiAccounts1[0].Total.ShouldBe(75m);
+            debitPiAccounts1[0].Account.ShouldBe(invoice.Project.Accounts[0].Number);
+            debitPiAccounts1[1].Total.ShouldBe(25m);
+            debitPiAccounts1[1].Account.ShouldBe(invoice.Project.Accounts[1].Number);
+
+            var debitHarvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount && a.Type == "Debit").ToArray();
+            debitHarvestAccounts.Length.ShouldBe(2);
+            debitHarvestAccounts[0].Total.ShouldBe(10m);
+            debitHarvestAccounts[0].Account.ShouldBe("3-FRMRATE");
+            debitHarvestAccounts[1].Total.ShouldBe(20m);
+            debitHarvestAccounts[1].Account.ShouldBe("3-RRACRES");
+
+            var creditHarvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount && a.Type == "Credit").ToArray();
+            creditHarvestAccounts.Length.ShouldBe(1);
+            creditHarvestAccounts[0].Total.ShouldBe(100m);
+            creditHarvestAccounts[0].Account.ShouldBe("3-APSNFLP");
+            
+
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+            invoice.Project.ChargedTotal.ShouldBe(5070m); //It subtracted the $10 refund.
         }
         //Test passthrough
         //Test Expense grouping
