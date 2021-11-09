@@ -620,7 +620,7 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(4970m); //It subtracted the $10 refund.
+            invoice.Project.ChargedTotal.ShouldBe(4970m); 
         }
 
         [Fact]
@@ -698,7 +698,7 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(5070m); //It subtracted the $10 refund.
+            invoice.Project.ChargedTotal.ShouldBe(5070m); 
         }
 
         //Test passthrough
@@ -781,7 +781,7 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(5035m); //It subtracted the $10 refund.
+            invoice.Project.ChargedTotal.ShouldBe(5035m); 
         }
 
         [Fact]
@@ -803,7 +803,7 @@ namespace Test.TestsServices
             expense.Account = "3-APSNFLP--80RS";
             invoice.Expenses.Add(expense);
 
-            expense = CreateValidEntities.Expense(4, 1); //Next test will add this expense, and with grouping, total transfers remains the same
+            expense = CreateValidEntities.Expense(4, 1); //Test above didn't have this one. Shows grouping
             expense.Total = 100.00m;
             expense.IsPassthrough = true;
             expense.Account = "3-APSNFLP--80RS";
@@ -863,7 +863,7 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(5135m); //It subtracted the $10 refund.
+            invoice.Project.ChargedTotal.ShouldBe(5135m); 
         }
 
 
