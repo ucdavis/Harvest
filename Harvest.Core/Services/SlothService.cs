@@ -419,8 +419,8 @@ namespace Harvest.Core.Services
                 Log.Information("No pending invoices to process");
                 return;
             }
-
-            using var client = new HttpClient { BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/") };
+            using var client = _clientFactory.CreateClient();
+            client.BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/");
             client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
 
             Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
