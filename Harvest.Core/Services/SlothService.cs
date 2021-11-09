@@ -474,6 +474,8 @@ namespace Harvest.Core.Services
                             await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
 
                             //await _emailService.InvoiceDone(invoice, SlothStatuses.Cancelled); //Email the PI that it was canceled? 
+                            //Probably what we want to do is to set the expense invoiceIds to null, then delete the invoice
+                            //Then send a notification to the FM and maybe us?
 
                             rolledBackCount++;
                             //TODO: Write to the notes field? Trigger off an email?

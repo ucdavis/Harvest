@@ -1,4 +1,5 @@
-﻿using Harvest.Core.Data;
+﻿using System;
+using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models.FinancialAccountModels;
 using Harvest.Core.Models.Settings;
@@ -33,7 +34,10 @@ namespace Test.TestsServices
         public Mock<IOptions<SlothSettings>> MockSlothSettings { get; set; }
         public SlothSettings SlothSettings { get; set; } = new SlothSettings()
         {
-            ApiKey = "Fake", ApiUrl = "http://sloth-fake.ucdavis.edu/", CreditObjectCode = "3900", CreditPassthroughObjectCode = "3918",
+            ApiKey = "Fake",
+            ApiUrl = "http://sloth-fake.ucdavis.edu/",
+            CreditObjectCode = "3900",
+            CreditPassthroughObjectCode = "3918",
             MerchantTrackingUrl = "UnitTest//"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
@@ -49,7 +53,7 @@ namespace Test.TestsServices
                 JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
         }
 
-        private Mock<IHttpClientFactory> BasicSetup(out HttpClient httpClient, HttpStatusCode statusCode, bool noContent = false)
+        private Mock<IHttpClientFactory> BasicSetup(out HttpClient httpClient, HttpStatusCode statusCode, bool noContent = false, string status = "PendingApproval")
         {
             MockMessageHandler = new Mock<HttpMessageHandler>(MockBehavior.Default);
             MockDbContext = new Mock<AppDbContext>(new DbContextOptions<AppDbContext>());
@@ -62,6 +66,10 @@ namespace Test.TestsServices
 
             JsonSerializerOptions = JsonOptions.Standard.WithStandard().WithGeoJson();
 
+            //Possible other values to replace: Id, KfsTrackingNumber
+            var content =
+                $"{{\r\n  \"id\": \"dfb39437-e604-4518-bc72-af89ea933684\",\r\n  \"status\": \"{status}\",\r\n  \"sourceName\": \"Harvest Recharge\",\r\n  \"sourceType\": \"Recharge\",\r\n  \"merchantTrackingNumber\": \"1006\",\r\n  \"merchantTrackingUrl\": \"https://localhost:44308/Invoice/Details/6/1006\",\r\n  \"originCode\": \"CP\",\r\n  \"documentNumber\": \"000000254\",\r\n  \"documentType\": \"GLIB\",\r\n  \"kfsTrackingNumber\": \"0000000192\",\r\n  \"transactionDate\": \"2021-10-22T20:40:31.8700177Z\",\r\n  \"transfers\": [\r\n    {{\r\n      \"id\": \"6dea5ce6-e2dc-4870-9ad9-08a7f47eb94a\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"CRU9033\",\r\n      \"objectCode\": \"RAS5\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Debit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    }},\r\n    {{\r\n      \"id\": \"e56518c5-fb99-402d-ace7-4317d29aef94\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"RRACRES\",\r\n      \"subAccount\": \"CNTRY\",\r\n      \"objectCode\": \"3900\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Credit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    }}\r\n  ],\r\n  \"isReversal\": false,\r\n  \"hasReversal\": false,\r\n  \"statusEvents\": [\r\n    {{\r\n      \"id\": \"3efaebae-a2de-4dc1-8be7-2cef5f9624fc\",\r\n      \"status\": \"PendingApproval\",\r\n      \"eventDate\": \"2021-10-22T20:40:45.5049293Z\",\r\n      \"eventDetails\": \"File: TransactionsController.cs, Member: Post, Line: 211\",\r\n      \"transactionId\": \"dfb39437-e604-4518-bc72-af89ea933684\"\r\n    }}\r\n  ]\r\n}}";
+
             MockMessageHandler.Protected().Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
                     ItExpr.IsAny<HttpRequestMessage>(),
@@ -71,8 +79,7 @@ namespace Test.TestsServices
                 .ReturnsAsync(new HttpResponseMessage()
                 {
                     StatusCode = statusCode,
-                    Content = noContent ? null : new StringContent(
-                        "{\r\n  \"id\": \"dfb39437-e604-4518-bc72-af89ea933684\",\r\n  \"status\": \"PendingApproval\",\r\n  \"sourceName\": \"Harvest Recharge\",\r\n  \"sourceType\": \"Recharge\",\r\n  \"merchantTrackingNumber\": \"1006\",\r\n  \"merchantTrackingUrl\": \"https://localhost:44308/Invoice/Details/6/1006\",\r\n  \"originCode\": \"CP\",\r\n  \"documentNumber\": \"000000254\",\r\n  \"documentType\": \"GLIB\",\r\n  \"kfsTrackingNumber\": \"0000000192\",\r\n  \"transactionDate\": \"2021-10-22T20:40:31.8700177Z\",\r\n  \"transfers\": [\r\n    {\r\n      \"id\": \"6dea5ce6-e2dc-4870-9ad9-08a7f47eb94a\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"CRU9033\",\r\n      \"objectCode\": \"RAS5\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Debit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    },\r\n    {\r\n      \"id\": \"e56518c5-fb99-402d-ace7-4317d29aef94\",\r\n      \"amount\": 92.00,\r\n      \"chart\": \"3\",\r\n      \"account\": \"RRACRES\",\r\n      \"subAccount\": \"CNTRY\",\r\n      \"objectCode\": \"3900\",\r\n      \"description\": \"Proj: xxx Inv: 1006\",\r\n      \"direction\": \"Credit\",\r\n      \"fiscalYear\": 2022,\r\n      \"fiscalPeriod\": 4\r\n    }\r\n  ],\r\n  \"isReversal\": false,\r\n  \"hasReversal\": false,\r\n  \"statusEvents\": [\r\n    {\r\n      \"id\": \"3efaebae-a2de-4dc1-8be7-2cef5f9624fc\",\r\n      \"status\": \"PendingApproval\",\r\n      \"eventDate\": \"2021-10-22T20:40:45.5049293Z\",\r\n      \"eventDetails\": \"File: TransactionsController.cs, Member: Post, Line: 211\",\r\n      \"transactionId\": \"dfb39437-e604-4518-bc72-af89ea933684\"\r\n    }\r\n  ]\r\n}"), //sloth content
+                    Content = noContent ? null : new StringContent(content), //sloth content
                 })
                 .Verifiable();
 
@@ -92,7 +99,7 @@ namespace Test.TestsServices
             var expenses = new List<Expense>();
             for (int i = 0; i < 3; i++)
             {
-                expenses.Add(CreateValidEntities.Expense(i+1, project.Id));
+                expenses.Add(CreateValidEntities.Expense(i + 1, project.Id));
             }
 
             project.Accounts = new List<Account>();
@@ -133,12 +140,13 @@ namespace Test.TestsServices
             rtValue.KfsAccount = kfsAccount;
             rtValue.IsValid = setIsValid;
             if (!setIsValid)
-            { 
+            {
                 rtValue.Message = "Fake Message";
             }
             return Task.FromResult(rtValue);
         }
 
+        #region MoveMoney tests
         [Theory]
         [InlineData(1, Invoice.Statuses.Completed)]
         [InlineData(1, Invoice.Statuses.Pending)]
@@ -270,7 +278,7 @@ namespace Test.TestsServices
             invoice.Transfers.Count(a => a.IsProjectAccount).ShouldBe(2);
             invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[0].Number).Total.ShouldBe(0.98m);
             invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[1].Number).Total.ShouldBe(0.02m);
-            invoice.Transfers.Single(a => a.Account == expense.Account.Substring(0,9)).Total.ShouldBe(1m);
+            invoice.Transfers.Single(a => a.Account == expense.Account.Substring(0, 9)).Total.ShouldBe(1m);
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
         }
@@ -370,7 +378,7 @@ namespace Test.TestsServices
             invoice.Expenses.Add(expense);
 
             MockData();
-             
+
 
 
             invoice.Transfers.ShouldBeNull();
@@ -597,7 +605,7 @@ namespace Test.TestsServices
             invoice.Transfers.Count.ShouldBe(6);
             //There are 4 credits because the expense object codes (2) and pi accounts (2)
             var creditAccounts1 = invoice.Transfers
-                .Where(a=> a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).ToArray();
+                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).ToArray();
             var creditAccounts2 = invoice.Transfers
                 .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number).ToArray();
             creditAccounts1.Length.ShouldBe(2);
@@ -620,7 +628,7 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(4970m); 
+            invoice.Project.ChargedTotal.ShouldBe(4970m);
         }
 
         [Fact]
@@ -672,7 +680,7 @@ namespace Test.TestsServices
             creditPiAccounts1.Length.ShouldBe(2);
             creditPiAccounts1[0].Total.ShouldBe(7.5m);
             creditPiAccounts1[1].Total.ShouldBe(15m);
-      
+
             creditPiAccounts2.Length.ShouldBe(2);
             creditPiAccounts2[0].Total.ShouldBe(2.5m);
             creditPiAccounts2[1].Total.ShouldBe(5m);
@@ -694,11 +702,11 @@ namespace Test.TestsServices
             creditHarvestAccounts.Length.ShouldBe(1);
             creditHarvestAccounts[0].Total.ShouldBe(100m);
             creditHarvestAccounts[0].Account.ShouldBe("3-APSNFLP");
-            
+
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(5070m); 
+            invoice.Project.ChargedTotal.ShouldBe(5070m);
         }
 
         //Test passthrough
@@ -769,7 +777,7 @@ namespace Test.TestsServices
             var harvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
             harvestAccounts.Length.ShouldBe(3);
             harvestAccounts.ShouldAllBe(a => a.Type == "Credit");
-            
+
             harvestAccounts[0].Total.ShouldBe(10m);
             harvestAccounts[0].Account.ShouldBe("3-FRMRATE");
 
@@ -781,7 +789,7 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(5035m); 
+            invoice.Project.ChargedTotal.ShouldBe(5035m);
         }
 
         [Fact]
@@ -863,9 +871,82 @@ namespace Test.TestsServices
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
-            invoice.Project.ChargedTotal.ShouldBe(5135m); 
+            invoice.Project.ChargedTotal.ShouldBe(5135m);
+        }
+
+        #endregion MoveMoney tests
+
+        #region ProcessTransferUpdates tests
+
+        [Theory]
+        [InlineData(Invoice.Statuses.Completed)]
+        [InlineData(Invoice.Statuses.Created)]
+        public async Task ProcessTransferUpdatesReturnsEarlyIfThereAreNoPendingInvoices(string status)
+        {
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = status;
+            }
+            MockData();
+
+            await SlothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData(" ")]
+        [InlineData("")]
+        public async Task ProcessTransferUpdatesWhenInvoiceHasNoSlothTransactionId(string slothId)
+        {
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Completed;
+            }
+
+            Invoices[1].Status = Invoice.Statuses.Pending;
+            Invoices[1].SlothTransactionId = slothId;
+            MockData();
+
+            await SlothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once); //It didn't save anything though
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.NoContent, true)]
+        [InlineData(HttpStatusCode.NotFound, false)]
+        public async Task ProcessTransferUpdatesWhenNoContent(HttpStatusCode statusCode, bool noContent)
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, statusCode, noContent);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Completed;
+            }
+
+            Invoices[1].Status = Invoice.Statuses.Pending;
+            Invoices[1].SlothTransactionId = "FakeId";
+            MockData();
+
+            await slothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once); //It didn't save anything though
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
         }
 
 
+        #endregion ProcessTransferUpdates tests
     }
 }
