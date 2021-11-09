@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Harvest.Core.Models.SlothModels;
 using Test.Helpers;
 using TestHelpers.Helpers;
 using Xunit;
@@ -894,6 +895,8 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
             MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
         }
 
         [Theory]
@@ -917,12 +920,14 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
             MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
             Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
         }
 
         [Theory]
         [InlineData(HttpStatusCode.NoContent, true)]
         [InlineData(HttpStatusCode.NotFound, false)]
-        public async Task ProcessTransferUpdatesWhenNoContent(HttpStatusCode statusCode, bool noContent)
+        public async Task ProcessTransferUpdatesWhenHttpStatus(HttpStatusCode statusCode, bool noContent)
         {
             var httpClientFactory = BasicSetup(out var httpClient, statusCode, noContent);
 
@@ -944,6 +949,68 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
             MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
             Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+        }
+
+        /// <summary>
+        /// Still pending, don't do anything.
+        /// </summary>
+        /// <returns></returns>
+        [Fact]
+        public async Task ProcessTransferUpdatesSlothReturnsPending()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.PendingApproval);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Completed;
+            }
+
+            Invoices[1].Status = Invoice.Statuses.Pending;
+            Invoices[1].SlothTransactionId = "FakeId";
+            MockData();
+
+            await slothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once); //It didn't save anything though
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
+
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ProcessTransferUpdatesSlothReturnsCancelled()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Cancelled);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Completed;
+            }
+
+            Invoices[1].Status = Invoice.Statuses.Pending;
+            Invoices[1].SlothTransactionId = "FakeId";
+            MockData();
+
+            await slothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once); //It didn't save anything though
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
+
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(Invoices[1].Project.Id, Invoices[1]), Times.Once);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
         }
 
 
