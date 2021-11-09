@@ -419,8 +419,8 @@ namespace Harvest.Core.Services
                 Log.Information("No pending invoices to process");
                 return;
             }
-
-            using var client = new HttpClient { BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/") };
+            using var client = _clientFactory.CreateClient();
+            client.BaseAddress = new Uri($"{_slothSettings.ApiUrl}Transactions/");
             client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
 
             Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
@@ -474,6 +474,8 @@ namespace Harvest.Core.Services
                             await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
 
                             //await _emailService.InvoiceDone(invoice, SlothStatuses.Cancelled); //Email the PI that it was canceled? 
+                            //Probably what we want to do is to set the expense invoiceIds to null, then delete the invoice
+                            //Then send a notification to the FM and maybe us?
 
                             rolledBackCount++;
                             //TODO: Write to the notes field? Trigger off an email?
