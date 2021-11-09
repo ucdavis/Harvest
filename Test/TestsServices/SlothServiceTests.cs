@@ -1013,6 +1013,99 @@ namespace Test.TestsServices
             MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
         }
 
+        [Fact]
+        public async Task ProcessTransferUpdatesSlothReturnsCompletedWithActiveProject()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Completed);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Completed;
+            }
+
+            Invoices[1].Status = Invoice.Statuses.Pending;
+            Invoices[1].SlothTransactionId = "FakeId";
+            Invoices[1].Project.Status = Project.Statuses.Active; 
+            MockData();
+
+            await slothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.AtLeastOnce); 
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(Invoices[1], Invoice.Statuses.Completed), Times.Once);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Completed);
+
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(Invoices[1].Project.Id, Invoices[1]), Times.Once);
+        }
+
+        [Fact]
+        public async Task ProcessTransferUpdatesSlothReturnsCompletedWithActiveProjects()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Completed);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Pending;
+                invoice.SlothTransactionId = "FakeId";
+                invoice.Project.Status = Project.Statuses.Active;
+            }
+
+            MockData();
+
+            await slothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.AtLeastOnce);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), Invoice.Statuses.Completed), Times.Exactly(3));
+            
+            Invoices[0].Status.ShouldBe(Invoice.Statuses.Completed);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Completed);
+            Invoices[2].Status.ShouldBe(Invoice.Statuses.Completed);
+
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Exactly(3));
+
+            Invoices[1].Project.Status.ShouldBe(Project.Statuses.Active);
+            MockProjectHistoryService.Verify(a => a.ProjectCompleted(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ProcessTransferUpdatesSlothReturnsCompletedWithProjectFinalInvoicePending()
+        {
+            var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Completed);
+
+            var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+
+            SetupGenericData();
+            foreach (var invoice in Invoices)
+            {
+                invoice.Status = Invoice.Statuses.Completed;
+            }
+
+            Invoices[1].Status = Invoice.Statuses.Pending;
+            Invoices[1].SlothTransactionId = "FakeId";
+            Invoices[1].Project.Status = Project.Statuses.FinalInvoicePending;
+            MockData();
+
+            await slothService.ProcessTransferUpdates();
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.AtLeastOnce);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+            MockEmailService.Verify(a => a.InvoiceDone(Invoices[1], Invoice.Statuses.Completed), Times.Once);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Completed);
+            Invoices[1].Project.Status.ShouldBe(Project.Statuses.Completed);
+            MockProjectHistoryService.Verify(a => a.ProjectCompleted(Invoices[1].Project.Id, Invoices[1].Project), Times.Once);
+
+            MockProjectHistoryService.Verify(a => a.InvoiceCancelled(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);
+            MockProjectHistoryService.Verify(a => a.InvoiceCompleted(Invoices[1].Project.Id, Invoices[1]), Times.Once);
+        }
 
         #endregion ProcessTransferUpdates tests
     }
