@@ -2,7 +2,7 @@ import * as yup from "yup";
 import { SchemaOf } from "yup";
 import { BlobFile, User, TicketInput, WorkItem, Activity } from "./types";
 import { ErrorMessages } from "./errorMessages";
-import { addDays } from "./Util/Calculations";
+import { addDays, countDecimals } from "./Util/Calculations";
 import { roundToTwo } from "./Util/Calculations";
 
 // @ts-ignore - override correct yup type
@@ -82,7 +82,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
           .test(
             "maxDigitsAfterDecimal",
             ErrorMessages.WorkItemQuantityDecimalPlaces,
-            (number: number) => Number.isInteger((number || 0) * 10 ** 2)
+            (number: number) => countDecimals(number) <= 2
           )
     ),
   unit: yup.string().defined(),
