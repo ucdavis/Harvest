@@ -331,7 +331,7 @@ export const QuoteContainer = () => {
                 })}
               </ul>
             </div>
-            <div className="row justify-content-center">
+            <div className="row justify-content-center mb-4">
               {/* Supervisor can only see save option, so it becomes a primary button.  FM can do both save and submit */}
               <ShowFor roles={["Supervisor"]}>
                 <button

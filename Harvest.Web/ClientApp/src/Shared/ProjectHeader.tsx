@@ -79,52 +79,54 @@ export const ProjectHeader = (props: Props) => {
               </ModalFooter>
             </Modal>
           </div>
-          <div className="col-md-6 quote-info-box">
-            <div className="row">
-              <div className="col-sm-6">
-                <p className="lede">Status</p>
-                <p className={`project-status-${project.status}`}>
-                  {convertCamelCase(project.status)}
-                </p>
-                <p className="lede">Type</p>
-                <p>{project.cropType}</p>
-                <p className="lede">Acres</p>
-                <p>{project.acres}</p>
-              </div>
-              <div className="col-sm-6">
-                <p className="lede">Timeline</p>
-                <p>
-                  {new Date(project.start).toLocaleDateString()} through{" "}
-                  {new Date(project.end).toLocaleDateString()}
-                </p>
-                <p className="lede">Crops</p>
-                <p>{crops}</p>
-              </div>
-            </div>
-            <div className="row mt-3">
-              <div className="progress-bar-details col">
-                <p className="lede">Progress</p>
-                <div className="row justify-content-between">
-                  <div className="col">
-                    <p className="mb-1">
-                      ${formatCurrency(project.chargedTotal)} Billed
-                    </p>
-                  </div>
-                  <div className="col text-right">
-                    <p className="mb-1">
-                      $
-                      {formatCurrency(
-                        project.quoteTotal - project.chargedTotal
-                      )}{" "}
-                      Remaining
-                    </p>
-                  </div>
+          <div className="col-md-6">
+            <div className="quote-info-box">
+              <div className="row">
+                <div className="col-sm-6">
+                  <p className="lede">Status</p>
+                  <p className={`project-status-${project.status}`}>
+                    {convertCamelCase(project.status)}
+                  </p>
+                  <p className="lede">Type</p>
+                  <p>{project.cropType}</p>
+                  <p className="lede">Acres</p>
+                  <p>{project.acres}</p>
                 </div>
+                <div className="col-sm-6">
+                  <p className="lede">Timeline</p>
+                  <p>
+                    {new Date(project.start).toLocaleDateString()} through{" "}
+                    {new Date(project.end).toLocaleDateString()}
+                  </p>
+                  <p className="lede">Crops</p>
+                  <p>{crops}</p>
+                </div>
+              </div>
+              <div className="row mt-3">
+                <div className="progress-bar-details col">
+                  <p className="lede">Progress</p>
+                  <div className="row justify-content-between">
+                    <div className="col">
+                      <p className="mb-1">
+                        ${formatCurrency(project.chargedTotal)} Billed
+                      </p>
+                    </div>
+                    <div className="col text-right">
+                      <p className="mb-1">
+                        $
+                        {formatCurrency(
+                          project.quoteTotal - project.chargedTotal
+                        )}{" "}
+                        Remaining
+                      </p>
+                    </div>
+                  </div>
 
-                <Progress
-                  style={{ width: "100%", height: "14px" }}
-                  value={(project.chargedTotal / project.quoteTotal) * 100}
-                />
+                  <Progress
+                    style={{ width: "100%", height: "14px" }}
+                    value={(project.chargedTotal / project.quoteTotal) * 100}
+                  />
+                </div>
               </div>
             </div>
           </div>
