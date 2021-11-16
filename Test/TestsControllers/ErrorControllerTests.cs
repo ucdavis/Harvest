@@ -1,4 +1,5 @@
 ﻿using Harvest.Web.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TestHelpers.Helpers;
 using Xunit;
@@ -26,7 +27,9 @@ namespace Test.TestsControllers
         public void TestControllerClassAttributes()
         {
             ControllerReflection.ControllerInherits("Controller");
-            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(1);
+            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
+            ControllerReflection.ClassExpectedAttribute<AllowAnonymousAttribute>(2);
+            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
         }
 
         [Fact]
