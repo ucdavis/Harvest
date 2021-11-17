@@ -93,6 +93,23 @@ namespace Harvest.Web
                         return;
                     }
 
+                    // Sometimes CAS doesn't return the required IAM ID
+                    // If this happens, we take the reliable Kerberos (NameIdentifier claim) and use it to lookup IAM ID
+                    if (!identity.HasClaim(c => c.Type == "ucdPersonIAMID"))
+                    {
+                        var identityService = context.HttpContext.RequestServices.GetRequiredService<IIdentityService>();
+                        var kerbId = identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                        if (kerbId != null)
+                        {
+                            var identityUser = await identityService.GetByKerberos(kerbId.Value);
+
+                            if (identityUser != null)
+                            {
+                                identity.AddClaim(new Claim("ucdPersonIAMID", identityUser.Iam));
+                            }
+                        }
+                    }
+
                     // Ensure user exists in the db
                     var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                     await userService.GetUser(identity.Claims.ToArray());
