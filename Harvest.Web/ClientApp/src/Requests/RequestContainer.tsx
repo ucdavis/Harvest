@@ -151,8 +151,8 @@ export const RequestContainer = () => {
               title={"Original Field Request #" + (originalProject?.id || "")}
             />
           )}
-          <div className={originalProject && "card-green-bg"}>
-            <div className="col-md-8 col-lg-6 card-wrapper no-green mb-4">
+          <div className={originalProject && "card-green-bg pt-3 pb-2"}>
+            <div className="create-card col-md-8 col-lg-6 card-wrapper no-green mt-1 mb-4">
               <h2>
                 {projectId ? "Create Change Request" : "Create Field Request"}
               </h2>

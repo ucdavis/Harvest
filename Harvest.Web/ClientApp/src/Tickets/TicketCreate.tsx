@@ -91,108 +91,104 @@ export const TicketCreate = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-      <div className="card-green-bg">
-        <div className="row justify-content-center">
-          <div className="col-md-6 card-wrapper no-green mt-4 mb-4">
-            <div className="card-content">
-              <h2>Create new ticket for your project</h2>
+      <div className="card-green-bg pb-3">
+        <div className="create-card col-md-8 col-lg-6 card-wrapper no-green mt-4 mb-4">
+          <div className="card-content">
+            <h2>Create new ticket for your project</h2>
 
-              <FormGroup>
-                <Label>Subject</Label>
-                <Input
-                  type="text"
-                  name="name"
-                  id="name"
-                  value={ticket.name}
-                  className={getClassName("name")}
-                  onChange={onChange("name", (e) =>
-                    setTicket({ ...ticket, name: e.target.value })
-                  )}
-                  onBlur={onBlur("name")}
-                  placeholder="Enter a short description for this request"
-                />
-                <InputErrorMessage name="name" />
-              </FormGroup>
+            <FormGroup>
+              <Label>Subject</Label>
+              <Input
+                type="text"
+                name="name"
+                id="name"
+                value={ticket.name}
+                className={getClassName("name")}
+                onChange={onChange("name", (e) =>
+                  setTicket({ ...ticket, name: e.target.value })
+                )}
+                onBlur={onBlur("name")}
+                placeholder="Enter a short description for this request"
+              />
+              <InputErrorMessage name="name" />
+            </FormGroup>
 
-              <FormGroup>
-                <Label>What are the details of your ticket request?</Label>
-                <Input
-                  type="textarea"
-                  name="text"
-                  id="requirements"
-                  value={ticket.requirements}
-                  className={getClassName("requirements")}
-                  onChange={onChange("requirements", (e) =>
-                    setTicket({ ...ticket, requirements: e.target.value })
-                  )}
-                  onBlur={onBlur("requirements")}
-                  placeholder="Enter a full description of your requirements"
-                />
-                <InputErrorMessage name="requirements" />
-              </FormGroup>
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="form-group">
-                    <Label>Due Date?</Label>
-                    <div
-                      className="input-group"
-                      style={{ zIndex: 9000 }}
-                      //DatePicker doesn't expose an onBlur property, so placing this on parent element
-                      onBlur={() => onBlurValue("dueDate", ticket.dueDate)}
-                    >
-                      <DatePicker
-                        className={
-                          "form-control " +
-                          getClassName("dueDate", "react-date-picker__wrapper")
-                        }
-                        selected={ticket.dueDate}
-                        onChange={onChangeValue("dueDate", (date: Date) =>
-                          setTicket({ ...ticket, dueDate: date })
-                        )}
-                        isClearable
-                      />
-                    </div>
-                    <InputErrorMessage name="dueDate" />
+            <FormGroup>
+              <Label>What are the details of your ticket request?</Label>
+              <Input
+                type="textarea"
+                name="text"
+                id="requirements"
+                value={ticket.requirements}
+                className={getClassName("requirements")}
+                onChange={onChange("requirements", (e) =>
+                  setTicket({ ...ticket, requirements: e.target.value })
+                )}
+                onBlur={onBlur("requirements")}
+                placeholder="Enter a full description of your requirements"
+              />
+              <InputErrorMessage name="requirements" />
+            </FormGroup>
+            <div className="row">
+              <div className="col-md-6">
+                <div className="form-group">
+                  <Label>Due Date?</Label>
+                  <div
+                    className="input-group"
+                    style={{ zIndex: 9000 }}
+                    //DatePicker doesn't expose an onBlur property, so placing this on parent element
+                    onBlur={() => onBlurValue("dueDate", ticket.dueDate)}
+                  >
+                    <DatePicker
+                      className={
+                        "form-control " +
+                        getClassName("dueDate", "react-date-picker__wrapper")
+                      }
+                      selected={ticket.dueDate}
+                      onChange={onChangeValue("dueDate", (date: Date) =>
+                        setTicket({ ...ticket, dueDate: date })
+                      )}
+                      isClearable
+                    />
                   </div>
+                  <InputErrorMessage name="dueDate" />
                 </div>
               </div>
-              <FormGroup>
-                <Label>Want to attach any files?</Label>
-                <FileUpload
-                  files={ticket.attachments || []}
-                  setFiles={(f) =>
-                    setTicket((tick) => ({ ...tick, attachments: [...f] }))
-                  }
-                  updateFile={(f) =>
-                    setTicket((tick) => {
-                      // update just one specific file from ticket p
-                      tick.attachments[
-                        tick.attachments.findIndex(
-                          (file) => file.identifier === f.identifier
-                        )
-                      ] = { ...f };
+            </div>
+            <FormGroup>
+              <Label>Want to attach any files?</Label>
+              <FileUpload
+                files={ticket.attachments || []}
+                setFiles={(f) =>
+                  setTicket((tick) => ({ ...tick, attachments: [...f] }))
+                }
+                updateFile={(f) =>
+                  setTicket((tick) => {
+                    // update just one specific file from ticket p
+                    tick.attachments[
+                      tick.attachments.findIndex(
+                        (file) => file.identifier === f.identifier
+                      )
+                    ] = { ...f };
 
-                      return { ...tick, attachments: [...tick.attachments] };
-                    })
+                    return { ...tick, attachments: [...tick.attachments] };
+                  })
+                }
+              ></FileUpload>
+            </FormGroup>
+            <div className="row justify-content-center">
+              <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
+                <Button
+                  className="btn-lg mb-2"
+                  color="primary"
+                  onClick={create}
+                  disabled={
+                    notification.pending || formErrorCount > 0 || !formIsTouched
                   }
-                ></FileUpload>
-              </FormGroup>
-              <div className="row justify-content-center">
-                <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
-                  <Button
-                    className="btn-lg"
-                    color="primary"
-                    onClick={create}
-                    disabled={
-                      notification.pending ||
-                      formErrorCount > 0 ||
-                      !formIsTouched
-                    }
-                  >
-                    Create New Ticket
-                  </Button>
-                </ShowFor>
-              </div>
+                >
+                  Create New Ticket
+                </Button>
+              </ShowFor>
             </div>
           </div>
         </div>
