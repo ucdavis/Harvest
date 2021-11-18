@@ -93,6 +93,23 @@ namespace Harvest.Web
                         return;
                     }
 
+                    // Sometimes CAS doesn't return the required IAM ID
+                    // If this happens, we take the reliable Kerberos (NameIdentifier claim) and use it to lookup IAM ID
+                    if (!identity.HasClaim(c => c.Type == "ucdPersonIAMID"))
+                    {
+                        var identityService = context.HttpContext.RequestServices.GetRequiredService<IIdentityService>();
+                        var kerbId = identity.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                        if (kerbId != null)
+                        {
+                            var identityUser = await identityService.GetByKerberos(kerbId.Value);
+
+                            if (identityUser != null)
+                            {
+                                identity.AddClaim(new Claim("ucdPersonIAMID", identityUser.Iam));
+                            }
+                        }
+                    }
+
                     // Ensure user exists in the db
                     var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                     await userService.GetUser(identity.Claims.ToArray());
@@ -228,7 +245,7 @@ namespace Harvest.Web
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(account|rate|permissions|crop|home|system|help)" }
+                    constraints: new { controller = "(account|rate|permissions|crop|home|system|help|error)" }
                 );
 
                 // API routes map to all other controllers
