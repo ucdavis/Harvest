@@ -136,7 +136,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-danger btn-sm mr-4 float-right"
+          className="btn btn-danger btn-sm float-right"
           onClick={() => cancelProject()}
         >
           Cancel Request <FontAwesomeIcon icon={faTimes} />
@@ -313,7 +313,7 @@ export const ProjectDetailContainer = () => {
                 ))}
               </ul>
             </div>
-            <div className="col-md-6 text-center">
+            <div className="col-md-6 text-right">
               {" "}
               <ProjectUnbilledButton
                 projectId={project.id}

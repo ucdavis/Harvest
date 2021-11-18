@@ -19,7 +19,7 @@ body {
   border-bottom: 1px solid $borders;
   box-shadow: $box-shadow;
   &.no-green {
-    border-top: 8px solid #fff;
+    border-top: 16px solid #fff;
   }
   &.gray-top {
     border-top: 8px solid rgba(0, 0, 0, 0.03);
@@ -67,10 +67,7 @@ header {
     }
   }
 }
-.nav-wrapper {
-  border-bottom: 1px solid $borders;
-  margin-bottom: 2%;
-}
+
 .right-side {
   margin-top: 31px;
 }

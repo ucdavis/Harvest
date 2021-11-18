@@ -17,15 +17,15 @@
 
 // quote info area
 .quote-info {
-  margin-bottom: 8px;
-  padding-bottom: 8px;
+  p {
+    margin-bottom: 6px;
+  }
   p.lede {
     margin-bottom: 0;
   }
   .quote-info-box {
     border: 1px solid $borders;
-    padding: 24px;
-    padding-bottom: 8px;
+    padding: 2%;
   }
 }
 .card-project-totals {
@@ -63,6 +63,11 @@
 .form-group {
   margin-bottom: 1.5rem;
 }
+.nav-wrapper {
+  border-bottom: 1px solid $borders;
+
+  margin-bottom: 2%;
+}
 .navbar {
   padding-left: 0;
   .nav-item {
@@ -75,8 +80,16 @@
       }
     }
   }
+  .dropdown-menu {
+    z-index: 9999;
+  }
 }
-
+.user-sign-in {
+  justify-content: center;
+}
+.create-card {
+  margin: 0 auto;
+}
 // quote page
 .activity-line {
   margin-top: 2%;
@@ -144,6 +157,7 @@
   }
   p {
     font-size: 1.1rem;
+    margin-bottom: 0px;
   }
   border-top: 1px solid $borders;
 }

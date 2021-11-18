@@ -31,18 +31,19 @@ export const RecentTicketsContainer = (props: Props) => {
 
   return (
     <div>
-      <div className="row justify-content-between">
-        <h3>Recent Tickets</h3>
-        <div>
+      <div className="row justify-content-between mt-4">
+        <div className="col">
+          <h3>Recent Tickets</h3>
+        </div>
+        <div className="col text-right">
           <Link className="mr-4" to={`/ticket/create/${props.projectId}`}>
             Create Ticket
           </Link>
           <Link to={`/ticket/List/${props.projectId}`}>View All</Link>
         </div>
       </div>
-      <div className="row justify-content-center">
-        <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
-      </div>
+
+      <TicketTable compact={props.compact} tickets={tickets}></TicketTable>
     </div>
   );
 };

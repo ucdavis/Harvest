@@ -25,8 +25,8 @@ export const AppNav = () => {
       <div className="container">
         <Navbar color="light" light expand="md">
           <NavbarToggler onClick={toggle} />
-          <Collapse isOpen={isOpen} navbar>
-            <Nav className="mr-auto" navbar>
+          <Collapse className="justify-content-between" isOpen={isOpen} navbar>
+            <Nav navbar>
               <ShowFor roles={["FieldManager", "Supervisor"]}>
                 <NavItem>
                   <NavLink href="/project">All Projects</NavLink>
@@ -70,14 +70,9 @@ export const AppNav = () => {
                 <NavLink href="/Help">Help</NavLink>
               </NavItem>
             </Nav>
-            <div className="row align-items-center">
-              Welcome {user.detail.name}
-              <form
-                className="flexer"
-                action="/Account/Logout"
-                method="post"
-                id="logoutForm"
-              >
+            <div className="d-flex align-items-center user-sign-in">
+              Welcome, {user.detail.name}
+              <form action="/Account/Logout" method="post" id="logoutForm">
                 <button className="btn btn-link btn-sm" type="submit">
                   Sign out
                 </button>
