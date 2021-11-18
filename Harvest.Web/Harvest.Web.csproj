@@ -46,16 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="ClientApp\public\error.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="ClientApp\public\error.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Harvest.Core\Harvest.Core.csproj" />
   </ItemGroup>
 
