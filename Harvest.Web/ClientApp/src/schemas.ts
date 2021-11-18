@@ -82,7 +82,7 @@ export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
           .test(
             "maxDigitsAfterDecimal",
             ErrorMessages.WorkItemQuantityDecimalPlaces,
-            (number: number) => Number.isInteger((number || 0) * 10 ** 2)
+            (number: number) => Number.parseFloat(number.toFixed(2)) === number
           )
     ),
   unit: yup.string().defined(),
