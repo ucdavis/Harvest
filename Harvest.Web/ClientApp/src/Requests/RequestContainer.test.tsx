@@ -111,13 +111,13 @@ describe("Request Container", () => {
     )[0];
     const vegetable = container.querySelector(".rbt-input-wrapper");
     const PI = container.querySelectorAll("input.rbt-input-main");
-    const button = container.querySelectorAll(".row.justify-content-center")[1];
+    const button = container.querySelector("#Request-Button");
 
     expect(startDate?.value).toContain("");
     expect(endDate?.value).toContain("");
     expect(cropType?.innerHTML).toContain("");
     expect(vegetable?.textContent).toContain("");
     expect(PI[1]?.value).toContain("");
-    expect(button.innerHTML).toContain("disabled");
+    expect(button).toContainHTML("disabled=");
   });
 });
