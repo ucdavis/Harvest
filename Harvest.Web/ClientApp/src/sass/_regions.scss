@@ -80,6 +80,9 @@
       }
     }
   }
+  .dropdown-menu {
+    z-index: 9999;
+  }
 }
 .user-sign-in {
   justify-content: center;
