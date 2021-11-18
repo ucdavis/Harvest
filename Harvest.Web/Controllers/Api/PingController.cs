@@ -14,6 +14,7 @@ namespace Harvest.Web.Controllers.Api
             _dbContext = dbContext;
         }
         [Route("api/ping")]
+        [ResponseCache(Duration = 300)]
         public async Task<ActionResult> Index()
         {
             if (await _dbContext.Database.CanConnectAsync())
