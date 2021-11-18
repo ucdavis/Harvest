@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,12 +18,18 @@ namespace Harvest.Web.Views.Shared.Components.DynamicStyles
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var files = _fileProvider.GetDirectoryContents("ClientApp/build/static/css");
+            // Get the CRA generated index file, which includes optimized scripts
+            var indexPage = _fileProvider.GetFileInfo("ClientApp/build/index.html");
 
-            // Get all CSS files
-            // TODO: does loading order matter?  is there ever more than one file?
-            var fileNames = files.Where(f => Regex.IsMatch(f.Name, "^.*\\.css$")).OrderBy(f => f.Name).Select(f => f.Name);
-            return View(await Task.FromResult(fileNames.ToArray()));
+            // read the file
+            var fileContents = await File.ReadAllTextAsync(indexPage.PhysicalPath);
+
+            // find all link tags with the rel attribute set to stylesheet
+            var styleSheetLinks = Regex.Matches(fileContents, "<link.*rel=\"stylesheet\".*>", RegexOptions.IgnoreCase);
+
+            var styleLinksAsString = styleSheetLinks.Cast<Match>().Select(m => m.Value).ToList();
+
+            return View(styleSheetLinks.Select(m => m.Value).ToArray());
         }
     }
 }
