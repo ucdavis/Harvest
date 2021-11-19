@@ -25,11 +25,14 @@ namespace Harvest.Web.Views.Shared.Components.DynamicStyles
             var fileContents = await File.ReadAllTextAsync(indexPage.PhysicalPath);
 
             // find all link tags with the rel attribute set to stylesheet
-            var styleSheetLinks = Regex.Matches(fileContents, "<link.*rel=\"stylesheet\".*>", RegexOptions.IgnoreCase);
+            var linkTags = Regex.Matches(fileContents, "<link.*?>", RegexOptions.IgnoreCase);
 
-            var styleLinksAsString = styleSheetLinks.Cast<Match>().Select(m => m.Value).ToList();
+            // make an array with just the stylesheet links
+            var styleLinksAsStrings = linkTags.Where(m => m.Value.Contains("rel=\"stylesheet\""))
+                .Select(m => m.Value)
+                .ToArray();
 
-            return View(styleSheetLinks.Select(m => m.Value).ToArray());
+            return View(styleLinksAsStrings);
         }
     }
 }
