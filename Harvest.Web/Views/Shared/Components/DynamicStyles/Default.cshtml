@@ -2,5 +2,5 @@
 
 @foreach (var style in Model)
 {
-    <link href="/static/css/@style" rel="stylesheet">
+    @Html.Raw(style)
 }
