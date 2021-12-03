@@ -4,6 +4,7 @@ import { Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface RouteParams {
   projectId?: string;
@@ -17,7 +18,7 @@ export const TicketsContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -30,7 +31,7 @@ export const TicketsContainer = () => {
 
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Ticket/GetList?projectId=${projectId}`);
+      const response = await authenticatedFetch(`/api/Ticket/GetList?projectId=${projectId}`);
 
       if (response.ok) {
         getIsMounted() && setTickets(await response.json());

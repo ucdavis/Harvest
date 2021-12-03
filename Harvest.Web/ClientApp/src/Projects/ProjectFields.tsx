@@ -5,6 +5,7 @@ import { Project } from "../types";
 import { getBoundingBox } from "../Util/Geography";
 import { LatLngBoundsExpression } from "leaflet";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface ProjectField {
   id: number;
@@ -22,7 +23,7 @@ export const ProjectFields = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getFields = async () => {
-      const response = await fetch("/api/Project/GetFields");
+      const response = await authenticatedFetch("/api/Project/GetFields");
 
       if (response.ok) {
         const result = await response.json();

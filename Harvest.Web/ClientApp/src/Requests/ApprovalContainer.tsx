@@ -8,6 +8,7 @@ import { QuoteDisplay } from "../Quotes/QuoteDisplay";
 import { RejectQuote } from "../Quotes/RejectQuote";
 import { formatCurrency } from "../Util/NumberFormatting";
 
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
@@ -30,7 +31,7 @@ export const ApprovalContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await fetch(`/api/Quote/Get/${projectId}`);
+      const quoteResponse = await authenticatedFetch(`/api/Quote/Get/${projectId}`);
 
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
@@ -50,12 +51,8 @@ export const ApprovalContainer = () => {
   const approve = async () => {
     const model = { accounts };
 
-    const request = fetch(`/api/Request/Approve/${projectId}`, {
+    const request = authenticatedFetch(`/api/Request/Approve/${projectId}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(model),
     });
 

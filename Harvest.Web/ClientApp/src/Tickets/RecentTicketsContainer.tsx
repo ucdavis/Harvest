@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   projectId?: string;
@@ -17,7 +18,7 @@ export const RecentTicketsContainer = (props: Props) => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/Ticket/GetList?projectId=${props.projectId}&maxRows=${maxRows}`
       );
 

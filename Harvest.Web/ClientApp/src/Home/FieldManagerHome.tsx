@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import { authenticatedFetch } from "../Util/Api";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
 import { Project, Ticket } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
@@ -13,7 +14,7 @@ export const FieldManagerHome = () => {
   useEffect(() => {
     // get info on projects requiring approval
     const getProjects = async () => {
-      const response = await fetch("/api/project/RequiringManagerAttention");
+      const response = await authenticatedFetch("/api/project/RequiringManagerAttention");
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
         getIsMounted() && setProjects(projects);
@@ -25,7 +26,7 @@ export const FieldManagerHome = () => {
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         "/api/ticket/RequiringManagerAttention?limit=3"
       );
       if (getIsMounted()) {

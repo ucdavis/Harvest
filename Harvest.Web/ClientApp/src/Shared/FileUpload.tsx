@@ -6,6 +6,7 @@ import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { BlobServiceClient } from "@azure/storage-blob";
 import { BlobFile } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   disabled?: boolean;
@@ -44,7 +45,7 @@ export const FileUpload = (props: Props) => {
   useEffect(() => {
     // grab the sas token right away
     const cb = async () => {
-      const response = await fetch(`/api/File/GetUploadDetails`);
+      const response = await authenticatedFetch(`/api/File/GetUploadDetails`);
 
       if (response.ok) {
         const url = await response.text();

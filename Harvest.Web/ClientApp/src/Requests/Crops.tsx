@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Typeahead, TypeaheadProps } from "react-bootstrap-typeahead";
 import { Crop, CropType } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props extends Pick<TypeaheadProps<string>, "onBlur"> {
   crops: string;
@@ -41,7 +42,7 @@ export const Crops = (props: Props) => {
     const onSearch = async () => {
       setIsSearchLoading(true);
 
-      const response = await fetch(`/api/Crop/Search?type=${props.cropType}`);
+      const response = await authenticatedFetch(`/api/Crop/Search?type=${props.cropType}`);
 
       if (response.ok) {
         if (response.status === 204) {

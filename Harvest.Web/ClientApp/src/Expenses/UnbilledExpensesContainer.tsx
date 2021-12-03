@@ -6,6 +6,7 @@ import { ExpenseTable } from "./ExpenseTable";
 import { ShowFor } from "../Shared/ShowFor";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -42,7 +43,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
     if (projectId === undefined) return;
 
     const cb = async () => {
-      const response = await fetch(`/api/Expense/GetUnbilled/${projectId}`);
+      const response = await authenticatedFetch(`/api/Expense/GetUnbilled/${projectId}`);
 
       if (response.ok) {
         const expenses: Expense[] = await response.json();
@@ -62,7 +63,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -85,12 +86,8 @@ export const UnbilledExpensesContainer = (props: Props) => {
       return;
     }
 
-    const request = fetch(`/api/Expense/Delete?expenseId=${expense.id}`, {
+    const request = authenticatedFetch(`/api/Expense/Delete?expenseId=${expense.id}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
     });
     setNotification(request, "Removing Expense", () => {
       if (getIsMounted()) {

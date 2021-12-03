@@ -28,6 +28,7 @@ import * as yup from "yup";
 import { useQuery } from "../Shared/UseQuery";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { validatorOptions } from "../constants";
+import { authenticatedFetch } from "../Util/Api";
 import { convertCamelCase } from "../Util/StringFormatting";
 
 interface RouteParams {
@@ -84,7 +85,7 @@ export const ExpenseEntryContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch("/api/Rate/Active");
+      const response = await authenticatedFetch("/api/Rate/Active");
 
       if (response.ok) {
         const rates: Rate[] = await response.json();
@@ -101,7 +102,7 @@ export const ExpenseEntryContainer = () => {
   useEffect(() => {
     // get project in order to determine if it can accept new expenses
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -180,12 +181,8 @@ export const ExpenseEntryContainer = () => {
         )
     );
 
-    const request = fetch(`/api/Expense/Create/${projectId}`, {
+    const request = authenticatedFetch(`/api/Expense/Create/${projectId}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(expensesBody),
     });
 

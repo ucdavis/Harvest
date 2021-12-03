@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   projectSource: string;
@@ -15,7 +16,7 @@ export const TicketListContainer = (props: Props) => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(props.projectSource);
+      const response = await authenticatedFetch(props.projectSource);
 
       if (response.ok) {
         getIsMounted() && setTickets(await response.json());

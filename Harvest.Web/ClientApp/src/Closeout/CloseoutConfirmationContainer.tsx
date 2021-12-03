@@ -12,6 +12,7 @@ import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import AppContext from "../Shared/AppContext";
+import { authenticatedFetch } from "../Util/Api";
 
 interface RouteParams {
   projectId?: string;
@@ -28,7 +29,7 @@ export const CloseoutConfirmationContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
       if (response.ok) {
         const proj: Project = await response.json();
         getIsMounted() && setProject(proj);
@@ -66,7 +67,7 @@ export const CloseoutConfirmationContainer = () => {
       return;
     }
 
-    const request = fetch(`/api/Invoice/DoCloseout/${projectId}`, {
+    const request = authenticatedFetch(`/api/Invoice/DoCloseout/${projectId}`, {
       method: "POST",
     });
 

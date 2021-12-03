@@ -1,5 +1,6 @@
 ﻿import { TicketDetails } from "../types";
 import { Button, FormGroup, Input } from "reactstrap";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
@@ -16,14 +17,10 @@ export const TicketWorkNotesEdit = (props: Props) => {
   const update = async () => {
     // TODO: validation
 
-    const request = fetch(
+    const request = authenticatedFetch(
       `/api/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(ticket.workNotes),
       }
     );

@@ -4,6 +4,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { Project, ProjectAccount } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
@@ -23,7 +24,7 @@ export const AccountChangeContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -41,12 +42,8 @@ export const AccountChangeContainer = () => {
 
   //TODO: require PI or supervisor access after updating auth policies
   const changeAccounts = async () => {
-    const request = fetch(`/api/Request/ChangeAccount/${projectId}`, {
+    const request = authenticatedFetch(`/api/Request/ChangeAccount/${projectId}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ Accounts: accounts }),
     });
 

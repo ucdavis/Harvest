@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Project } from "../types";
 import { ProjectTable } from "./ProjectTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -30,7 +31,7 @@ export const ProjectListContainer = (props: Props) => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(props.projectSource);
+      const response = await authenticatedFetch(props.projectSource);
 
       if (response.ok) {
         getIsMounted() && setProjects(await response.json());
