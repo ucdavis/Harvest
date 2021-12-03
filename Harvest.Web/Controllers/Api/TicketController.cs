@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
-    public class TicketController : Controller
+    public class TicketController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;

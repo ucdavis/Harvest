@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize(Policy = AccessCodes.SupervisorAccess)]
-    public class FieldController : Controller
+    public class FieldController : SuperController
     {
         private AppDbContext _dbContext;
 

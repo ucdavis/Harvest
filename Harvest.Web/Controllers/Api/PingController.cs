@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace Harvest.Web.Controllers.Api
 {
 
-    public class PingController : Controller
+    public class PingController : SuperController
     {
         private readonly AppDbContext _dbContext;
 

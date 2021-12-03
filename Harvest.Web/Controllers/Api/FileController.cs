@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
-    public class FileController : Controller
+    public class FileController : SuperController
     {
         private readonly StorageSettings storageSettings;
         private readonly IFileService fileService;

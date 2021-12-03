@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
-    public class ExpenseController : Controller
+    public class ExpenseController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
