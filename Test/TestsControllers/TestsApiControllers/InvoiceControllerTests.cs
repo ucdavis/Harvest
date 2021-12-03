@@ -31,12 +31,12 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerClassAttributes()
         {
-            ControllerReflection.ControllerInherits("Controller");
-            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
-            var attributes = ControllerReflection.ClassExpectedAttribute<AuthorizeAttribute>(2, showListOfAttributes: true);
+            ControllerReflection.ControllerInherits("SuperController");
+            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
+            var attributes = ControllerReflection.ClassExpectedAttribute<AuthorizeAttribute>(3, showListOfAttributes: true);
             attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-            //ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); //TODO: Enable when this gets added.
-            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
+            ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); //TODO: Enable when this gets added.
+            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
         }
 
         [Fact]
