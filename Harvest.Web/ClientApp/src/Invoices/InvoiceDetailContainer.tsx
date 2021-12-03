@@ -5,6 +5,7 @@ import { ProjectWithInvoice } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 // Lazy load quote pdf link since it's a large JS file and causes a console warning
 const InvoicePDFLink = React.lazy(() => import("../Pdf/InvoicePDFLink"));
@@ -22,7 +23,7 @@ export const InvoiceDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const invoiceResponse = await fetch(
+      const invoiceResponse = await authenticatedFetch(
         `/api/Invoice/Get/${projectId}?invoiceId=${invoiceId}`
       );
 

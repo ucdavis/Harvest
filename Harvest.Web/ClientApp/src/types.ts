@@ -347,6 +347,7 @@ export interface ProjectWithInvoice {
 }
 
 export interface AppContextShape {
+  antiForgeryToken: string;
   user: {
     detail: User;
     roles: RoleName[];

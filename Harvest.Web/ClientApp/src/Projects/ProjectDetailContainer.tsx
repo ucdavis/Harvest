@@ -23,6 +23,7 @@ import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
 import { ProjectAlerts } from "./ProjectAlerts";
+import { authenticatedFetch } from "../Util/Api";
 
 interface RouteParams {
   projectId?: string;
@@ -42,7 +43,7 @@ export const ProjectDetailContainer = () => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       setIsLoading(true);
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -57,12 +58,8 @@ export const ProjectDetailContainer = () => {
   }, [projectId, getIsMounted]);
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const request = fetch(`/api/Request/Files/${projectId}`, {
+    const request = authenticatedFetch(`/api/Request/Files/${projectId}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ Attachments: attachments }),
     });
 
@@ -82,12 +79,8 @@ export const ProjectDetailContainer = () => {
 
   //cancel the project
   const cancelProject = async () => {
-    const request = fetch(`/api/Request/Cancel/${projectId}`, {
+    const request = authenticatedFetch(`/api/Request/Cancel/${projectId}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
     });
     setNotification(request, "Canceling", "Project Request Canceled");
     const response = await request;

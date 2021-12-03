@@ -7,6 +7,7 @@ import {
   TypeaheadProps,
 } from "react-bootstrap-typeahead";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 import { User } from "../types";
 
@@ -23,7 +24,7 @@ export const SearchPerson = (props: Props) => {
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
-    const response = await fetch(`/api/people/search?query=${query}`);
+    const response = await authenticatedFetch(`/api/people/search?query=${query}`);
 
     if (response.ok) {
       if (response.status === 204) {

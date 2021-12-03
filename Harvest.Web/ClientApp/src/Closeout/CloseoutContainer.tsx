@@ -12,6 +12,7 @@ import { roundToTwo } from "../Util/Calculations";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { ShowFor } from "../Shared/ShowFor";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 interface RouteParams {
@@ -35,7 +36,7 @@ export const CloseoutContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
       if (response.ok) {
         const proj: Project = await response.json();
         getIsMounted() && setProject(proj);
@@ -89,7 +90,7 @@ export const CloseoutContainer = () => {
       return;
     }
 
-    const request = fetch(`/api/Invoice/InitiateCloseout/${projectId}`, {
+    const request = authenticatedFetch(`/api/Invoice/InitiateCloseout/${projectId}`, {
       method: "POST",
     });
 

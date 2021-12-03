@@ -4,6 +4,7 @@ import { FormGroup, Input } from "reactstrap";
 
 import { Project } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   selectedProject: (projectId: number) => void;
@@ -16,7 +17,7 @@ export const ProjectSelection = (props: Props) => {
   useEffect(() => {
     // get list of projects
     const cb = async () => {
-      const response = await fetch(`/api/Project/Active`);
+      const response = await authenticatedFetch(`/api/Project/Active`);
 
       if (response.ok) {
         const projects = await response.json();

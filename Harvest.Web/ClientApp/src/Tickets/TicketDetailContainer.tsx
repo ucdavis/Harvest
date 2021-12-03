@@ -8,6 +8,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { TicketWorkNotesEdit } from "./TicketWorkNotesEdit";
 import { TicketReply } from "./TicketReply";
 import { Button } from "reactstrap";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
@@ -27,7 +28,7 @@ export const TicketDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -40,7 +41,7 @@ export const TicketDetailContainer = () => {
 
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Ticket/Get/${projectId}/${ticketId}`);
+      const response = await authenticatedFetch(`/api/Ticket/Get/${projectId}/${ticketId}`);
 
       if (response.ok) {
         const tick: TicketDetails = await response.json();
@@ -56,14 +57,10 @@ export const TicketDetailContainer = () => {
   }
 
   const closeTicket = async () => {
-    const request = fetch(
+    const request = authenticatedFetch(
       `/api/Ticket/Close?projectId=${projectId}&ticketId=${ticketId}`,
       {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
       }
     );
     setNotification(request, "Closing Ticket", "Ticket Closed");

@@ -7,6 +7,7 @@ import { Button, FormGroup, Input, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { ShowFor } from "../Shared/ShowFor";
 import { ticketSchema } from "../schemas";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useInputValidator } from "use-input-validator";
@@ -42,7 +43,7 @@ export const TicketCreate = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -67,12 +68,8 @@ export const TicketCreate = () => {
       return;
     }
 
-    const request = fetch(`/api/Ticket/Create?projectId=${projectId}`, {
+    const request = authenticatedFetch(`/api/Ticket/Create?projectId=${projectId}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(ticket),
     });
     setNotification(request, "Creating Ticket", "Ticket Created");

@@ -4,6 +4,7 @@ import { useHistory, useParams } from "react-router-dom";
 import { ProjectWithQuote } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "./QuoteDisplay";
+import { authenticatedFetch } from "../Util/Api";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 import { useIsMounted } from "../Shared/UseIsMounted";
@@ -23,7 +24,7 @@ export const QuoteDisplayContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await fetch(`/api/Quote/GetApproved/${projectId}`);
+      const quoteResponse = await authenticatedFetch(`/api/Quote/GetApproved/${projectId}`);
 
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();

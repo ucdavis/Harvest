@@ -13,6 +13,7 @@ import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 import { useInputValidator, ValidationProvider } from "use-input-validator";
 import { validatorOptions } from "../constants";
 
@@ -51,7 +52,7 @@ export const RequestContainer = () => {
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -82,12 +83,8 @@ export const RequestContainer = () => {
       return;
     }
 
-    const request = fetch(`/api/Request/Create`, {
+    const request = authenticatedFetch(`/api/Request/Create`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(project),
     });
 

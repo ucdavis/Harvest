@@ -39,6 +39,7 @@ const fakeAttachments: BlobFile[] = [
 ];
 
 export const fakeAppContext: AppContextShape = {
+  antiForgeryToken: "fakeAntiForgeryToken",
   user: {
     detail: {
       ...fakeUser,

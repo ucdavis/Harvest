@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-    public class QuoteController : Controller
+    public class QuoteController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;

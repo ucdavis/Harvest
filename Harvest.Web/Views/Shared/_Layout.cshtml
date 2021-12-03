@@ -2,6 +2,8 @@
 @using Harvest.Core.Services
 @inject IConfiguration Configuration
 @inject IUserService UserService
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
 <!DOCTYPE html>
 <html>
 
@@ -73,6 +75,7 @@
         var Harvest = { user: {} };
         Harvest.user.detail = @Html.Raw(Context.GetUserDetails());
         Harvest.user.roles = @Html.Raw(await Context.GetUserRoles());
+        Harvest.antiForgeryToken = "@Xsrf.GetAndStoreTokens(Context).RequestToken";
     </script>
 
     <environment include="Development">

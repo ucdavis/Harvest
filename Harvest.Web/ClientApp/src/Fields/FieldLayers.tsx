@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { LayersControl, GeoJSON, Popup, LayerGroup } from "react-leaflet";
 import { Field, Project } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   project: Project;
@@ -18,7 +19,7 @@ export const FieldLayers = (props: Props) => {
       const endDate = new Date(props.project.end);
       const projectId = props.project.id;
 
-      const activeFieldResponse = await fetch(
+      const activeFieldResponse = await authenticatedFetch(
         `/api/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}&projectId=${projectId}`
       );
 

@@ -5,6 +5,7 @@ import { Invoice, Project } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import { authenticatedFetch } from "../Util/Api";
 
 interface RouteParams {
   projectId?: string;
@@ -19,7 +20,7 @@ export const InvoiceListContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(`/api/Invoice/List/?projectId=${projectId}`);
+      const response = await authenticatedFetch(`/api/Invoice/List/?projectId=${projectId}`);
 
       if (response.ok) {
         getIsMounted() && setInvoices(await response.json());
@@ -32,7 +33,7 @@ export const InvoiceListContainer = () => {
   }, [projectId, getIsMounted]);
   useEffect(() => {
     const cb = async () => {
-      const response = await fetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
 
       if (response.ok) {
         const proj: Project = await response.json();

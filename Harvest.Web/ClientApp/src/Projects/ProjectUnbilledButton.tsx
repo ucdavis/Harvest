@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { authenticatedFetch } from "../Util/Api";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
@@ -15,7 +16,7 @@ export const ProjectUnbilledButton = (props: Props) => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/expense/getunbilledtotal/${props.projectId}`
       );
 

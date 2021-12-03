@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Project } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 export const WorkerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -10,7 +11,7 @@ export const WorkerHome = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
-      const response = await fetch("/api/expense/GetRecentExpensedProjects");
+      const response = await authenticatedFetch("/api/expense/GetRecentExpensedProjects");
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
         getIsMounted() && setProjects(projects);

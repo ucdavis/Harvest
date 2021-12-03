@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize()]
-    public class PeopleController : Controller
+    public class PeopleController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;

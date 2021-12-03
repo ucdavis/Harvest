@@ -1,6 +1,7 @@
 ﻿import React, { useState } from "react";
 import { Button, FormGroup, Input } from "reactstrap";
 import { TicketDetails, TicketMessage } from "../types";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
@@ -22,14 +23,10 @@ export const TicketReply = (props: Props) => {
   const update = async () => {
     // TODO: validation
 
-    const request = fetch(
+    const request = authenticatedFetch(
       `/api/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify(ticketMessage),
       }
     );

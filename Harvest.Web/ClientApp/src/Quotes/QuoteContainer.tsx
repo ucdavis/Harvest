@@ -16,6 +16,7 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
 
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useInputValidator, ValidationProvider } from "use-input-validator";
 import { quoteContentSchema } from "../schemas";
@@ -53,8 +54,8 @@ export const QuoteContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await fetch(`/api/Quote/Get/${projectId}`);
-      const pricingResponse = await fetch("/api/Rate/Active");
+      const quoteResponse = await authenticatedFetch(`/api/Quote/Get/${projectId}`);
+      const pricingResponse = await authenticatedFetch("/api/Rate/Active");
 
       if (quoteResponse.ok && pricingResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
@@ -203,12 +204,8 @@ export const QuoteContainer = () => {
       }
     }
 
-    const request = fetch(`/api/Quote/Save/${projectId}?submit=${submit}`, {
+    const request = authenticatedFetch(`/api/Quote/Save/${projectId}?submit=${submit}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify(quote),
     });
 

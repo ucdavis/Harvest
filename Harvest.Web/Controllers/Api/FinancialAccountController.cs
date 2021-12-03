@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize]
-    public class FinancialAccountController : Controller
+    public class FinancialAccountController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IFinancialService _financialService;

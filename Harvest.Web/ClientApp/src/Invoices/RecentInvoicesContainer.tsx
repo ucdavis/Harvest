@@ -5,6 +5,7 @@ import { Invoice } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
 import { ShowFor } from "../Shared/ShowFor";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   projectId?: string;
@@ -18,7 +19,7 @@ export const RecentInvoicesContainer = (props: Props) => {
   useEffect(() => {
     const cb = async () => {
       // TODO: only fetch first 5 instead of chopping off client-side
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `/api/Invoice/List/?projectId=${props.projectId}&maxRows=5`
       );
 

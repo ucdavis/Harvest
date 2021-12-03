@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { Project } from "../types";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { notEmptyOrFalsey } from "../Util/ValueChecks";
@@ -49,12 +50,8 @@ export const RejectQuote = (props: Props) => {
       return;
     }
 
-    const request = fetch(`/api/Request/RejectQuote/${props.project.id}`, {
+    const request = authenticatedFetch(`/api/Request/RejectQuote/${props.project.id}`, {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ reason }),
     });
 

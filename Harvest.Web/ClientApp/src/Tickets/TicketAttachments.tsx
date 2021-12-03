@@ -4,6 +4,7 @@ import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { TicketAttachment, TicketDetails, BlobFile } from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
+import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
@@ -28,14 +29,10 @@ export const TicketAttachments = (props: Props) => {
 
   const getIsMounted = useIsMounted();
   const updateFiles = async (attachments: BlobFile[]) => {
-    const request = fetch(
+    const request = authenticatedFetch(
       `/api/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
       {
         method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ Attachments: attachments }),
       }
     );
