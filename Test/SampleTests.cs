@@ -10,7 +10,7 @@ namespace Test
         [Fact]
         public void Test1()
         {
-            Assert.Equal(4, 2 + 2);
+            Assert.Equal(4, 2 + 2); //Force Rebuild
         }
 
         [Fact(Skip = "Test skipped because it is a test of the fail")]
