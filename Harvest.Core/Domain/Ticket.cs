@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Harvest.Core.Domain
 {
@@ -43,9 +43,7 @@ namespace Harvest.Core.Domain
         [StringLength(25)]
         public string Status { get; set; } = Statuses.Created;
         public bool Completed { get; set; } = false;
-        [JsonIgnore]
         public List<TicketMessage> Messages { get; set; }
-        [JsonIgnore]
         public List<TicketAttachment> Attachments { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
