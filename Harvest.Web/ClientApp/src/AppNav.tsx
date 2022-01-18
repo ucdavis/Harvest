@@ -48,11 +48,15 @@ export const AppNav = () => {
                     Admin
                   </DropdownToggle>
                   <DropdownMenu right>
-                    <DropdownItem href="/Permissions/Index">
-                      Permissions
-                    </DropdownItem>
+                    <ShowFor roles={["FieldManager"]}>
+                      <DropdownItem href="/Permissions/Index">
+                        Permissions
+                      </DropdownItem>
+                    </ShowFor>
                     <DropdownItem href="/Rate/Index">Rates</DropdownItem>
-                    <DropdownItem href="/Crop/Index">Crops</DropdownItem>
+                    <ShowFor roles={["FieldManager"]}>
+                      <DropdownItem href="/Crop/Index">Crops</DropdownItem>
+                    </ShowFor>
                     <DropdownItem divider />
                     <DropdownItem href="/Project/Completed">
                       Completed Projects
