@@ -2,7 +2,9 @@
 @inject IConfiguration Configuration
 @model int
 @{
+
     ViewData["Title"] = "An Error has occurred";
+
     Layout = null;
 }
 
@@ -44,8 +46,12 @@
             <div class="container">
                 @if (Configuration["Environment:ShowTestBanner"] == "Yes")
 
+
+
                 {
-                    <h1 style="background-color: red; text-align: center; color: white">----------- Beta Testing. Data will not be retained. -----------</h1>
+                    <h1 style="background-color: red; text-align: center; color: white">----------- Beta Testing. Data will
+                        not be retained. -----------</h1>
+
                 }
                 <div class="row justify-content-between align-items-end">
                     <div class="col-sm-8 col-md-5 col-xl-4">
@@ -66,30 +72,45 @@
             <h2>Error</h2>
 
             @{
-            
+
+
+
                 var statusCode = Model;
                 var statusmessage = "";
 
                 switch (statusCode)
                 {
+
                     case 400:
+
                         statusmessage = "Bad request";
+
                         break;
-            
+
+
+
                     case 403:
-                    statusmessage = "Access Denied";
+
+                        statusmessage = "Access Denied";
+
                         break;
+
                     case 404:
+
                         statusmessage = "Page not found";
+
                         break;
+
                     default:
+
                         statusmessage = "Something went wrong";
+
                         break;
                 }
                 <h1>@statusmessage</h1>
 
                 <div class="err-container">
-                    
+
                 </div>
             }
         </main>
@@ -122,16 +143,10 @@
 
 </html>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+<script type="text/javascript">
+    //On page Load check if cookies are disabled
+    window.onload = function () {
+        if (navigator.cookieEnabled === false) {
+            alert("Cookies are disabled in your browser. Please enable cookies to use Harvest.");
+        } 
+</script>
