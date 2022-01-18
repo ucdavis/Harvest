@@ -38,13 +38,6 @@
             background-size: contain;
         }
     </style>
-    <script type="text/javascript">
-    //On page Load check if cookies are disabled
-    window.onload = function () {
-        if (navigator.cookieEnabled === false) {
-            alert("Cookies are disabled in your browser. Please enable cookies to use Harvest.");
-        } 
-    </script>
 
 </head>
 
@@ -147,6 +140,13 @@
         </cache>
     </environment>
 
+    <script type="text/javascript">
+        //On page Load check if cookies are disabled
+        window.onload = function () {
+            if (navigator.cookieEnabled === false) {
+                alert("Cookies are disabled in your browser. Please enable cookies to use Harvest.");
+            } 
+    </script>
 </body>
 
 </html>
