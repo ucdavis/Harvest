@@ -50,9 +50,13 @@ describe("Request Container", () => {
     await act(async () => {
       global.fetch = jest
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(projectResponse))
-        .mockImplementationOnce(() => Promise.resolve(cropResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+        .mockImplementation((x) =>
+          x.includes("/api/Project")
+            ? Promise.resolve(projectResponse)
+            : x.includes("/api/File/")
+            ? Promise.resolve(fileResponse)
+            : Promise.resolve(cropResponse)
+        );
 
       render(
         <MemoryRouter initialEntries={["/request/create/3"]}>
@@ -88,8 +92,13 @@ describe("Request Container", () => {
     await act(async () => {
       global.fetch = jest
         .fn()
-        .mockImplementationOnce(() => Promise.resolve(cropResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
+        .mockImplementation((x) =>
+          x.includes("/api/Project")
+            ? Promise.resolve(projectResponse)
+            : x.includes("/api/File/")
+            ? Promise.resolve(fileResponse)
+            : Promise.resolve(cropResponse)
+        );
 
       render(
         <MemoryRouter initialEntries={["/request/create"]}>
