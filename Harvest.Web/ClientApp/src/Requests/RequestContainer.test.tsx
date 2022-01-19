@@ -27,19 +27,24 @@ beforeEach(() => {
     ok: true,
     json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
   };
+
+  function ResponseMap(arg) {
+    if (arg.includes("/api/Project")) {
+      return Promise.resolve(projectResponse);
+    }
+    if (arg.includes("/api/File/")) {
+      return Promise.resolve(fileResponse);
+    }
+    if (arg.includes("/api/Crop")) {
+      return Promise.resolve(cropResponse);
+    }
+  }
+
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
-  global.fetch = jest
-    .fn()
-    .mockImplementation((x) =>
-      x.includes("/api/Project")
-        ? Promise.resolve(projectResponse)
-        : x.includes("/api/File/")
-        ? Promise.resolve(fileResponse)
-        : Promise.resolve(cropResponse)
-    );
+  global.fetch = jest.fn().mockImplementation((x) => ResponseMap(x));
 });
 
 afterEach(() => {
