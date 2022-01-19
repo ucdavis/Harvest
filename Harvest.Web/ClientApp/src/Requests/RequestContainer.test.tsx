@@ -5,6 +5,7 @@ import { act } from "react-dom/test-utils";
 
 import { RequestContainer } from "./RequestContainer";
 import { fakeAppContext, fakeCrops, fakeProject } from "../Test/mockData";
+import { responseMap } from "../Test/testHelpers";
 import "jest-canvas-mock";
 
 let container: Element;
@@ -28,20 +29,12 @@ beforeEach(() => {
     json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
   };
 
-  function ResponseMap(
-    url: string,
-    dict: { [key: string]: Promise<any> }
-  ): Promise<any> {
-    let key = Object.keys(dict).find((key: string) => url.includes(key));
-    return key ? dict[key] : Promise.resolve(undefined);
-  }
-
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
   global.fetch = jest.fn().mockImplementation((x) =>
-    ResponseMap(x, {
+    responseMap(x, {
       "/api/Project": projectResponse,
       "/api/File/": fileResponse,
       "/api/Crop": cropResponse,
