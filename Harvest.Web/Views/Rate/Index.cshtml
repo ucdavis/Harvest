@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    var allowEdit = (bool)ViewBag.AllowEdit;
 }
 <div class="row justify-content-between mb-3">
     <div class="col">
@@ -77,9 +78,16 @@
                 @item.UpdatedOn.ToPacificTime().Format("d")
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new {id=item.Id }) |
-                @Html.ActionLink("Details", "Details", new {id=item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new {id=item.Id })
+                @if(allowEdit)
+                {
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span> |</span>
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) <span> |</span>
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                }
+                else
+                {
+                    @Html.ActionLink("Details", "Details", new {id=item.Id })
+                }
             </td>
         </tr>
     }
