@@ -10,24 +10,6 @@ import "jest-canvas-mock";
 let container: Element;
 
 beforeEach(() => {
-  (global as any).Harvest = fakeAppContext;
-  // setup a DOM element as a render target
-  container = document.createElement("div");
-  document.body.appendChild(container);
-});
-
-afterEach(() => {
-  // cleanup on exiting
-  // clear any mocks living on fetch
-  if ((global.fetch as any).mockClear) {
-    (global.fetch as any).mockClear();
-  }
-  unmountComponentAtNode(container);
-  container.remove();
-  // container = null;
-});
-
-describe("Request Container", () => {
   const projectResponse = {
     status: 200,
     ok: true,
@@ -45,19 +27,35 @@ describe("Request Container", () => {
     ok: true,
     json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
   };
+  (global as any).Harvest = fakeAppContext;
+  // setup a DOM element as a render target
+  container = document.createElement("div");
+  document.body.appendChild(container);
+  global.fetch = jest
+    .fn()
+    .mockImplementation((x) =>
+      x.includes("/api/Project")
+        ? Promise.resolve(projectResponse)
+        : x.includes("/api/File/")
+        ? Promise.resolve(fileResponse)
+        : Promise.resolve(cropResponse)
+    );
+});
 
+afterEach(() => {
+  // cleanup on exiting
+  // clear any mocks living on fetch
+  if ((global.fetch as any).mockClear) {
+    (global.fetch as any).mockClear();
+  }
+  unmountComponentAtNode(container);
+  container.remove();
+  // container = null;
+});
+
+describe("Request Container", () => {
   it("Populate form", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementation((x) =>
-          x.includes("/api/Project")
-            ? Promise.resolve(projectResponse)
-            : x.includes("/api/File/")
-            ? Promise.resolve(fileResponse)
-            : Promise.resolve(cropResponse)
-        );
-
       render(
         <MemoryRouter initialEntries={["/request/create/3"]}>
           <Route path="/request/create/:projectId?">
@@ -90,16 +88,6 @@ describe("Request Container", () => {
 
   it("No Project", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementation((x) =>
-          x.includes("/api/Project")
-            ? Promise.resolve(projectResponse)
-            : x.includes("/api/File/")
-            ? Promise.resolve(fileResponse)
-            : Promise.resolve(cropResponse)
-        );
-
       render(
         <MemoryRouter initialEntries={["/request/create"]}>
           <Route path="/request/create/:projectId?">
