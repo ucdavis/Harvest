@@ -34,6 +34,7 @@ namespace Harvest.Web.Controllers
         public async Task<ActionResult> Index()
         {
             var rates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            ViewBag.AllowEdit = await _userService.HasAnyRoles(new string[] { Role.Codes.System, Role.Codes.FieldManager });
             return View(rates);
         }
 
