@@ -156,7 +156,7 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const ticketTable = document.querySelectorAll("tbody")[0];
+    const ticketTable = document.querySelectorAll("tbody")[0]; //TODO: Better selector for this
     const rows = ticketTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(4);
