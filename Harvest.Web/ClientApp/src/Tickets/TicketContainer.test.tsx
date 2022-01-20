@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 import AppContext from "../Shared/AppContext";
 
-import { TicketsContainer } from "../Tickets/TicketsContainer";
+import { TicketsContainer } from "./TicketsContainer";
 
 import { fakeAppContext, fakeTickets, fakeProject } from "../Test/mockData";
 
@@ -163,6 +163,26 @@ describe("Request Container", () => {
       "#ticketTableContainer"
     )?.textContent;
     expect(ticketContainer).toContain("Create Ticket");
+  });
+
+  it("Does not have View All link", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/ticket/List/3"]}>
+            <Route path="/ticket/List/:projectId">
+              <TicketsContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketContainer = container.querySelector(
+      "#ticketTableContainer"
+    )?.textContent;
+    expect(ticketContainer).not.toContain("View All");
   });
 
   it("Display correct number of tickets", async () => {

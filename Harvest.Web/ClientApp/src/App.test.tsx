@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
-import App from "../App";
-import { fakeAppContext } from "../Test/mockData";
+import App from "./App";
+import { fakeAppContext } from "./Test/mockData";
 
 jest.mock("react-leaflet", () => ({
   MapContainer: () => <div id="MapContainer">MapContainer</div>,

@@ -3,7 +3,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
 import { act, Simulate } from "react-dom/test-utils";
 
-import { ExpenseEntryContainer } from "../Expenses/ExpenseEntryContainer";
+import { ExpenseEntryContainer } from "./ExpenseEntryContainer";
 import { fakeAppContext, sampleRates, fakeProject } from "../Test/mockData";
 import { responseMap } from "../Test/testHelpers";
 

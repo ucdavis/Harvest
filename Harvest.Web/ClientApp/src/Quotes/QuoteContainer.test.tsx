@@ -3,7 +3,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
-import { QuoteContainer } from "../Quotes/QuoteContainer";
+import { QuoteContainer } from "./QuoteContainer";
 import {
   fakeAppContext,
   fakeProjectWithQuote,

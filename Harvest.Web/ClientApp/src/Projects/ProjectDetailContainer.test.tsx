@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 import AppContext from "../Shared/AppContext";
 
-import { ProjectDetailContainer } from "../Projects/ProjectDetailContainer";
+import { ProjectDetailContainer } from "./ProjectDetailContainer";
 import {
   fakeAppContext,
   fakeInvoices,
