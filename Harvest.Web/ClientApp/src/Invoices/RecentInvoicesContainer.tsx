@@ -33,7 +33,7 @@ export const RecentInvoicesContainer = (props: Props) => {
 
   return (
     <ShowFor roles={["FieldManager", "Supervisor", "PI"]}>
-      <div>
+      <div id="recentInvoiceContainer">
         <div className="row justify-content-between">
           <div className="col">
             <h3>Recent Invoices</h3>

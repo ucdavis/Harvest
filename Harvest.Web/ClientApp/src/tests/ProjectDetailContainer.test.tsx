@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 import AppContext from "../Shared/AppContext";
 
-import { ProjectDetailContainer } from "./ProjectDetailContainer";
+import { ProjectDetailContainer } from "../Projects/ProjectDetailContainer";
 import {
   fakeAppContext,
   fakeInvoices,
@@ -156,7 +156,9 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const ticketTable = document.querySelectorAll("tbody")[0]; //TODO: Better selector for this
+    const ticketTable = document
+      .querySelector("#recentTicketContainer")
+      ?.querySelector("tbody");
     const rows = ticketTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(4);
@@ -176,7 +178,9 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const invoiceTable = document.querySelectorAll("tbody")[1];
+    const invoiceTable = document
+      .querySelector?.("#recentInvoiceContainer")
+      ?.querySelector("tbody");
     const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(3);

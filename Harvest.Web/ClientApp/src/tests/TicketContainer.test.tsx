@@ -4,7 +4,7 @@ import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 import AppContext from "../Shared/AppContext";
 
-import { TicketsContainer } from "./TicketsContainer";
+import { TicketsContainer } from "../Tickets/TicketsContainer";
 
 import { fakeAppContext, fakeTickets, fakeProject } from "../Test/mockData";
 
@@ -158,5 +158,25 @@ describe("Request Container", () => {
 
     const fieldTitle = container.querySelector("#ticketTable")?.textContent;
     expect(fieldTitle).toContain("Create Ticket");
+  });
+
+  it("Display correct number of tickets", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/ticket/List/3"]}>
+            <Route path="/ticket/List/:projectId">
+              <TicketsContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketTable = document.querySelector("#ticketTable");
+    const rows = ticketTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(4);
   });
 });
