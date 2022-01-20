@@ -141,4 +141,44 @@ describe("Project Detail Container", () => {
 
     expect(attachemntsLength?.length).toBe(2);
   });
+
+  it("Display correct number of recent tickets", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketTable = document.querySelectorAll("tbody")[0];
+    const rows = ticketTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(4);
+  });
+
+  it("Display correct number of recent invoices", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const invoiceTable = document.querySelectorAll("tbody")[1];
+    const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
+
+    expect(rows?.length).toBe(3);
+  });
 });
