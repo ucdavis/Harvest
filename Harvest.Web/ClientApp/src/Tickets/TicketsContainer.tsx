@@ -18,7 +18,9 @@ export const TicketsContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -31,7 +33,9 @@ export const TicketsContainer = () => {
 
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Ticket/GetList?projectId=${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Ticket/GetList?projectId=${projectId}`
+      );
 
       if (response.ok) {
         getIsMounted() && setTickets(await response.json());
@@ -51,7 +55,7 @@ export const TicketsContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-      <div className="card-content">
+      <div id="ticketTable" className="card-content">
         <div className="row justify-content-between">
           <h3>List of all tickets for your project</h3>
 
