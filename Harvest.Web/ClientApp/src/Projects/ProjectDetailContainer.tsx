@@ -43,12 +43,17 @@ export const ProjectDetailContainer = () => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       setIsLoading(true);
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const project = (await response.json()) as Project;
         getIsMounted() && setProject(project);
         setIsLoading(false);
+      } else {
+        setNotification(response, "Error", "Error Loading Project");
+        //history.push("/"); //If we redirect to the home page, we will have to fix the tests
       }
     };
 
