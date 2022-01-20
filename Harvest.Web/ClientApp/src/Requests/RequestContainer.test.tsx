@@ -3,7 +3,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 
-import { RequestContainer } from "../Requests/RequestContainer";
+import { RequestContainer } from "./RequestContainer";
 import { fakeAppContext, fakeCrops, fakeProject } from "../Test/mockData";
 import { responseMap } from "../Test/testHelpers";
 import "jest-canvas-mock";
