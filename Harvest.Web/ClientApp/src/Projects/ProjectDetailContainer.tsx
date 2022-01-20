@@ -52,7 +52,7 @@ export const ProjectDetailContainer = () => {
         getIsMounted() && setProject(project);
         setIsLoading(false);
       } else {
-        setNotification(response, "Error", "Error Loading Project");
+        setNotification(response, "Loading", "Error Loading Project");
         //history.push("/"); //If we redirect to the home page, we will have to fix the tests
       }
     };
