@@ -31,7 +31,7 @@ export const RecentTicketsContainer = (props: Props) => {
   }, [props.projectId, getIsMounted]);
 
   return (
-    <div>
+    <div id="recentTicketContainer">
       <div className="row justify-content-between mt-4">
         <div className="col">
           <h3>Recent Tickets</h3>
