@@ -55,7 +55,7 @@ export const TicketsContainer = () => {
         project={project}
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
-      <div id="ticketTable" className="card-content">
+      <div id="ticketTableContainer" className="card-content">
         <div className="row justify-content-between">
           <h3>List of all tickets for your project</h3>
 

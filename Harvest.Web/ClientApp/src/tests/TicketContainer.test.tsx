@@ -121,8 +121,9 @@ describe("Request Container", () => {
       );
     });
 
-    const fieldTitle = container.querySelector(".green-bg-border")?.textContent;
-    expect(fieldTitle).toContain("Back to project details");
+    const backContainer =
+      container.querySelector(".green-bg-border")?.textContent;
+    expect(backContainer).toContain("Back to project details");
   });
   it("Displays Text List of all tickets for your project", async () => {
     await act(async () => {
@@ -138,8 +139,10 @@ describe("Request Container", () => {
       );
     });
 
-    const fieldTitle = container.querySelector("#ticketTable")?.textContent;
-    expect(fieldTitle).toContain("List of all tickets for your project");
+    const ticketContainer = container.querySelector(
+      "#ticketTableContainer"
+    )?.textContent;
+    expect(ticketContainer).toContain("List of all tickets for your project");
   });
 
   it("Has Link Create Ticket", async () => {
@@ -156,8 +159,10 @@ describe("Request Container", () => {
       );
     });
 
-    const fieldTitle = container.querySelector("#ticketTable")?.textContent;
-    expect(fieldTitle).toContain("Create Ticket");
+    const ticketContainer = container.querySelector(
+      "#ticketTableContainer"
+    )?.textContent;
+    expect(ticketContainer).toContain("Create Ticket");
   });
 
   it("Display correct number of tickets", async () => {
@@ -174,7 +179,7 @@ describe("Request Container", () => {
       );
     });
 
-    const ticketTable = document.querySelector("#ticketTable");
+    const ticketTable = document.querySelector("#ticketTableContainer");
     const rows = ticketTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(4);
