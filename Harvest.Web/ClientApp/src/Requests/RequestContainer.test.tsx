@@ -5,29 +5,12 @@ import { act } from "react-dom/test-utils";
 
 import { RequestContainer } from "./RequestContainer";
 import { fakeAppContext, fakeCrops, fakeProject } from "../Test/mockData";
+import { responseMap } from "../Test/testHelpers";
 import "jest-canvas-mock";
 
 let container: Element;
 
 beforeEach(() => {
-  (global as any).Harvest = fakeAppContext;
-  // setup a DOM element as a render target
-  container = document.createElement("div");
-  document.body.appendChild(container);
-});
-
-afterEach(() => {
-  // cleanup on exiting
-  // clear any mocks living on fetch
-  if ((global.fetch as any).mockClear) {
-    (global.fetch as any).mockClear();
-  }
-  unmountComponentAtNode(container);
-  container.remove();
-  // container = null;
-});
-
-describe("Request Container", () => {
   const projectResponse = {
     status: 200,
     ok: true,
@@ -46,14 +29,33 @@ describe("Request Container", () => {
     json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
   };
 
+  (global as any).Harvest = fakeAppContext;
+  // setup a DOM element as a render target
+  container = document.createElement("div");
+  document.body.appendChild(container);
+  global.fetch = jest.fn().mockImplementation((x) =>
+    responseMap(x, {
+      "/api/Project": projectResponse,
+      "/api/File/": fileResponse,
+      "/api/Crop": cropResponse,
+    })
+  );
+});
+
+afterEach(() => {
+  // cleanup on exiting
+  // clear any mocks living on fetch
+  if ((global.fetch as any).mockClear) {
+    (global.fetch as any).mockClear();
+  }
+  unmountComponentAtNode(container);
+  container.remove();
+  // container = null;
+});
+
+describe("Request Container", () => {
   it("Populate form", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(projectResponse))
-        .mockImplementationOnce(() => Promise.resolve(cropResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
-
       render(
         <MemoryRouter initialEntries={["/request/create/3"]}>
           <Route path="/request/create/:projectId?">
@@ -86,11 +88,6 @@ describe("Request Container", () => {
 
   it("No Project", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(cropResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse));
-
       render(
         <MemoryRouter initialEntries={["/request/create"]}>
           <Route path="/request/create/:projectId?">

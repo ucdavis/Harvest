@@ -9,6 +9,7 @@ import {
   fakeProjectWithQuote,
   sampleRates,
 } from "../Test/mockData";
+import { responseMap } from "../Test/testHelpers";
 import { ValidationProvider } from "use-input-validator";
 
 let container: Element;
@@ -22,10 +23,29 @@ jest.mock("react-leaflet", () => ({
 }));
 
 beforeEach(() => {
+  const quoteResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeProjectWithQuote),
+  };
+
+  const rateResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(sampleRates),
+  };
+
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
+
+  global.fetch = jest.fn().mockImplementation((x) =>
+    responseMap(x, {
+      "/api/Quote/Get/": quoteResponse,
+      "/api/Rate/Active": rateResponse,
+    })
+  );
 });
 
 afterEach(() => {
@@ -41,7 +61,25 @@ afterEach(() => {
 
 describe("Quote Container", () => {
   it("Shows loading screen", async () => {
+    const notOkProjectResponse = {
+      status: 200,
+      ok: false,
+      json: () => Promise.resolve(fakeProjectWithQuote),
+    };
+    const notOkRateResponse = {
+      status: 200,
+      ok: false,
+      json: () => Promise.resolve(sampleRates),
+    };
+
     await act(async () => {
+      global.fetch = jest.fn().mockImplementation((x) =>
+        responseMap(x, {
+          "/api/Quote/Get/": notOkProjectResponse,
+          "/api/Rate/Active": notOkRateResponse,
+        })
+      );
+
       render(
         <MemoryRouter initialEntries={["/quote/create/1"]}>
           <Route path="/quote/create/:projectId">
@@ -57,23 +95,6 @@ describe("Quote Container", () => {
   });
   it("loads field request", async () => {
     await act(async () => {
-      const response = {
-        status: 200,
-        ok: true,
-        json: () => Promise.resolve(fakeProjectWithQuote),
-      };
-
-      const response2 = {
-        status: 200,
-        ok: true,
-        json: () => Promise.resolve(sampleRates),
-      };
-
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(response)) // return project info
-        .mockImplementationOnce(() => Promise.resolve(response2)); // return rate info
-
       render(
         <MemoryRouter initialEntries={["/quote/create/3"]}>
           <Route path="/quote/create/:projectId">
