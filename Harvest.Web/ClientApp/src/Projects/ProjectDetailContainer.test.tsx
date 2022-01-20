@@ -11,6 +11,7 @@ import {
   fakeProject,
   fakeTickets,
 } from "../Test/mockData";
+import { responseMap } from "../Test/testHelpers";
 
 let container: Element;
 
@@ -82,13 +83,15 @@ describe("Project Detail Container", () => {
 
   it("Load details", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(projectResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse))
-        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse));
+      global.fetch = jest.fn().mockImplementation((x) =>
+        responseMap(x, {
+          "/api/Project/Get/": projectResponse,
+          "/api/Invoice/List/": invoiceResponse,
+          "/api/Ticket/GetList": ticketResponses,
+          "/api/expense/getunbilledtotal/": unbilledResponse,
+          "/api/File/GetUploadDetails": fileResponse,
+        })
+      );
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
@@ -108,13 +111,15 @@ describe("Project Detail Container", () => {
 
   it("Display correct number of attachments", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(projectResponse))
-        .mockImplementationOnce(() => Promise.resolve(fileResponse))
-        .mockImplementationOnce(() => Promise.resolve(unbilledResponse))
-        .mockImplementationOnce(() => Promise.resolve(ticketResponses))
-        .mockImplementationOnce(() => Promise.resolve(invoiceResponse));
+      global.fetch = jest.fn().mockImplementation((x) =>
+        responseMap(x, {
+          "/api/Project/Get/": projectResponse,
+          "/api/Invoice/List/": invoiceResponse,
+          "/api/Ticket/GetList": ticketResponses,
+          "/api/expense/getunbilledtotal/": unbilledResponse,
+          "/api/File/GetUploadDetails": fileResponse,
+        })
+      );
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
