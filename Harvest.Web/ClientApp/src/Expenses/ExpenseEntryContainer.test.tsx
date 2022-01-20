@@ -5,14 +5,33 @@ import { act, Simulate } from "react-dom/test-utils";
 
 import { ExpenseEntryContainer } from "./ExpenseEntryContainer";
 import { fakeAppContext, sampleRates, fakeProject } from "../Test/mockData";
+import { responseMap } from "../Test/testHelpers";
 
 let container: Element;
 
 beforeEach(() => {
+  const projectResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeProject),
+  };
+  const rateResponse = {
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(sampleRates),
+  };
+
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
+
+  global.fetch = jest.fn().mockImplementation((x) =>
+    responseMap(x, {
+      "/api/Project": projectResponse,
+      "/api/Rate/Active": rateResponse,
+    })
+  );
 });
 
 afterEach(() => {
@@ -27,23 +46,7 @@ afterEach(() => {
 });
 
 describe("Expense Entry Container", () => {
-  const projectResponse = {
-    status: 200,
-    ok: true,
-    json: () => Promise.resolve(fakeProject),
-  };
-  const rateResponse = {
-    status: 200,
-    ok: true,
-    json: () => Promise.resolve(sampleRates),
-  };
-
   it("Generic Activity Default", async () => {
-    global.fetch = jest
-      .fn()
-      .mockImplementationOnce(() => Promise.resolve(rateResponse))
-      .mockImplementationOnce(() => Promise.resolve(projectResponse));
-
     await act(async () => {
       render(
         <MemoryRouter initialEntries={["/expense/entry/3"]}>
@@ -63,11 +66,6 @@ describe("Expense Entry Container", () => {
 
   it("Rate Reflection", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(rateResponse))
-        .mockImplementationOnce(() => Promise.resolve(projectResponse));
-
       render(
         <MemoryRouter initialEntries={["/expense/entry/3"]}>
           <Route path="/expense/entry/:projectId">
@@ -93,11 +91,6 @@ describe("Expense Entry Container", () => {
 
   it("Total Value", async () => {
     await act(async () => {
-      global.fetch = jest
-        .fn()
-        .mockImplementationOnce(() => Promise.resolve(rateResponse))
-        .mockImplementationOnce(() => Promise.resolve(projectResponse));
-
       render(
         <MemoryRouter initialEntries={["/expense/entry/3"]}>
           <Route path="/expense/entry/:projectId">
