@@ -88,4 +88,75 @@ describe("Request Container", () => {
     const messageContent = container.querySelector("div")?.textContent;
     expect(messageContent).toContain("Loading");
   });
+
+  it("Load details", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/ticket/List/3"]}>
+            <Route path="/ticket/List/:projectId">
+              <TicketsContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const fieldTitle = container.querySelector("#request-title")?.textContent;
+    expect(fieldTitle).toContain("Field Request #3");
+  });
+
+  it("Has back to project", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/ticket/List/3"]}>
+            <Route path="/ticket/List/:projectId">
+              <TicketsContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const fieldTitle = container.querySelector(".green-bg-border")?.textContent;
+    expect(fieldTitle).toContain("Back to project details");
+  });
+  it("Displays Text List of all tickets for your project", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/ticket/List/3"]}>
+            <Route path="/ticket/List/:projectId">
+              <TicketsContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const fieldTitle = container.querySelector("#ticketTable")?.textContent;
+    expect(fieldTitle).toContain("List of all tickets for your project");
+  });
+
+  it("Has Link Create Ticket", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/ticket/List/3"]}>
+            <Route path="/ticket/List/:projectId">
+              <TicketsContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const fieldTitle = container.querySelector("#ticketTable")?.textContent;
+    expect(fieldTitle).toContain("Create Ticket");
+  });
 });
