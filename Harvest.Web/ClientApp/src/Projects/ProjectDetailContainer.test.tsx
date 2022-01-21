@@ -156,10 +156,52 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const ticketTable = document.querySelectorAll("tbody")[0]; //TODO: Better selector for this
+    const ticketTable = document
+      .querySelector("#recentTicketContainer")
+      ?.querySelector("tbody");
     const rows = ticketTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(4);
+  });
+
+  it("Display create ticket", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketTable = document.querySelector(
+      "#recentTicketContainer"
+    )?.textContent;
+    expect(ticketTable).toContain("Create Ticket");
+  });
+
+  it("Display ticket View All", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketTable = document.querySelector(
+      "#recentTicketContainer"
+    )?.textContent;
+    expect(ticketTable).toContain("View All");
   });
 
   it("Display correct number of recent invoices", async () => {
@@ -176,9 +218,31 @@ describe("Project Detail Container", () => {
       );
     });
 
-    const invoiceTable = document.querySelectorAll("tbody")[1];
+    const invoiceTable = document
+      .querySelector?.("#recentInvoiceContainer")
+      ?.querySelector("tbody");
     const rows = invoiceTable?.querySelectorAll(".rt-tr-group");
 
     expect(rows?.length).toBe(3);
+  });
+
+  it("Display invoice View All", async () => {
+    await act(async () => {
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <MemoryRouter initialEntries={["/project/details/3"]}>
+            <Route path="/project/details/:projectId">
+              <ProjectDetailContainer />
+            </Route>
+          </MemoryRouter>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const ticketTable = document.querySelector(
+      "#recentInvoiceContainer"
+    )?.textContent;
+    expect(ticketTable).toContain("View All");
   });
 });

@@ -25,5 +25,5 @@ describe("Request Container", () => {
     );
     const linkElement = screen.getByText(/You have the following roles:/i);
     expect(linkElement).toBeInTheDocument();
-  })
-})
+  });
+});
