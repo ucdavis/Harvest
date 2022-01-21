@@ -6,7 +6,8 @@
     Layout = "_EmailLayout_mjml";
 }
 
-<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+<mj-section border-top="4px solid #266041" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc"
+    background-color="#ffffff" padding-bottom="20px" padding-top="20px">
     <mj-column width="100%" vertical-align="top">
         <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
             <p>@@Model.Title</p>
@@ -17,22 +18,30 @@
     </mj-column>
 </mj-section>
 
-<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#EBF1EE" border-top="1px solid #DEEEFF" border-bottom="1px solid #DEEEFF" padding-bottom="0px" padding-top="0px">
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#EBF1EE"
+    border-top="1px solid #DEEEFF" border-bottom="1px solid #DEEEFF" padding-bottom="0px" padding-top="0px">
     <mj-column width="50%" vertical-align="top">
-        <mj-text align="center" font-size="18px" line-height="1.5" color="#000000" padding-right="25px" padding-bottom="0px" padding-top="0">
+        <mj-text align="center" font-size="18px" line-height="1.5" color="#000000" padding-right="25px"
+            padding-bottom="0px" padding-top="0">
 
         </mj-text>
-        <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle" border="none" padding="15px 30px" border-radius="3px" href="@@Model.ButtonUrlForInvoice" padding-left="25px" padding-right="25px" padding-bottom="10px">@@Model.ButtonInvoiceText</mj-button>
+        <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle"
+            border="none" padding="15px 30px" border-radius="3px" href="@@Model.ButtonUrlForInvoice" padding-left="25px"
+            padding-right="25px" padding-bottom="10px">@@Model.ButtonInvoiceText</mj-button>
     </mj-column>
     <mj-column width="50%" vertical-align="top">
-        <mj-text align="center" font-size="18px" line-height="1.5" color="#000000" padding-right="25px" padding-bottom="0px" padding-top="0">
+        <mj-text align="center" font-size="18px" line-height="1.5" color="#000000" padding-right="25px"
+            padding-bottom="0px" padding-top="0">
 
         </mj-text>
-        <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle" border="none" padding="15px 30px" border-radius="3px" href="@@Model.ButtonUrlForProject" padding-left="25px" padding-right="25px" padding-bottom="10px">@@Model.ButtonProjectText</mj-button>
+        <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle"
+            border="none" padding="15px 30px" border-radius="3px" href="@@Model.ButtonUrlForProject" padding-left="25px"
+            padding-right="25px" padding-bottom="10px">@@Model.ButtonProjectText</mj-button>
     </mj-column>
 </mj-section>
 
-<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="10px" padding-top="5px">
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff"
+    padding-bottom="10px" padding-top="5px">
     <mj-column width="90%" vertical-align="top" border-bottom="1px solid #c7c8cc">
         <mj-text padding-top="20px" padding-left="0px" padding-bottom="0px">
             <h4>Notification Details</h4>
@@ -40,16 +49,22 @@
     </mj-column>
 </mj-section>
 
-<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff"
+    padding-top="20px" padding-bottom="0px">
     <mj-column width="90%" vertical-align="top">
         <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
             <h2>@@Model.ProjectName</h2>
         </mj-text>
     </mj-column>
+</mj-section>
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff"
+    padding-top="0px">
     <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
-        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Status", "@Model.InvoiceStatus"))
-        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Created On", "@Model.InvoiceCreatedOn"))
-        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Amount", "@Model.InvoiceAmount"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Status",
+        "@Model.InvoiceStatus"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Created On",
+        "@Model.InvoiceCreatedOn"))
+        @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Amount",
+        "@Model.InvoiceAmount"))
     </mj-column>
 </mj-section>
-
