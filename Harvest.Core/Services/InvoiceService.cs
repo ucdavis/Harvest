@@ -195,6 +195,9 @@ namespace Harvest.Core.Services
                     await _historyService.ProjectCompleted(project.Id, project);
                     resultMessage = "Final invoice created. Project has been marked 'Completed'.";
                 }
+
+                //Email FM that PI has confirmed the closeout
+                await _emailService.ProjectClosed(project);
             }
 
             await _dbContext.SaveChangesAsync();

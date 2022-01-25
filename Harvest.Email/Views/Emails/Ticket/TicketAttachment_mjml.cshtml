@@ -40,24 +40,28 @@
     </mj-column>
 </mj-section>
 
-<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="0px" padding-top="20px">
     <mj-column width="90%" vertical-align="top">
         <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
             <h2>@@Model.ProjectName</h2>
         </mj-text>
     </mj-column>
+</mj-section>
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="0px">
     <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
         @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("On", "@Model.CreatedOn"))
         @await Html.PartialAsync("_EmailInnerDetails_mjml", new EmailInnerDetailsModel("Subject", "@Model.Subject"))
     </mj-column>
 </mj-section>
 
-<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="0px" padding-top="20px">
     <mj-column width="90%" vertical-align="top">
         <mj-text padding-top="0px" padding-left="0px" padding-bottom="0px">
             <h2>Attachment(s) -- (view the ticket to download them)</h2>
         </mj-text>
     </mj-column>
+</mj-section>
+<mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="0px">
 
     <mj-column width="90%" vertical-align="top" border-left="4px solid #266041" padding-left="10px">
         <mj-table>

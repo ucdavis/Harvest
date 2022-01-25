@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Email.Models.Invoice;
+using Harvest.Email.Models.Ticket;
 
 namespace Harvest.Web.Controllers
 {
@@ -31,11 +32,11 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> TestBody()
         {
-            var model = new InvoiceEmailModel();
+            var model = new ProjectClosedModel();
+      
 
 
-
-            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceCreated_mjml.cshtml", model);
+            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProjectClosed_mjml.cshtml", model);
 
             return Content(results);
         }
@@ -113,7 +114,7 @@ namespace Harvest.Web.Controllers
 
         public async Task<IActionResult> TestInvoiceTooBig()
         {
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 2);
             if (await _emailService.InvoiceExceedsQuote(project, 12345.67000m, 530.00000m))
             {
                 return Content("Done.");
@@ -139,6 +140,21 @@ namespace Harvest.Web.Controllers
         {
             var invoice = await _dbContext.Invoices.SingleAsync(a => a.Id == 4);
             var rtValue = await _emailService.InvoiceDone(invoice, "Cancelled");
+            return Content($"Email was {rtValue}");
+        }
+
+        public async Task<IActionResult> TestInvoiceErrors()
+        {
+            var invoice = await _dbContext.Invoices.SingleAsync(a => a.Id == 1);
+            var rtValue = await _emailService.InvoiceError(invoice);
+            return Content($"Email was {rtValue}");
+        }
+
+        public async Task<IActionResult> TestCloseoutApproved()
+        {
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == 19);
+            var rtValue = await _emailService.ProjectClosed(project);
+
             return Content($"Email was {rtValue}");
         }
     }

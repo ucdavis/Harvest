@@ -614,6 +614,8 @@ namespace Harvest.Core.Services
         {
             try
             {
+                project = await CheckForMissingDataForProject(project);
+
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var emailTo = await FieldManagersEmails();
                 var ccEmails = new string[] { project.PrincipalInvestigator.Email };
@@ -654,6 +656,22 @@ namespace Harvest.Core.Services
             {
                 project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == invoice.ProjectId);
+            }
+
+            return project;
+        }
+
+        private async Task<Project> CheckForMissingDataForProject(Project project)
+        {
+            if (project == null)
+            {
+                throw new Exception("Pjoject is null");
+            }
+
+            if (project.PrincipalInvestigator == null || project.Accounts == null)
+            {
+                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
+                    .SingleAsync(a => a.Id == project.Id);
             }
 
             return project;
