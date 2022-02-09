@@ -34,6 +34,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(i => i.Expenses)
                 .ThenInclude(e => e.Rate)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .SingleAsync(i => i.Id == invoiceId);
 
             if (invoice.ProjectId != projectId)
@@ -46,6 +47,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.CreatedBy)
                 .Include(p => p.Accounts)
                 .AsNoTracking()
+                .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
 
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
