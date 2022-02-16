@@ -44,7 +44,7 @@ beforeEach(() => {
     responseMap(x, {
       "/api/Quote/Get/": quoteResponse,
       "/api/Rate/Active": rateResponse,
-    })
+    } as any)
   );
 });
 
@@ -77,7 +77,7 @@ describe("Quote Container", () => {
         responseMap(x, {
           "/api/Quote/Get/": notOkProjectResponse,
           "/api/Rate/Active": notOkRateResponse,
-        })
+        } as any)
       );
 
       render(

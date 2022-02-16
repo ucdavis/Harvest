@@ -36,7 +36,7 @@ beforeEach(() => {
     responseMap(x, {
       "/api/Project/Get/": projectResponse,
       "/api/Ticket/GetList": ticketResponses,
-    })
+    } as any)
   );
 });
 
@@ -70,7 +70,7 @@ describe("Request Container", () => {
         responseMap(x, {
           "/api/Project/Get/": notOkProjectResponse,
           "/api/Ticket/GetList": notOkticketResponses,
-        })
+        } as any)
       );
 
       render(

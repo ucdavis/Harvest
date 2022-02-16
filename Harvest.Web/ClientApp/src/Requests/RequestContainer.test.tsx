@@ -38,7 +38,7 @@ beforeEach(() => {
       "/api/Project": projectResponse,
       "/api/File/": fileResponse,
       "/api/Crop": cropResponse,
-    })
+    } as any)
   );
 });
 

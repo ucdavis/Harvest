@@ -58,7 +58,7 @@ beforeEach(() => {
       "/api/Ticket/GetList": ticketResponses,
       "/api/expense/getunbilledtotal/": unbilledResponse,
       "/api/File/GetUploadDetails": fileResponse,
-    })
+    } as any)
   );
 });
 
@@ -85,7 +85,7 @@ describe("Project Detail Container", () => {
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
           "/api/Project/Get/": notOkProjectResponse,
-        })
+        } as any)
       );
 
       render(

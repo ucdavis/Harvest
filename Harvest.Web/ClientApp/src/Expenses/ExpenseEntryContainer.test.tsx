@@ -30,7 +30,7 @@ beforeEach(() => {
     responseMap(x, {
       "/api/Project": projectResponse,
       "/api/Rate/Active": rateResponse,
-    })
+    } as any)
   );
 });
 
