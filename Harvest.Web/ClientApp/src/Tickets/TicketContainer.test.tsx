@@ -15,17 +15,17 @@ import "jest-canvas-mock";
 let container: Element;
 
 beforeEach(() => {
-  const projectResponse = {
+  const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(fakeProject),
-  };
+    json: () => fakeProject,
+  });
 
-  const ticketResponses = {
+  const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(fakeTickets),
-  };
+    json: () => fakeTickets,
+  });
 
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
@@ -36,7 +36,7 @@ beforeEach(() => {
     responseMap(x, {
       "/api/Project/Get/": projectResponse,
       "/api/Ticket/GetList": ticketResponses,
-    } as any)
+    })
   );
 });
 
@@ -53,16 +53,16 @@ afterEach(() => {
 
 describe("Request Container", () => {
   it("Shows loading screen", async () => {
-    const notOkProjectResponse = {
+    const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => Promise.resolve(undefined),
-    };
-    const notOkticketResponses = {
+      json: () => undefined,
+    });
+    const notOkticketResponses = Promise.resolve({
       status: 200,
       ok: true,
-      json: () => Promise.resolve(undefined),
-    };
+      json: () => undefined,
+    });
 
     await act(async () => {
       //Clear out the fetch mock and return a not ok for the loading text
@@ -70,7 +70,7 @@ describe("Request Container", () => {
         responseMap(x, {
           "/api/Project/Get/": notOkProjectResponse,
           "/api/Ticket/GetList": notOkticketResponses,
-        } as any)
+        })
       );
 
       render(

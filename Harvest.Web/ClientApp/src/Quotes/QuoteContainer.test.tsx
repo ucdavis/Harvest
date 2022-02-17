@@ -23,17 +23,17 @@ jest.mock("react-leaflet", () => ({
 }));
 
 beforeEach(() => {
-  const quoteResponse = {
+  const quoteResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(fakeProjectWithQuote),
-  };
+    json: () => fakeProjectWithQuote,
+  });
 
-  const rateResponse = {
+  const rateResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(sampleRates),
-  };
+    json: () => sampleRates,
+  });
 
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
@@ -44,7 +44,7 @@ beforeEach(() => {
     responseMap(x, {
       "/api/Quote/Get/": quoteResponse,
       "/api/Rate/Active": rateResponse,
-    } as any)
+    })
   );
 });
 
@@ -61,23 +61,23 @@ afterEach(() => {
 
 describe("Quote Container", () => {
   it("Shows loading screen", async () => {
-    const notOkProjectResponse = {
+    const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => Promise.resolve(fakeProjectWithQuote),
-    };
-    const notOkRateResponse = {
+      json: () => fakeProjectWithQuote,
+    });
+    const notOkRateResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => Promise.resolve(sampleRates),
-    };
+      json: () => sampleRates,
+    });
 
     await act(async () => {
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
           "/api/Quote/Get/": notOkProjectResponse,
           "/api/Rate/Active": notOkRateResponse,
-        } as any)
+        })
       );
 
       render(

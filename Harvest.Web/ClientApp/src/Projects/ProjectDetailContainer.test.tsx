@@ -16,35 +16,35 @@ import { responseMap } from "../Test/testHelpers";
 let container: Element;
 
 beforeEach(() => {
-  const projectResponse = {
+  const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(fakeProject),
-  };
+    json: () => fakeProject,
+  });
 
-  const unbilledResponse = {
+  const unbilledResponse = Promise.resolve({
     status: 200,
     ok: true,
-    text: () => Promise.resolve("0.00"),
-  };
+    text: () => "0.00",
+  });
 
-  const fileResponse = {
+  const fileResponse = Promise.resolve({
     status: 200,
     ok: true,
-    text: () => Promise.resolve("file 1"),
-  };
+    text: () => "file 1",
+  });
 
-  const invoiceResponse = {
+  const invoiceResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(fakeInvoices),
-  };
+    json: () => fakeInvoices,
+  });
 
-  const ticketResponses = {
+  const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => Promise.resolve(fakeTickets),
-  };
+    json: () => fakeTickets,
+  });
 
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
@@ -58,7 +58,7 @@ beforeEach(() => {
       "/api/Ticket/GetList": ticketResponses,
       "/api/expense/getunbilledtotal/": unbilledResponse,
       "/api/File/GetUploadDetails": fileResponse,
-    } as any)
+    })
   );
 });
 
@@ -74,18 +74,18 @@ afterEach(() => {
 
 describe("Project Detail Container", () => {
   it("Shows loading screen", async () => {
-    const notOkProjectResponse = {
+    const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => Promise.resolve(fakeProject),
-    };
+      json: () => fakeProject,
+    });
 
     await act(async () => {
       //Clear out the fetch mock and return a not ok for the loading text
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
           "/api/Project/Get/": notOkProjectResponse,
-        } as any)
+        })
       );
 
       render(
