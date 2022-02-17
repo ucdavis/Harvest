@@ -18,13 +18,13 @@ beforeEach(() => {
   const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeProject,
+    json: () => Promise.resolve(fakeProject),
   });
 
   const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeTickets,
+    json: () => Promise.resolve(fakeTickets),
   });
 
   (global as any).Harvest = fakeAppContext;
@@ -56,12 +56,12 @@ describe("Request Container", () => {
     const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => undefined,
+      json: () => Promise.resolve(undefined),
     });
     const notOkticketResponses = Promise.resolve({
       status: 200,
       ok: true,
-      json: () => undefined,
+      json: () => Promise.resolve(undefined),
     });
 
     await act(async () => {

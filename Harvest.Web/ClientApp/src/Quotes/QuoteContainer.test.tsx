@@ -26,13 +26,13 @@ beforeEach(() => {
   const quoteResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeProjectWithQuote,
+    json: () => Promise.resolve(fakeProjectWithQuote),
   });
 
   const rateResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => sampleRates,
+    json: () => Promise.resolve(sampleRates),
   });
 
   (global as any).Harvest = fakeAppContext;
@@ -64,12 +64,12 @@ describe("Quote Container", () => {
     const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => fakeProjectWithQuote,
+      json: () => Promise.resolve(fakeProjectWithQuote),
     });
     const notOkRateResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => sampleRates,
+      json: () => Promise.resolve(sampleRates),
     });
 
     await act(async () => {

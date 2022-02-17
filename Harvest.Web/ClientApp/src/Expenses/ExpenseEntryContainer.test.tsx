@@ -13,12 +13,12 @@ beforeEach(() => {
   const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeProject,
+    json: () => Promise.resolve(fakeProject),
   });
   const rateResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => sampleRates,
+    json: () => Promise.resolve(sampleRates),
   });
 
   (global as any).Harvest = fakeAppContext;

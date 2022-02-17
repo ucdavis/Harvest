@@ -19,31 +19,31 @@ beforeEach(() => {
   const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeProject,
+    json: () => Promise.resolve(fakeProject),
   });
 
   const unbilledResponse = Promise.resolve({
     status: 200,
     ok: true,
-    text: () => "0.00",
+    text: () => Promise.resolve("0.00"),
   });
 
   const fileResponse = Promise.resolve({
     status: 200,
     ok: true,
-    text: () => "file 1",
+    text: () => Promise.resolve("file 1"),
   });
 
   const invoiceResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeInvoices,
+    json: () => Promise.resolve(fakeInvoices),
   });
 
   const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeTickets,
+    json: () => Promise.resolve(fakeTickets),
   });
 
   (global as any).Harvest = fakeAppContext;
@@ -77,7 +77,7 @@ describe("Project Detail Container", () => {
     const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
-      json: () => fakeProject,
+      json: () => Promise.resolve(fakeProject),
     });
 
     await act(async () => {

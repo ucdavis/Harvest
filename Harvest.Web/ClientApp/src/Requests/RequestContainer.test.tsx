@@ -14,19 +14,19 @@ beforeEach(() => {
   const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeProject,
+    json: () => Promise.resolve(fakeProject),
   });
 
   const fileResponse = Promise.resolve({
     status: 200,
     ok: true,
-    text: () => "file 1",
+    text: () => Promise.resolve("file 1"),
   });
 
   const cropResponse = Promise.resolve({
     status: 200,
     ok: true,
-    json: () => fakeCrops.filter((c) => c.type === "Row"),
+    json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
   });
 
   (global as any).Harvest = fakeAppContext;
