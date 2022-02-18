@@ -11,23 +11,23 @@ import "jest-canvas-mock";
 let container: Element;
 
 beforeEach(() => {
-  const projectResponse = {
+  const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
     json: () => Promise.resolve(fakeProject),
-  };
+  });
 
-  const fileResponse = {
+  const fileResponse = Promise.resolve({
     status: 200,
     ok: true,
     text: () => Promise.resolve("file 1"),
-  };
+  });
 
-  const cropResponse = {
+  const cropResponse = Promise.resolve({
     status: 200,
     ok: true,
     json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
-  };
+  });
 
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target

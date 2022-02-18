@@ -16,35 +16,35 @@ import { responseMap } from "../Test/testHelpers";
 let container: Element;
 
 beforeEach(() => {
-  const projectResponse = {
+  const projectResponse = Promise.resolve({
     status: 200,
     ok: true,
     json: () => Promise.resolve(fakeProject),
-  };
+  });
 
-  const unbilledResponse = {
+  const unbilledResponse = Promise.resolve({
     status: 200,
     ok: true,
     text: () => Promise.resolve("0.00"),
-  };
+  });
 
-  const fileResponse = {
+  const fileResponse = Promise.resolve({
     status: 200,
     ok: true,
     text: () => Promise.resolve("file 1"),
-  };
+  });
 
-  const invoiceResponse = {
+  const invoiceResponse = Promise.resolve({
     status: 200,
     ok: true,
     json: () => Promise.resolve(fakeInvoices),
-  };
+  });
 
-  const ticketResponses = {
+  const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
     json: () => Promise.resolve(fakeTickets),
-  };
+  });
 
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
@@ -74,11 +74,11 @@ afterEach(() => {
 
 describe("Project Detail Container", () => {
   it("Shows loading screen", async () => {
-    const notOkProjectResponse = {
+    const notOkProjectResponse = Promise.resolve({
       status: 200,
       ok: false,
       json: () => Promise.resolve(fakeProject),
-    };
+    });
 
     await act(async () => {
       //Clear out the fetch mock and return a not ok for the loading text
