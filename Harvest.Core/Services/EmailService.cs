@@ -76,7 +76,7 @@ namespace Harvest.Core.Services
                 var model = new ProfessorQuoteModel()
                 {
                     ProfName = project.PrincipalInvestigator.Name,
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                     QuoteAmount = quote.Total.ToString("C"),
@@ -110,7 +110,7 @@ namespace Harvest.Core.Services
             var model = new NewFieldRequestModel()
             {
                 PI = project.PrincipalInvestigator.NameAndEmail,
-                ProjectName = project.Name,
+                ProjectName = project.NameAndId,
                 ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                 ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                 CropType = project.CropType,
@@ -142,7 +142,7 @@ namespace Harvest.Core.Services
             var model = new ChangeRequestModel()
             {
                 PI = project.PrincipalInvestigator.NameAndEmail,
-                ProjectName = project.Name,
+                ProjectName = project.NameAndId,
                 ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                 ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                 CropType = project.CropType,
@@ -176,7 +176,7 @@ namespace Harvest.Core.Services
             var model = new QuoteDecisionModel()
             {
                 PI = project.PrincipalInvestigator.NameAndEmail,
-                ProjectName = project.Name,
+                ProjectName = project.NameAndId,
                 ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                 ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                 Decision = approved ? "Approved":"Denied",
@@ -255,7 +255,7 @@ namespace Harvest.Core.Services
             var model = new InvoiceExceedsQuoteModel()
             {
                 PI              = project.PrincipalInvestigator.NameAndEmail,
-                ProjectName     = project.Name,
+                ProjectName     = project.NameAndId,
                 ProjectStart    = project.Start.ToPacificTime().Date.Format("d"),
                 ProjectEnd      = project.End.ToPacificTime().Date.Format("d"),
                 InvoiceAmount   = invoiceAmount.ToString("C"),
@@ -288,7 +288,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var model = new NewTicketModel()
                 {
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     PI = project.PrincipalInvestigator.NameAndEmail,
                     CreatedOn = ticket.CreatedOn.ToPacificTime().Date.Format("d"),
                     DueDate = ticket.DueDate.HasValue ? ticket.DueDate.Value.ToPacificTime().Date.Format("d") : "N/A",
@@ -325,7 +325,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var model = new TicketReplyModel()
                 {
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     From = ticketMessage.CreatedBy.NameAndEmail,
                     CreatedOn = ticketMessage.CreatedOn.ToPacificTime().Date.Format("d"),
                     Subject = ticket.Name,
@@ -362,7 +362,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var model = new TicketAttachmentModel()
                 {
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     From = firstAttachment.CreatedBy.NameAndEmail,
                     CreatedOn = firstAttachment.CreatedOn.ToPacificTime().Date.Format("d"),
                     Subject = ticket.Name,   
@@ -405,7 +405,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var model = new TicketReplyModel()
                 {
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     Subject = ticket.Name,
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
                     ButtonUrlForTicket = $"{ticketUrl}{project.Id}/{ticket.Id}",
@@ -433,7 +433,7 @@ namespace Harvest.Core.Services
                     .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
                     {
                         EndDate = s.End.ToShortDateString(),
-                        Name = s.Name,
+                        Name = s.NameAndId,
                         ProjectUrl = $"{_emailSettings.BaseUrl}/Project/Details/{s.Id}"
                     }).ToArrayAsync();
                 if (model == null || model.Length == 0)
@@ -470,7 +470,7 @@ namespace Harvest.Core.Services
                     InvoiceStatus = invoice.Status.SafeHumanizeTitle(),
                     InvoiceId = invoice.Id,
                     InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     Title = $"Invoice {invoice.Id} Has Been Created.",
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
                     ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
@@ -506,7 +506,7 @@ namespace Harvest.Core.Services
                     InvoiceStatus = status.SafeHumanizeTitle(),
                     InvoiceId = invoice.Id,
                     InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     Title = $"Invoice {invoice.Id} Has Been Processed.",
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
                     ButtonUrlForInvoice = $"{invoiceUrl}{project.Id}/{invoice.Id}",
@@ -543,7 +543,7 @@ namespace Harvest.Core.Services
                     InvoiceStatus = invoice.Status.SafeHumanizeTitle(),
                     InvoiceId = invoice.Id,
                     InvoiceCreatedOn = invoice.CreatedOn.ToPacificTime().Date.Format("d"),
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     Title = $"Your project has one or more invalid accounts preventing Invoice {invoice.Id} from being processed.",
                     ButtonUrlForProject = $"{projectUrl}{project.Id}",
                     ButtonProjectText = "Update Accounts",
@@ -587,7 +587,7 @@ namespace Harvest.Core.Services
                 var model = new CloseoutConfirmationModel()
                 {
                     PI = project.PrincipalInvestigator.NameAndEmail,
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                     ButtonUrl1 = $"{projectUrl}{project.Id}",
@@ -623,7 +623,7 @@ namespace Harvest.Core.Services
                 var model = new ProjectClosedModel()
                 {
                     PI = project.PrincipalInvestigator.NameAndEmail,
-                    ProjectName = project.Name,
+                    ProjectName = project.NameAndId,
                     ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
                     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                     ButtonUrl1 = $"{projectUrl}{project.Id}",
