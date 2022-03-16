@@ -43,6 +43,9 @@ namespace Harvest.Core.Domain
         [StringLength(200)]
         public string Name { get; set; }
 
+
+        public string NameAndId => $"{Name} ({Id})";
+
         public int PrincipalInvestigatorId { get; set; }
 
         public User PrincipalInvestigator { get; set; }
