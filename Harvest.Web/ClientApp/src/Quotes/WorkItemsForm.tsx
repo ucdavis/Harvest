@@ -186,7 +186,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
         <div className="col-1 col-md-2">
           <CustomInput
             type="switch"
-            id={`markup-${workItem.id}`}
+            id={`markup-${workItem.id}-${workItem.activityId}`}
             checked={workItem.markup}
             onChange={(e) => {
               props.updateWorkItems({
