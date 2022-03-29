@@ -22,6 +22,8 @@ namespace Harvest.Core.Services
         Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false);
         Task<int> CreateInvoices(bool manualOverride = false);
         Task<List<int>> GetCreatedInvoiceIds();
+
+        Task<int> AutoCloseoutProjects(int daysBeforeAutoCloseout);
     }
 
     public class InvoiceService : IInvoiceService
@@ -231,6 +233,30 @@ namespace Harvest.Core.Services
             //TODO: Check project status?
             return await _dbContext.Invoices.Where(a => a.Status == Invoice.Statuses.Created).Select(a => a.Id)
                 .ToListAsync();
+        }
+
+        /// <summary>
+        /// Automatically closeout projects that are 18 days or older since closeout was initiated.
+        /// </summary>
+        /// <param name="daysBeforeAutoCloseout">Negative Value</param>
+        /// <returns></returns>
+        public async Task<int> AutoCloseoutProjects(int daysBeforeAutoCloseout)
+        {
+            var dateCutoff = DateTime.UtcNow.AddDays(daysBeforeAutoCloseout);
+
+            var count = 0;
+            var potentialProjectIds = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval).Select(a => a.Id).ToArrayAsync();
+            var projectIds = await _dbContext.ProjectHistory.Where(a => a.Action == "ProjectCloseoutInitiated" && potentialProjectIds.Contains(a.ProjectId) && a.ActionDate < dateCutoff).Select(a => a.ProjectId).ToArrayAsync();
+
+            foreach (var projectId in projectIds)
+            {
+                var result = await CreateInvoice(projectId, true);
+                if (!result.IsError)
+                {
+                    count++;
+                }
+            }
+            return count;
         }
     }
 }

@@ -38,7 +38,15 @@ namespace Harvest.Jobs.AutoCloseout
 
         private static async Task ProcessProjectsNeedingAutoCloseout(IInvoiceService invoiceService)
         {
-
+            try
+            {
+                var count = await invoiceService.AutoCloseoutProjects(-18);
+                Log.Information($"Projects Auto Approved for closeout: {count}");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.InnerException.Message);
+            }
         }
 
         private static async Task ProcessNotifications(IEmailService emailService)
