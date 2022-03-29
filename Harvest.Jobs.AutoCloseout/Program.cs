@@ -53,7 +53,7 @@ namespace Harvest.Jobs.AutoCloseout
         {
             try
             {
-                var count = await emailService.ResendCloseoutNotifications();
+                var count = await emailService.SendCloseoutNotifications();
                 Log.Information($"Projects awaiting closeout confirmation resent: {count}");
             }
             catch (Exception ex)

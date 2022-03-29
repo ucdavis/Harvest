@@ -47,7 +47,7 @@ namespace Harvest.Core.Services
         Task<bool> CloseoutConfirmation(Project project, bool ccFieldManagers = true); //Project is awaiting PI to close it
         Task<bool> ProjectClosed(Project project); //Project has been closed by PI
 
-        Task<int> ResendCloseoutNotifications();
+        Task<int> SendCloseoutNotifications();
     }
 
     public class EmailService : IEmailService
@@ -612,7 +612,7 @@ namespace Harvest.Core.Services
             return true;
         }
 
-        public async Task<int> ResendCloseoutNotifications()
+        public async Task<int> SendCloseoutNotifications()
         {
             var count = 0;
             var projectsAwaitingCloseout = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval).ToArrayAsync();
