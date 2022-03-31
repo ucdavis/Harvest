@@ -44,8 +44,10 @@ namespace Harvest.Core.Services
         Task<bool> InvoiceDone(Invoice invoice, string status);
         Task<bool> InvoiceError(Invoice invoice);
 
-        Task<bool> CloseoutConfirmation(Project project); //Project is awaiting PI to close it
+        Task<bool> CloseoutConfirmation(Project project, bool ccFieldManagers = true); //Project is awaiting PI to close it
         Task<bool> ProjectClosed(Project project); //Project has been closed by PI
+
+        Task<int> SendCloseoutNotifications();
     }
 
     public class EmailService : IEmailService
@@ -575,14 +577,14 @@ namespace Harvest.Core.Services
             return true;
         }
 
-        public async Task<bool> CloseoutConfirmation(Project project)
+        public async Task<bool> CloseoutConfirmation(Project project, bool ccFieldManagers = true)
         {
             try
             {
                 var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
                 var closeoutUrl = $"{_emailSettings.BaseUrl}/Project/CloseoutConfirmation/";
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
-                var ccEmails = await FieldManagersEmails();
+                var ccEmails = ccFieldManagers ? await FieldManagersEmails() : null;
 
                 var model = new CloseoutConfirmationModel()
                 {
@@ -608,6 +610,24 @@ namespace Harvest.Core.Services
             }
 
             return true;
+        }
+
+        public async Task<int> SendCloseoutNotifications()
+        {
+            var count = 0;
+            var projectsAwaitingCloseout = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval).ToArrayAsync();
+            if (projectsAwaitingCloseout.Any())
+            {
+                foreach(var project in projectsAwaitingCloseout)
+                {
+                    if(await CloseoutConfirmation(project, false))
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
         }
 
         public async Task<bool> ProjectClosed(Project project)
@@ -676,5 +696,7 @@ namespace Harvest.Core.Services
 
             return project;
         }
+
+
     }
 }

@@ -1227,7 +1227,7 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe("Project is not Active");
 
-            MockEmailService.Verify(a => a.CloseoutConfirmation(It.IsAny<Project>()), times: Times.Never);
+            MockEmailService.Verify(a => a.CloseoutConfirmation(It.IsAny<Project>(), true), times: Times.Never);
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
             MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
         }
@@ -1243,7 +1243,7 @@ namespace Test.TestsServices
             Projects[1].ChargedTotal = Projects[1].QuoteTotal - 1; //1 dollar left
 
             MockData();
-            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1])).ReturnsAsync(true);
+            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1], true)).ReturnsAsync(true);
 
             Projects[1].IsActive.ShouldBe(true);
             Projects[1].Status.ShouldBe(status);
@@ -1253,7 +1253,7 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe("Project has unbilled expenses that exceed the quote total");
 
-            MockEmailService.Verify(a => a.CloseoutConfirmation(It.IsAny<Project>()), times: Times.Never);
+            MockEmailService.Verify(a => a.CloseoutConfirmation(It.IsAny<Project>(), true), times: Times.Never);
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
             MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
         }
@@ -1268,7 +1268,7 @@ namespace Test.TestsServices
             Projects[1].IsActive = true;
             Projects[1].Status = status;
             MockData();
-            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1])).ReturnsAsync(false);
+            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1], true)).ReturnsAsync(false);
 
             Projects[1].IsActive.ShouldBe(true);
             Projects[1].Status.ShouldBe(status);
@@ -1277,7 +1277,7 @@ namespace Test.TestsServices
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
             rtValue.Message.ShouldBe("Failed to send confirmation email");
-            MockEmailService.Verify(a => a.CloseoutConfirmation(Projects[1]), times: Times.Once);
+            MockEmailService.Verify(a => a.CloseoutConfirmation(Projects[1], true), times: Times.Once);
 
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Never);
             MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Never);
@@ -1292,7 +1292,7 @@ namespace Test.TestsServices
             Projects[1].IsActive = true;
             Projects[1].Status = status;
             MockData();
-            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1])).ReturnsAsync(true);
+            MockEmailService.Setup(a => a.CloseoutConfirmation(Projects[1], true)).ReturnsAsync(true);
 
             Projects[1].IsActive.ShouldBe(true);
             Projects[1].Status.ShouldBe(status);
@@ -1303,7 +1303,7 @@ namespace Test.TestsServices
             rtValue.Message.ShouldBe("Closeout initiated. An approval request has been sent to project's PI.");
 
             Projects[1].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
-            MockEmailService.Verify(a => a.CloseoutConfirmation(Projects[1]), times: Times.Once);
+            MockEmailService.Verify(a => a.CloseoutConfirmation(Projects[1], true), times: Times.Once);
 
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockProjectHistoryService.Verify(a => a.ProjectCloseoutInitiated(It.IsAny<int>(), It.IsAny<Project>()), Times.Once);
