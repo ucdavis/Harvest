@@ -19,7 +19,7 @@ namespace Harvest.Core.Services
     public interface IInvoiceService
     {
         Task<Result<bool>> InitiateCloseout(int projectId);
-        Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false);
+        Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false, bool isAutoCloseout = false);
         Task<int> CreateInvoices(bool manualOverride = false);
         Task<List<int>> GetCreatedInvoiceIds();
 
@@ -81,7 +81,7 @@ namespace Harvest.Core.Services
             return Result.Value(true, "Closeout initiated. An approval request has been sent to project's PI.");
         }
 
-        public async Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false)
+        public async Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false, bool isAutoCloseout = false)
         {
             var now = _dateTimeService.DateTimeUtcNow();// DateTime.UtcNow;
 
@@ -95,6 +95,11 @@ namespace Harvest.Core.Services
             if (project == null)
             {
                 return Result.Error("No active project found for given projectId: {projectId}", projectId);
+            }
+
+            if(isAutoCloseout)
+            {
+                await _historyService.ProjectAutoCloseout(projectId, project); 
             }
 
             if (isCloseout && project.Status != Project.Statuses.PendingCloseoutApproval)
@@ -251,7 +256,7 @@ namespace Harvest.Core.Services
             foreach (var projectId in projectIds)
             {
                 Log.Information($"Starting auto closeout of project: {projectId}");
-                var result = await CreateInvoice(projectId, true);
+                var result = await CreateInvoice(projectId, true, true);
                 if (result.IsError)
                 { 
                     Log.Error($"Error creating invoice for AutoCloseout. Error: {result.Message}");
