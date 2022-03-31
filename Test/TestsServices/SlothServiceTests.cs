@@ -1029,7 +1029,7 @@ namespace Test.TestsServices
 
             Invoices[1].Status = Invoice.Statuses.Pending;
             Invoices[1].SlothTransactionId = "FakeId";
-            Invoices[1].Project.Status = Project.Statuses.Active; 
+            Invoices[1].Project.UpdateStatus(Project.Statuses.Active); 
             MockData();
 
             await slothService.ProcessTransferUpdates();
@@ -1055,7 +1055,7 @@ namespace Test.TestsServices
             {
                 invoice.Status = Invoice.Statuses.Pending;
                 invoice.SlothTransactionId = "FakeId";
-                invoice.Project.Status = Project.Statuses.Active;
+                invoice.Project.UpdateStatus(Project.Statuses.Active);
             }
 
             MockData();
@@ -1092,7 +1092,7 @@ namespace Test.TestsServices
 
             Invoices[1].Status = Invoice.Statuses.Pending;
             Invoices[1].SlothTransactionId = "FakeId";
-            Invoices[1].Project.Status = Project.Statuses.FinalInvoicePending;
+            Invoices[1].Project.UpdateStatus(Project.Statuses.FinalInvoicePending);
             MockData();
 
             await slothService.ProcessTransferUpdates();

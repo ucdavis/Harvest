@@ -14,6 +14,8 @@ namespace Harvest.Core.Domain
             Accounts = new List<Account>();
             Quotes = new List<Quote>();
             Attachments = new List<ProjectAttachment>();
+            LastStatusUpdatedOn = DateTime.UtcNow;
+            CreatedOn = DateTime.UtcNow;
         }
 
         [Key]
@@ -72,6 +74,7 @@ namespace Harvest.Core.Domain
         public int CreatedById { get; set; }
 
         public DateTime CreatedOn { get; set; }
+        public DateTime LastStatusUpdatedOn { get; set; }
 
         [StringLength(50)]
         [Required]
@@ -107,6 +110,12 @@ namespace Harvest.Core.Domain
         public List<Expense> Expenses { get; set; }
 
         public List<ProjectAttachment> Attachments { get; set; }
+
+        public void UpdateStatus(string newStatus)
+        {
+            Status = newStatus;
+            LastStatusUpdatedOn = DateTime.UtcNow;
+        }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {

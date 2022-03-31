@@ -95,7 +95,7 @@ namespace Harvest.Web.Controllers.Api
             if (submit)
             {
                 quote.Status = Quote.Statuses.Proposed;
-                project.Status = Project.Statuses.PendingApproval;
+                project.UpdateStatus(Project.Statuses.PendingApproval);
                 await _historyService.QuoteSubmitted(projectId, quote);
             }
             else

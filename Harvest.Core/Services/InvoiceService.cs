@@ -72,7 +72,7 @@ namespace Harvest.Core.Services
                 return Result.Error("Failed to send confirmation email");
             }
 
-            project.Status = Project.Statuses.PendingCloseoutApproval;
+            project.UpdateStatus(Project.Statuses.PendingCloseoutApproval);
 
             await _historyService.ProjectCloseoutInitiated(project.Id, project);
 
@@ -129,7 +129,7 @@ namespace Harvest.Core.Services
                 //Don't create an invoice for project past its end date, and just mark it as AwaitingCloseout
                 if (project.End < now)
                 {
-                    project.Status = Project.Statuses.AwaitingCloseout;
+                    project.UpdateStatus(Project.Statuses.AwaitingCloseout);
                     await _dbContext.SaveChangesAsync();
                     return Result.Error("Can't create invoice for project past its end date: {projectId}", projectId);
                 }
@@ -192,13 +192,13 @@ namespace Harvest.Core.Services
             {
                 if (unbilledExpenses.Length > 0)
                 {
-                    project.Status = Project.Statuses.FinalInvoicePending;
+                    project.UpdateStatus(Project.Statuses.FinalInvoicePending);
                     await _historyService.FinalInvoicePending(project.Id, newInvoice);
                     resultMessage = "Final invoice created. Project will be marked 'Completed' upon money movement.";
                 }
                 else
                 {
-                    project.Status = Project.Statuses.Completed;
+                    project.UpdateStatus(Project.Statuses.Completed);
                     await _historyService.ProjectCompleted(project.Id, project);
                     resultMessage = "Final invoice created. Project has been marked 'Completed'.";
                 }

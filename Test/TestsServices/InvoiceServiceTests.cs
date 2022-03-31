@@ -111,7 +111,7 @@ namespace Test.TestsServices
         {
             SetupData();
             Projects[1].IsActive = active;
-            Projects[1].Status = status;
+            Projects[1].UpdateStatus(status);
             MockData();
 
             Projects[1].IsActive.ShouldBe(active);
@@ -131,7 +131,7 @@ namespace Test.TestsServices
         {
             SetupData();
             Projects[1].IsActive = true;
-            Projects[1].Status = Project.Statuses.Active;
+            Projects[1].UpdateStatus(Project.Statuses.Active);
             MockData();
 
             Projects[1].IsActive.ShouldBe(true);
@@ -179,7 +179,7 @@ namespace Test.TestsServices
         {
             SetupData();
             Projects[1].IsActive = active;
-            Projects[1].Status = status;
+            Projects[1].UpdateStatus(status);
             MockData();
 
             Projects[1].IsActive.ShouldBe(active);
@@ -692,7 +692,7 @@ namespace Test.TestsServices
                 expense.Invoice = CreateValidEntities.Invoice(9 + expense.Id, Projects[0].Id);
             }
 
-            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
+            Projects[0].UpdateStatus(Project.Statuses.PendingCloseoutApproval);
             MockData();
             Projects[0].IsActive.ShouldBe(true);
             Projects[0].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
@@ -726,7 +726,7 @@ namespace Test.TestsServices
         public async Task WhenUnbilledExpensesAndCloseout()
         {
             SetupData();
-            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
+            Projects[0].UpdateStatus(Project.Statuses.PendingCloseoutApproval);
             MockData();
             Projects[0].IsActive.ShouldBe(true);
             Projects[0].Status.ShouldBe(Project.Statuses.PendingCloseoutApproval);
@@ -1035,7 +1035,7 @@ namespace Test.TestsServices
         {
             var date = new DateTime(year, month, day).FromPacificTime();
             SetupData();
-            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
+            Projects[0].UpdateStatus(Project.Statuses.PendingCloseoutApproval);
             MockData();
             var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
@@ -1135,7 +1135,7 @@ namespace Test.TestsServices
                 //Set the expenses as billed
                 expense.Invoice = CreateValidEntities.Invoice(9 + expense.Id, Projects[0].Id);
             }
-            Projects[0].Status = Project.Statuses.PendingCloseoutApproval;
+            Projects[0].UpdateStatus(Project.Statuses.PendingCloseoutApproval);
             MockData();
             var devSet = new DevSettings { RecreateDb = false, NightlyInvoices = false, UseSql = false };
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
@@ -1185,7 +1185,7 @@ namespace Test.TestsServices
         {
             SetupData();
             Projects[1].IsActive = true;
-            Projects[1].Status = status;
+            Projects[1].UpdateStatus(status);
             MockData();
 
             Projects[1].IsActive.ShouldBe(true);
@@ -1216,7 +1216,7 @@ namespace Test.TestsServices
         {
             SetupData();
             Projects[1].IsActive = false;
-            Projects[1].Status = status;
+            Projects[1].UpdateStatus(status);
             MockData();
 
             Projects[1].IsActive.ShouldBe(false);
