@@ -15,6 +15,7 @@ namespace Harvest.Core.Domain
             Quotes = new List<Quote>();
             Attachments = new List<ProjectAttachment>();
             LastStatusUpdatedOn = DateTime.UtcNow;
+            CreatedOn = DateTime.UtcNow;
         }
 
         [Key]
