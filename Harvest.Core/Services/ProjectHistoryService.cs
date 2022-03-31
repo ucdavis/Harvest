@@ -28,6 +28,8 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> InvoiceCreated(int projectId, Invoice invoice);
         Task<ProjectHistory> MoveMoneyRequested(int projectId, Invoice invoice);
         Task<ProjectHistory> ProjectCloseoutInitiated(int projectId, Project project);
+        Task<ProjectHistory> ProjectCloseoutApproved(int projectId, Project project);
+        Task<ProjectHistory> ProjectAutoCloseout(int projectId, Project project);
         Task<ProjectHistory> ProjectCompleted(int projectId, Project project);
         Task<ProjectHistory> ProjectRequestCanceled(int projectId, Project project);
         Task<ProjectHistory> ProjectFilesAttached(int projectId, IEnumerable<ProjectAttachment> attachments);
@@ -76,6 +78,10 @@ namespace Harvest.Core.Services
             MakeHistory(projectId, nameof(MoveMoneyRequested), new InvoiceModel(invoice));
         public Task<ProjectHistory> ProjectCloseoutInitiated(int projectId, Project project) =>
             MakeHistory(projectId, nameof(ProjectCloseoutInitiated), new ProjectHistoryModel(project));
+        public Task<ProjectHistory> ProjectCloseoutApproved(int projectId, Project project) =>
+            MakeHistory(projectId, nameof(ProjectCloseoutApproved), new ProjectHistoryModel(project));
+        public Task<ProjectHistory> ProjectAutoCloseout(int projectId, Project project) =>
+            MakeHistory(projectId, nameof(ProjectAutoCloseout), new ProjectHistoryModel(project));
         public Task<ProjectHistory> ProjectCompleted(int projectId, Project project) =>
             MakeHistory(projectId, nameof(ProjectCompleted), new ProjectHistoryModel(project));
         public Task<ProjectHistory> ProjectRequestCanceled(int projectId, Project project) =>
