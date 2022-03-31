@@ -17,12 +17,14 @@ namespace Harvest.Web.Controllers.Api
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IInvoiceService _invoiceService;
+        private readonly IProjectHistoryService _historyService;
 
-        public InvoiceController(AppDbContext dbContext, IUserService userService, IInvoiceService invoiceService)
+        public InvoiceController(AppDbContext dbContext, IUserService userService, IInvoiceService invoiceService, IProjectHistoryService historyService)
         {
-            this._dbContext = dbContext;
-            this._userService = userService;
-            this._invoiceService = invoiceService;
+            _dbContext = dbContext;
+            _userService = userService;
+            _invoiceService = invoiceService;
+            _historyService = historyService;
         }
 
         // Get info on the project as well as invoice
@@ -82,6 +84,10 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> DoCloseout(int projectId)
         {
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            await _historyService.ProjectCloseoutApproved(projectId, project); //Deal with this if the result has errors? I think logging that they approved it is fine, even if it fails.
+            await _dbContext.SaveChangesAsync();
+
             var result = await _invoiceService.CreateInvoice(projectId, true);
             return Ok(result);
         }
