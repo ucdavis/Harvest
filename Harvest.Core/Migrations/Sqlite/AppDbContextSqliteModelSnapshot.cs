@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
+#nullable disable
+
 namespace Harvest.Core.Migrations.Sqlite
 {
     [DbContext(typeof(AppDbContextSqlite))]
@@ -14,8 +16,7 @@ namespace Harvest.Core.Migrations.Sqlite
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "5.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
 
             modelBuilder.Entity("Harvest.Core.Domain.Account", b =>
                 {
@@ -350,6 +351,9 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("LastStatusUpdatedOn")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasMaxLength(200)
