@@ -52,7 +52,7 @@ namespace Harvest.Web.Controllers.Api
                 {Project.Statuses.ChangeRequested, Project.Statuses.Requested, Project.Statuses.QuoteRejected};
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.IsActive && statuses.Contains(a.Status));
             project.IsActive = false;
-            project.Status = Project.Statuses.Canceled;
+            project.UpdateStatus(Project.Statuses.Canceled);
             var quote = await _dbContext.Quotes.SingleOrDefaultAsync(a => a.ProjectId == projectId);
             if (quote != null)
             {
@@ -103,7 +103,7 @@ namespace Harvest.Web.Controllers.Api
                 project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == changeRequestProject.OriginalProjectId);
 
                 changeRequestProject.IsActive = false; // soft delete change request so we don't see it anymore
-                changeRequestProject.Status = Project.Statuses.ChangeApplied;
+                changeRequestProject.UpdateStatus(Project.Statuses.ChangeApplied);
                 changeRequestProject.Quote = originalQuote;
 
                 // replace original project info with newly approved project info
@@ -114,7 +114,7 @@ namespace Harvest.Web.Controllers.Api
                 project.End = changeRequestProject.End;
                 project.IsApproved = true;
                 project.Requirements = changeRequestProject.Requirements;
-                project.Status = Project.Statuses.Active;
+                project.UpdateStatus(Project.Statuses.Active);
                 project.Accounts = new List<Account>();
                 project.Attachments = new List<ProjectAttachment>();
                 project.Quote = quote;
@@ -175,7 +175,7 @@ namespace Harvest.Web.Controllers.Api
             project.AcreageRateId = quoteDetail.AcreageRateId;
             //Ignore accounts that don't have a percentage
             project.Accounts = new List<Account>(model.Accounts.Where(a => a.Percentage > 0.0m).ToArray());
-            project.Status = Project.Statuses.Active;
+            project.UpdateStatus(Project.Statuses.Active);
             project.IsApproved = true;
             project.QuoteTotal = (decimal)quoteDetail.GrandTotal;
             project.Name = quoteDetail.ProjectName;
@@ -228,7 +228,7 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.Tickets.AddAsync(ticketToCreate);
             await _historyService.TicketCreated(project.Id, ticketToCreate);
 
-            project.Status = Project.Statuses.QuoteRejected;
+            project.UpdateStatus(Project.Statuses.QuoteRejected);
             quote.Status = Quote.Statuses.Rejected;
 
             await _historyService.QuoteRejected(project.Id, model.Reason);
@@ -338,7 +338,7 @@ namespace Harvest.Web.Controllers.Api
             {
                 // this project already exists, so we are requesting a change
                 changeRequest = true;
-                newProject.Status = Project.Statuses.ChangeRequested;
+                newProject.UpdateStatus(Project.Statuses.ChangeRequested);
                 newProject.OriginalProjectId = project.Id;
                 newProject.Acres = project.Acres;
 
