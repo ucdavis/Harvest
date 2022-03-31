@@ -250,14 +250,17 @@ namespace Harvest.Core.Services
 
             foreach (var projectId in projectIds)
             {
+                Log.Information($"Starting auto closeout of project: {projectId}");
                 var result = await CreateInvoice(projectId, true);
                 if (result.IsError)
                 { 
                     Log.Error($"Error creating invoice for AutoCloseout. Error: {result.Message}");
+                    Log.Information($"Auto closeout of project {projectId} failed.");
                 }
                 else
                 {
                     count++;
+                    Log.Information($"Auto closeout of project {projectId} succeeded.");
                 }
             }
             return count;
