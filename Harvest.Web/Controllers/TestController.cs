@@ -153,7 +153,7 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestCloseoutApproved()
         {
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == 19);
-            var rtValue = await _emailService.ProjectClosed(project);
+            var rtValue = await _emailService.ProjectClosed(project, true);
 
             return Content($"Email was {rtValue}");
         }

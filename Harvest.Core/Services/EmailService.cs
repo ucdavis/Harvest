@@ -45,7 +45,7 @@ namespace Harvest.Core.Services
         Task<bool> InvoiceError(Invoice invoice);
 
         Task<bool> CloseoutConfirmation(Project project, bool ccFieldManagers = true); //Project is awaiting PI to close it
-        Task<bool> ProjectClosed(Project project); //Project has been closed by PI
+        Task<bool> ProjectClosed(Project project, bool isAutoCloseout); //Project has been closed by PI
 
         Task<int> SendCloseoutNotifications();
     }
@@ -630,7 +630,7 @@ namespace Harvest.Core.Services
             return count;
         }
 
-        public async Task<bool> ProjectClosed(Project project)
+        public async Task<bool> ProjectClosed(Project project, bool isAutoCloseout)
         {
             try
             {
@@ -648,6 +648,7 @@ namespace Harvest.Core.Services
                     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                     ButtonUrl1 = $"{projectUrl}{project.Id}",
                     ButtonText1 = "View Project",
+                    NotificationText = isAutoCloseout ? "your project as been closed-out automatically." : "has approved the closeout of the project.",
                 };
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProjectClosed.cshtml", model);
