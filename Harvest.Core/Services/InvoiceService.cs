@@ -204,7 +204,7 @@ namespace Harvest.Core.Services
                 }
 
                 //Email FM that PI has confirmed the closeout
-                await _emailService.ProjectClosed(project);
+                await _emailService.ProjectClosed(project, isAutoCloseout);
             }
 
             await _dbContext.SaveChangesAsync();
