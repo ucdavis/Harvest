@@ -250,8 +250,7 @@ namespace Harvest.Core.Services
             var dateCutoff = DateTime.UtcNow.AddDays(daysBeforeAutoCloseout);
 
             var count = 0;
-            var potentialProjectIds = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval).Select(a => a.Id).ToArrayAsync();
-            var projectIds = await _dbContext.ProjectHistory.Where(a => a.Action == "ProjectCloseoutInitiated" && potentialProjectIds.Contains(a.ProjectId) && a.ActionDate < dateCutoff).Select(a => a.ProjectId).ToArrayAsync();
+            var projectIds = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval && a.LastStatusUpdatedOn < dateCutoff).Select(a => a.Id).ToArrayAsync();
 
             foreach (var projectId in projectIds)
             {
