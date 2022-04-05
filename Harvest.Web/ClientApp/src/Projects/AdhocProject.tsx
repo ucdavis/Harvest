@@ -166,7 +166,22 @@ export const AdhocProject = () => {
     <ValidationProvider context={context}>
       <div className="card-wrapper">
         <div className="card-content">
-          <h1>Add Expenses for Ad-Hoc Project</h1>
+          <h1>Ad-Hoc Project Details</h1>
+          <br />
+          <div>SOME INPUTS HERE</div>
+        </div>
+
+        <br />
+
+        <div className="card-content">
+          <h1>Account Details</h1>
+          <br />
+          <div>SOME INPUTS HERE</div>
+        </div>
+
+        <br />
+        <div className="card-content">
+          <h1>Add Expenses</h1>
           <br />
           <div>
             {activities.map((activity) => (
