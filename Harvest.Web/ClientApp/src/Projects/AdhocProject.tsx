@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import {
   Activity,
   Expense,
+  AdhocProjectModel,
   Rate,
   WorkItemImpl,
   ExpenseQueryParams,
@@ -122,10 +123,15 @@ export const AdhocProject = () => {
         )
     );
 
+    const addhoc: AdhocProjectModel = {
+      expenses: expensesBody,
+      accounts: [],
+    };
+
     //TODO: Change to new api
     const request = authenticatedFetch(`/api/Project/CreateAdhoc`, {
       method: "POST",
-      body: JSON.stringify(expensesBody), //TODO: use correct model
+      body: JSON.stringify(addhoc), //TODO: use correct model
     });
 
     setNotification(request, "Saving Expenses", "Expenses Saved");

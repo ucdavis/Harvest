@@ -110,6 +110,12 @@ export interface Expense {
   createdBy?: User;
 }
 
+export interface AdhocProjectModel {
+  project?: Project;
+  expenses: Expense[];
+  accounts: ProjectAccount[];
+}
+
 export enum ExpenseQueryParams {
   ReturnOnSubmit = "returnOnSubmit",
 }

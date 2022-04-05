@@ -191,6 +191,28 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
         {
+            postModel.Project = new Project();
+            postModel.Project.Name = "Fake One 3";
+            postModel.Project.Crop = "Special Services";
+            postModel.Project.CropType = "Row";
+            postModel.Project.Start = DateTime.Now;
+            postModel.Project.End = DateTime.Now.AddMonths(1);
+            postModel.Project.Requirements = "Fake Requirements";
+
+            postModel.Accounts = new Account[2];
+            postModel.Accounts[0] = new Account();
+            postModel.Accounts[1] = new Account();
+            postModel.Accounts[0].Percentage = 75m;
+            postModel.Accounts[0].Name = "CrU 1";
+            postModel.Accounts[0].Number = "3-CRU9033";
+
+            postModel.Accounts[1].Percentage = 25m;
+            postModel.Accounts[1].Name = "CrU 2";
+            postModel.Accounts[1].Number = "3-CRUEQIP";
+
+
+
+
             var currentUser = await _userService.GetCurrentUser();
             var newProject = new Project
             {
@@ -204,14 +226,35 @@ namespace Harvest.Web.Controllers.Api
                 IsActive = true,
                 IsApproved = true,
                 Requirements = postModel.Project.Requirements,
-                Status = Project.Statuses.Active
+                PrincipalInvestigatorId = currentUser.Id,
             };
+            newProject.UpdateStatus(Project.Statuses.Active);
+
+            newProject.Acres = 0;
+            newProject.ChargedTotal = 0;
+            newProject.QuoteTotal = postModel.Expenses.Select(a => a.Total).Sum();
+           
+
+            try
+            {
+                await _dbContext.Projects.AddAsync(newProject);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var xxx = ex.Message;
+            }
+
+
+            newProject.Expenses =  new List<Expense>();
+            //Save project first if projectId needed. Wrap in a transaction
             var percentage = 0.0m;
 
             foreach (var account in postModel.Accounts)
             {
                 // Accounts will be auto-approved by quote approver
                 account.ApprovedById = currentUser.Id;
+                account.ProjectId= newProject.Id;
                 account.ApprovedOn = DateTime.UtcNow;
                 percentage += account.Percentage;
                 if (account.Percentage < 0)
@@ -231,20 +274,26 @@ namespace Harvest.Web.Controllers.Api
             {
                 expense.CreatedBy = currentUser;
                 expense.CreatedOn = DateTime.UtcNow;
-                //expense.ProjectId = projectId;
+                expense.ProjectId = newProject.Id;
                 expense.InvoiceId = null;
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                 expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
-                newProject.Expenses.Add(expense);
+            }
+            _dbContext.Expenses.AddRange(postModel.Expenses);
+
+            //Create Quote from Expenses?
+            //I think we may just want to leave null
+
+
+            try
+            {
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                var xxx = ex.Message;
             }
 
-
-            //Create Quote from Expenses
-
-
-
-
-            throw new NotImplementedException();
             return Ok(newProject);
         }
     }
