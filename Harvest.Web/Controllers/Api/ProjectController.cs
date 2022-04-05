@@ -7,6 +7,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
+using Harvest.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -184,6 +185,52 @@ namespace Harvest.Web.Controllers.Api
             }
 
             return Content("Project already up to date.");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            var newProject = new Project
+            {
+                Crop = postModel.Project.Crop,
+                CropType = postModel.Project.CropType,
+                Start = postModel.Project.Start, //Start and stop just now and a month from now?
+                End = postModel.Project.End,
+                CreatedOn = DateTime.UtcNow,
+                CreatedById = currentUser.Id,
+                IsActive = true,
+                IsApproved = true,
+                Requirements = postModel.Project.Requirements,
+                Status = Project.Statuses.Active
+            };
+            var percentage = 0.0m;
+
+            foreach (var account in postModel.Accounts)
+            {
+                // Accounts will be auto-approved by quote approver
+                account.ApprovedById = currentUser.Id;
+                account.ApprovedOn = DateTime.UtcNow;
+                percentage += account.Percentage;
+                if (account.Percentage < 0)
+                {
+                    return BadRequest("Negative Percentage Detected");
+                }
+                newProject.Accounts.Add(account); //Don't need to specify projectId if I add it to the project?
+            }
+
+            if (percentage != 100.0m)
+            {
+                return BadRequest("Percentage of accounts is not 100%");
+            }
+            //Create Quote from Expenses
+            //Add expenses
+
+
+
+            throw new NotImplementedException();
+            return Ok(newProject);
         }
     }
 }

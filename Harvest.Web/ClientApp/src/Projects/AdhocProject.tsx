@@ -123,9 +123,9 @@ export const AdhocProject = () => {
     );
 
     //TODO: Change to new api
-    const request = authenticatedFetch(`/api/Expense/Create/24`, {
+    const request = authenticatedFetch(`/api/Project/CreateAdhoc`, {
       method: "POST",
-      body: JSON.stringify(expensesBody),
+      body: JSON.stringify(expensesBody), //TODO: use correct model
     });
 
     setNotification(request, "Saving Expenses", "Expenses Saved");
