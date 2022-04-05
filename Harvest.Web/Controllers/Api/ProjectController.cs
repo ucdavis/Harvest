@@ -194,6 +194,7 @@ namespace Harvest.Web.Controllers.Api
             var currentUser = await _userService.GetCurrentUser();
             var newProject = new Project
             {
+                Name = postModel.Project.Name,
                 Crop = postModel.Project.Crop,
                 CropType = postModel.Project.CropType,
                 Start = postModel.Project.Start, //Start and stop just now and a month from now?
@@ -224,8 +225,22 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest("Percentage of accounts is not 100%");
             }
+
+            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            foreach (var expense in postModel.Expenses)
+            {
+                expense.CreatedBy = currentUser;
+                expense.CreatedOn = DateTime.UtcNow;
+                //expense.ProjectId = projectId;
+                expense.InvoiceId = null;
+                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                newProject.Expenses.Add(expense);
+            }
+
+
             //Create Quote from Expenses
-            //Add expenses
+
 
 
 
