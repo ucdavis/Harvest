@@ -57,6 +57,12 @@ export const AppNav = () => {
                     <ShowFor roles={["FieldManager"]}>
                       <DropdownItem href="/Crop/Index">Crops</DropdownItem>
                     </ShowFor>
+                    <ShowFor roles={["FieldManager"]}>
+                      <DropdownItem divider />
+                      <DropdownItem href="/request/create">
+                        Ad-Hoc Project
+                      </DropdownItem>
+                    </ShowFor>
                     <DropdownItem divider />
                     <DropdownItem href="/Project/Completed">
                       Completed Projects
