@@ -1,13 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import { useHistory, useParams } from "react-router-dom";
-import toast from "react-hot-toast";
+import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import {
   Activity,
   Expense,
   AdhocProjectModel,
   Rate,
   WorkItemImpl,
-  ExpenseQueryParams,
   Project,
   CropType,
 } from "../types";
@@ -28,11 +26,9 @@ import AppContext from "../Shared/AppContext";
 import { workItemSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import * as yup from "yup";
-import { useQuery } from "../Shared/UseQuery";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { validatorOptions } from "../constants";
 import { authenticatedFetch } from "../Util/Api";
-import { convertCamelCase } from "../Util/StringFormatting";
 import { useInputValidator, ValidationProvider } from "use-input-validator";
 import { adhocProjectSchema } from "../schemas";
 
