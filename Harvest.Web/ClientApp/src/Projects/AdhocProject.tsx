@@ -195,70 +195,103 @@ export const AdhocProject = () => {
       <div className="card-wrapper">
         <div className="card-content">
           <h1>Ad-Hoc Project Details</h1>
-          <br />
-          <div>SOME INPUTS HERE</div>
-          <FormGroup>
-            <Label>Project Name</Label>
-            <Input
-              type="text"
-              name="text"
-              id="name"
-              value={project.requirements}
-              onChange={onChange("name", (e) =>
-                setProject({ ...project, name: e.target.value })
-              )}
-              onBlur={onBlur("name")}
-              placeholder="Unique project name"
-            />
-            <InputErrorMessage name="name" />
-          </FormGroup>
-          <FormGroup>
-            <Label>Which type of crop will we grow?</Label>
-            <div className="custom-control custom-radio">
-              <input
-                type="radio"
-                id="rowCropInput"
-                name="rowCropInput"
-                className="custom-control-input"
-                style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
-                value="Row"
-                checked={project.cropType === "Row"}
-                onChange={handleCropTypeChange}
-              />
-              <label className="custom-control-label" htmlFor="rowCropInput">
-                Row Crops
-              </label>
+
+          <div
+            className="card-wrapper mb-4 no-green"
+            style={{ overflow: "visible" }}
+          >
+            <div className="card-content">
+              <div className="row justify-content-between align-items-end">
+                <div className="col-md-12">
+                  <div className="row justify-content-between mb-2">
+                    <div className="col">
+                      <FormGroup>
+                        <Label>Project Name</Label>
+                        <Input
+                          type="text"
+                          name="text"
+                          id="name"
+                          value={project.requirements}
+                          onChange={onChange("name", (e) =>
+                            setProject({ ...project, name: e.target.value })
+                          )}
+                          onBlur={onBlur("name")}
+                          placeholder="Unique project name"
+                        />
+                        <InputErrorMessage name="name" />
+                      </FormGroup>
+                      <FormGroup>
+                        <Label>Which type of crop will we grow?</Label>
+                        <div className="custom-control custom-radio">
+                          <input
+                            type="radio"
+                            id="rowCropInput"
+                            name="rowCropInput"
+                            className="custom-control-input"
+                            style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                            value="Row"
+                            checked={project.cropType === "Row"}
+                            onChange={handleCropTypeChange}
+                          />
+                          <label
+                            className="custom-control-label"
+                            htmlFor="rowCropInput"
+                          >
+                            Row Crops
+                          </label>
+                        </div>
+                        <div className="custom-control custom-radio">
+                          <input
+                            type="radio"
+                            id="treeCropInput"
+                            name="treeCropInput"
+                            className="custom-control-input"
+                            style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                            value="Tree"
+                            checked={project.cropType === "Tree"}
+                            onChange={handleCropTypeChange}
+                          />
+                          <label
+                            className="custom-control-label"
+                            htmlFor="treeCropInput"
+                          >
+                            Tree Crops
+                          </label>
+                        </div>
+                      </FormGroup>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="custom-control custom-radio">
-              <input
-                type="radio"
-                id="treeCropInput"
-                name="treeCropInput"
-                className="custom-control-input"
-                style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
-                value="Tree"
-                checked={project.cropType === "Tree"}
-                onChange={handleCropTypeChange}
-              />
-              <label className="custom-control-label" htmlFor="treeCropInput">
-                Tree Crops
-              </label>
-            </div>
-          </FormGroup>
+          </div>
         </div>
 
         <br />
 
         <div className="card-content">
           <h1>Account Details</h1>
-          <br />
-          <div>SOME INPUTS HERE</div>
+          <div
+            className="card-wrapper mb-4 no-green"
+            style={{ overflow: "visible" }}
+          >
+            <div className="card-content">
+              <div className="row justify-content-between align-items-end">
+                <div className="col-md-12">
+                  <div className="row justify-content-between mb-2">
+                    <div className="col">
+                      <div> Some Account Info </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <br />
         <div className="card-content">
           <h1>Add Expenses</h1>
-          <br />
           <div>
             {activities.map((activity) => (
               <ActivityForm
