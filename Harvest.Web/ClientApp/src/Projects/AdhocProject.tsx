@@ -9,6 +9,7 @@ import {
   WorkItemImpl,
   ExpenseQueryParams,
   Project,
+  CropType,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button } from "reactstrap";
@@ -31,10 +32,6 @@ import { validatorOptions } from "../constants";
 import { authenticatedFetch } from "../Util/Api";
 import { convertCamelCase } from "../Util/StringFormatting";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 const getDefaultActivity = (id: number) => ({
   id,
   name: "Generic Activity",
@@ -50,6 +47,12 @@ const getDefaultActivity = (id: number) => ({
 
 export const AdhocProject = () => {
   const history = useHistory();
+  const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
+  const [project, setProject] = useState<Project>({
+    id: 0,
+    cropType: "Row" as CropType,
+    principalInvestigator: userDetail,
+  } as Project);
 
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
@@ -124,6 +127,7 @@ export const AdhocProject = () => {
     );
 
     const addhoc: AdhocProjectModel = {
+      project: project,
       expenses: expensesBody,
       accounts: [],
     };
