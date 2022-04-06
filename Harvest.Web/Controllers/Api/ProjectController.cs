@@ -278,14 +278,13 @@ namespace Harvest.Web.Controllers.Api
 
             var quote = new Quote();
             quote.InitiatedById = currentUser.Id;
-            quote.Status = "New"; // TODO: definte status progression
             quote.CreatedDate = DateTime.UtcNow;
             quote.Project = newProject;
             quote.ProjectId = newProject.Id;
             quote.Total = postModel.Expenses.Select(a => a.Total).Sum(); //Calculate totals here? probably not done yet
-            postModel.Quote.EquipmentTotal = (double)postModel.Expenses.Where(a=> a.Type == "Equipment").Select(a => a.Total).Sum();
-            postModel.Quote.LaborTotal = (double)postModel.Expenses.Where(a => a.Type == "Labor").Select(a => a.Total).Sum();
-            postModel.Quote.OtherTotal = (double)postModel.Expenses.Where(a => a.Type == "Other").Select(a => a.Total).Sum();
+            postModel.Quote.EquipmentTotal = (double)postModel.Expenses.Where(a=> a.Type == Rate.Types.Equipment).Select(a => a.Total).Sum();
+            postModel.Quote.LaborTotal = (double)postModel.Expenses.Where(a => a.Type == Rate.Types.Labor).Select(a => a.Total).Sum();
+            postModel.Quote.OtherTotal = (double)postModel.Expenses.Where(a => a.Type == Rate.Types.Other).Select(a => a.Total).Sum();
             postModel.Quote.GrandTotal = (double)quote.Total;
 
             var activities = new List<Activity>();
