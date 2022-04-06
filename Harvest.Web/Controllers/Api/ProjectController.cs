@@ -205,7 +205,7 @@ namespace Harvest.Web.Controllers.Api
                 CreatedById = currentUser.Id,
                 IsActive = true,
                 IsApproved = true,
-                Requirements = postModel.Project.Requirements,               
+                Requirements = postModel.Project.Requirements, 
             };
 
             // create PI if needed and assign to project
@@ -273,8 +273,49 @@ namespace Harvest.Web.Controllers.Api
             //Without the quote, the create change request doesn't work?
 
 
-
             await _dbContext.Projects.AddAsync(newProject);
+            await _dbContext.SaveChangesAsync();
+
+            var quote = new Quote();
+            quote.InitiatedById = currentUser.Id;
+            quote.Status = "New"; // TODO: definte status progression
+            quote.CreatedDate = DateTime.UtcNow;
+            quote.Project = newProject;
+            quote.ProjectId = newProject.Id;
+            quote.Total = postModel.Expenses.Select(a => a.Total).Sum(); //Calculate totals here? probably not done yet
+            postModel.Quote.EquipmentTotal = (double)postModel.Expenses.Where(a=> a.Type == "Equipment").Select(a => a.Total).Sum();
+            postModel.Quote.LaborTotal = (double)postModel.Expenses.Where(a => a.Type == "Labor").Select(a => a.Total).Sum();
+            postModel.Quote.OtherTotal = (double)postModel.Expenses.Where(a => a.Type == "Other").Select(a => a.Total).Sum();
+            postModel.Quote.GrandTotal = (double)quote.Total;
+
+            var activities = new List<Activity>();
+            foreach(var activity in postModel.Quote.Activities)
+            {
+                if(activity.Total > 0)
+                {
+                    var workItems = new List<WorkItem>();
+                    foreach(var wi in activity.WorkItems)
+                    {
+                        if(wi.Total > 0)
+                        {
+                            workItems.Add(wi);
+                        }
+                    }
+                    activity.WorkItems = workItems.ToArray();
+                    activities.Add(activity);
+                }
+            }
+            postModel.Quote.Activities = activities.ToArray();
+
+            quote.Text = QuoteDetail.Serialize(postModel.Quote);
+            quote.ApprovedById = currentUser.Id;
+            quote.Status = Quote.Statuses.Approved;
+
+            newProject.Quote = quote;
+ 
+            //_dbContext.Projects.Update(newProject);
+
+            await _dbContext.Quotes.AddAsync(quote);
             await _dbContext.SaveChangesAsync();
 
 

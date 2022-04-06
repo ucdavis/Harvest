@@ -9,6 +9,8 @@ import {
   Project,
   CropType,
   ProjectAccount,
+  QuoteContent,
+  QuoteContentImpl,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -57,6 +59,8 @@ export const AdhocProject = () => {
   } as Project);
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
+
+  const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
 
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
@@ -142,10 +146,13 @@ export const AdhocProject = () => {
         )
     );
 
+    quote.activities = activities.filter((a) => a.workItems.length > 0);
+
     const addhoc: AdhocProjectModel = {
       project: project,
       expenses: expensesBody,
       accounts: accounts,
+      quote: quote,
     };
 
     //TODO: Change to new api

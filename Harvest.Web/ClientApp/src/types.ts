@@ -114,6 +114,7 @@ export interface AdhocProjectModel {
   project?: Project;
   expenses: Expense[];
   accounts: ProjectAccount[];
+  quote: QuoteContent;
 }
 
 export enum ExpenseQueryParams {
