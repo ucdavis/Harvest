@@ -193,22 +193,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
         {
             var currentUser = await _userService.GetCurrentUser();
-
-            postModel.Accounts = new Account[2];
-            postModel.Accounts[0] = new Account();
-            postModel.Accounts[1] = new Account();
-            postModel.Accounts[0].Percentage = 75m;
-            postModel.Accounts[0].Name = "CrU 1";
-            postModel.Accounts[0].Number = "3-CRU9033";
-
-            postModel.Accounts[1].Percentage = 25m;
-            postModel.Accounts[1].Name = "CrU 2";
-            postModel.Accounts[1].Number = "3-CRUEQIP";
-
-
-
-
-            
+          
             var newProject = new Project
             {
                 Name = postModel.Project.Name,
@@ -288,15 +273,10 @@ namespace Harvest.Web.Controllers.Api
             //Without the quote, the create change request doesn't work?
 
 
-            try
-            {
-                await _dbContext.Projects.AddAsync(newProject);
-                await _dbContext.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                var xxx = ex.Message;
-            }
+
+            await _dbContext.Projects.AddAsync(newProject);
+            await _dbContext.SaveChangesAsync();
+
 
             return Ok(newProject);
         }

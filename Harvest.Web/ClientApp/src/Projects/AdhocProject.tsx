@@ -8,6 +8,7 @@ import {
   WorkItemImpl,
   Project,
   CropType,
+  ProjectAccount,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -31,6 +32,7 @@ import { validatorOptions } from "../constants";
 import { authenticatedFetch } from "../Util/Api";
 import { useInputValidator, ValidationProvider } from "use-input-validator";
 import { adhocProjectSchema } from "../schemas";
+import { AccountsInput } from "../Requests/AccountsInput";
 
 const getDefaultActivity = (id: number) => ({
   id,
@@ -53,6 +55,8 @@ export const AdhocProject = () => {
     cropType: "Row" as CropType,
     principalInvestigator: userDetail,
   } as Project);
+  const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
@@ -141,7 +145,7 @@ export const AdhocProject = () => {
     const addhoc: AdhocProjectModel = {
       project: project,
       expenses: expensesBody,
-      accounts: [],
+      accounts: accounts,
     };
 
     //TODO: Change to new api
@@ -332,7 +336,11 @@ export const AdhocProject = () => {
                 <div className="col-md-12">
                   <div className="row justify-content-between mb-2">
                     <div className="col">
-                      <div> Some Account Info </div>
+                      <AccountsInput
+                        accounts={accounts}
+                        setAccounts={setAccounts}
+                        setDisabled={setDisabled}
+                      />
                     </div>
                   </div>
                 </div>
@@ -382,10 +390,13 @@ export const AdhocProject = () => {
               className="btn btn-primary btn-lg btn-block"
               onClick={submit}
               disabled={
-                notification.pending || !isValid() || context.formErrorCount > 0
+                disabled ||
+                notification.pending ||
+                !isValid() ||
+                context.formErrorCount > 0
               }
             >
-              Submit Expense
+              Create Ad-hoc Project
             </button>
           </div>
         </div>
