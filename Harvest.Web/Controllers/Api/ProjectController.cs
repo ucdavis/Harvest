@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
@@ -193,15 +194,6 @@ namespace Harvest.Web.Controllers.Api
         {
             var currentUser = await _userService.GetCurrentUser();
 
-            postModel.Project = new Project();
-            postModel.Project.Name = "Fake One 3";
-            postModel.Project.Crop = "Special Services";
-            postModel.Project.CropType = "Row";
-            postModel.Project.Start = DateTime.Now;
-            postModel.Project.End = DateTime.Now.AddMonths(1);
-            postModel.Project.Requirements = "Fake Requirements";
-            postModel.Project.PrincipalInvestigatorId = currentUser.Id;
-
             postModel.Accounts = new Account[2];
             postModel.Accounts[0] = new Account();
             postModel.Accounts[1] = new Account();
@@ -222,15 +214,27 @@ namespace Harvest.Web.Controllers.Api
                 Name = postModel.Project.Name,
                 Crop = postModel.Project.Crop,
                 CropType = postModel.Project.CropType,
-                Start = postModel.Project.Start, //Start and stop just now and a month from now?
-                End = postModel.Project.End,
+                Start = DateTime.UtcNow.ToPacificTime(), //Start and stop just now and a month from now?
+                End = DateTime.UtcNow.ToPacificTime().AddMonths(1),
                 CreatedOn = DateTime.UtcNow,
                 CreatedById = currentUser.Id,
                 IsActive = true,
                 IsApproved = true,
-                Requirements = postModel.Project.Requirements,
-                PrincipalInvestigatorId = postModel.Project.PrincipalInvestigatorId, //TODO: See how this is set in the request new project code
+                Requirements = postModel.Project.Requirements,               
             };
+
+            // create PI if needed and assign to project
+            var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.Project.PrincipalInvestigator.Iam);
+            if (pi != null)
+            {
+                newProject.PrincipalInvestigatorId = pi.Id;
+            }
+            else
+            {
+                // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
+                newProject.PrincipalInvestigator = postModel.Project.PrincipalInvestigator;
+            }
+
             newProject.UpdateStatus(Project.Statuses.Active);
 
             newProject.Acres = 0;

@@ -13,6 +13,8 @@ import {
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button, FormGroup, Input, Label } from "reactstrap";
+import { Crops } from "../Requests/Crops";
+import { SearchPerson } from "../Requests/SearchPerson";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -211,7 +213,7 @@ export const AdhocProject = () => {
                           type="text"
                           name="text"
                           id="name"
-                          value={project.requirements}
+                          value={project.name}
                           onChange={onChange("name", (e) =>
                             setProject({ ...project, name: e.target.value })
                           )}
@@ -258,6 +260,60 @@ export const AdhocProject = () => {
                             Tree Crops
                           </label>
                         </div>
+                      </FormGroup>
+                      <FormGroup tag="fieldset">
+                        <Label>What crop(s) will we grow?</Label>
+                        <Crops
+                          crops={project.crop}
+                          onChange={onChangeValue("crop", (c) =>
+                            setProject({ ...project, crop: c })
+                          )}
+                          cropType={project.cropType}
+                          onBlur={() => onBlurValue("crop")}
+                        />
+                        <InputErrorMessage name="crop" />
+                      </FormGroup>
+
+                      <FormGroup>
+                        <Label>Who will be the PI?</Label>
+                        <SearchPerson
+                          user={project.principalInvestigator}
+                          onChange={onChangeValue(
+                            "principalInvestigator",
+                            (u) =>
+                              setProject({
+                                ...project,
+                                principalInvestigator: u,
+                              })
+                          )}
+                          onBlur={() => onBlurValue("principalInvestigator")}
+                        />
+                        <InputErrorMessage name="principalInvestigator" />
+                        {!propertyHasErrors("principalInvestigator") && (
+                          <small id="PIHelp" className="form-text text-muted">
+                            Enter PI Email or Kerberos. Click [x] to clear out
+                            an existing PI.
+                          </small>
+                        )}
+                      </FormGroup>
+
+                      <FormGroup>
+                        <Label>What are the requirements?</Label>
+                        <Input
+                          type="textarea"
+                          name="text"
+                          id="requirements"
+                          value={project.requirements}
+                          onChange={onChange("requirements", (e) =>
+                            setProject({
+                              ...project,
+                              requirements: e.target.value,
+                            })
+                          )}
+                          onBlur={onBlur("requirements")}
+                          placeholder="Enter a full description of your requirements"
+                        />
+                        <InputErrorMessage name="requirements" />
                       </FormGroup>
                     </div>
                   </div>
