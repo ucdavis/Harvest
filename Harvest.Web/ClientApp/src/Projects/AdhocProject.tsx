@@ -12,17 +12,17 @@ import {
   CropType,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
-import { Button } from "reactstrap";
+import { Button, FormGroup, Input, Label } from "reactstrap";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { usePromiseNotification } from "../Util/Notifications";
 import AppContext from "../Shared/AppContext";
 
-import {
-  useOrCreateValidationContext,
-  ValidationProvider,
-} from "use-input-validator";
+// import {
+//   useOrCreateValidationContext,
+//   ValidationProvider,
+// } from "use-input-validator";
 import { workItemSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import * as yup from "yup";
@@ -31,6 +31,8 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { validatorOptions } from "../constants";
 import { authenticatedFetch } from "../Util/Api";
 import { convertCamelCase } from "../Util/StringFormatting";
+import { useInputValidator, ValidationProvider } from "use-input-validator";
+import { adhocProjectSchema } from "../schemas";
 
 const getDefaultActivity = (id: number) => ({
   id,
@@ -56,7 +58,19 @@ export const AdhocProject = () => {
 
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
-  const context = useOrCreateValidationContext(validatorOptions);
+  //const context = useOrCreateValidationContext(validatorOptions);
+  const {
+    context,
+    validateAll,
+    formErrorCount,
+    formIsDirty,
+    onChange,
+    onChangeValue,
+    onBlur,
+    onBlurValue,
+    InputErrorMessage,
+    propertyHasErrors,
+  } = useInputValidator(adhocProjectSchema, project, validatorOptions);
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([
@@ -172,6 +186,10 @@ export const AdhocProject = () => {
   const isValid = () =>
     activities.reduce((prev, curr) => prev + curr.total || 0, 0) > 0;
 
+  const handleCropTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setProject({ ...project, cropType: e.target.value as CropType });
+  };
+
   return (
     <ValidationProvider context={context}>
       <div className="card-wrapper">
@@ -179,6 +197,39 @@ export const AdhocProject = () => {
           <h1>Ad-Hoc Project Details</h1>
           <br />
           <div>SOME INPUTS HERE</div>
+          <FormGroup>
+            <Label>Which type of crop will we grow?</Label>
+            <div className="custom-control custom-radio">
+              <input
+                type="radio"
+                id="rowCropInput"
+                name="rowCropInput"
+                className="custom-control-input"
+                style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                value="Row"
+                checked={project.cropType === "Row"}
+                onChange={handleCropTypeChange}
+              />
+              <label className="custom-control-label" htmlFor="rowCropInput">
+                Row Crops
+              </label>
+            </div>
+            <div className="custom-control custom-radio">
+              <input
+                type="radio"
+                id="treeCropInput"
+                name="treeCropInput"
+                className="custom-control-input"
+                style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                value="Tree"
+                checked={project.cropType === "Tree"}
+                onChange={handleCropTypeChange}
+              />
+              <label className="custom-control-label" htmlFor="treeCropInput">
+                Tree Crops
+              </label>
+            </div>
+          </FormGroup>
         </div>
 
         <br />
