@@ -60,7 +60,7 @@ export const AdhocProject = () => {
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
 
-  const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
+  //const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
 
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
@@ -146,7 +146,49 @@ export const AdhocProject = () => {
         )
     );
 
-    quote.activities = activities.filter((a) => a.workItems.length > 0);
+    //quote.activities = activities.filter((a) => a.workItems.length > 0);
+
+    const quote: QuoteContent = {
+      projectName: project.name,
+      acres: 0,
+      acreageRate: 0,
+      years: 0,
+      acreageTotal: 0,
+      activitiesTotal: 0,
+      //sum up all activities with a labor type
+      laborTotal: activities.reduce(
+        (acc, activity) =>
+          acc +
+          activity.workItems
+            .filter((w) => w.type === "Labor")
+            .reduce((acc, workItem) => acc + workItem.total, 0),
+        0
+      ),
+      //sum up all activities with a equipment type
+      equipmentTotal: activities.reduce(
+        (acc, activity) =>
+          acc +
+          activity.workItems
+            .filter((w) => w.type === "Equipment")
+            .reduce((acc, workItem) => acc + workItem.total, 0),
+        0
+      ),
+      //sum up all activities with an other type
+      otherTotal: activities.reduce(
+        (acc, activity) =>
+          acc +
+          activity.workItems
+            .filter((w) => w.type === "Other")
+            .reduce((acc, workItem) => acc + workItem.total, 0),
+        0
+      ),
+      //sum up all activities
+      grandTotal: activities.reduce((acc, activity) => acc + activity.total, 0),
+      fields: [],
+      activities: activities.filter((a) => a.workItems.length > 0),
+      acreageRateId: null,
+      acreageRateDescription: "",
+    };
 
     const addhoc: AdhocProjectModel = {
       project: project,

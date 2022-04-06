@@ -281,11 +281,8 @@ namespace Harvest.Web.Controllers.Api
             quote.CreatedDate = DateTime.UtcNow;
             quote.Project = newProject;
             quote.ProjectId = newProject.Id;
-            quote.Total = postModel.Expenses.Select(a => a.Total).Sum(); //Calculate totals here? probably not done yet
-            postModel.Quote.EquipmentTotal = (double)postModel.Expenses.Where(a=> a.Type == Rate.Types.Equipment).Select(a => a.Total).Sum();
-            postModel.Quote.LaborTotal = (double)postModel.Expenses.Where(a => a.Type == Rate.Types.Labor).Select(a => a.Total).Sum();
-            postModel.Quote.OtherTotal = (double)postModel.Expenses.Where(a => a.Type == Rate.Types.Other).Select(a => a.Total).Sum();
-            postModel.Quote.GrandTotal = (double)quote.Total;
+            quote.Total = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
+
 
             var activities = new List<Activity>();
             foreach(var activity in postModel.Quote.Activities)
