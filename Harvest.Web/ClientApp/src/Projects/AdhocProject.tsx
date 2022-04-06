@@ -49,7 +49,7 @@ const getDefaultActivity = (id: number) => ({
 
 export const AdhocProject = () => {
   const history = useHistory();
-  const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
+  const { detail: userDetail } = useContext(AppContext).user; //Only FM can do this, so we don't care about roles like we would in the project request
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
@@ -197,6 +197,21 @@ export const AdhocProject = () => {
           <h1>Ad-Hoc Project Details</h1>
           <br />
           <div>SOME INPUTS HERE</div>
+          <FormGroup>
+            <Label>Project Name</Label>
+            <Input
+              type="text"
+              name="text"
+              id="name"
+              value={project.requirements}
+              onChange={onChange("name", (e) =>
+                setProject({ ...project, name: e.target.value })
+              )}
+              onBlur={onBlur("name")}
+              placeholder="Unique project name"
+            />
+            <InputErrorMessage name="name" />
+          </FormGroup>
           <FormGroup>
             <Label>Which type of crop will we grow?</Label>
             <div className="custom-control custom-radio">
