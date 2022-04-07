@@ -43,7 +43,9 @@ export const UnbilledExpensesContainer = (props: Props) => {
     if (projectId === undefined) return;
 
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Expense/GetUnbilled/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Expense/GetUnbilled/${projectId}`
+      );
 
       if (response.ok) {
         const expenses: Expense[] = await response.json();
@@ -63,7 +65,9 @@ export const UnbilledExpensesContainer = (props: Props) => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -86,9 +90,12 @@ export const UnbilledExpensesContainer = (props: Props) => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Expense/Delete?expenseId=${expense.id}`, {
-      method: "POST",
-    });
+    const request = authenticatedFetch(
+      `/api/Expense/Delete?expenseId=${expense.id}`,
+      {
+        method: "POST",
+      }
+    );
     setNotification(request, "Removing Expense", () => {
       if (getIsMounted()) {
         let expensesCopy = [...expenses];
@@ -98,7 +105,8 @@ export const UnbilledExpensesContainer = (props: Props) => {
         expensesCopy.splice(index, 1);
 
         setExpenses(expensesCopy);
-        const total = expenses.reduce((acc, cur) => acc + cur.total, 0);
+        const total = expensesCopy.reduce((acc, cur) => acc + cur.total, 0);
+
         setTotal(total);
         setTotalUnbilled && setTotalUnbilled(total);
       }
@@ -122,6 +130,12 @@ export const UnbilledExpensesContainer = (props: Props) => {
               <h3>
                 Unbilled Expenses
                 <small> (${formatCurrency(total)} total)</small>
+                {total - project.quoteTotal > 0 && (
+                  <p style={{ color: "red" }}>
+                    <strong> Warning!</strong> Expenses exceed amount remaining
+                    by ${formatCurrency(total - project.quoteTotal)}
+                  </p>
+                )}
               </h3>
             ) : (
               <h3>No Unbilled Expenses</h3>
