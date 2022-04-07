@@ -33,6 +33,7 @@ namespace Harvest.Core.Services
         Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage);
         Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments);
         Task<bool> TicketClosed(Project project, Ticket ticket, User ClosedBy);
+        Task<bool> AdhocProjectCreated(Project project);
         /// <summary>
         /// 
         /// </summary>
@@ -698,6 +699,35 @@ namespace Harvest.Core.Services
             return project;
         }
 
+        public async Task<bool> AdhocProjectCreated(Project project)
+        {
+            var url = $"{_emailSettings.BaseUrl}/project/details/";
 
+            var model = new NewFieldRequestModel()
+            {
+                PI = project.PrincipalInvestigator.NameAndEmail,
+                ProjectName = project.NameAndId,
+                ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                ProjectEnd = project.End.ToPacificTime().Date.Format("d"), //Not used in the email...
+                CropType = project.CropType,
+                Crops = project.Crop,
+                Requirements = project.Requirements,
+                ButtonUrl = $"{url}{project.Id}"
+            };
+
+            try
+            {
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/AdhocProjectCreated.cshtml", model);
+
+                await _notificationService.SendNotification(await FieldManagersEmails(), new[] { project.PrincipalInvestigator.Email }, emailBody, "An Ad-hoc project for billing purposes has been created", "Harvest Notification - Ad-hoc project created");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Ad-hoc project", e);
+                return false;
+            }
+
+            return true;
+        }
     }
 }
