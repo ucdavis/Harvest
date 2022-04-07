@@ -208,7 +208,8 @@ export const AdhocProject = () => {
     const response = await request;
 
     if (response.ok) {
-      history.push("/"); //TODO: Open project that was created instead
+      const data = await response.json();
+      history.push(`/Project/Details/${data.id}`);
     }
   };
 

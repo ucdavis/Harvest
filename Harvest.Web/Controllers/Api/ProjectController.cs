@@ -239,7 +239,6 @@ namespace Harvest.Web.Controllers.Api
                 {
                     // Accounts will be auto-approved by quote approver
                     account.ApprovedById = currentUser.Id;
-                    //account.ProjectId= newProject.Id;
                     account.Project = newProject;
                     account.ApprovedOn = DateTime.UtcNow;
                     percentage += account.Percentage;
@@ -247,7 +246,7 @@ namespace Harvest.Web.Controllers.Api
                     {
                         return BadRequest("Negative Percentage Detected");
                     }
-                    newProject.Accounts.Add(account); //Don't need to specify projectId if I add it to the project?
+                    newProject.Accounts.Add(account); 
                 }
 
                 if (percentage != 100.0m)
@@ -260,18 +259,13 @@ namespace Harvest.Web.Controllers.Api
                 {
                     expense.CreatedBy = currentUser;
                     expense.CreatedOn = DateTime.UtcNow;
-                    //expense.ProjectId = newProject.Id;
                     expense.Project = newProject;
                     expense.InvoiceId = null;
                     expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                     expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
                     newProject.Expenses.Add(expense);
                 }
-                //_dbContext.Expenses.AddRange(postModel.Expenses);
 
-                //Create Quote from Expenses? Or if needed, pass it as a new parameter in the postmodel? I think expenses have much stripped out.
-                //I think we may just want to leave null
-                //Without the quote, the create change request doesn't work?
 
 
                 await _dbContext.Projects.AddAsync(newProject);
@@ -310,14 +304,13 @@ namespace Harvest.Web.Controllers.Api
 
                 newProject.Quote = quote;
 
-                //_dbContext.Projects.Update(newProject);
 
                 await _dbContext.Quotes.AddAsync(quote);
                 await _dbContext.SaveChangesAsync();
 
 
                 await txn.CommitAsync();
-                return Ok();
+                return Ok(newProject);
             }
         }
     }
