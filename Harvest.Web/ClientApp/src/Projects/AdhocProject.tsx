@@ -22,10 +22,6 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { usePromiseNotification } from "../Util/Notifications";
 import AppContext from "../Shared/AppContext";
 
-// import {
-//   useOrCreateValidationContext,
-//   ValidationProvider,
-// } from "use-input-validator";
 import { workItemSchema } from "../schemas";
 import { checkValidity } from "../Util/ValidationHelpers";
 import * as yup from "yup";
@@ -60,16 +56,10 @@ export const AdhocProject = () => {
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
 
-  //const [quote, setQuote] = useState<QuoteContent>(new QuoteContentImpl());
-
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
-  //const context = useOrCreateValidationContext(validatorOptions);
   const {
     context,
-    validateAll,
-    formErrorCount,
-    formIsDirty,
     onChange,
     onChangeValue,
     onBlur,
@@ -96,8 +86,6 @@ export const AdhocProject = () => {
         const rates: Rate[] = await response.json();
 
         getIsMounted() && setRates(rates);
-
-        // create default activity
       }
     };
 
@@ -105,8 +93,6 @@ export const AdhocProject = () => {
   }, [getIsMounted]);
 
   const submit = async () => {
-    // TODO: some sort of full screen processing UI
-
     const inputErrors = await context.validateAll();
     if (inputErrors.length > 0) {
       return;
@@ -145,8 +131,6 @@ export const AdhocProject = () => {
           })
         )
     );
-
-    //quote.activities = activities.filter((a) => a.workItems.length > 0);
 
     const quote: QuoteContent = {
       projectName: project.name,
@@ -190,7 +174,7 @@ export const AdhocProject = () => {
       acreageRateDescription: "",
     };
 
-    const addhoc: AdhocProjectModel = {
+    const adhoc: AdhocProjectModel = {
       project: project,
       expenses: expensesBody,
       accounts: accounts,
@@ -200,7 +184,7 @@ export const AdhocProject = () => {
     //TODO: Change to new api
     const request = authenticatedFetch(`/api/Project/CreateAdhoc`, {
       method: "POST",
-      body: JSON.stringify(addhoc), //TODO: use correct model
+      body: JSON.stringify(adhoc), //TODO: use correct model
     });
 
     setNotification(request, "Saving Expenses", "Expenses Saved");
