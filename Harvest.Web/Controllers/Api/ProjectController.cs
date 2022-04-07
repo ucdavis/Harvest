@@ -193,129 +193,132 @@ namespace Harvest.Web.Controllers.Api
         public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
         {
             var currentUser = await _userService.GetCurrentUser();
-          
-            var newProject = new Project
+
+            using (var txn = await _dbContext.Database.BeginTransactionAsync())
             {
-                Name = postModel.Project.Name,
-                Crop = postModel.Project.Crop,
-                CropType = postModel.Project.CropType,
-                Start = DateTime.UtcNow.ToPacificTime(), //Start and stop just now and a month from now?
-                End = DateTime.UtcNow.ToPacificTime().AddMonths(1),
-                CreatedOn = DateTime.UtcNow,
-                CreatedById = currentUser.Id,
-                IsActive = true,
-                IsApproved = true,
-                Requirements = postModel.Project.Requirements, 
-            };
 
-            // create PI if needed and assign to project
-            var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.Project.PrincipalInvestigator.Iam);
-            if (pi != null)
-            {
-                newProject.PrincipalInvestigatorId = pi.Id;
-            }
-            else
-            {
-                // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
-                newProject.PrincipalInvestigator = postModel.Project.PrincipalInvestigator;
-            }
-
-            newProject.UpdateStatus(Project.Statuses.Active);
-
-            newProject.Acres = 0;
-            newProject.ChargedTotal = 0;
-            newProject.QuoteTotal = postModel.Expenses.Select(a => a.Total).Sum();
-           
-
-
-
-
-            newProject.Expenses =  new List<Expense>();
-
-            var percentage = 0.0m;
-
-            foreach (var account in postModel.Accounts)
-            {
-                // Accounts will be auto-approved by quote approver
-                account.ApprovedById = currentUser.Id;
-                //account.ProjectId= newProject.Id;
-                account.Project = newProject;
-                account.ApprovedOn = DateTime.UtcNow;
-                percentage += account.Percentage;
-                if (account.Percentage < 0)
+                var newProject = new Project
                 {
-                    return BadRequest("Negative Percentage Detected");
+                    Name = postModel.Project.Name,
+                    Crop = postModel.Project.Crop,
+                    CropType = postModel.Project.CropType,
+                    Start = DateTime.UtcNow.ToPacificTime(), //Start and stop just now and a month from now?
+                    End = DateTime.UtcNow.ToPacificTime().AddMonths(1),
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedById = currentUser.Id,
+                    IsActive = true,
+                    IsApproved = true,
+                    Requirements = postModel.Project.Requirements,
+                };
+
+                // create PI if needed and assign to project
+                var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.Project.PrincipalInvestigator.Iam);
+                if (pi != null)
+                {
+                    newProject.PrincipalInvestigatorId = pi.Id;
                 }
-                newProject.Accounts.Add(account); //Don't need to specify projectId if I add it to the project?
-            }
-
-            if (percentage != 100.0m)
-            {
-                return BadRequest("Percentage of accounts is not 100%");
-            }
-
-            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
-            foreach (var expense in postModel.Expenses)
-            {
-                expense.CreatedBy = currentUser;
-                expense.CreatedOn = DateTime.UtcNow;
-                //expense.ProjectId = newProject.Id;
-                expense.Project = newProject;
-                expense.InvoiceId = null;
-                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-                expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
-                newProject.Expenses.Add(expense);
-            }
-            //_dbContext.Expenses.AddRange(postModel.Expenses);
-
-            //Create Quote from Expenses? Or if needed, pass it as a new parameter in the postmodel? I think expenses have much stripped out.
-            //I think we may just want to leave null
-            //Without the quote, the create change request doesn't work?
-
-
-            await _dbContext.Projects.AddAsync(newProject);
-            await _dbContext.SaveChangesAsync();
-
-            var quote = new Quote();
-            quote.InitiatedById = currentUser.Id;
-            quote.CreatedDate = DateTime.UtcNow;
-            quote.Project = newProject;
-            quote.ProjectId = newProject.Id;
-            quote.Total = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
-
-
-            var activities = new List<Activity>();
-            foreach(var activity in postModel.Quote.Activities)
-            {
-                if(activity.Total > 0)
+                else
                 {
-                    var workItems = new List<WorkItem>();
-                    foreach(var wi in activity.WorkItems)
+                    // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
+                    newProject.PrincipalInvestigator = postModel.Project.PrincipalInvestigator;
+                }
+
+                newProject.UpdateStatus(Project.Statuses.Active);
+
+                newProject.Acres = 0;
+                newProject.ChargedTotal = 0;
+                newProject.QuoteTotal = postModel.Expenses.Select(a => a.Total).Sum();
+
+
+
+                newProject.Expenses = new List<Expense>();
+
+                var percentage = 0.0m;
+
+                foreach (var account in postModel.Accounts)
+                {
+                    // Accounts will be auto-approved by quote approver
+                    account.ApprovedById = currentUser.Id;
+                    //account.ProjectId= newProject.Id;
+                    account.Project = newProject;
+                    account.ApprovedOn = DateTime.UtcNow;
+                    percentage += account.Percentage;
+                    if (account.Percentage < 0)
                     {
-                        if(wi.Total > 0)
-                        {
-                            workItems.Add(wi);
-                        }
+                        return BadRequest("Negative Percentage Detected");
                     }
-                    activity.WorkItems = workItems.ToArray();
-                    activities.Add(activity);
+                    newProject.Accounts.Add(account); //Don't need to specify projectId if I add it to the project?
                 }
+
+                if (percentage != 100.0m)
+                {
+                    return BadRequest("Percentage of accounts is not 100%");
+                }
+
+                var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+                foreach (var expense in postModel.Expenses)
+                {
+                    expense.CreatedBy = currentUser;
+                    expense.CreatedOn = DateTime.UtcNow;
+                    //expense.ProjectId = newProject.Id;
+                    expense.Project = newProject;
+                    expense.InvoiceId = null;
+                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    newProject.Expenses.Add(expense);
+                }
+                //_dbContext.Expenses.AddRange(postModel.Expenses);
+
+                //Create Quote from Expenses? Or if needed, pass it as a new parameter in the postmodel? I think expenses have much stripped out.
+                //I think we may just want to leave null
+                //Without the quote, the create change request doesn't work?
+
+
+                await _dbContext.Projects.AddAsync(newProject);
+                await _dbContext.SaveChangesAsync();
+
+                var quote = new Quote();
+                quote.InitiatedById = currentUser.Id;
+                quote.CreatedDate = DateTime.UtcNow;
+                quote.Project = newProject;
+                quote.ProjectId = newProject.Id;
+                quote.Total = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
+
+
+                var activities = new List<Activity>();
+                foreach (var activity in postModel.Quote.Activities)
+                {
+                    if (activity.Total > 0)
+                    {
+                        var workItems = new List<WorkItem>();
+                        foreach (var wi in activity.WorkItems)
+                        {
+                            if (wi.Total > 0)
+                            {
+                                workItems.Add(wi);
+                            }
+                        }
+                        activity.WorkItems = workItems.ToArray();
+                        activities.Add(activity);
+                    }
+                }
+                postModel.Quote.Activities = activities.ToArray();
+
+                quote.Text = QuoteDetail.Serialize(postModel.Quote);
+                quote.ApprovedById = currentUser.Id;
+                quote.Status = Quote.Statuses.Approved;
+
+                newProject.Quote = quote;
+
+                //_dbContext.Projects.Update(newProject);
+
+                await _dbContext.Quotes.AddAsync(quote);
+                await _dbContext.SaveChangesAsync();
+
+
+                await txn.CommitAsync();
+                return Ok();
             }
-            postModel.Quote.Activities = activities.ToArray();
-
-            quote.Text = QuoteDetail.Serialize(postModel.Quote);
-            quote.ApprovedById = currentUser.Id;
-            quote.Status = Quote.Statuses.Approved;
-
-            newProject.Quote = quote;
- 
-            //_dbContext.Projects.Update(newProject);
-
-            await _dbContext.Quotes.AddAsync(quote);
-            await _dbContext.SaveChangesAsync();
-
-
-            return Ok(newProject);
         }
     }
 }
