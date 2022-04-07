@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
+using Harvest.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,17 +25,17 @@ namespace Harvest.Web.Controllers.Api
         private readonly IProjectHistoryService _historyService;
         private readonly StorageSettings _storageSettings;
         private readonly IFileService _fileService;
-        private readonly IInvoiceService _invoiceService;
+        private readonly IEmailService _emailService;
 
         public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
-            IFileService fileService, IProjectHistoryService historyService, IInvoiceService invoiceService)
+            IFileService fileService, IProjectHistoryService historyService, IEmailService emailService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _storageSettings = storageSettings.Value;
             _fileService = fileService;
             _historyService = historyService;
-            _invoiceService = invoiceService;
+            _emailService = emailService;
         }
 
         [Authorize(Policy = AccessCodes.WorkerAccess)]
@@ -184,6 +186,135 @@ namespace Harvest.Web.Controllers.Api
             }
 
             return Content("Project already up to date.");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+
+            using (var txn = await _dbContext.Database.BeginTransactionAsync())
+            {
+
+                var newProject = new Project
+                {
+                    Name = postModel.Project.Name,
+                    Crop = postModel.Project.Crop,
+                    CropType = postModel.Project.CropType,
+                    Start = DateTime.UtcNow.ToPacificTime(), //Start and stop just now and a month from now?
+                    End = DateTime.UtcNow.ToPacificTime().AddMonths(1),
+                    CreatedOn = DateTime.UtcNow,
+                    CreatedById = currentUser.Id,
+                    IsActive = true,
+                    IsApproved = true,
+                    Requirements = postModel.Project.Requirements,
+                };
+
+                // create PI if needed and assign to project
+                var pi = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.Project.PrincipalInvestigator.Iam);
+                if (pi != null)
+                {
+                    newProject.PrincipalInvestigatorId = pi.Id;
+                }
+                else
+                {
+                    // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
+                    newProject.PrincipalInvestigator = postModel.Project.PrincipalInvestigator;
+                }
+
+                newProject.UpdateStatus(Project.Statuses.Active);
+
+                newProject.Acres = 0;
+                newProject.ChargedTotal = 0;
+                newProject.QuoteTotal = postModel.Expenses.Select(a => a.Total).Sum();
+
+
+
+                newProject.Expenses = new List<Expense>();
+
+                var percentage = 0.0m;
+
+                foreach (var account in postModel.Accounts)
+                {
+                    // Accounts will be auto-approved by quote approver
+                    account.ApprovedById = currentUser.Id;
+                    account.Project = newProject;
+                    account.ApprovedOn = DateTime.UtcNow;
+                    percentage += account.Percentage;
+                    if (account.Percentage < 0)
+                    {
+                        return BadRequest("Negative Percentage Detected");
+                    }
+                    newProject.Accounts.Add(account); 
+                }
+
+                if (percentage != 100.0m)
+                {
+                    return BadRequest("Percentage of accounts is not 100%");
+                }
+
+                var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+                foreach (var expense in postModel.Expenses)
+                {
+                    expense.CreatedBy = currentUser;
+                    expense.CreatedOn = DateTime.UtcNow;
+                    expense.Project = newProject;
+                    expense.InvoiceId = null;
+                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    newProject.Expenses.Add(expense);
+                }
+
+
+
+                await _dbContext.Projects.AddAsync(newProject);
+                await _dbContext.SaveChangesAsync();
+
+                var quote = new Quote();
+                quote.InitiatedById = currentUser.Id;
+                quote.CreatedDate = DateTime.UtcNow;
+                quote.Project = newProject;
+                quote.ProjectId = newProject.Id;
+                quote.Total = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
+
+
+                var activities = new List<Activity>();
+                foreach (var activity in postModel.Quote.Activities)
+                {
+                    if (activity.Total > 0)
+                    {
+                        var workItems = new List<WorkItem>();
+                        foreach (var wi in activity.WorkItems)
+                        {
+                            if (wi.Total > 0)
+                            {
+                                workItems.Add(wi);
+                            }
+                        }
+                        activity.WorkItems = workItems.ToArray();
+                        activities.Add(activity);
+                    }
+                }
+                postModel.Quote.Activities = activities.ToArray();
+
+                quote.Text = QuoteDetail.Serialize(postModel.Quote);
+                quote.ApprovedById = currentUser.Id;
+                quote.Status = Quote.Statuses.Approved;
+
+                newProject.Quote = quote;
+
+
+                await _dbContext.Quotes.AddAsync(quote);
+                await _historyService.AdhocProjectCreated(newProject);
+                await _dbContext.SaveChangesAsync();
+
+                await _emailService.AdhocProjectCreated(newProject);
+
+
+                await txn.CommitAsync();
+                return Ok(newProject);
+            }
         }
     }
 }

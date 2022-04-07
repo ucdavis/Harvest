@@ -44,6 +44,18 @@ export const requestSchema = yup.object().shape({
   files: yup.array().of(fileSchema),
 });
 
+export const adhocProjectSchema = yup.object().shape({
+  id: yup.number().required(),
+  name: yup.string().required(),
+  crop: yup.string().required(),
+  cropType: yup.string().required(),
+  requirements: yup.string().required(),
+  // principalInvestigator: yup.lazy((value) =>
+  //   // investigatorSchema.required() didn't work, but this seems to do the trick
+  //   value ? investigatorSchema : yup.object().required(ErrorMessages.PIRequired)
+  // ),
+});
+
 export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
   name: yup
     .string()
