@@ -25,17 +25,17 @@ namespace Harvest.Web.Controllers.Api
         private readonly IProjectHistoryService _historyService;
         private readonly StorageSettings _storageSettings;
         private readonly IFileService _fileService;
-        private readonly IInvoiceService _invoiceService;
+        private readonly IEmailService _emailService;
 
         public ProjectController(AppDbContext dbContext, IUserService userService, IOptions<StorageSettings> storageSettings,
-            IFileService fileService, IProjectHistoryService historyService, IInvoiceService invoiceService)
+            IFileService fileService, IProjectHistoryService historyService, IEmailService emailService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _storageSettings = storageSettings.Value;
             _fileService = fileService;
             _historyService = historyService;
-            _invoiceService = invoiceService;
+            _emailService = emailService;
         }
 
         [Authorize(Policy = AccessCodes.WorkerAccess)]
@@ -306,7 +306,10 @@ namespace Harvest.Web.Controllers.Api
 
 
                 await _dbContext.Quotes.AddAsync(quote);
+                await _historyService.AdhocProjectCreated(newProject);
                 await _dbContext.SaveChangesAsync();
+
+                await _emailService.AdhocProjectCreated(newProject);
 
 
                 await txn.CommitAsync();

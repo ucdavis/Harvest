@@ -39,6 +39,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> QuoteSaved(int projectId, Quote quote);
         Task<ProjectHistory> QuoteSubmitted(int projectId, Quote quote);
         Task<ProjectHistory> RequestCreated(Project project);
+        Task<ProjectHistory> AdhocProjectCreated(Project project);
         Task<ProjectHistory> TicketCreated(int projectId, Ticket ticket);
         Task<ProjectHistory> TicketFilesAttached(int projectId, IEnumerable<TicketAttachment> attachments);
         Task<ProjectHistory> TicketNotesUpdated(int projectId, Ticket ticket);
@@ -96,6 +97,8 @@ namespace Harvest.Core.Services
             MakeHistory(projectId, nameof(QuoteSubmitted), quote.Text); // quote.Text is a preserialized QuoteDetail
         public Task<ProjectHistory> RequestCreated(Project project) =>
             MakeHistory(project, nameof(RequestCreated), new ProjectHistoryModel(project));
+        public Task<ProjectHistory> AdhocProjectCreated(Project project) =>
+            MakeHistory(project, nameof(AdhocProjectCreated), new ProjectHistoryModel(project));
         public Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts) =>
             MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)));
         public Task<ProjectHistory> QuoteRejected(int projectId, string reason) =>
