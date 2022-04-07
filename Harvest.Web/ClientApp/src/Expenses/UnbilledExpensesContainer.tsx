@@ -105,7 +105,8 @@ export const UnbilledExpensesContainer = (props: Props) => {
         expensesCopy.splice(index, 1);
 
         setExpenses(expensesCopy);
-        const total = expenses.reduce((acc, cur) => acc + cur.total, 0);
+        const total = expensesCopy.reduce((acc, cur) => acc + cur.total, 0);
+
         setTotal(total);
         setTotalUnbilled && setTotalUnbilled(total);
       }
