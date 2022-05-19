@@ -245,10 +245,10 @@ namespace Harvest.Core.Services
                 }
 
                 rtValue.KfsAccount.ChartOfAccountsCode = accountArray[0].ToUpper();
-                rtValue.KfsAccount.AccountNumber = accountArray[1].ToUpper();
+                rtValue.KfsAccount.AccountNumber = accountArray[1].Trim().ToUpper();
                 if (accountArray.Length > 2)
                 {
-                    rtValue.KfsAccount.SubAccount = accountArray[2].ToUpper();
+                    rtValue.KfsAccount.SubAccount = accountArray[2].Trim().ToUpper();
                 }
                 //TODO: Maybe a project? or leave a placeholder for project?
                 if (accountArray.Length > 3)
@@ -322,7 +322,7 @@ namespace Harvest.Core.Services
             }
 
             var accountLookup = await GetAccount(account.ChartOfAccountsCode, account.AccountNumber);
-            rtValue.KfsAccount.AccountName = accountLookup.AccountName;
+            rtValue.KfsAccount.AccountName = accountLookup.AccountName.Trim();
             rtValue.KfsAccount.OrganizationCode = accountLookup.OrganizationCode;
             rtValue.KfsAccount.SubFundGroupCode = accountLookup.SubFundGroupCode;
             rtValue.KfsAccount.SubFundGroupTypeCode = accountLookup.SubFundGroupTypeCode;
@@ -372,10 +372,10 @@ namespace Harvest.Core.Services
             }
 
             rtValue.ChartOfAccountsCode = accountArray[0].ToUpper();
-            rtValue.AccountNumber = accountArray[1].ToUpper();
+            rtValue.AccountNumber = accountArray[1].Trim().ToUpper();
             if (accountArray.Length > 2)
             {
-                rtValue.SubAccount = accountArray[2].ToUpper();
+                rtValue.SubAccount = accountArray[2].Trim().ToUpper();
             }
             //TODO: Maybe a project? or leave a placeholder for project?
             if (accountArray.Length > 3)
