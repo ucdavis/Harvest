@@ -16,6 +16,12 @@
             @Project.CropTypes.Tree
         </label>
     </div>
+    <div class="radio">
+        <label>
+            <input type="radio" name="Type" id="TypeOther" value="@Project.CropTypes.Other" @(Model.Type == Project.CropTypes.Other ? "checked='checked'" : "") />
+            @Project.CropTypes.Other
+        </label>
+    </div>
 </div>
 
 <div class="form-group">

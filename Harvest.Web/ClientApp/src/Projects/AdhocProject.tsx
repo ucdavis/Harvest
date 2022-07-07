@@ -294,6 +294,24 @@ export const AdhocProject = () => {
                             Tree Crops
                           </label>
                         </div>
+                        <div className="custom-control custom-radio">
+                          <input
+                            type="radio"
+                            id="otherCropInput"
+                            name="otherCropInput"
+                            className="custom-control-input"
+                            style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                            value="Other"
+                            checked={project.cropType === "Other"}
+                            onChange={handleCropTypeChange}
+                          />
+                          <label
+                            className="custom-control-label"
+                            htmlFor="OtherCropInput"
+                          >
+                            Other
+                          </label>
+                        </div>
                       </FormGroup>
                       <FormGroup tag="fieldset">
                         <Label>What crop(s) will we grow?</Label>
