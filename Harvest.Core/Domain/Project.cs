@@ -220,11 +220,13 @@ namespace Harvest.Core.Domain
         {
             public const string Row = "Row";
             public const string Tree = "Tree";
+            public const string Other = "Other";
 
             public static List<string> TypeList = new List<string>
             {
                 Row,
-                Tree
+                Tree,
+                Other
             };
         }
     }

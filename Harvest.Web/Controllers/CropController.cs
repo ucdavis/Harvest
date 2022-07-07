@@ -49,7 +49,7 @@ namespace Harvest.Web.Controllers
             }
             if (!Project.CropTypes.TypeList.Contains(model.Type))
             {
-                ErrorMessage = $"Type must be {Project.CropTypes.Tree} or {Project.CropTypes.Row}";
+                ErrorMessage = $"Type must be {Project.CropTypes.Tree} or {Project.CropTypes.Row} or {Project.CropTypes.Other}";
                 return View(model);
             }
 
@@ -96,7 +96,7 @@ namespace Harvest.Web.Controllers
             }
             if (!Project.CropTypes.TypeList.Contains(model.Type))
             {
-                ErrorMessage = $"Type must be {Project.CropTypes.Tree} or {Project.CropTypes.Row}";
+                ErrorMessage = $"Type must be {Project.CropTypes.Tree} or {Project.CropTypes.Row} or {Project.CropTypes.Other}";
                 return View(model);
             }
 

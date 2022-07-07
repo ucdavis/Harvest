@@ -52,7 +52,9 @@ export const RequestContainer = () => {
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -231,6 +233,24 @@ export const RequestContainer = () => {
                     htmlFor="treeCropInput"
                   >
                     Tree Crops
+                  </label>
+                </div>
+                <div className="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    id="otherCropInput"
+                    name="otherCropInput"
+                    className="custom-control-input"
+                    style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                    value="Other"
+                    checked={project.cropType === "Other"}
+                    onChange={handleCropTypeChange}
+                  />
+                  <label
+                    className="custom-control-label"
+                    htmlFor="OtherCropInput"
+                  >
+                    Other
                   </label>
                 </div>
               </FormGroup>
