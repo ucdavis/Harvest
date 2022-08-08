@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
+using Serilog;
 
 namespace Harvest.Web.Controllers.Api
 {
@@ -189,6 +190,13 @@ namespace Harvest.Web.Controllers.Api
                 {
                     poly = (Polygon)poly.Reverse();
                 }
+
+                if (poly.IsEmpty || !poly.IsValid)
+                {
+                    Log.Error("Invalid polygon detected in quote");
+                    continue;
+                }
+
 
                 var field = new Field { Crop = quoteField.Crop, Details = quoteField.Details, IsActive = true, ProjectId = project.Id, Location = poly };
 
