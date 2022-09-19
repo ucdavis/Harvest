@@ -70,7 +70,7 @@ export const QuotePDF = (props: Props) => (
       <TotalSection
         acreageTotal={props.quote.acreageTotal}
         laborTotal={props.quote.laborTotal}
-        equipmentTotal={props.quote.laborTotal}
+        equipmentTotal={props.quote.equipmentTotal}
         otherTotal={props.quote.otherTotal}
         grandTotal={props.quote.grandTotal}
       />
