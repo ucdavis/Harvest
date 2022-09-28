@@ -20,6 +20,7 @@ namespace Harvest.Core.Services
     public interface IEmailService
     {
         Task<bool> ProfessorQuoteReady(Project project, Quote quote);
+        Task<bool> SupervisorSavedQuote(Project project, Quote quote);
         Task<bool> NewFieldRequest(Project project);
         Task<bool> ChangeRequest(Project project);
 
@@ -100,9 +101,50 @@ namespace Harvest.Core.Services
 
         }
 
+        public async Task<bool> SupervisorSavedQuote(Project project, Quote quote)
+        {
+            var url = $"{_emailSettings.BaseUrl}/quote/create/";
+            if (quote == null)
+            {
+                throw new Exception("No quote.");
+            }
+
+
+            try
+            {
+                var model = new ProfessorQuoteModel()
+                {
+                    ProfName = "Field Managers",
+                    ProjectName = project.NameAndId,
+                    ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                    ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                    QuoteAmount = quote.Total.ToString("C"),
+                    ButtonUrl = $"{url}{project.Id}",
+                    ButtonQuoteText = "View Saved Quote"
+                };
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
+
+                await _notificationService.SendNotification( await FieldManagersEmails(), null, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Supervisor Saved Quote");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
+
+        }
+
         private async Task<string[]> FieldManagersEmails()
         {
             return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
+        }
+
+        private async Task<string[]> FieldManagersAndSupervisorEmails()
+        {
+            return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager || a.Role.Name == Role.Codes.Supervisor).Select(a => a.User.Email).Distinct().ToArrayAsync();
         }
 
 
@@ -126,7 +168,7 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
@@ -161,7 +203,7 @@ namespace Harvest.Core.Services
 
                 var textVersion = $"A change request has been made by {model.PI} for project {model.ProjectName}.";
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
             }
             catch (Exception e)
             {

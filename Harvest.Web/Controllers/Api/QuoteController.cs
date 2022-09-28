@@ -101,6 +101,10 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 await _historyService.QuoteSaved(projectId, quote);
+                if(!await _userService.HasAccess(AccessCodes.FieldManagerAccess))
+                {
+                    await _emailService.SupervisorSavedQuote(project, quote);
+                }
             }
 
             await _dbContext.SaveChangesAsync();
