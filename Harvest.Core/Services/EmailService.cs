@@ -105,6 +105,11 @@ namespace Harvest.Core.Services
             return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
         }
 
+        private async Task<string[]> FieldManagersAndSupervisorEmails()
+        {
+            return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager || a.Role.Name == Role.Codes.Supervisor).Select(a => a.User.Email).Distinct().ToArrayAsync();
+        }
+
 
         public async Task<bool> NewFieldRequest(Project project)
         {
@@ -126,7 +131,7 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
@@ -161,7 +166,7 @@ namespace Harvest.Core.Services
 
                 var textVersion = $"A change request has been made by {model.PI} for project {model.ProjectName}.";
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
             }
             catch (Exception e)
             {
