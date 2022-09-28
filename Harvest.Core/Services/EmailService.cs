@@ -20,6 +20,7 @@ namespace Harvest.Core.Services
     public interface IEmailService
     {
         Task<bool> ProfessorQuoteReady(Project project, Quote quote);
+        Task<bool> SupervisorSavedQuote(Project project, Quote quote);
         Task<bool> NewFieldRequest(Project project);
         Task<bool> ChangeRequest(Project project);
 
@@ -89,6 +90,42 @@ namespace Harvest.Core.Services
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
                 await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+            }
+            catch (Exception e)
+            {
+                Log.Error("Error trying to email Quote", e);
+                return false;
+            }
+
+            return true;
+
+        }
+
+        public async Task<bool> SupervisorSavedQuote(Project project, Quote quote)
+        {
+            var url = $"{_emailSettings.BaseUrl}/quote/create/";
+            if (quote == null)
+            {
+                throw new Exception("No quote.");
+            }
+
+
+            try
+            {
+                var model = new ProfessorQuoteModel()
+                {
+                    ProfName = "Field Managers",
+                    ProjectName = project.NameAndId,
+                    ProjectStart = project.Start.ToPacificTime().Date.Format("d"),
+                    ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
+                    QuoteAmount = quote.Total.ToString("C"),
+                    ButtonUrl = $"{url}{project.Id}",
+                    ButtonQuoteText = "View Saved Quote"
+                };
+
+                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
+
+                await _notificationService.SendNotification( await FieldManagersEmails(), null, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Supervisor Saved Quote");
             }
             catch (Exception e)
             {
