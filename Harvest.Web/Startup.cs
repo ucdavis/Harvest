@@ -175,6 +175,7 @@ namespace Harvest.Web
             services.Configure<StorageSettings>(Configuration.GetSection("Storage"));
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
             services.Configure<DevSettings>(Configuration.GetSection("Dev"));
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
 
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<RewriteError404>();
@@ -191,6 +192,7 @@ namespace Harvest.Web
             services.AddScoped<IExpenseService, ExpenseService>();
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
             services.AddTransient<IDateTimeService, DateTimeService>();
+            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
