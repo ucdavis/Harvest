@@ -23,6 +23,7 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> Get(string account)
         {
+            //TODO: Call AE validation/lookup.
             var validationModel = await _financialService.IsValid(account);
             if (validationModel.IsValid)
             {

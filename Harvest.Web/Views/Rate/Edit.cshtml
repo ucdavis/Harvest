@@ -9,7 +9,7 @@
 <h4>Rate</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -28,6 +28,23 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    @{
+        <script src="https://finjector.ucdavis.edu/finjector.js?v=3" type="text/javascript" asp-add-nonce="true"></script>
+        <script type="text/javascript" asp-add-nonce="true">
+            $("#ccoa-picker").on("click",
+                async function () {
+                    const chart = await window.Finjector.findChartSegmentString("https://finjector.ucdavis.edu/landing");
+                    if (chart && chart.status === "success") {
+                        $("#Rate_Account").val(chart.data);
+                    }
+                    else {
+                        alert("Something went wrong with the CCOA picker")
+                    }
+                    return false;
+                });
+        </script>
+    }
 }
 @section Styles
 {
