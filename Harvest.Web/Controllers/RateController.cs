@@ -23,12 +23,14 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IFinancialService _financialService;
+        private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
-        public RateController(AppDbContext dbContext, IUserService userService, IFinancialService financialService)
+        public RateController(AppDbContext dbContext, IUserService userService, IFinancialService financialService, IAggieEnterpriseService aggieEnterpriseService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _financialService = financialService;
+            _aggieEnterpriseService = aggieEnterpriseService;
         }
         // GET: RateController
         public async Task<ActionResult> Index()
@@ -93,6 +95,15 @@ namespace Harvest.Web.Controllers
                 }
             }
 
+            if ((await _aggieEnterpriseService.IsAccountValid(model.Rate.Account)).IsValid == false)
+            {
+                //TODO: Do some kind of object code validation here?
+                ModelState.AddModelError("Rate.Account", $"Account is not valid.");
+            }
+            
+            //TODO: I was doing something with this... commented it out to compile...
+            //var segments = _aggieEnterpriseService.
+
             if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
             {
                 ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
@@ -120,6 +131,7 @@ namespace Harvest.Web.Controllers
                 await _dbContext.SaveChangesAsync();
                 if (rateToCreate.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
                 {
+                    //775001 is the passthrough accountI don't think PPM should be allowed here... 
                     Message = "Rate Created -- WARNING! Passthrough object code is not 80RS";
                 }
                 else
