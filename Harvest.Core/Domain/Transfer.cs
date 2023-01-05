@@ -15,7 +15,7 @@ namespace Harvest.Core.Domain
         public string Type { get; set; }
 
         [Required]
-        [StringLength(50)]
+        [StringLength(80)]
         public string Account { get; set; }
 
         [Range(0.01, Double.MaxValue, ErrorMessage = "Total must be greater than 0.01")] //Actually, sloth does have a max value...

@@ -56,7 +56,7 @@ namespace Harvest.Core.Domain
         public bool IsPassthrough { get; set; } = false;
 
         [Required]
-        [StringLength(50)]
+        [StringLength(80)]
         public string Account { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
