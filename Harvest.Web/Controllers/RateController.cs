@@ -14,6 +14,8 @@ using Harvest.Web.Models.RateModels;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Harvest.Core.Models.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
@@ -24,13 +26,15 @@ namespace Harvest.Web.Controllers
         private readonly IUserService _userService;
         private readonly IFinancialService _financialService;
         private readonly IAggieEnterpriseService _aggieEnterpriseService;
+        private readonly AggieEnterpriseOptions _aeSettings;
 
-        public RateController(AppDbContext dbContext, IUserService userService, IFinancialService financialService, IAggieEnterpriseService aggieEnterpriseService)
+        public RateController(AppDbContext dbContext, IUserService userService, IFinancialService financialService, IAggieEnterpriseService aggieEnterpriseService, IOptions<AggieEnterpriseOptions> options)
         {
             _dbContext = dbContext;
             _userService = userService;
             _financialService = financialService;
             _aggieEnterpriseService = aggieEnterpriseService;
+            _aeSettings = options.Value;
         }
         // GET: RateController
         public async Task<ActionResult> Index()

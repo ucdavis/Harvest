@@ -4,5 +4,7 @@
     {
         public string GraphQlUrl { get; set; }
         public string Token { get; set; }
+
+        public bool UseCoA { get; set; }
     }
 }
