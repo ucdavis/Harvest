@@ -77,27 +77,75 @@
     <dd class="col-sm-10">
         @Html.DisplayFor(model => model.Rate.Account)
     </dd>
-    @if (Model.AccountValidation.IsValid)
+    @if (Model.AccountValidation.KfsAccount != null)
     {
-        <dt class="col-sm-2">
-            Account Details
-        </dt>
-        <dd class="col-sm-10">
-            <div><strong>Account Name:</strong> @Model.AccountValidation.KfsAccount.AccountName</div>
-            <div><strong>Organization Code:</strong> @Model.AccountValidation.KfsAccount.OrganizationCode</div>
-            <div><strong>Sub Fund Group Name:</strong> @Model.AccountValidation.KfsAccount.SubFundGroupName</div>
-            <div><strong>Account Expiration Date:</strong> @(Model.AccountValidation.KfsAccount.AccountExpirationDate.HasValue ? Model.AccountValidation.KfsAccount.AccountExpirationDate : "N/A")</div>
-        </dd>
-    }
-    else
-    {
-        <dt class="col-sm-2">
-            Account Validation
-        </dt>
-        <dd class="alert-danger col-sm-10">
-            <p>Account is Invalid</p>
-            <p>@Model.AccountValidation.Field <span>: </span> @Model.AccountValidation.Message</p>
-        </dd>
+        if (Model.AccountValidation.IsValid)
+        {
+            <dt class="col-sm-2">
+                Account Details
+            </dt>
+            <dd class="col-sm-10">
+                <div><strong>Account Name:</strong> @Model.AccountValidation.KfsAccount.AccountName</div>
+                <div><strong>Organization Code:</strong> @Model.AccountValidation.KfsAccount.OrganizationCode</div>
+                <div><strong>Sub Fund Group Name:</strong> @Model.AccountValidation.KfsAccount.SubFundGroupName</div>
+                <div><strong>Account Expiration Date:</strong> @(
+            Model.AccountValidation.KfsAccount.AccountExpirationDate.HasValue ? Model.AccountValidation.KfsAccount.AccountExpirationDate : "N/A"
+            )</div>
+            </dd>
+        }
+        else
+        {
+            <dt class="col-sm-2">
+                Account Validation
+            </dt>
+            <dd class="alert-danger col-sm-10">
+                <p>Account is Invalid</p>
+                <p>@Model.AccountValidation.Field <span>: </span> @Model.AccountValidation.Message</p>
+            </dd>
+        }
 
+    }
+    else if (Model.AccountValidation.FinancialSegmentString != null)
+    {
+        @if (Model.AccountValidation.Details.Any())
+        {
+            <dt class="col-sm-2">
+                Aggie Enterprise COA Details
+            </dt>
+            <dd class="col-sm-10">
+                @foreach (var detail in Model.AccountValidation.Details)
+                {
+                    <div><strong>@detail.Key</strong> @(detail.Value != null ? detail.Value : "n/a")</div>
+                }
+            </dd>
+        }
+
+        if (Model.AccountValidation?.IsValid == false)
+        {
+            <dt class="col-sm-2">
+                Account Validation
+            </dt>
+            <dd class="alert-danger col-sm-10">
+                <p>Account is Invalid</p>
+                @foreach (var detail in Model.AccountValidation.Messages)
+                {
+                    <p>Error: @detail</p>
+                }
+            </dd>
+        }
+
+        if (Model.AccountValidation.Warnings.Any())
+        {
+            <dt class="col-sm-2">
+                Account Validation
+            </dt>
+            <dd class="alert-danger col-sm-10">
+                <p>Account Warnings</p>
+                @foreach (var detail in Model.AccountValidation.Warnings)
+                {
+                    <p>Warning: @detail</p>
+                }
+            </dd>
+        }
     }
 </dl>

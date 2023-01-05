@@ -239,7 +239,7 @@ namespace Harvest.Core.Services
                 if (accountArray.Length < 2)
                 {
                     rtValue.IsValid = false;
-                    rtValue.Message = "Need chart and account";
+                    rtValue.Messages.Add("Need chart and account");
                     rtValue.Field = "Account";
                     return rtValue;
                 }
@@ -262,7 +262,7 @@ namespace Harvest.Core.Services
             catch
             {
                 rtValue.IsValid = false;
-                rtValue.Message = "Unable to parse account string";
+                rtValue.Messages.Add("Unable to parse account string");
                 rtValue.Field = "Account";
             }
 
@@ -277,7 +277,7 @@ namespace Harvest.Core.Services
             {
                 rtValue.IsValid = false;
                 rtValue.Field = "Account";
-                rtValue.Message = "Valid Account Not Found. (Invalid or Expired).";
+                rtValue.Messages.Add("Valid Account Not Found. (Invalid or Expired).");
 
                 return rtValue;
             }
@@ -294,7 +294,7 @@ namespace Harvest.Core.Services
                 {
                     rtValue.IsValid = false;
                     rtValue.Field = "Project";
-                    rtValue.Message = "Project Not Valid.";
+                    rtValue.Messages.Add("Project Not Valid.");
                     return rtValue;
                 }
                 else
@@ -309,14 +309,14 @@ namespace Harvest.Core.Services
                 {
                     rtValue.IsValid = false;
                     rtValue.Field = "ObjectCode";
-                    rtValue.Message = "Object Code is too long";
+                    rtValue.Messages.Add("Object Code is too long");
                     return rtValue;
                 }
                 if (!await IsObjectValid(account.ChartOfAccountsCode, account.ObjectCode))
                 {
                     rtValue.IsValid = false;
                     rtValue.Field = "ObjectCode";
-                    rtValue.Message = "Object Code is not valid";
+                    rtValue.Messages.Add("Object Code is not valid");
                     return rtValue;
                 }
             }

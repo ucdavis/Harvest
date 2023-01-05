@@ -59,9 +59,15 @@ namespace Harvest.Web.Controllers
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == id);
-            var model = new RateDetailsModel {Rate = rate};
-            model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
-
+            var model = new RateDetailsModel { Rate = rate };
+            if (_aeSettings.UseCoA)
+            {
+                model.AccountValidation = await _aggieEnterpriseService.IsAccountValid(rate.Account);
+            }
+            else
+            {
+                model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
+            }
             return View(model);
         }
 
@@ -86,6 +92,7 @@ namespace Harvest.Web.Controllers
                 return View(model);
             }
 
+            //TODO!!!
             var accountValidation = await _financialService.IsValid(model.Rate.Account);
             if (!accountValidation.IsValid)
             {
