@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using AggieEnterpriseApi.Types;
+using AggieEnterpriseApi.Validation;
+using System.Collections.Generic;
 
 namespace Harvest.Core.Models.FinancialAccountModels
 {
@@ -13,7 +15,9 @@ namespace Harvest.Core.Models.FinancialAccountModels
         //AE Stuff:
         public string FinancialSegmentString { get; set; } //Not sure if I want this here, but I have the KFS Account above, so maybe.
         //public bool IsValid { get; set; } = false; So above this defaults to true, need to set to false for AE stuff.
-        public bool IsPpm { get; set; } = false;
+        public FinancialChartStringType CoaChartType { get; set; }
+        public GlSegments GlSegments { get; set; }
+        public PpmSegments PpmSegments { get; set; }
         /// <summary>
         /// Return Segment info.
         /// </summary>

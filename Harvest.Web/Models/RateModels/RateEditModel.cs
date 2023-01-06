@@ -7,5 +7,7 @@ namespace Harvest.Web.Models.RateModels
     {
         public Rate Rate { get; set; }
         public List<string> TypeList { get; set; }
+
+        public bool UseCoA { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Harvest.Core.Services
 {
     public interface IAggieEnterpriseService
     {
-        Task<AccountValidationModel> IsAccountValid(string financialSegmentString, bool validateCVRs = true);
+        Task<AccountValidationModel> IsAccountValid(string financialSegmentString, bool validateCVRs = true, bool validateRate = false);
 
         Task<FinancialOfficerDetails> GetFinancialOfficer(string financialSegmentString);
     }
@@ -30,8 +30,14 @@ namespace Harvest.Core.Services
             _aggieClient = GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
         }
 
-
-        public async Task<AccountValidationModel> IsAccountValid(string financialSegmentString, bool validateCVRs = true)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="financialSegmentString"></param>
+        /// <param name="validateCVRs"></param>
+        /// <param name="validateRate">Performs extra validation needed for Rates</param>
+        /// <returns></returns>
+        public async Task<AccountValidationModel> IsAccountValid(string financialSegmentString, bool validateCVRs = true, bool validateRate = false)
         {
             var rtValue = new AccountValidationModel();
             rtValue.IsValid = false;
@@ -39,6 +45,7 @@ namespace Harvest.Core.Services
             rtValue.FinancialSegmentString = financialSegmentString;
 
             var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(financialSegmentString);
+            rtValue.CoaChartType = segmentStringType;
 
             if (segmentStringType == FinancialChartStringType.Gl)
             {
@@ -47,7 +54,6 @@ namespace Harvest.Core.Services
                 var data = result.ReadData();
 
                 rtValue.IsValid = data.GlValidateChartstring.ValidationResponse.Valid;
-                rtValue.IsPpm = false;
 
                 if (!rtValue.IsValid)
                 {
@@ -73,6 +79,10 @@ namespace Harvest.Core.Services
                     }
                 }
 
+                rtValue.GlSegments = FinancialChartValidation.GetGlSegments(financialSegmentString);
+
+                //TODO: Rate Validations
+
                 return rtValue;
             }
 
@@ -83,7 +93,6 @@ namespace Harvest.Core.Services
                 var data = result.ReadData();
 
                 rtValue.IsValid = data.PpmStringSegmentsValidate.ValidationResponse.Valid;
-                rtValue.IsPpm = true;
                 if (!rtValue.IsValid)
                 {
                     foreach (var err in data.PpmStringSegmentsValidate.ValidationResponse.ErrorMessages)
@@ -107,11 +116,20 @@ namespace Harvest.Core.Services
                     }
                 }
 
+                rtValue.PpmSegments = FinancialChartValidation.GetPpmSegments(financialSegmentString);
+
+                //TODO: Rate Validations
+                if (validateRate)
+                {
+                    rtValue.IsValid = false;
+                    rtValue.Messages.Add("Harvest Rates can't have PPM COA's");
+                }
+
                 return rtValue;
             }
 
             rtValue.IsValid = false; //Just in case.
-            rtValue.Messages.Add("This is not a valid Aggie Enterprise COA format");
+            rtValue.Messages.Add("Invalid Aggie Enterprise COA format");
             
             return rtValue;
         }
