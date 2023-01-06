@@ -192,6 +192,7 @@ namespace Harvest.Web.Controllers
         {
             var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id);
             var model = new RateEditModel { Rate = rate, TypeList = Rate.Types.TypeList };
+            model.UseCoA = _aeSettings.UseCoA;
 
             return View(model);
         }
@@ -203,28 +204,41 @@ namespace Harvest.Web.Controllers
         {
             model.Rate.Id = id;
             model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
+            model.UseCoA = _aeSettings.UseCoA;
+            model.Rate.Account = model.Rate.Account?.ToUpper().Trim();
+            
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
                 return View(model);
             }
 
-            var accountValidation = await _financialService.IsValid(model.Rate.Account);
+            AccountValidationModel accountValidation = null;
+            if (_aeSettings.UseCoA)
+            {
+                accountValidation = await _aggieEnterpriseService.IsAccountValid(model.Rate.Account, validateRate: true);
+            }
+            else
+            {
+                accountValidation = await _financialService.IsValid(model.Rate.Account);
+            }
+
             if (!accountValidation.IsValid)
             {
                 ModelState.AddModelError("Rate.Account", $"Field: {accountValidation.Field} is not valid: {accountValidation.Message}");
             }
             else
             {
-                if (string.IsNullOrWhiteSpace(accountValidation.KfsAccount.ObjectCode))
+                if (!_aeSettings.UseCoA && string.IsNullOrWhiteSpace(accountValidation.KfsAccount.ObjectCode))
                 {
                     ModelState.AddModelError("Rate.Account", $"Object Code is missing from the account.");
                 }
+                //TODO: Look at the segments to check this in the COA?
             }
 
-            if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
+            if (accountValidation.Warnings.Any())
             {
-                ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
+                ErrorMessage = "This COA has associated warnings, please select details to review them.";
             }
 
             if (!ModelState.IsValid)
@@ -243,13 +257,27 @@ namespace Harvest.Web.Controllers
             try
             {
                 await _dbContext.SaveChangesAsync();
-                if (rateToEdit.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
+                if (_aeSettings.UseCoA)
                 {
-                    Message = "Rate Updated -- WARNING! Passthrough object code is not 80RS";
+                    if (rateToEdit.IsPassthrough && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
+                    {
+                        Message = "Rate Updated -- WARNING! Passthrough natural accounts should be 775001";
+                    }
+                    else
+                    {
+                        Message = "Rate Updated";
+                    }
                 }
                 else
                 {
-                    Message = "Rate Updated";
+                    if (rateToEdit.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
+                    {
+                        Message = "Rate Updated -- WARNING! Passthrough object code is not 80RS";
+                    }
+                    else
+                    {
+                        Message = "Rate Updated";
+                    }
                 }
 
                 return RedirectToAction(nameof(Index));
