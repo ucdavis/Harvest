@@ -154,15 +154,13 @@ namespace Harvest.Web.Controllers
             {
                 await _dbContext.Rates.AddAsync(rateToCreate);
                 await _dbContext.SaveChangesAsync();
+                Message = "Rate Created";
+                
                 if (_aeSettings.UseCoA)
                 {
                     if(rateToCreate.IsPassthrough && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
                     {
                         Message = "Rate Created -- WARNING! Passthrough natural accounts should be 775001";
-                    }
-                    else 
-                    { 
-                        Message = "Rate Created";
                     }
                 }
                 else
@@ -170,10 +168,6 @@ namespace Harvest.Web.Controllers
                     if (rateToCreate.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
                     {
                         Message = "Rate Created -- WARNING! Passthrough object code is not 80RS";
-                    }
-                    else
-                    {
-                        Message = "Rate Created";
                     }
                 }
 
@@ -257,15 +251,12 @@ namespace Harvest.Web.Controllers
             try
             {
                 await _dbContext.SaveChangesAsync();
+                Message = "Rate Updated";
                 if (_aeSettings.UseCoA)
                 {
                     if (rateToEdit.IsPassthrough && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
                     {
                         Message = "Rate Updated -- WARNING! Passthrough natural accounts should be 775001";
-                    }
-                    else
-                    {
-                        Message = "Rate Updated";
                     }
                 }
                 else
@@ -273,10 +264,6 @@ namespace Harvest.Web.Controllers
                     if (rateToEdit.IsPassthrough && accountValidation.KfsAccount.ObjectCode != "80RS")
                     {
                         Message = "Rate Updated -- WARNING! Passthrough object code is not 80RS";
-                    }
-                    else
-                    {
-                        Message = "Rate Updated";
                     }
                 }
 
@@ -319,8 +306,15 @@ namespace Harvest.Web.Controllers
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == id);
-            var model = new RateDetailsModel { Rate = rate };
-            model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
+            var model = new RateDetailsModel { Rate = rate }; 
+            if (_aeSettings.UseCoA)
+            {
+                model.AccountValidation = await _aggieEnterpriseService.IsAccountValid(model.Rate.Account, validateRate: true);
+            }
+            else
+            {
+                model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
+            }
 
             return View(model);
         }
