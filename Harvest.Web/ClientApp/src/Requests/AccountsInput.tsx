@@ -127,13 +127,39 @@ export const AccountsInput = (props: Props) => {
 
 const lookupcoa = async () => {
 
-    const chart = await window.Finjector.findChartSegmentString().then((response: any) => {
+    let coa = null;
+    await window.Finjector.findChartSegmentString().then((response: any) => {
         if (response.status === "success") {
-            alert(response.data);
-            (typeaheadRef.current as any)?.clear();
-            (typeaheadRef.text as any) = response.data;
-        }
+            coa = response.data;
+        }        
     });
+
+    if (coa != null) {
+        const response = await authenticatedFetch(`/api/financialaccount/get?account=${coa}`);
+
+        if (response.ok) {
+            if (response.status === 204) {
+                setError("Account Selected is not valid");
+                return;
+            } else {
+                const accountInfo: ProjectAccount = await response.json();
+
+                if (accounts.some((a) => a.number === accountInfo.number)) {
+                    setError("Account already selected -- choose a different account");
+                    return;
+                } else {
+                    setError(undefined);
+                }
+
+                if (accounts.length === 0) {
+                    // if it's our first account, default to 100%
+                    accountInfo.percentage = 100.0;
+                }
+
+                setAccounts([...accounts, accountInfo]);
+            }
+        }
+    }
 };
 
   return (
