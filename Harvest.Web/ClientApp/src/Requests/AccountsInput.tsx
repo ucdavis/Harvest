@@ -1,6 +1,6 @@
 // typeahead input box that allows entering valid account numbers
 // each one entered is displayed on a new line where percentages can be set
-import React, { createRef, useEffect, useState } from "react";
+import React, { createRef, useContext, useEffect, useState } from "react";
 
 import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
 import { Col, Input, Row } from "reactstrap";
@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
+import AppContext from "../Shared/AppContext";
 
 interface Props {
   accounts: ProjectAccount[];
@@ -19,9 +20,9 @@ interface Props {
 }
 
 declare const window: Window &
-    typeof globalThis & {
-        Finjector: any
-    }
+  typeof globalThis & {
+    Finjector: any;
+  };
 
 export const AccountsInput = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
@@ -62,7 +63,9 @@ export const AccountsInput = (props: Props) => {
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
-    const response = await authenticatedFetch(`/api/financialaccount/get?account=${query}`);
+    const response = await authenticatedFetch(
+      `/api/financialaccount/get?account=${query}`
+    );
 
     if (response.ok) {
       if (response.status === 204) {
@@ -123,39 +126,39 @@ export const AccountsInput = (props: Props) => {
     setAccounts([...accounts]);
   };
 
-
-
-const lookupcoa = async () => {
-
+  const usecoa = useContext(AppContext).usecoa;
+  const lookupcoa = async () => {
     const chart = await window.Finjector.findChartSegmentString();
 
     if (chart.status === "success") {
-        const response = await authenticatedFetch(`/api/financialaccount/get?account=${chart.data}`);
+      const response = await authenticatedFetch(
+        `/api/financialaccount/get?account=${chart.data}`
+      );
 
-        if (response.ok) {
-            if (response.status === 204) {
-                setError("Account Selected is not valid");
-                return;
-            } else {
-                const accountInfo: ProjectAccount = await response.json();
+      if (response.ok) {
+        if (response.status === 204) {
+          setError("Account Selected is not valid");
+          return;
+        } else {
+          const accountInfo: ProjectAccount = await response.json();
 
-                if (accounts.some((a) => a.number === accountInfo.number)) {
-                    setError("Account already selected -- choose a different account");
-                    return;
-                } else {
-                    setError(undefined);
-                }
+          if (accounts.some((a) => a.number === accountInfo.number)) {
+            setError("Account already selected -- choose a different account");
+            return;
+          } else {
+            setError(undefined);
+          }
 
-                if (accounts.length === 0) {
-                    // if it's our first account, default to 100%
-                    accountInfo.percentage = 100.0;
-                }
+          if (accounts.length === 0) {
+            // if it's our first account, default to 100%
+            accountInfo.percentage = 100.0;
+          }
 
-                setAccounts([...accounts, accountInfo]);
-            }
+          setAccounts([...accounts, accountInfo]);
         }
+      }
     }
-};
+  };
 
   return (
     <div>
@@ -164,7 +167,11 @@ const lookupcoa = async () => {
         ref={typeaheadRef}
         isLoading={isSearchLoading}
         minLength={9}
-        placeholder="Enter account number.  ex: 3-ABC1234"
+        placeholder={
+          usecoa === true
+            ? "Enter Aggie Enterprise COA or use button below"
+            : "Enter account number.  ex: 3-ABC1234"
+        }
         labelKey={(option: ProjectAccount) =>
           `${option.number} (${option.name})`
         }
@@ -186,8 +193,12 @@ const lookupcoa = async () => {
         onSearch={onSearch}
         onChange={onSelect}
         options={searchResultAccounts}
-          />
-          <button className="btn btn-primary" onClick={() => lookupcoa()}>COA Picker</button>
+      />
+      {usecoa === true && (
+        <button className="btn btn-primary" onClick={() => lookupcoa()}>
+          COA Picker
+        </button>
+      )}
       {accounts.length > 0 && (
         <Row className="approval-row approval-row-title">
           <Col md={6}>Account To Charge</Col>
