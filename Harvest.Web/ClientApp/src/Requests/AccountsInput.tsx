@@ -20,11 +20,11 @@ interface Props {
 }
 
 declare const window: Window &
-    typeof globalThis & {
-        Finjector: any
-    }
+  typeof globalThis & {
+    Finjector: any;
+  };
 
-export const AccountsInput = (props: Props) => {   
+export const AccountsInput = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [searchResultAccounts, setSearchResultAccounts] = useState<
     ProjectAccount[]
@@ -63,7 +63,9 @@ export const AccountsInput = (props: Props) => {
   const onSearch = async (query: string) => {
     setIsSearchLoading(true);
 
-    const response = await authenticatedFetch(`/api/financialaccount/get?account=${query}`);
+    const response = await authenticatedFetch(
+      `/api/financialaccount/get?account=${query}`
+    );
 
     if (response.ok) {
       if (response.status === 204) {
@@ -124,50 +126,52 @@ export const AccountsInput = (props: Props) => {
     setAccounts([...accounts]);
   };
 
-
-    const usecoa = useContext(AppContext).usecoa;
-const lookupcoa = async () => {
-
+  const usecoa = useContext(AppContext).usecoa;
+  const lookupcoa = async () => {
     const chart = await window.Finjector.findChartSegmentString();
 
     if (chart.status === "success") {
-        const response = await authenticatedFetch(`/api/financialaccount/get?account=${chart.data}`);
+      const response = await authenticatedFetch(
+        `/api/financialaccount/get?account=${chart.data}`
+      );
 
-        if (response.ok) {
-            if (response.status === 204) {
-                setError("Account Selected is not valid");
-                return;
-            } else {
-                const accountInfo: ProjectAccount = await response.json();
+      if (response.ok) {
+        if (response.status === 204) {
+          setError("Account Selected is not valid");
+          return;
+        } else {
+          const accountInfo: ProjectAccount = await response.json();
 
-                if (accounts.some((a) => a.number === accountInfo.number)) {
-                    setError("Account already selected -- choose a different account");
-                    return;
-                } else {
-                    setError(undefined);
-                }
+          if (accounts.some((a) => a.number === accountInfo.number)) {
+            setError("Account already selected -- choose a different account");
+            return;
+          } else {
+            setError(undefined);
+          }
 
-                if (accounts.length === 0) {
-                    // if it's our first account, default to 100%
-                    accountInfo.percentage = 100.0;
-                }
+          if (accounts.length === 0) {
+            // if it's our first account, default to 100%
+            accountInfo.percentage = 100.0;
+          }
 
-                setAccounts([...accounts, accountInfo]);
-            }
+          setAccounts([...accounts, accountInfo]);
         }
+      }
     }
-};
-
-
+  };
 
   return (
     <div>
-          <AsyncTypeahead
-              id="searchAccounts" // for accessibility
-              ref={typeaheadRef}
-              isLoading={isSearchLoading}
-              minLength={9}
-              placeholder={usecoa === true ? "Enter Aggie Enterprise COA or use button below" : "Enter account number.  ex: 3-ABC1234"}
+      <AsyncTypeahead
+        id="searchAccounts" // for accessibility
+        ref={typeaheadRef}
+        isLoading={isSearchLoading}
+        minLength={9}
+        placeholder={
+          usecoa === true
+            ? "Enter Aggie Enterprise COA or use button below"
+            : "Enter account number.  ex: 3-ABC1234"
+        }
         labelKey={(option: ProjectAccount) =>
           `${option.number} (${option.name})`
         }
@@ -189,10 +193,12 @@ const lookupcoa = async () => {
         onSearch={onSearch}
         onChange={onSelect}
         options={searchResultAccounts}
-          />
-          {usecoa === true && (
-              <button className="btn btn-primary" onClick={() => lookupcoa()}>COA Picker</button>
-          )}
+      />
+      {usecoa === true && (
+        <button className="btn btn-primary" onClick={() => lookupcoa()}>
+          COA Picker
+        </button>
+      )}
       {accounts.length > 0 && (
         <Row className="approval-row approval-row-title">
           <Col md={6}>Account To Charge</Col>
