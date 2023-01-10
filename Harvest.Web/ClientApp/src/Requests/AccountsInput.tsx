@@ -18,6 +18,11 @@ interface Props {
   setDisabled: (disabled: boolean) => void;
 }
 
+declare const window: Window &
+    typeof globalThis & {
+        Finjector: any
+    }
+
 export const AccountsInput = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [searchResultAccounts, setSearchResultAccounts] = useState<
@@ -118,6 +123,19 @@ export const AccountsInput = (props: Props) => {
     setAccounts([...accounts]);
   };
 
+
+
+const lookupcoa = async () => {
+
+    const chart = await window.Finjector.findChartSegmentString().then((response: any) => {
+        if (response.status === "success") {
+            alert(response.data);
+            (typeaheadRef.current as any)?.clear();
+            (typeaheadRef.text as any) = response.data;
+        }
+    });
+};
+
   return (
     <div>
       <AsyncTypeahead
@@ -147,7 +165,8 @@ export const AccountsInput = (props: Props) => {
         onSearch={onSearch}
         onChange={onSelect}
         options={searchResultAccounts}
-      />
+          />
+          <button className="btn btn-primary" onClick={() => lookupcoa()}>COA Picker</button>
       {accounts.length > 0 && (
         <Row className="approval-row approval-row-title">
           <Col md={6}>Account To Charge</Col>
