@@ -44,8 +44,9 @@ export const fakeAppContext: AppContextShape = {
     detail: {
       ...fakeUser,
     },
-    roles: ["System", "FieldManager", "PI"],
-  },
+      roles: ["System", "FieldManager", "PI"],      
+    },
+    usecoa: false,
 };
 
 export const fakeProject: Project = {

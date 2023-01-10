@@ -1,6 +1,6 @@
 // typeahead input box that allows entering valid account numbers
 // each one entered is displayed on a new line where percentages can be set
-import React, { createRef, useEffect, useState } from "react";
+import React, { createRef, useContext, useEffect, useState } from "react";
 
 import { AsyncTypeahead, Highlighter } from "react-bootstrap-typeahead";
 import { Col, Input, Row } from "reactstrap";
@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinusCircle } from "@fortawesome/free-solid-svg-icons";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
+import AppContext from "../Shared/AppContext";
 
 interface Props {
   accounts: ProjectAccount[];
@@ -23,7 +24,7 @@ declare const window: Window &
         Finjector: any
     }
 
-export const AccountsInput = (props: Props) => {
+export const AccountsInput = (props: Props) => {   
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [searchResultAccounts, setSearchResultAccounts] = useState<
     ProjectAccount[]
@@ -124,7 +125,7 @@ export const AccountsInput = (props: Props) => {
   };
 
 
-
+    const usecoa = useContext(AppContext).usecoa;
 const lookupcoa = async () => {
 
     const chart = await window.Finjector.findChartSegmentString();
@@ -157,14 +158,16 @@ const lookupcoa = async () => {
     }
 };
 
+
+
   return (
     <div>
-      <AsyncTypeahead
-        id="searchAccounts" // for accessibility
-        ref={typeaheadRef}
-        isLoading={isSearchLoading}
-        minLength={9}
-        placeholder="Enter account number.  ex: 3-ABC1234"
+          <AsyncTypeahead
+              id="searchAccounts" // for accessibility
+              ref={typeaheadRef}
+              isLoading={isSearchLoading}
+              minLength={9}
+              placeholder={usecoa === true ? "Enter Aggie Enterprise COA or use button below" : "Enter account number.  ex: 3-ABC1234"}
         labelKey={(option: ProjectAccount) =>
           `${option.number} (${option.name})`
         }
@@ -187,7 +190,9 @@ const lookupcoa = async () => {
         onChange={onSelect}
         options={searchResultAccounts}
           />
-          <button className="btn btn-primary" onClick={() => lookupcoa()}>COA Picker</button>
+          {usecoa === true && (
+              <button className="btn btn-primary" onClick={() => lookupcoa()}>COA Picker</button>
+          )}
       {accounts.length > 0 && (
         <Row className="approval-row approval-row-title">
           <Col md={6}>Account To Charge</Col>
