@@ -18,6 +18,11 @@ interface Props {
   setDisabled: (disabled: boolean) => void;
 }
 
+declare const window: Window &
+    typeof globalThis & {
+        Finjector: any
+    }
+
 export const AccountsInput = (props: Props) => {
   const [isSearchLoading, setIsSearchLoading] = useState<boolean>(false);
   const [searchResultAccounts, setSearchResultAccounts] = useState<
@@ -118,6 +123,40 @@ export const AccountsInput = (props: Props) => {
     setAccounts([...accounts]);
   };
 
+
+
+const lookupcoa = async () => {
+
+    const chart = await window.Finjector.findChartSegmentString();
+
+    if (chart.status === "success") {
+        const response = await authenticatedFetch(`/api/financialaccount/get?account=${chart.data}`);
+
+        if (response.ok) {
+            if (response.status === 204) {
+                setError("Account Selected is not valid");
+                return;
+            } else {
+                const accountInfo: ProjectAccount = await response.json();
+
+                if (accounts.some((a) => a.number === accountInfo.number)) {
+                    setError("Account already selected -- choose a different account");
+                    return;
+                } else {
+                    setError(undefined);
+                }
+
+                if (accounts.length === 0) {
+                    // if it's our first account, default to 100%
+                    accountInfo.percentage = 100.0;
+                }
+
+                setAccounts([...accounts, accountInfo]);
+            }
+        }
+    }
+};
+
   return (
     <div>
       <AsyncTypeahead
@@ -147,7 +186,8 @@ export const AccountsInput = (props: Props) => {
         onSearch={onSearch}
         onChange={onSelect}
         options={searchResultAccounts}
-      />
+          />
+          <button className="btn btn-primary" onClick={() => lookupcoa()}>COA Picker</button>
       {accounts.length > 0 && (
         <Row className="approval-row approval-row-title">
           <Col md={6}>Account To Charge</Col>
