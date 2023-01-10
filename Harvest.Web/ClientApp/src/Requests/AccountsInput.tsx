@@ -127,15 +127,10 @@ export const AccountsInput = (props: Props) => {
 
 const lookupcoa = async () => {
 
-    let coa = null;
-    await window.Finjector.findChartSegmentString().then((response: any) => {
-        if (response.status === "success") {
-            coa = response.data;
-        }        
-    });
+    const chart = await window.Finjector.findChartSegmentString();
 
-    if (coa != null) {
-        const response = await authenticatedFetch(`/api/financialaccount/get?account=${coa}`);
+    if (chart.status === "success") {
+        const response = await authenticatedFetch(`/api/financialaccount/get?account=${chart.data}`);
 
         if (response.ok) {
             if (response.status === 204) {
