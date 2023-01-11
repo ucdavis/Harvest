@@ -93,7 +93,7 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> UpdatePendingExpenses()
         {
 
-            var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).Include(a => a.Rate).Include(a => a.Invoice).Select(Expense.ExpressionProjection()).ToListAsync();
+            var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).Include(a => a.Rate).Include(a => a.Invoice).Select(Expense.ExpenseProjectionToUnprocessedExpensesModel()).ToListAsync();
 
             return View();
         }
@@ -148,21 +148,5 @@ namespace Harvest.Web.Controllers
             return Content($"{updatedExpenseCount} of {pendingExpenseCount} expenses updated");
         }
 
-        //private Expression<Func<Expense, UnprocessedExpensesModel>> ExpressionProjection()
-        //{
-        //    return a => new UnprocessedExpensesModel
-        //    {
-        //        ProjectName   = a.Project.Name,
-        //        ProjectStatus = a.Project.Status,
-        //        ProjectId     = a.ProjectId,
-        //        InvoiceStatus = a.Invoice != null ? a.Invoice.Status : "Not Created",
-        //        Id            = a.Id,
-        //        Description   = a.Description,
-        //        Total         = a.Total,
-        //        IsPassthrough = a.IsPassthrough,
-        //        Account       = a.Account,
-        //        RateAccount   = a.Rate.Account
-        //    };
-        //}
     }   
 }

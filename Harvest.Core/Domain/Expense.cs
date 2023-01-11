@@ -71,7 +71,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>().Property(a => a.IsPassthrough).HasDefaultValue(false);
         }
 
-        public static Expression<Func<Expense, UnprocessedExpensesModel>> ExpressionProjection()
+        public static Expression<Func<Expense, UnprocessedExpensesModel>> ExpenseProjectionToUnprocessedExpensesModel()
         {
             return a => new UnprocessedExpensesModel
             {
