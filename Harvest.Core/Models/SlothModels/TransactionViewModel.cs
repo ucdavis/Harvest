@@ -22,6 +22,8 @@ namespace Harvest.Core.Models.SlothModels
         public string Source { get; set; } = "Harvest Recharge";
         public string SourceType { get; set; } = "Recharge";
 
+        public string Description { get; set; } //If it isn't set, Sloth with use one of the transfer descriptions...
+
         public IList<TransferViewModel> Transfers { get; set; }
     }
 

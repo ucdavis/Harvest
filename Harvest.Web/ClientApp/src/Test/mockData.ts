@@ -46,6 +46,7 @@ export const fakeAppContext: AppContextShape = {
     },
     roles: ["System", "FieldManager", "PI"],
   },
+  usecoa: false,
 };
 
 export const fakeProject: Project = {

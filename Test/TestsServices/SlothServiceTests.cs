@@ -142,7 +142,7 @@ namespace Test.TestsServices
             rtValue.IsValid = setIsValid;
             if (!setIsValid)
             {
-                rtValue.Message = "Fake Message";
+                rtValue.Messages.Add("Fake Message");
             }
             return Task.FromResult(rtValue);
         }

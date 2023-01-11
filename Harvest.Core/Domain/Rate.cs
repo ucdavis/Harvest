@@ -30,7 +30,7 @@ namespace Harvest.Core.Domain
         [Display(Name = "Billing Unit")]
         public string BillingUnit { get; set; }
         [Required]
-        [StringLength(50)]
+        [StringLength(80)] //Probably only 69 characters, but just in case
         public string Account { get; set; }
 
         [Display(Name = "Rate")] 

@@ -539,7 +539,7 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Property<string>("Account")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(80)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("BillingUnit")
