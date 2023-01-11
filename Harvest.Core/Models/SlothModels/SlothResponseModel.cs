@@ -16,5 +16,9 @@ namespace Harvest.Core.Models.SlothModels
         public const string Scheduled = "Scheduled";
         public const string Completed = "Completed";
         public const string Cancelled = "Cancelled";
+        
+        //Probably not going to do anything with these, just here for completeness 
+        public const string Processing = "Processing";
+        public const string Rejected = "Rejected";
     }
 }
