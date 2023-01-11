@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using Harvest.Core.Models.SystemModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -67,6 +69,23 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>().Property(a => a.Total).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.Quantity).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.IsPassthrough).HasDefaultValue(false);
+        }
+
+        public static Expression<Func<Expense, UnprocessedExpensesModel>> ExpressionProjection()
+        {
+            return a => new UnprocessedExpensesModel
+            {
+                ProjectName   = a.Project.Name,
+                ProjectStatus = a.Project.Status,
+                ProjectId     = a.ProjectId,
+                InvoiceStatus = a.Invoice != null ? a.Invoice.Status : "Not Created",
+                Id            = a.Id,
+                Description   = a.Description,
+                Total         = a.Total,
+                IsPassthrough = a.IsPassthrough,
+                Account       = a.Account,
+                RateAccount   = a.Rate.Account
+            };
         }
     }
 }

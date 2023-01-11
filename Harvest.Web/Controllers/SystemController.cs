@@ -13,6 +13,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Harvest.Core.Models.Settings;
+using Microsoft.Extensions.Options;
+using AggieEnterpriseApi.Validation;
+using static Harvest.Core.Domain.Invoice;
+using Harvest.Core.Domain;
 
 namespace Harvest.Web.Controllers
 {
@@ -22,11 +27,13 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
         public const string IamIdClaimType = "ucdPersonIAMID";
+        private readonly AggieEnterpriseOptions _aeSettings;
 
-        public SystemController(AppDbContext dbContext, IIdentityService identityService)
+        public SystemController(AppDbContext dbContext, IIdentityService identityService, IOptions<AggieEnterpriseOptions> options)
         {
             _dbContext = dbContext;
             _identityService = identityService;
+            _aeSettings = options.Value;
         }
 
         [HttpGet]
@@ -81,5 +88,81 @@ namespace Harvest.Web.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-    }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdatePendingExpenses()
+        {
+
+            var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).Include(a => a.Rate).Include(a => a.Invoice).Select(Expense.ExpressionProjection()).ToListAsync();
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdatePendingExpenses(bool update)
+        {
+            if (!_aeSettings.UseCoA)
+            {
+                Log.Information("UpdatePendingExpenses called but CoA is not enabled");
+                return Content("Not using CoA yet");
+            }
+            var rates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            foreach (var rate in rates)
+            {
+                if (FinancialChartValidation.GetFinancialChartStringType(rate.Account) == FinancialChartStringType.Invalid)
+                {
+                    Log.Information($"At least one active rate has not been converted to a CoA yet. Can't continue. Rate: {rate.Description}");
+                    return Content($"At least one active rate has not been converted to a CoA yet. Can't continue. Rate: {rate.Description}");
+                }
+            }
+
+            var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).ToListAsync();
+            var pendingExpenseCount = pendingExpenses.Count;
+            var updatedExpenseCount = 0;
+            foreach (var expense in pendingExpenses)
+            {
+                var rate = rates.FirstOrDefault(a => a.Id == expense.RateId);
+                if (rate == null)
+                {
+                    Log.Information($"Expense {expense.Id} has no active rate. Can't continue.");
+                    return Content($"Expense {expense.Id} has no active rate. Can't continue.");
+                }
+            }
+
+            foreach (var expense in pendingExpenses)
+            {
+                var rate = rates.FirstOrDefault(a => a.Id == expense.RateId);
+                if (expense.Account != rate.Account)
+                {
+                    Log.Information("Updating expense {expenseId} from {oldAccount} to {newAccount}", expense.Id, expense.Account, rate.Account);
+                    expense.Account = rate.Account;
+                    _dbContext.Expenses.Update(expense);
+                    updatedExpenseCount++;
+                }
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            Log.Information("Updated {updatedExpenseCount} of {pendingExpenseCount} pending expenses", updatedExpenseCount, pendingExpenseCount);
+
+            return Content($"{updatedExpenseCount} of {pendingExpenseCount} expenses updated");
+        }
+
+        //private Expression<Func<Expense, UnprocessedExpensesModel>> ExpressionProjection()
+        //{
+        //    return a => new UnprocessedExpensesModel
+        //    {
+        //        ProjectName   = a.Project.Name,
+        //        ProjectStatus = a.Project.Status,
+        //        ProjectId     = a.ProjectId,
+        //        InvoiceStatus = a.Invoice != null ? a.Invoice.Status : "Not Created",
+        //        Id            = a.Id,
+        //        Description   = a.Description,
+        //        Total         = a.Total,
+        //        IsPassthrough = a.IsPassthrough,
+        //        Account       = a.Account,
+        //        RateAccount   = a.Rate.Account
+        //    };
+        //}
+    }   
 }
