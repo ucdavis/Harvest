@@ -79,12 +79,13 @@ namespace Harvest.Core.Domain
                 ProjectStatus = a.Project.Status,
                 ProjectId     = a.ProjectId,
                 InvoiceStatus = a.Invoice != null ? a.Invoice.Status : "Not Created",
-                Id            = a.Id,
+                RateId        = a.RateId,
                 Description   = a.Description,
                 Total         = a.Total,
                 IsPassthrough = a.IsPassthrough,
                 Account       = a.Account,
-                RateAccount   = a.Rate.Account
+                RateAccount   = a.Rate.Account,
+                IsSame        = a.Rate.Account == a.Account ? "Yes" : "No"
             };
         }
     }

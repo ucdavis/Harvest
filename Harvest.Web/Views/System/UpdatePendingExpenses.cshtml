@@ -1,0 +1,112 @@
+﻿@using Harvest.Core.Models.SystemModels
+@model IEnumerable<UnprocessedExpensesModel>
+
+@{
+    ViewData["Title"] = "Unprocessed Expenses";
+}
+<div class="row justify-content-between mb-3">
+    <div class="col">
+        <h1>Unprocessed Expenses</h1>
+    </div>
+    <div class="col text-right">
+        <form asp-action="UpdatePendingExpenses" method="post" class="d-inline" asp-route-update="true">
+            <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-refresh fa-xs"></i> Update Expenses</button>
+        </form>
+    </div>
+</div>
+
+<table class="table harvest-table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InvoiceStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsPassthrough)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RateAccount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsSame)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a href="/project/details/@item.ProjectId" target="_blank">@Html.DisplayFor(modelItem => item.ProjectName)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InvoiceStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)                    
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Total)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsPassthrough)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account)
+                </td>
+                <td>
+                    <a asp-controller="Rate" asp-action="Edit" asp-route-id="@item.RateId" target="_blank">@Html.DisplayFor(modelItem => item.RateAccount)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsSame)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Styles
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+    }
+
+    @section Scripts
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('.table').DataTable({
+            columnDefs: [
+                {
+                    type: "boolean",
+                    targets: [5]
+                }
+            ]            
+        });
+    </script>
+}

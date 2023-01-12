@@ -92,10 +92,19 @@ namespace Harvest.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> UpdatePendingExpenses()
         {
+            var rates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            foreach (var rate in rates)
+            {
+                if (FinancialChartValidation.GetFinancialChartStringType(rate.Account) == FinancialChartStringType.Invalid)
+                {                    
+                    Message = $"Warning!!! At least one active rate has not been converted to a CoA yet. Rate: {rate.Description}";
+                    break;
+                }
+            }
 
             var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).Include(a => a.Rate).Include(a => a.Invoice).Select(Expense.ExpenseProjectionToUnprocessedExpensesModel()).ToListAsync();
 
-            return View();
+            return View(pendingExpenses);
         }
 
         [HttpPost]
@@ -104,17 +113,10 @@ namespace Harvest.Web.Controllers
             if (!_aeSettings.UseCoA)
             {
                 Log.Information("UpdatePendingExpenses called but CoA is not enabled");
-                return Content("Not using CoA yet");
+                ErrorMessage = "Not using CoA yet";
+                return RedirectToAction("UpdatePendingExpenses");
             }
             var rates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
-            foreach (var rate in rates)
-            {
-                if (FinancialChartValidation.GetFinancialChartStringType(rate.Account) == FinancialChartStringType.Invalid)
-                {
-                    Log.Information($"At least one active rate has not been converted to a CoA yet. Can't continue. Rate: {rate.Description}");
-                    return Content($"At least one active rate has not been converted to a CoA yet. Can't continue. Rate: {rate.Description}");
-                }
-            }
 
             var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).ToListAsync();
             var pendingExpenseCount = pendingExpenses.Count;
@@ -125,7 +127,8 @@ namespace Harvest.Web.Controllers
                 if (rate == null)
                 {
                     Log.Information($"Expense {expense.Id} has no active rate. Can't continue.");
-                    return Content($"Expense {expense.Id} has no active rate. Can't continue.");
+                    ErrorMessage = $"Expense {expense.Id} has no active rate. Can't continue.";
+                    return RedirectToAction("UpdatePendingExpenses");
                 }
             }
 
@@ -145,7 +148,8 @@ namespace Harvest.Web.Controllers
 
             Log.Information("Updated {updatedExpenseCount} of {pendingExpenseCount} pending expenses", updatedExpenseCount, pendingExpenseCount);
 
-            return Content($"{updatedExpenseCount} of {pendingExpenseCount} expenses updated");
+            Message = $"{updatedExpenseCount} of {pendingExpenseCount} expenses updated";
+            return RedirectToAction("UpdatePendingExpenses");
         }
 
     }   
