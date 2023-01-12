@@ -23,6 +23,7 @@ namespace Harvest.Core.Models.SlothModels
         public string SourceType { get; set; } = "Recharge";
 
         public string Description { get; set; } //If it isn't set, Sloth with use one of the transfer descriptions...
+        public Dictionary<string, string> Metadata { get; set; } //May not use, but it's here if we need it
 
         public IList<TransferViewModel> Transfers { get; set; }
     }
@@ -40,7 +41,8 @@ namespace Harvest.Core.Models.SlothModels
         public string ObjectCode { get; set; }
         [StringLength(40)]
         public string Description { get; set; }
-        
+        public string FinancialSegmentString { get; set; }
+
         public string Direction { get; set; }// Debit or Credit Code associated with the transaction. = ['Credit', 'Debit'],
 
         public class Directions

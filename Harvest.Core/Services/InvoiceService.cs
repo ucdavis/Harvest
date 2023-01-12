@@ -34,9 +34,10 @@ namespace Harvest.Core.Services
         private readonly IExpenseService _expenseService;
         private readonly IDateTimeService _dateTimeService;
         private readonly DevSettings _devSettings;
+        private readonly AggieEnterpriseOptions _aeSettings;
 
         public InvoiceService(AppDbContext dbContext, IProjectHistoryService historyService,
-            IEmailService emailService, IExpenseService expenseService, IOptions<DevSettings> devSettings, IDateTimeService dateTimeService)
+            IEmailService emailService, IExpenseService expenseService, IOptions<DevSettings> devSettings, IDateTimeService dateTimeService, IOptions<AggieEnterpriseOptions> options)
         {
             _dbContext = dbContext;
             _historyService = historyService;
@@ -44,6 +45,7 @@ namespace Harvest.Core.Services
             _expenseService = expenseService;
             _dateTimeService = dateTimeService;
             _devSettings = devSettings.Value;
+            _aeSettings = options.Value;
         }
 
         public async Task<Result<bool>> InitiateCloseout(int projectId)

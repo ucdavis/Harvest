@@ -43,7 +43,7 @@ namespace Test.TestsControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(2);
+            ControllerReflection.ControllerPublicMethods(4);
         }
 
         [Fact]
@@ -61,6 +61,12 @@ namespace Test.TestsControllers
             //1 -2 
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Emulate", countAdjustment + 2, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Emulate", countAdjustment + 2, isSecondMethod: true);
+
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("UpdatePendingExpenses", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("UpdatePendingExpenses", countAdjustment + 2);
+
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("UpdatePendingExpenses", countAdjustment + 2, isSecondMethod: true);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("UpdatePendingExpenses", countAdjustment + 2, isSecondMethod: true);
 
         }
     }

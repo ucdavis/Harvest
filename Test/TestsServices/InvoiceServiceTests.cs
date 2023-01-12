@@ -26,6 +26,7 @@ namespace Test.TestsServices
         public Mock<IEmailService> MockEmailService { get; set; }
         public Mock<IExpenseService> MockExpenseService { get; set; }
         public Mock<IOptions<DevSettings>> MockDevSettings { get; set; }
+        public Mock<IOptions<AggieEnterpriseOptions>> MockAeSettings { get; set; }
         public Mock<IDateTimeService> MockDateTimeService { get; set; }
 
         public List<Project> Projects { get; set; }
@@ -41,13 +42,14 @@ namespace Test.TestsServices
             MockExpenseService = new Mock<IExpenseService>();
             MockDevSettings = new Mock<IOptions<DevSettings>>();
             MockDateTimeService = new Mock<IDateTimeService>();
+            MockAeSettings = new Mock<IOptions<AggieEnterpriseOptions>>();
 
             var devSet = new DevSettings {RecreateDb = false, NightlyInvoices = true, UseSql = false};
 
             MockDevSettings.Setup(a => a.Value).Returns(devSet);
 
             InvoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
         }
         private void SetupData()
         {
@@ -240,7 +242,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -284,7 +286,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -330,7 +332,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -384,7 +386,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -429,7 +431,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -478,7 +480,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -518,7 +520,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -570,7 +572,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
 
@@ -817,7 +819,7 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
 
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeFalse();
@@ -871,7 +873,7 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
 
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id);
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeFalse();
@@ -922,7 +924,7 @@ namespace Test.TestsServices
             Projects[0].Status.ShouldBe(Project.Statuses.Active);
 
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             //Note, just calling the create for all active projects.... Otherwise same as previous test
             var rtValue = await invoiceServ.CreateInvoices();
@@ -1047,7 +1049,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id, true);
             rtValue.ShouldNotBeNull();
@@ -1147,7 +1149,7 @@ namespace Test.TestsServices
 
             //Use this invoice because we changed the Dev Settings
             var invoiceServ = new InvoiceService(MockDbContext.Object, MockProjectHistoryService.Object, MockEmailService.Object,
-                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object);
+                MockExpenseService.Object, MockDevSettings.Object, MockDateTimeService.Object, MockAeSettings.Object);
 
             var rtValue = await invoiceServ.CreateInvoice(Projects[0].Id, true);
             rtValue.ShouldNotBeNull();
