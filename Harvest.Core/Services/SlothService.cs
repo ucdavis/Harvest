@@ -564,6 +564,7 @@ namespace Harvest.Core.Services
                     }
                 }
             }
+            // KFS Way
             else
             {
                 //For the Credits, we need to group by account and IsPassthrough... 

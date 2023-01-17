@@ -33,6 +33,9 @@ namespace Test.TestsServices
         public Mock<IFinancialService> MockFinancialService { get; set; }
         public Mock<IProjectHistoryService> MockProjectHistoryService { get; set; }
         public Mock<IOptions<SlothSettings>> MockSlothSettings { get; set; }
+        public Mock<IOptions<AggieEnterpriseOptions>> MockAeSettings { get; set; }
+
+        public Mock<AggieEnterpriseService> MockAeService { get; set; }
         public SlothSettings SlothSettings { get; set; } = new SlothSettings()
         {
             ApiKey = "Fake",
@@ -41,6 +44,13 @@ namespace Test.TestsServices
             CreditObjectCode = "3900",
             CreditPassthroughObjectCode = "3918",
             MerchantTrackingUrl = "UnitTest//"
+        };
+
+        public AggieEnterpriseOptions AeOptions { get;set; } = new AggieEnterpriseOptions()
+        {
+            UseCoA = false,
+            GraphQlUrl = "http://fake.ucdavis.edu/graphql",
+            Token = "Fake"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
         private SlothService SlothService { get; set; }
@@ -52,7 +62,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK);
 
             SlothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
         }
 
         private Mock<IHttpClientFactory> BasicSetup(out HttpClient httpClient, HttpStatusCode statusCode, bool noContent = false, string status = "PendingApproval")
@@ -63,8 +73,13 @@ namespace Test.TestsServices
             MockEmailService = new Mock<IEmailService>();
             MockFinancialService = new Mock<IFinancialService>();
             MockSlothSettings = new Mock<IOptions<SlothSettings>>();
+            MockAeSettings = new Mock<IOptions<AggieEnterpriseOptions>>();
+            
 
             MockSlothSettings.Setup(a => a.Value).Returns(SlothSettings);
+            MockAeSettings.Setup(a => a.Value).Returns(AeOptions);
+
+            MockAeService = new Mock<AggieEnterpriseService>(MockAeSettings.Object);
 
             JsonSerializerOptions = JsonOptions.Standard.WithStandard().WithGeoJson();
 
@@ -409,7 +424,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.NotFound);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);
@@ -442,7 +457,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.NoContent, true);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);
@@ -475,7 +490,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.BadRequest);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);
@@ -933,7 +948,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, statusCode, noContent);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             foreach (var invoice in Invoices)
@@ -964,7 +979,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.PendingApproval);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             foreach (var invoice in Invoices)
@@ -992,7 +1007,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Cancelled);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             foreach (var invoice in Invoices)
@@ -1020,7 +1035,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Completed);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             foreach (var invoice in Invoices)
@@ -1049,7 +1064,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Completed);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             foreach (var invoice in Invoices)
@@ -1083,7 +1098,7 @@ namespace Test.TestsServices
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK, false, SlothStatuses.Completed);
 
             var slothService = new SlothService(MockDbContext.Object, MockSlothSettings.Object, MockFinancialService.Object,
-                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object);
+                JsonSerializerOptions, MockProjectHistoryService.Object, MockEmailService.Object, httpClientFactory.Object, MockAeSettings.Object, MockAeService.Object);
 
             SetupGenericData();
             foreach (var invoice in Invoices)
