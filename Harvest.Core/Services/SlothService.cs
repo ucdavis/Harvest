@@ -62,7 +62,11 @@ namespace Harvest.Core.Services
             var url = _slothSettings.ApiUrl;
             if(_aeSettings.UseCoA)
             {
-                url = _slothSettings.ApiUrlV2;
+                url = $"{url}v2/";
+            }
+            else
+            {
+                url = $"{url}v1/";
             }
 
             if (string.IsNullOrWhiteSpace(token))
@@ -621,7 +625,11 @@ namespace Harvest.Core.Services
             var url = _slothSettings.ApiUrl;
             if (_aeSettings.UseCoA)
             {
-                url = _slothSettings.ApiUrlV2;
+                url = $"{url}v2/";
+            }
+            else
+            {
+                url = $"{url}v1/";
             }
 
             Log.Information("Beginning ProcessTransferUpdates");

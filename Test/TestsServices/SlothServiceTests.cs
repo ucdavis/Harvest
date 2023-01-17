@@ -40,7 +40,6 @@ namespace Test.TestsServices
         {
             ApiKey = "Fake",
             ApiUrl = "http://sloth-fake.ucdavis.edu/",
-            ApiUrlV2 = "http://sloth-fake.ucdavis.edu/",
             CreditObjectCode = "3900",
             CreditPassthroughObjectCode = "3918",
             MerchantTrackingUrl = "UnitTest//"
