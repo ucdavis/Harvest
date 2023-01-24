@@ -129,11 +129,24 @@ namespace Harvest.Web.Controllers
 
             
 
-            if (model.Rate.IsPassthrough && model.Rate.Type != Rate.Types.Other)
+            if (model.Rate.IsPassthrough)
             {
-                ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Passthrough can only be checked for Other types.");
+                if(model.Rate.Type != Rate.Types.Other)
+                {
+                    ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Pass through can only be checked for Other types.");
+                }
+                if (_aeSettings.UseCoA && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
+                {
+                    ModelState.AddModelError("Rate.Account", $"Natural Account must be 775001 for Pass through, not {accountValidation.GlSegments.Account}.");
+                }
             }
-
+            else
+            {
+                if (_aeSettings.UseCoA && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account == "775001")
+                {
+                    ModelState.AddModelError("Rate.IsPassthrough", $"Natural Account is 775001 but Pass through is not checked.");
+                }
+            }
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
@@ -158,10 +171,10 @@ namespace Harvest.Web.Controllers
                 
                 if (_aeSettings.UseCoA)
                 {
-                    if(rateToCreate.IsPassthrough && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
-                    {
-                        Message = "Rate Created -- WARNING! Passthrough natural accounts should be 775001";
-                    }
+                    //if(rateToCreate.IsPassthrough && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
+                    //{
+                    //    Message = "Rate Created -- WARNING! Passthrough natural accounts should be 775001";
+                    //}
                 }
                 else
                 {
@@ -233,6 +246,25 @@ namespace Harvest.Web.Controllers
             if (accountValidation.Warnings.Any())
             {
                 ErrorMessage = "This COA has associated warnings, please select details to review them.";
+            }
+
+            if (model.Rate.IsPassthrough)
+            {
+                if (model.Rate.Type != Rate.Types.Other)
+                {
+                    ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Pass through can only be checked for Other types.");
+                }
+                if (_aeSettings.UseCoA && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
+                {
+                    ModelState.AddModelError("Rate.Account", $"Natural Account must be 775001 for Pass through, not {accountValidation.GlSegments.Account}.");
+                }
+            }
+            else
+            {
+                if (_aeSettings.UseCoA && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account == "775001")
+                {
+                    ModelState.AddModelError("Rate.IsPassthrough", $"Natural Account is 775001 but Pass through is not checked.");
+                }
             }
 
             if (!ModelState.IsValid)

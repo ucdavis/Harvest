@@ -18,6 +18,11 @@ namespace Harvest.Core.Models.FinancialAccountModels
         public FinancialChartStringType CoaChartType { get; set; }
         public GlSegments GlSegments { get; set; }
         public PpmSegments PpmSegments { get; set; }
+
+        public string AccountManager { get; set; }
+        public string AccountManagerEmail { get; set; }
+        public string ProjectName { get; set; }
+
         /// <summary>
         /// Return Segment info.
         /// </summary>

@@ -125,13 +125,30 @@ namespace Harvest.Core.Services
                     rtValue.Messages.Add("Harvest Rates can't have PPM COA's");
                 }
 
+                await GetPpmAccountManager(rtValue);
+
                 return rtValue;
             }
-
+            
             rtValue.IsValid = false; //Just in case.
             rtValue.Messages.Add("Invalid Aggie Enterprise COA format");
             
             return rtValue;
+        }
+
+        private async Task GetPpmAccountManager(AccountValidationModel rtValue)
+        {
+            var result = await _aggieClient.PpmProjectManager.ExecuteAsync(rtValue.PpmSegments.Project);
+
+            var data = result.ReadData();
+
+            if (data.PpmProjectByNumber?.ProjectNumber == rtValue.PpmSegments.Project)
+            {
+                rtValue.AccountManager = data.PpmProjectByNumber.PrimaryProjectManagerName;
+                rtValue.AccountManagerEmail = data.PpmProjectByNumber.PrimaryProjectManagerEmail;
+                rtValue.ProjectName = data.PpmProjectByNumber.Name;
+            }
+            return;  
         }
 
         /// <summary>
