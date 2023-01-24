@@ -221,18 +221,18 @@ namespace Harvest.Core.Services
             {
                 //Credits (Previously debits)
                 var debExpenseGroups = invoice.Expenses.Where(a => a.Total < 0)
-                    .GroupBy(a => a.Account) //Just group by account? 
-                    .Select(a => new { account = a.Key, total = a.Sum(s => Math.Abs(s.Total)) })
+                    .GroupBy(a => _aggieEnterpriseService.GetNaturalAccount(a.Account)) //Just group by account? Group by Natural Account?
+                    .Select(a => new { naturalAccount = a.Key, total = a.Sum(s => Math.Abs(s.Total)) })
                     .ToArray(); //This should only have 1 value
                 var localTransfers = new List<TransferViewModel>();
                 foreach (var debExpenseGroup in debExpenseGroups)
                 {
-
                     foreach (var projectAccount in invoice.Project.Accounts)
                     {
+                        //Replace the natural Account/Expenditure type with debExpenseGroup.naturalAccount...
                         var tvm = new TransferViewModel
                         {
-                            FinancialSegmentString = projectAccount.Number, //TODO: Might need to change the natural account when it is a refund.
+                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.naturalAccount), //TODO: Might need to change the natural account when it is a refund.
                             Amount = Math.Round(debExpenseGroup.total * (projectAccount.Percentage / 100), 2),
                             Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                             Direction = TransferViewModel.Directions.Credit,
@@ -264,7 +264,7 @@ namespace Harvest.Core.Services
                     amount = Math.Abs(amount);
                     var tvm = new TransferViewModel
                     {
-                        FinancialSegmentString = expenseGroup.Key.Account, //TODO: Maybe change the natural account when it is a refund?
+                        FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(expenseGroup.Key.Account, _aeSettings.CreditCoaNaturalAccount), //TODO: Verify this is correct: change the natural account when it is a refund?
                         Amount = amount,
                         Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                         Direction = TransferViewModel.Directions.Debit,
@@ -291,7 +291,6 @@ namespace Harvest.Core.Services
                 var localTransfers = new List<TransferViewModel>();
                 foreach (var debExpenseGroup in debExpenseGroups)
                 {
-
                     foreach (var projectAccount in invoice.Project.Accounts)
                     {
                         var account = _financialService.Parse(projectAccount.Number);
