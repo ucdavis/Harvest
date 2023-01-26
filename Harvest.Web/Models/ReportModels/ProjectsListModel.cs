@@ -10,7 +10,9 @@ namespace Harvest.Web.Models.ReportModels
 {
     public class ProjectsListModel
     {
+        [DataType(DataType.Date)]       
         public DateTime? Start { get; set; }
+        [DataType(DataType.Date)]
         public DateTime? End { get; set; }
 
         public List<ProjectInvoiceSummaryModel> ProjectInvoiceSummaries { get; set; }
