@@ -62,9 +62,25 @@
         var table = $('.table').DataTable({
             "dom": 'lBfrtip',
             "buttons": [
-                { extend: 'copyHtml5' },
-                { extend: 'excelHtml5' },
-                { extend: 'csvHtml5' },
+                {
+                    extend: 'copyHtml5', className: 'btn-primary', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }},
+                {
+                    extend: 'excelHtml5', className: 'btn-primary', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'csvHtml5', className: 'btn-primary', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'print', className: 'btn-primary', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
             ],
         });
     </script>
