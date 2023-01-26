@@ -43,7 +43,7 @@ function App() {
           <Switch>
             {/* Match any server-side routes and send empty content to let MVC return the view details */}
             <Route
-              path="/(account|rate|permissions|crop|home|system|help)"
+              path="/(account|rate|permissions|crop|home|system|help|report)"
               component={Empty}
             />
             <Route exact path="/" component={HomeContainer} />
