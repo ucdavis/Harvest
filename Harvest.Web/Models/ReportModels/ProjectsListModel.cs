@@ -1,6 +1,8 @@
 ﻿using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -16,9 +18,12 @@ namespace Harvest.Web.Models.ReportModels
     
     public class ProjectInvoiceSummaryModel
     {
+        [Display(Name = "Id")]
         public int ProjectId { get; set; }
+        [Display(Name = "Project Name")]
         public string ProjectName { get; set; }
         public string Status { get; set; }
+        [Display(Name = "Crop Type")]
         public string CropType { get; set; }
         public string Crop { get; set; }
         public double Acres { get; set; }
@@ -26,10 +31,12 @@ namespace Harvest.Web.Models.ReportModels
         public DateTime End { get; set; }
 
         public DateTime CreatedOn { get; set; }
-
+        [Display(Name = "PI Name")]
         public string PrincipalInvestigatorName { get; set; }
+        [Display(Name = "PI Email")]
         public string PrincipalInvestigatorEmail { get; set; }
 
+        [Display(Name = "Invoice Total")]
         public decimal InvoiceTotal { get; set; }
 
         public static Expression<Func<Project, ProjectInvoiceSummaryModel>> ProjectInvoiceSummaryProjection()
@@ -53,7 +60,7 @@ namespace Harvest.Web.Models.ReportModels
                 Acres = project.Acres,
                 Start = project.Start,
                 End = project.End,
-                CreatedOn = project.CreatedOn,
+                CreatedOn = project.CreatedOn.ToPacificTime(),
                 PrincipalInvestigatorName = project.PrincipalInvestigator.Name,
                 PrincipalInvestigatorEmail = project.PrincipalInvestigator.Email,
                 InvoiceTotal = project.Invoices.Sum(i => i.Total)

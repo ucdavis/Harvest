@@ -1,0 +1,71 @@
+﻿@model Harvest.Web.Models.ReportModels.ProjectsListModel
+@{
+    ViewData["Title"] = "All Projects";
+}
+
+<table class="table harvest-table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].ProjectId)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].ProjectName)</th>            
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].CreatedOn)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Start)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].End)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].CropType)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Crop)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Acres)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].PrincipalInvestigatorName)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].PrincipalInvestigatorEmail)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].InvoiceTotal)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Status)</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ProjectInvoiceSummaries)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ProjectId)</td>
+                <td>@Html.DisplayFor(modelItem => item.ProjectName)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatedOn)</td>
+                <td>@Html.DisplayFor(modelItem => item.Start)</td>
+                <td>@Html.DisplayFor(modelItem => item.End)</td>
+                <td>@Html.DisplayFor(modelItem => item.CropType)</td>
+                <td>@Html.DisplayFor(modelItem => item.Crop)</td>
+                <td>@Html.DisplayFor(modelItem => item.Acres)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrincipalInvestigatorName)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrincipalInvestigatorEmail)</td>
+                <td>@Html.DisplayFor(modelItem => item.InvoiceTotal)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>                
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Styles
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+    }
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('.table').DataTable({
+            "dom": 'lBfrtip',
+            "buttons": [
+                { extend: 'copyHtml5' },
+                { extend: 'excelHtml5' },
+                { extend: 'csvHtml5' },
+            ],
+        });
+    </script>
+}
