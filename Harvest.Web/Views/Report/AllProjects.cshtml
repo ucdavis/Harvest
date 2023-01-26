@@ -65,7 +65,8 @@
                 {
                     extend: 'copyHtml5', className: 'btn-primary', init: function (api, node, config) {
                         $(node).removeClass('btn-secondary')
-                    }},
+                    }
+                },
                 {
                     extend: 'excelHtml5', className: 'btn-primary', init: function (api, node, config) {
                         $(node).removeClass('btn-secondary')
@@ -82,6 +83,10 @@
                     }
                 },
             ],
+            columnDefs: [{
+                type: "date",
+                targets: [2,3,4]
+            }]
         });
     </script>
 }

@@ -27,9 +27,12 @@ namespace Harvest.Web.Models.ReportModels
         public string CropType { get; set; }
         public string Crop { get; set; }
         public double Acres { get; set; }
+        [DataType(DataType.Date)]
         public DateTime Start { get; set; }
+        [DataType(DataType.Date)]
         public DateTime End { get; set; }
-
+        [DataType(DataType.Date)]
+        [Display(Name = "Created")]
         public DateTime CreatedOn { get; set; }
         [Display(Name = "PI Name")]
         public string PrincipalInvestigatorName { get; set; }
