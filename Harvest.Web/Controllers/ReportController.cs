@@ -54,5 +54,27 @@ namespace Harvest.Web.Controllers
             return View(model);
 
         }
+
+        public async Task<IActionResult> HistoricalRateActivity(DateTime? start, DateTime? end)
+        {
+            if (!start.HasValue)
+            {
+                start = new(DateTime.Now.Year - 1, 1, 1);
+            }
+
+            if (!end.HasValue)
+            {
+                end = new DateTime(DateTime.Now.Year - 1, 12, 31);
+            }
+            var model = new HistoricalRateActivityModelList();
+            model.Start = start.Value;
+            model.End = end.Value;
+
+            model.HistoricalRates = await _dbContext.Rates.Include(a => a.Expenses)
+                .Select(HistoricalRateActivityModel.Projection(start.Value.Date.FromPacificTime(), end.Value.Date.FromPacificTime()))
+                .ToListAsync();
+
+            return View(model);
+        }
     }
 }
