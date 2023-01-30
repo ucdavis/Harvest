@@ -71,22 +71,5 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>().Property(a => a.IsPassthrough).HasDefaultValue(false);
         }
 
-        public static Expression<Func<Expense, UnprocessedExpensesModel>> ExpenseProjectionToUnprocessedExpensesModel()
-        {
-            return a => new UnprocessedExpensesModel
-            {
-                ProjectName   = a.Project.Name,
-                ProjectStatus = a.Project.Status,
-                ProjectId     = a.ProjectId,
-                InvoiceStatus = a.Invoice != null ? a.Invoice.Status : "Not Created",
-                RateId        = a.RateId,
-                Description   = a.Description,
-                Total         = a.Total,
-                IsPassthrough = a.IsPassthrough,
-                Account       = a.Account,
-                RateAccount   = a.Rate.Account,
-                IsSame        = a.Rate.Account == a.Account ? "Yes" : "No"
-            };
-        }
     }
 }
