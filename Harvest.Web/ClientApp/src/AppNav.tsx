@@ -81,8 +81,11 @@ export const AppNav = () => {
                       <DropdownItem href="/System/Emulate">
                         Emulate
                       </DropdownItem>
-                      <DropdownItem href="/">
-                        Reports - Coming Soon
+                      <DropdownItem href="/Report/AllProjects">
+                        Reports - Projects
+                      </DropdownItem>
+                      <DropdownItem href="/Report/HistoricalRateActivity">
+                        Reports - Historical Rate Activity
                       </DropdownItem>
                     </ShowFor>
                   </DropdownMenu>

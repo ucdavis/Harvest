@@ -63,6 +63,9 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Project> Projects { get; set; }
 
+        [JsonIgnore]
+        public List<Expense> Expenses { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Rate>().HasIndex(a => a.Type);

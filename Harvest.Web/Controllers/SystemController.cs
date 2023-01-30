@@ -17,7 +17,7 @@ using Harvest.Core.Models.Settings;
 using Microsoft.Extensions.Options;
 using AggieEnterpriseApi.Validation;
 using static Harvest.Core.Domain.Invoice;
-using Harvest.Core.Domain;
+using Harvest.Core.Models.SystemModels;
 
 namespace Harvest.Web.Controllers
 {
@@ -102,7 +102,7 @@ namespace Harvest.Web.Controllers
                 }
             }
 
-            var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).Include(a => a.Rate).Include(a => a.Invoice).Select(Expense.ExpenseProjectionToUnprocessedExpensesModel()).ToListAsync();
+            var pendingExpenses = await _dbContext.Expenses.Where(a => a.Invoice == null || a.Invoice.Status == Statuses.Created).Include(a => a.Rate).Include(a => a.Invoice).Select(UnprocessedExpensesModel.Projection()).ToListAsync();
 
             return View(pendingExpenses);
         }
