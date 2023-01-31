@@ -6,8 +6,8 @@
         public string Token { get; set; }
 
         public bool UseCoA { get; set; }
-        public string CreditCoaNaturalAccount { get; set; }
-        public string CreditPassthroughCoaNaturalAccount { get; set; }
+        public string NormalCoaNaturalAccount { get; set; }
+        public string PassthroughCoaNaturalAccount { get; set; }
     }
 }
 
