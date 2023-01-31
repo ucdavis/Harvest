@@ -221,18 +221,19 @@ namespace Harvest.Core.Services
             {
                 //Credits (Previously debits)
                 var debExpenseGroups = invoice.Expenses.Where(a => a.Total < 0)
-                    .GroupBy(a => _aggieEnterpriseService.GetNaturalAccount(a.Account)) //Just group by account? Group by Natural Account?
-                    .Select(a => new { naturalAccount = a.Key, total = a.Sum(s => Math.Abs(s.Total)) })
+                    .GroupBy(a => a.IsPassthrough) //Just group by is passthrough
+                    .Select(a => new { isPassthrough = a.Key, total = a.Sum(s => Math.Abs(s.Total)) })
                     .ToArray(); //This should only have 1 value
+
                 var localTransfers = new List<TransferViewModel>();
-                foreach (var debExpenseGroup in debExpenseGroups)
-                {
+                foreach (var debExpenseGroup in debExpenseGroups) //At most, this will contain 2 items
+                {                    
                     foreach (var projectAccount in invoice.Project.Accounts)
                     {
-                        //Replace the natural Account/Expenditure type with debExpenseGroup.naturalAccount...
+                        //Replace the natural Account/Expenditure type with 
                         var tvm = new TransferViewModel
                         {
-                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.naturalAccount), //TODO: Might need to change the natural account when it is a refund.
+                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount), 
                             Amount = Math.Round(debExpenseGroup.total * (projectAccount.Percentage / 100), 2),
                             Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                             Direction = TransferViewModel.Directions.Credit,
@@ -258,13 +259,13 @@ namespace Harvest.Core.Services
 
                 //Debit (Previously Credit)
                 var expenseGroups = invoice.Expenses.Where(a => a.Total < 0).GroupBy(a => new { a.Account });
-                foreach (var expenseGroup in expenseGroups) //Probably only 1, but just in case
+                foreach (var expenseGroup in expenseGroups)
                 {
                     var amount = Math.Round(expenseGroup.Sum(a => a.Total), 2);
                     amount = Math.Abs(amount);
                     var tvm = new TransferViewModel
                     {
-                        FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(expenseGroup.Key.Account, _aeSettings.NormalCoaNaturalAccount), //TODO: Verify this is correct: change the natural account when it is a refund?
+                        FinancialSegmentString = expenseGroup.Key.Account,
                         Amount = amount,
                         Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                         Direction = TransferViewModel.Directions.Debit,
@@ -442,7 +443,7 @@ namespace Harvest.Core.Services
                         }
                         Log.Information("Adjusted debit expense amount to get everything to balance. {exTotal} {dbTotal}", expenseGroup.total, debitTotal);
                     }
-                    //Now add them to the model (This is a new way for COA and cleaner)
+                    //Now add them to the model (This is a new way for COA and cleaner) 
                     foreach (var transfer in localTransfers)
                     {
                         model.Transfers.Add(transfer);
