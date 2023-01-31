@@ -418,7 +418,7 @@ namespace Harvest.Core.Services
                         if (tvm.Amount >= 0.01m)
                         {
                             //Only create this if the amount if 0.01 or greater (sloth requirement)
-                            //model.Transfers.Add(tvm); //Don't add this here, add them after the adjustment of the loicalTransfers
+                            //model.Transfers.Add(tvm); //Don't add this here, add them after the adjustment of the localTransfers
                             localTransfers.Add(tvm);
                         }
                         else
