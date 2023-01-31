@@ -41,18 +41,18 @@ namespace Harvest.Web.Controllers.Api
                 if(segmentStringType == FinancialChartStringType.Gl)
                 {
                     var glSegments = FinancialChartValidation.GetGlSegments(account);
-                    if (glSegments.Account != _aeSettings.CreditCoaNaturalAccount && glSegments.Account != _aeSettings.CreditPassthroughCoaNaturalAccount)
+                    if (glSegments.Account != _aeSettings.NormalCoaNaturalAccount && glSegments.Account != _aeSettings.PassthroughCoaNaturalAccount)
                     {
-                        glSegments.Account = _aeSettings.CreditCoaNaturalAccount;
+                        glSegments.Account = _aeSettings.NormalCoaNaturalAccount;
                         account = glSegments.ToSegmentString();
                     }
                 }
                 else if (segmentStringType == FinancialChartStringType.Ppm)
                 {
                     var ppmSegments = FinancialChartValidation.GetPpmSegments(account);
-                    if (ppmSegments.ExpenditureType != _aeSettings.CreditCoaNaturalAccount && ppmSegments.ExpenditureType != _aeSettings.CreditPassthroughCoaNaturalAccount)
+                    if (ppmSegments.ExpenditureType != _aeSettings.NormalCoaNaturalAccount && ppmSegments.ExpenditureType != _aeSettings.PassthroughCoaNaturalAccount)
                     {
-                        ppmSegments.ExpenditureType = _aeSettings.CreditCoaNaturalAccount;
+                        ppmSegments.ExpenditureType = _aeSettings.NormalCoaNaturalAccount;
                         account = ppmSegments.ToSegmentString();
                     }
                 }
