@@ -1,0 +1,120 @@
+﻿@model Harvest.Web.Models.ReportModels.ProjectsListModel
+@{
+    ViewData["Title"] = "All Projects";
+}
+
+<div>
+    <div> 
+        <h1>Projects</h1>
+    </div>
+    <div>
+        <form asp-action="AllProjects" method="get">    
+            <h3>Filters</h3>
+            <div class="d-flex">
+            <div style="margin-right:2px" class="form-group">
+                <label asp-for="Start" class="control-label"></label>
+                <input id="start" asp-for="Start" class="form-control" />
+                <span asp-validation-for="Start" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="End" class="control-label"></label>
+                <input id="end" asp-for="End" class="form-control" />
+                <span asp-validation-for="End" class="text-danger"></span>
+            </div>
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline btn-sm"><i class="fas fa-sync-alt fa-sm"></i> Refresh Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<table class="table harvest-table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].ProjectId)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].ProjectName)</th>            
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].CreatedOn)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Start)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].End)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].CropType)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Crop)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Acres)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].PrincipalInvestigatorName)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].PrincipalInvestigatorEmail)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].InvoiceTotal)</th>
+            <th>@Html.DisplayNameFor(model => model.ProjectInvoiceSummaries[0].Status)</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ProjectInvoiceSummaries)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ProjectId)</td>
+                <td>@Html.DisplayFor(modelItem => item.ProjectName)</td>
+                <td>@Html.DisplayFor(modelItem => item.CreatedOn)</td>
+                <td>@Html.DisplayFor(modelItem => item.Start)</td>
+                <td>@Html.DisplayFor(modelItem => item.End)</td>
+                <td>@Html.DisplayFor(modelItem => item.CropType)</td>
+                <td>@Html.DisplayFor(modelItem => item.Crop)</td>
+                <td>@Html.DisplayFor(modelItem => item.Acres)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrincipalInvestigatorName)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrincipalInvestigatorEmail)</td>
+                <td>@Html.DisplayFor(modelItem => item.InvoiceTotal)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>                
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Styles
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+    }
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('.table').DataTable({
+            "dom": 'lBfrtip',
+            "buttons": [
+                {
+                    extend: 'copyHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'excelHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'csvHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+            ],
+            columnDefs: [{
+                type: "date",
+                targets: [2,3,4]
+            }]
+        });
+    </script>
+}

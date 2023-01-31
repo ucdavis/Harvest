@@ -5,6 +5,7 @@ using AggieEnterpriseApi.Validation;
 using Harvest.Core.Models.FinancialAccountModels;
 using Harvest.Core.Models.Settings;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,9 @@ namespace Harvest.Core.Services
         Task<AccountValidationModel> IsAccountValid(string financialSegmentString, bool validateCVRs = true, bool validateRate = false);
 
         Task<FinancialOfficerDetails> GetFinancialOfficer(string financialSegmentString);
+
+        string GetNaturalAccount(string financialSegmentString);
+        string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount);
     }
 
     public class AggieEnterpriseService : IAggieEnterpriseService{
@@ -125,13 +129,30 @@ namespace Harvest.Core.Services
                     rtValue.Messages.Add("Harvest Rates can't have PPM COA's");
                 }
 
+                await GetPpmAccountManager(rtValue);
+
                 return rtValue;
             }
-
+            
             rtValue.IsValid = false; //Just in case.
             rtValue.Messages.Add("Invalid Aggie Enterprise COA format");
             
             return rtValue;
+        }
+
+        private async Task GetPpmAccountManager(AccountValidationModel rtValue)
+        {
+            var result = await _aggieClient.PpmProjectManager.ExecuteAsync(rtValue.PpmSegments.Project);
+
+            var data = result.ReadData();
+
+            if (data.PpmProjectByNumber?.ProjectNumber == rtValue.PpmSegments.Project)
+            {
+                rtValue.AccountManager = data.PpmProjectByNumber.PrimaryProjectManagerName;
+                rtValue.AccountManagerEmail = data.PpmProjectByNumber.PrimaryProjectManagerEmail;
+                rtValue.ProjectName = data.PpmProjectByNumber.Name;
+            }
+            return;  
         }
 
         /// <summary>
@@ -146,6 +167,41 @@ namespace Harvest.Core.Services
             rtValue.FinancialOfficerId = null;
 
             return rtValue;
+        }
+
+        public string GetNaturalAccount(string financialSegmentString)
+        {
+            var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(financialSegmentString);
+            if (segmentStringType == FinancialChartStringType.Gl)
+            {
+                var segments = FinancialChartValidation.GetGlSegments(financialSegmentString);
+                return segments.Account;
+            }
+            if (segmentStringType == FinancialChartStringType.Ppm)
+            {
+                var segments = FinancialChartValidation.GetPpmSegments(financialSegmentString);
+                return segments.ExpenditureType;
+            }
+            return null;
+        }
+
+        public string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount)
+        {
+            var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(financialSegmentString);
+            if (segmentStringType == FinancialChartStringType.Gl)
+            {
+                var segments = FinancialChartValidation.GetGlSegments(financialSegmentString);
+                segments.Account = naturalAccount;
+                return segments.ToSegmentString();
+            }
+            if (segmentStringType == FinancialChartStringType.Ppm)
+            {
+                var segments = FinancialChartValidation.GetPpmSegments(financialSegmentString);
+                segments.ExpenditureType = naturalAccount;
+                return segments.ToSegmentString();
+            }
+            Log.Error($"Invalid financial segment string: {financialSegmentString}");
+            return financialSegmentString;
         }
 
 

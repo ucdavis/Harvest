@@ -85,6 +85,8 @@ namespace Harvest.Jobs.AutoCloseout
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
             services.Configure<DevSettings>(Configuration.GetSection("Dev"));
+            //TODO: Configure AE settings and maybe service. Check other jobs if they need it too.
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise")); //Don't really know if this is needed for this job...
 
             services.AddScoped<IFinancialService, FinancialService>();
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>(); //Don't know if I need this or the user stuff.
@@ -99,6 +101,8 @@ namespace Harvest.Jobs.AutoCloseout
             services.AddScoped<IExpenseService, ExpenseService>();
             services.AddScoped<ISlothService, SlothService>();
             services.AddTransient<IDateTimeService, DateTimeService>();
+
+            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>(); //Don't really know if this is needed for this job...
 
 
             return services.BuildServiceProvider();

@@ -111,6 +111,9 @@ namespace Harvest.Core.Domain
 
         public List<ProjectAttachment> Attachments { get; set; }
 
+        [JsonIgnore]
+        public List<Invoice> Invoices { get; set; }
+
         public void UpdateStatus(string newStatus)
         {
             Status = newStatus;

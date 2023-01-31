@@ -253,6 +253,13 @@ export const AccountsInput = (props: Props) => {
         </Row>
       )}
       {error && <span className="text-danger">{error}</span>}
+      {usecoa === true && (
+        <p className="discreet mt-5">
+          The Expenditure Type / Natural Account needs a value, but it will be
+          replaced when the money is moved. We suggest using 770006 - "Other
+          Support Services"
+        </p>
+      )}
       <p className="discreet mt-5">
         Please check with your account manager for each account above before
         approving

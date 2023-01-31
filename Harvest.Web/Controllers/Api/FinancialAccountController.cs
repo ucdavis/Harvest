@@ -36,6 +36,28 @@ namespace Harvest.Web.Controllers.Api
             account = account?.ToUpper().Trim();
             if (_aeSettings.UseCoA)
             {
+                //Replace Natural Account/Expenditure type if needed
+                var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(account);
+                if(segmentStringType == FinancialChartStringType.Gl)
+                {
+                    var glSegments = FinancialChartValidation.GetGlSegments(account);
+                    if (glSegments.Account != _aeSettings.NormalCoaNaturalAccount && glSegments.Account != _aeSettings.PassthroughCoaNaturalAccount)
+                    {
+                        glSegments.Account = _aeSettings.NormalCoaNaturalAccount;
+                        account = glSegments.ToSegmentString();
+                    }
+                }
+                else if (segmentStringType == FinancialChartStringType.Ppm)
+                {
+                    var ppmSegments = FinancialChartValidation.GetPpmSegments(account);
+                    if (ppmSegments.ExpenditureType != _aeSettings.NormalCoaNaturalAccount && ppmSegments.ExpenditureType != _aeSettings.PassthroughCoaNaturalAccount)
+                    {
+                        ppmSegments.ExpenditureType = _aeSettings.NormalCoaNaturalAccount;
+                        account = ppmSegments.ToSegmentString();
+                    }
+                }
+                
+                //Now Validate...
                 validationModel = await _aggieEnterpriseService.IsAccountValid(account);
             }
             else
@@ -57,12 +79,13 @@ namespace Harvest.Web.Controllers.Api
                     });
                 }
                 else
-                {
+                {                    
                     return Ok(new Account
                     {
-                        Name = validationModel.CoaChartType == FinancialChartStringType.Ppm ? "PPM Account" : "GL Account",
-                        //AccountManagerName = validationModel.KfsAccount.AccountManager?.Name,
-                        //AccountManagerEmail = validationModel.KfsAccount.AccountManager?.EmailAddress, //TODO: Use AE endpoint to get info
+                        //TODO: Use PI name instead of account manager when it is available from the API
+                        Name = validationModel.CoaChartType == FinancialChartStringType.Ppm ? $"PPM: {validationModel.ProjectName} ({validationModel.AccountManager})" : "GL Account",
+                        AccountManagerName = validationModel.AccountManager,
+                        AccountManagerEmail = validationModel.AccountManagerEmail, 
                         Number = validationModel.FinancialSegmentString
                     });
                 }
