@@ -417,7 +417,7 @@ namespace Harvest.Core.Services
                         if (tvm.Amount >= 0.01m)
                         {
                             //Only create this if the amount if 0.01 or greater (sloth requirement)
-                            model.Transfers.Add(tvm);
+                            //model.Transfers.Add(tvm); //Don't add this here, add them after the adjustment of the loicalTransfers
                             localTransfers.Add(tvm);
                         }
                         else
@@ -428,27 +428,37 @@ namespace Harvest.Core.Services
 
 
                     //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
-                    var debitTotal = localTransfers
-                        .Where(a => a.Direction == TransferViewModel.Directions.Debit && _aggieEnterpriseService.GetNaturalAccount(a.FinancialSegmentString) == expenseGroup.naturalAccount)
+                    var debitTotal = localTransfers                        
                         .Select(a => a.Amount).Sum();
                     if (expenseGroup.total != debitTotal)
                     {
                         var lastAmount = localTransfers.Last().Amount;
                         Log.Information("Debit Total doesn't match. Attempting to fix. ExpenseTotal {expenseTotal} DebitTotal {debitTotal}", expenseGroup.total, debitTotal);
-                        var lastTransfer = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Debit && a.Amount == lastAmount);
-                        lastTransfer.Amount = lastTransfer.Amount + (expenseGroup.total - debitTotal);
-                        if (lastTransfer.Amount <= 0 || expenseGroup.total != model.Transfers
-                            .Where(a => a.Direction == TransferViewModel.Directions.Debit)
+                        localTransfers.Last().Amount = lastAmount + (expenseGroup.total - debitTotal);
+                        if (localTransfers.Last().Amount <= 0 || expenseGroup.total != localTransfers
                             .Select(a => a.Amount).Sum())
                         {
                             return Result.Error("Couldn't get Debits to balance for invoice {invoiceId}", invoice.Id);
                         }
                         Log.Information("Adjusted debit expense amount to get everything to balance. {exTotal} {dbTotal}", expenseGroup.total, debitTotal);
                     }
+                    //Now add them to the model
+                    foreach (var transfer in localTransfers)
+                    {
+                        model.Transfers.Add(transfer);
+                    }
                 }
             }
             // KFS Way
-            else 
+            /*
+             * Writing Debits: Taking money from the PI's account
+             * Takes all the expenses and groups them by the object code of the expense account and sums up the total
+             * For each of these groups, it debits the PI's accounts splitting the sum into the PI's accounts based on the percentage of the account
+             * The object code is replaced with the expense group's object code
+             * We skip adding any amount that is less than 0.01 because that is the minimum amount that can be transferred
+             * We total up all the debits for this group and if it doesn't match the total for the group, we try to adjust the last debit to make it match
+            */
+            else
             {
                 //Don't need to group by IsPassthrough here because the account will have the expenseObject code in it.
                 var expenseGroups = invoice.Expenses.Where(a => a.Total > 0)
@@ -569,6 +579,11 @@ namespace Harvest.Core.Services
                 }
             }
             // KFS Way
+            /*
+             * Writing Credits: Putting money into the expense accounts
+             * We group the expenses by the KFS account and if it is a passthrough or not
+             * The object code is changed based on the passthrough flag
+             */
             else
             {
                 //For the Credits, we need to group by account and IsPassthrough... 
