@@ -122,7 +122,7 @@ namespace Test.TestsServices
             }
 
             project.Accounts = new List<Account>();
-            project.Accounts.Add(CreateValidEntities.Account(1, acctNumber: "KP0953010U-301001-ADNO001-532303"));
+            project.Accounts.Add(CreateValidEntities.Account(1, acctNumber: $"KP0953010U-301001-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
 
             for (int i = 0; i < 3; i++)
             {
@@ -139,7 +139,7 @@ namespace Test.TestsServices
             MockDbContext.Setup(a => a.Invoices).Returns(Invoices.AsQueryable().MockAsyncDbSet().Object);
 
             //Mock the Aggie Enterprise Service IsAccountValid
-            MockAeService.Setup(a => a.IsAccountValid(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync(SetValidAccount("KP0953010U-301001-ADNO001-532303").Result);
+            MockAeService.Setup(a => a.IsAccountValid(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync((string fss, bool a, bool b) => SetValidAccount(fss).Result);
 
             var realAeService = new AggieEnterpriseService(MockAeSettings.Object);
 
@@ -248,7 +248,7 @@ namespace Test.TestsServices
             var rtValue = await SlothService.MoveMoney(invoice.Id);
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
-            rtValue.Message.ShouldBe("Account KP0953010U-301001-ADNO001-532303 is not a valid Aggie Enterprise CoA");
+            rtValue.Message.ShouldBe("Account KP0953010U-301001-ADNO001-770006 is not a valid Aggie Enterprise CoA");
         }
 
         [Fact]
@@ -368,24 +368,25 @@ namespace Test.TestsServices
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
             var expense = CreateValidEntities.Expense(1, 1);
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-238533-00-000-0000000000-000000-0000-000000-000000";
             expense.Total = 990.00m;
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(1, 1);
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-238533-00-000-0000000000-000000-0000-000000-000000";
             expense.Total = 100.00m;
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(1, 1);
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO002-238533-00-000-0000000000-000000-0000-000000-000000";
             expense.Total = 50.00m;
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(1, 1); //Same as first expense except not passthrough and object code different
+            expense.Account = "3110-13U20-ADNO003-238533-00-000-0000000000-000000-0000-000000-000000";
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
 
