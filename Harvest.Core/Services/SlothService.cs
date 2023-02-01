@@ -1,24 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using AggieEnterpriseApi.Validation;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
 using Harvest.Core.Models.FinancialAccountModels;
-using Harvest.Core.Models.InvoiceModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Models.SlothModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
-using Serilog.Events;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Harvest.Core.Services
 {
@@ -161,16 +157,31 @@ namespace Harvest.Core.Services
                 invoice.Transfers = new List<Transfer>();
                 foreach (var transferViewModel in model.Transfers)
                 {
-                    var account = new KfsAccount()
-                    {
-                        ChartOfAccountsCode = transferViewModel.Chart, AccountNumber = transferViewModel.Account,
-                        SubAccount = transferViewModel.SubAccount
-                    }; //Don't put in object code. Project accounts don't have them, they are on the rate accounts
                     var transfer = new Transfer();
-                    transfer.Account = account.ToString();
+                    if (_aeSettings.UseCoA)
+                    {
+                        transfer.Account = transferViewModel.FinancialSegmentString;
+                        transfer.IsProjectAccount =
+                            invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.PassthroughCoaNaturalAccount))
+                            || 
+                            invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.NormalCoaNaturalAccount));
+                    }
+                    else
+                    {
+                        var account = new KfsAccount()
+                        {
+                            ChartOfAccountsCode = transferViewModel.Chart,
+                            AccountNumber = transferViewModel.Account,
+                            SubAccount = transferViewModel.SubAccount
+                        }; //Don't put in object code. Project accounts don't have them, they are on the rate accounts
+
+                        transfer.Account = account.ToString();
+                        transfer.IsProjectAccount = invoice.Project.Accounts.Select(a => a.Number).Contains(transfer.Account);
+                    }
+
                     transfer.Total = transferViewModel.Amount;
                     transfer.Type = transferViewModel.Direction;
-                    transfer.IsProjectAccount = invoice.Project.Accounts.Select(a => a.Number).Contains(transfer.Account);
+
 
                     invoice.Transfers.Add(transfer);
                 }
