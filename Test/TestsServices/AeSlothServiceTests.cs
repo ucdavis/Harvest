@@ -141,8 +141,13 @@ namespace Test.TestsServices
             //Mock the Aggie Enterprise Service IsAccountValid
             MockAeService.Setup(a => a.IsAccountValid(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync(SetValidAccount("KP0953010U-301001-ADNO001-532303").Result);
 
-        }
+            var realAeService = new AggieEnterpriseService(MockAeSettings.Object);
 
+            //Call the real Aggie Enterprise Service ReplaceNaturalAccount
+            MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na) => realAeService.ReplaceNaturalAccount(fss, na));
+
+        }
+        
         private Task<AccountValidationModel> SetValidAccount(string coa, bool setIsValid = true)
         {
             var rtValue = new AccountValidationModel();
@@ -253,14 +258,14 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = -1.00m;
             invoice.Expenses.Add(expense);
             invoice.Project.Accounts = new List<Account>();
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(1, "3-CRU9033"));
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(2, "3-CRU9034"));
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(3, "3-CRU9035"));
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(4, "3-CRU9036"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(1, $"KP0953010U-301001-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(2, $"KP0953010U-301001-ADNO002-{AeOptions.NormalCoaNaturalAccount}"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(3, $"KP0953010U-301001-ADNO003-{AeOptions.PassthroughCoaNaturalAccount}"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(4, $"KP0953010U-301001-ADNO004-{AeOptions.PassthroughCoaNaturalAccount}"));
 
             invoice.Project.Accounts[0].Percentage = 98m;
             invoice.Project.Accounts[1].Percentage = 1m;
@@ -285,7 +290,7 @@ namespace Test.TestsServices
             invoice.Transfers.Count(a => a.IsProjectAccount).ShouldBe(2);
             invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[0].Number).Total.ShouldBe(0.98m);
             invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[1].Number).Total.ShouldBe(0.02m);
-            invoice.Transfers.Single(a => a.Account == expense.Account.Substring(0, 9)).Total.ShouldBe(1m);
+            invoice.Transfers.Single(a => a.Account == expense.Account).Total.ShouldBe(1m);
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
         }
