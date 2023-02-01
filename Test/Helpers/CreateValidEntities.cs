@@ -174,7 +174,7 @@ namespace Test.Helpers
             rtValue.Description = $"Description{counter}";
             rtValue.Rate = Rate(3);
             rtValue.RateId = 3;
-            rtValue.Rate.Account = useCoa ? "3110-13U20-ADNO003-238533-00-000-0000000000-000000-0000-000000-000000" : "3-FRMRATE--RAY9";
+            rtValue.Rate.Account = useCoa ? "3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000" : "3-FRMRATE--RAY9";
             rtValue.Quantity = 2.00m;
             rtValue.Total = rtValue.Quantity * rtValue.Rate.Price;
             rtValue.Price = rtValue.Rate.Price;

@@ -389,7 +389,7 @@ namespace Test.TestsServices
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
-            expense = CreateValidEntities.Expense(1, 1); //Same as first expense except not passthrough and object code different
+            expense = CreateValidEntities.Expense(1, 1); //Same as first expense except not passthrough and object code different 3-FRMRATE--RAY9
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
 
