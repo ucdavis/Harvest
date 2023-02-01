@@ -615,21 +615,19 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
-            invoice.Transfers.Count.ShouldBe(6);
-            //There are 4 credits because the expense object codes (2) and pi accounts (2)
+            invoice.Transfers.Count.ShouldBe(4);
+            //2 for the project accounts and 2 for the expense accounts. This is different from the KFS way, but is correct
             var creditAccounts1 = invoice.Transfers
-                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).ToArray();
+                .Where(a => a.IsProjectAccount && a.Account.StartsWith(invoice.Project.Accounts[0].Number.Substring(0,20))).ToArray();
             var creditAccounts2 = invoice.Transfers
-                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number).ToArray();
-            creditAccounts1.Length.ShouldBe(2);
+                .Where(a => a.IsProjectAccount && a.Account.StartsWith(invoice.Project.Accounts[1].Number.Substring(0, 20))).ToArray();
+            creditAccounts1.Length.ShouldBe(1);
             creditAccounts1.ShouldAllBe(a => a.Type == "Credit");
-            creditAccounts1[0].Total.ShouldBe(7.5m);
-            creditAccounts1[1].Total.ShouldBe(15m);
+            creditAccounts1[0].Total.ShouldBe(22.5m);
 
-            creditAccounts2.Length.ShouldBe(2);
+            creditAccounts2.Length.ShouldBe(1);
             creditAccounts2.ShouldAllBe(a => a.Type == "Credit");
-            creditAccounts2[0].Total.ShouldBe(2.5m);
-            creditAccounts2[1].Total.ShouldBe(5m);
+            creditAccounts2[0].Total.ShouldBe(7.5m);
 
             var debitAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
             debitAccounts.Length.ShouldBe(2);
@@ -637,7 +635,7 @@ namespace Test.TestsServices
             debitAccounts[0].Total.ShouldBe(10m);
             debitAccounts[0].Account.ShouldBe("3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000");
             debitAccounts[1].Total.ShouldBe(20m);
-            debitAccounts[1].Account.ShouldBe("3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000");
+            debitAccounts[1].Account.ShouldBe("3110-13U20-ADNO004-410003-64-000-0000000000-000000-0000-000000-000000");
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
