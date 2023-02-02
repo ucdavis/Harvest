@@ -577,7 +577,7 @@ namespace Harvest.Core.Services
                     var totalCost = Math.Round(expenseGroup.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
                     if (totalCost >= 0.01m)
                     {
-                        //TODO: Review if i should be replacing the Natural account here... 
+                        //We only replace the natural account on the PI's account. Not expenses
                         model.Transfers.Add(new TransferViewModel
                         {
                             FinancialSegmentString = credit.FinancialSegmentString,
