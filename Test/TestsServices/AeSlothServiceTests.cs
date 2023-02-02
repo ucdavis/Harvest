@@ -805,28 +805,28 @@ namespace Test.TestsServices
             var expense = CreateValidEntities.Expense(1, 1);
             expense.Total = 10.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(2, 1);
             expense.Total = 20.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(4, 1); //Test above didn't have this one. Shows grouping
             expense.Total = 100.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(3, 1);
             expense.Total = 5.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--RAY9";
+            expense.Account = "3110-13U20-ADNO005-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "KP0953010U-301077-ADNO001-770002"));
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
             MockData();
@@ -842,35 +842,30 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
-            invoice.Transfers.Count.ShouldBe(7);
+            invoice.Transfers.Count.ShouldBe(5);
 
             var piAccounts = invoice.Transfers.Where(a => a.IsProjectAccount).ToArray();
-            piAccounts.Length.ShouldBe(4);
+            piAccounts.Length.ShouldBe(2);
             piAccounts.ShouldAllBe(a => a.Type == "Debit");
-            piAccounts[0].Total.ShouldBe(97.5m);
-            piAccounts[0].Account.ShouldBe(invoice.Project.Accounts[0].Number);
+            piAccounts[0].Total.ShouldBe(101.25m);
+            piAccounts[0].Account.ShouldBe("KP0953010U-301001-ADNO001-770002");
 
-            piAccounts[1].Total.ShouldBe(32.5m);
-            piAccounts[1].Account.ShouldBe(invoice.Project.Accounts[1].Number);
+            piAccounts[1].Total.ShouldBe(33.75m);
+            piAccounts[1].Account.ShouldBe("KP0953010U-301077-ADNO001-770002");
 
-            piAccounts[2].Total.ShouldBe(3.75m);
-            piAccounts[2].Account.ShouldBe(invoice.Project.Accounts[0].Number);
-
-            piAccounts[3].Total.ShouldBe(1.25m);
-            piAccounts[3].Account.ShouldBe(invoice.Project.Accounts[1].Number);
 
             var harvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
             harvestAccounts.Length.ShouldBe(3);
             harvestAccounts.ShouldAllBe(a => a.Type == "Credit");
 
             harvestAccounts[0].Total.ShouldBe(10m);
-            harvestAccounts[0].Account.ShouldBe("3-FRMRATE");
+            harvestAccounts[0].Account.ShouldBe("3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000");
 
             harvestAccounts[1].Total.ShouldBe(120m);
-            harvestAccounts[1].Account.ShouldBe("3-APSNFLP");
+            harvestAccounts[1].Account.ShouldBe("3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000");
 
             harvestAccounts[2].Total.ShouldBe(5m);
-            harvestAccounts[2].Account.ShouldBe("3-APSNFLP");
+            harvestAccounts[2].Account.ShouldBe("3110-13U20-ADNO005-775001-64-000-0000000000-000000-0000-000000-000000");
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
