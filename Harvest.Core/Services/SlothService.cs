@@ -1,3 +1,4 @@
+using AggieEnterpriseApi.Validation;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
@@ -81,11 +82,24 @@ namespace Harvest.Core.Services
             {
                 return Result.Error("No accounts found for invoice: {invoiceId}", invoiceId);
             }
+
             if (_aeSettings.UseCoA)
             {
                 //Do an early check to make sure project account(s) are valid
                 foreach (var account in invoice.Project.Accounts)
                 {
+                    if(FinancialChartValidation.GetFinancialChartStringType(account.Number) == FinancialChartStringType.Invalid)
+                    {
+                        //Ok, it is an invalid COA format, so 99.99% chance this is still a KFS account. Lets try and convert it:
+                        var coa = await _aggieEnterpriseService.ConvertKfsAccount(account.Number);
+                        if(coa != null)
+                        {
+                            Log.Warning("Project Account not updated to COA, using KFS Convert. Project: {id}, KFS Account: {kfs}, COA: {coa}", account.ProjectId, account.Number, coa);
+                            account.Number = coa; // Assign it here so we can follow through with the validation. Will this get updated in the DB if everything else goes though I think.
+
+                        }
+                    }
+                    
                     var accountValidation = await _aggieEnterpriseService.IsAccountValid(account.Number);
                     if (!accountValidation.IsValid)
                     {

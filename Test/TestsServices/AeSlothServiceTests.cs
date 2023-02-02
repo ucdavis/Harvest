@@ -146,6 +146,7 @@ namespace Test.TestsServices
             //Call the real Aggie Enterprise Service ReplaceNaturalAccount
             MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na) => realAeService.ReplaceNaturalAccount(fss, na));
 
+            MockAeService.Setup(a => a.ConvertKfsAccount("3-APSFB55")).ReturnsAsync("K30APSFB55-TASK01-APLS002-770006");
         }
         
         private Task<AccountValidationModel> SetValidAccount(string coa, bool setIsValid = true)
@@ -167,7 +168,7 @@ namespace Test.TestsServices
         [InlineData(1, Invoice.Statuses.Completed)]
         [InlineData(1, Invoice.Statuses.Pending)]
         [InlineData(99, Invoice.Statuses.Pending)]
-        //[InlineData(1, Invoice.Statuses.Created, Skip = "This one would fall through")]
+        [InlineData(1, Invoice.Statuses.Created, Skip = "This one would fall through")]
         public async Task MoveMoneyReturnsErrorWhenCreatedInvoiceNotFound(int id, string status)
         {
             SetupGenericData();
@@ -557,6 +558,44 @@ namespace Test.TestsServices
             expense.Total = -10.00m;
             invoice.Expenses.Add(expense);
             invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: $"KP0953010U-301077-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
+            invoice.Project.Accounts[0].Percentage = 75m;
+            invoice.Project.Accounts[1].Percentage = 25m;
+            MockData();
+
+            invoice.Transfers.ShouldBeNull();
+            invoice.Status.ShouldBe(Invoice.Statuses.Created);
+            invoice.Project.ChargedTotal.ShouldBe(5000m);
+
+            var rtValue = await SlothService.MoveMoney(invoice.Id);
+            rtValue.ShouldNotBeNull();
+            rtValue.IsError.ShouldBeFalse();
+            MockProjectHistoryService.Verify(a => a.MoveMoneyRequested(It.IsAny<int>(), It.IsAny<Invoice>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
+            MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
+
+            invoice.Transfers.Count.ShouldBe(3);
+            //invoice.Transfers.ShouldAllBe(a => a.Total == 10);
+            invoice.Transfers.Single(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).Type.ShouldBe("Credit");
+            invoice.Transfers.Single(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).Total.ShouldBe(7.5m);
+            invoice.Transfers.Single(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number).Total.ShouldBe(2.5m);
+            invoice.Transfers.Single(a => !a.IsProjectAccount).Type.ShouldBe("Debit");
+            invoice.Transfers.Single(a => !a.IsProjectAccount).Total.ShouldBe(10m);
+            invoice.Status.ShouldBe(Invoice.Statuses.Pending);
+            invoice.KfsTrackingNumber.ShouldBe("0000000192");
+            invoice.Project.ChargedTotal.ShouldBe(4990m); //It subtracted the $10 refund.
+        }
+
+        [Fact]
+        public async Task MoveMoneyUpdatesWhenThereIsAValidKfsProjectAccount()
+        {
+            SetupGenericData();
+            var invoice = Invoices.Single(a => a.Id == 1);
+            invoice.Status = Invoice.Statuses.Created;
+            invoice.Expenses = new List<Expense>();
+            var expense = CreateValidEntities.Expense(1, 1);
+            expense.Total = -10.00m;
+            invoice.Expenses.Add(expense);
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-APSFB55")); //This gets converted to K30APSFB55-TASK01-APLS002-770006 with the mock, but the service would do the same thing.
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
             MockData();
