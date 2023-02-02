@@ -8,8 +8,6 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static Harvest.Core.Services.AggieEnterpriseService;
 
@@ -23,11 +21,15 @@ namespace Harvest.Core.Services
 
         string GetNaturalAccount(string financialSegmentString);
         string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount);
+
+        Task<string> ConvertKfsAccount(string account);
     }
 
     public class AggieEnterpriseService : IAggieEnterpriseService{
 
         private readonly IAggieEnterpriseClient _aggieClient;
+
+        public AggieEnterpriseOptions Options { get; set;}
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
@@ -40,6 +42,7 @@ namespace Harvest.Core.Services
                 Log.Error(ex, "Error creating Aggie Enterprise Client");
                 _aggieClient = null;
             }
+            Options = options.Value;
         }
 
         /// <summary>
@@ -210,6 +213,40 @@ namespace Harvest.Core.Services
             }
             Log.Error($"Invalid financial segment string: {financialSegmentString}");
             return financialSegmentString;
+        }
+
+        public async Task<string> ConvertKfsAccount(string account)
+        {
+            var parts = account.Split('-');
+
+            if (parts.Length < 2)
+            {
+                return null;
+            }
+
+            var chart = parts[0].Trim();
+            var accountPart = parts[1].Trim();
+            var subAcct = parts.Length > 2 ? parts[2].Trim() : null;
+
+            var result = await _aggieClient.KfsConvertAccount.ExecuteAsync(chart, accountPart, subAcct);
+            var data = result.ReadData();
+            if (data.KfsConvertAccount.GlSegments != null)
+            {
+                var tempGlSegments = new GlSegments(data.KfsConvertAccount.GlSegments);
+                tempGlSegments.Account = Options.NormalCoaNaturalAccount;
+                return tempGlSegments.ToSegmentString();
+            }
+
+            if (data.KfsConvertAccount.PpmSegments != null)
+            {
+                var tempPpmSegments = new PpmSegments(data.KfsConvertAccount.PpmSegments);
+                tempPpmSegments.ExpenditureType = Options.NormalCoaNaturalAccount;
+                return tempPpmSegments.ToSegmentString();
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
