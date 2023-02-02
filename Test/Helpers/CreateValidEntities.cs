@@ -166,7 +166,7 @@ namespace Test.Helpers
             return rtValue;
         }
 
-        public static Expense Expense(int? counter, int projectId)
+        public static Expense Expense(int? counter, int projectId, bool useCoa = false)
         {
             var rtValue = new Expense();
             rtValue.Id = counter ?? 99;
@@ -174,7 +174,7 @@ namespace Test.Helpers
             rtValue.Description = $"Description{counter}";
             rtValue.Rate = Rate(3);
             rtValue.RateId = 3;
-            rtValue.Rate.Account = "3-FRMRATE--RAY9";
+            rtValue.Rate.Account = useCoa ? "3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000" : "3-FRMRATE--RAY9";
             rtValue.Quantity = 2.00m;
             rtValue.Total = rtValue.Quantity * rtValue.Rate.Price;
             rtValue.Price = rtValue.Rate.Price;

@@ -56,7 +56,7 @@ namespace Harvest.Core.Domain
         public bool IsPassthrough { get; set; } = false;
 
         [Required]
-        [StringLength(50)]
+        [StringLength(80)]
         public string Account { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,5 +68,6 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Expense>().Property(a => a.Quantity).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.IsPassthrough).HasDefaultValue(false);
         }
+
     }
 }

@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Create";
 }
-<div class="card-wrapper col-md-6">
+<div class="card-wrapper col-md-8">
     <div class="card-content">
         <h2>Create Rate</h2>
              <form asp-action="Create">
@@ -19,12 +19,34 @@
     </div>
 </div>
 
+    
+
 
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    @{
+        <script src="https://finjector.ucdavis.edu/finjector.js?v=3" type="text/javascript" asp-add-nonce="true"></script>
+         <script type="text/javascript" asp-add-nonce="true">
+                        $("#ccoa-picker").on("click",
+                            async function () {
+                                const chart = await window.Finjector.findChartSegmentString("https://finjector.ucdavis.edu/landing");
+                                if (chart && chart.status === "success") {
+                                    $("#Rate_Account").val(chart.data);
+                                }
+                                else {
+                                    alert("Something went wrong with the CCOA picker")
+                                }
+                                return false;
+                            });
+    </script>
+    }
+
+
 }
 @section Styles
 {
     @{ await Html.RenderPartialAsync("_FaStylesPartial");}
 }
+

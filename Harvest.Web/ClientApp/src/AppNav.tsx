@@ -73,9 +73,25 @@ export const AppNav = () => {
                     <DropdownItem href="/Ticket/NeedsAttention">
                       Open Tickets
                     </DropdownItem>
+                    <ShowFor roles={["System"]}>
+                      <DropdownItem divider />
+                      <DropdownItem href="/System/UpdatePendingExpenses">
+                        Unprocessed Expenses
+                      </DropdownItem>
+                      <DropdownItem href="/System/Emulate">
+                        Emulate
+                      </DropdownItem>
+                      <DropdownItem href="/Report/AllProjects">
+                        Reports - Projects
+                      </DropdownItem>
+                      <DropdownItem href="/Report/HistoricalRateActivity">
+                        Reports - Historical Rate Activity
+                      </DropdownItem>
+                    </ShowFor>
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </ShowFor>
+
               <NavItem>
                 <NavLink href="/Help">Help</NavLink>
               </NavItem>

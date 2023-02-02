@@ -26,8 +26,16 @@
     <span asp-validation-for="Rate.BillingUnit" class="text-danger"></span>
 </div>
 <div class="form-group">
-    <label asp-for="Rate.Account" class="control-label"></label><span title="Account format: chart-account-{subaccount}-expenseObjectCode"> <i class="fas fa-question-circle fa-xs" ></i></span>
-    <input asp-for="Rate.Account" class="form-control" placeholder="x-xxxxxxx-xxxxx-xxxx"/>
+    <label asp-for="Rate.Account" class="control-label"></label><span title='@(Model.UseCoA ? "Use the COA Picker button to pick or build a valid Aggie Enterprise COA" : "Account format: chart-account-{subaccount}-expenseObjectCode")'> <i class="fas fa-question-circle fa-xs" ></i></span>
+    <div class="input-group">
+        <input asp-for="Rate.Account" class="form-control" placeholder='@(Model.UseCoA ? "" : "x-xxxxxxx-xxxxx-xxxx")'/>
+        @if (Model.UseCoA)
+        {
+            <div class="input-group-append">
+                <button id="ccoa-picker" class="btn btn-primary" type="button">COA Picker</button>
+            </div>
+        }
+    </div>
     <span asp-validation-for="Rate.Account" class="text-danger"></span>
 </div>
 <div class="form-group">

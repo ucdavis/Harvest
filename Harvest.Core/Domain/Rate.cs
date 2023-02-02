@@ -30,7 +30,7 @@ namespace Harvest.Core.Domain
         [Display(Name = "Billing Unit")]
         public string BillingUnit { get; set; }
         [Required]
-        [StringLength(50)]
+        [StringLength(80)] //Probably only 69 characters, but just in case
         public string Account { get; set; }
 
         [Display(Name = "Rate")] 
@@ -62,6 +62,9 @@ namespace Harvest.Core.Domain
         // projects using this rate
         [JsonIgnore]
         public List<Project> Projects { get; set; }
+
+        [JsonIgnore]
+        public List<Expense> Expenses { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {

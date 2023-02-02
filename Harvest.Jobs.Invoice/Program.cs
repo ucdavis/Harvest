@@ -61,6 +61,7 @@ namespace Harvest.Jobs.Invoice
             services.Configure<SparkpostSettings>(Configuration.GetSection("Sparkpost"));
             services.Configure<DevSettings>(Configuration.GetSection("Dev"));
             services.Configure<EmailSettings>(Configuration.GetSection("Email"));
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
 
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
@@ -74,6 +75,7 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddTransient<IDateTimeService, DateTimeService>();
+            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
 
             return services.BuildServiceProvider();
         }

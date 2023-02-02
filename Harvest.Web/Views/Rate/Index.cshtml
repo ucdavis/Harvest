@@ -39,9 +39,6 @@
             @Html.DisplayNameFor(model => model.Price)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CreatedOn)
-        </th>
-        <th>
             @Html.DisplayNameFor(model => model.UpdatedOn)
         </th>
         <th>Actions</th>
@@ -70,9 +67,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @item.CreatedOn.ToPacificTime().Format("d")
             </td>
             <td>
                 @item.UpdatedOn.ToPacificTime().Format("d")
@@ -117,14 +111,13 @@
                 { responsivePriority: 7, targets: 6 },
                 { responsivePriority: 8, targets: 7 },
                 { responsivePriority: 9, targets: 8 },
-                { responsivePriority: 10, targets: 9 },
                 {
                     type: "boolean",
                     targets: [2]
                 },
                 {
                     type: "date",
-                    targets: [7,8]
+                    targets: [7]
                 }
             ]
         });

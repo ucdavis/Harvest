@@ -359,6 +359,7 @@ export interface AppContextShape {
     detail: User;
     roles: RoleName[];
   };
+  usecoa: boolean;
 }
 
 export interface PromiseStatus {

@@ -78,13 +78,14 @@
         <p>Copyright &copy; <span id="copywrite-year"></span> The Regents of the University of California, Davis campus.
             All rights reserved.</p>
     </footer>
-
+    
 
     <script>
         var Harvest = { user: {} };
         Harvest.user.detail = @Html.Raw(Context.GetUserDetails());
         Harvest.user.roles = @Html.Raw(await Context.GetUserRoles());
         Harvest.antiForgeryToken = "@Xsrf.GetAndStoreTokens(Context).RequestToken";
+        Harvest.usecoa = @Configuration["AggieEnterprise:UseCoA"];
     </script>
 
     <environment include="Development">
