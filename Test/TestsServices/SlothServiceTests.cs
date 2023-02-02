@@ -167,7 +167,7 @@ namespace Test.TestsServices
         [InlineData(1, Invoice.Statuses.Completed)]
         [InlineData(1, Invoice.Statuses.Pending)]
         [InlineData(99, Invoice.Statuses.Pending)]
-        //[InlineData(1, Invoice.Statuses.Created, Skip = "This one would fall through")]
+        [InlineData(1, Invoice.Statuses.Created, Skip = "This one would fall through")]
         public async Task MoveMoneyReturnsErrorWhenCreatedInvoiceNotFound(int id, string status)
         {
             SetupGenericData();
