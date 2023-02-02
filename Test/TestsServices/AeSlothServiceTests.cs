@@ -21,11 +21,12 @@ using Harvest.Core.Models.SlothModels;
 using Test.Helpers;
 using TestHelpers.Helpers;
 using Xunit;
+using AggieEnterpriseApi.Validation;
 
 namespace Test.TestsServices
 {
     [Trait("Category", "ServiceTest")]
-    public class SlothServiceTests
+    public class AeSlothServiceTests
     {
         public Mock<HttpMessageHandler> MockMessageHandler { get; set; }
         public Mock<AppDbContext> MockDbContext { get; set; }
@@ -35,7 +36,7 @@ namespace Test.TestsServices
         public Mock<IOptions<SlothSettings>> MockSlothSettings { get; set; }
         public Mock<IOptions<AggieEnterpriseOptions>> MockAeSettings { get; set; }
 
-        public Mock<AggieEnterpriseService> MockAeService { get; set; }
+        public Mock<IAggieEnterpriseService> MockAeService { get; set; }
         public SlothSettings SlothSettings { get; set; } = new SlothSettings()
         {
             ApiKey = "Fake",
@@ -47,16 +48,18 @@ namespace Test.TestsServices
 
         public AggieEnterpriseOptions AeOptions { get;set; } = new AggieEnterpriseOptions()
         {
-            UseCoA = false,
+            UseCoA = true,
             GraphQlUrl = "http://fake.ucdavis.edu/graphql",
-            Token = "Fake"
+            Token = "Fake",
+            NormalCoaNaturalAccount ="770006",
+            PassthroughCoaNaturalAccount = "770002"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
         private SlothService SlothService { get; set; }
 
         public List<Invoice> Invoices { get; set; }
 
-        public SlothServiceTests()
+        public AeSlothServiceTests()
         {
             var httpClientFactory = BasicSetup(out var httpClient, HttpStatusCode.OK);
 
@@ -78,7 +81,7 @@ namespace Test.TestsServices
             MockSlothSettings.Setup(a => a.Value).Returns(SlothSettings);
             MockAeSettings.Setup(a => a.Value).Returns(AeOptions);
 
-            MockAeService = new Mock<AggieEnterpriseService>(MockAeSettings.Object);
+            MockAeService = new Mock<IAggieEnterpriseService>();
 
             JsonSerializerOptions = JsonOptions.Standard.WithStandard().WithGeoJson();
 
@@ -115,11 +118,11 @@ namespace Test.TestsServices
             var expenses = new List<Expense>();
             for (int i = 0; i < 3; i++)
             {
-                expenses.Add(CreateValidEntities.Expense(i + 1, project.Id));
+                expenses.Add(CreateValidEntities.Expense(i + 1, project.Id, true));
             }
 
             project.Accounts = new List<Account>();
-            project.Accounts.Add(CreateValidEntities.Account(1));
+            project.Accounts.Add(CreateValidEntities.Account(1, acctNumber: $"KP0953010U-301001-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
 
             for (int i = 0; i < 3; i++)
             {
@@ -135,29 +138,26 @@ namespace Test.TestsServices
         {
             MockDbContext.Setup(a => a.Invoices).Returns(Invoices.AsQueryable().MockAsyncDbSet().Object);
 
-            var mockFinancialSettings = new Mock<IOptions<FinancialLookupSettings>>();
-            var realFinancialService = new FinancialService(mockFinancialSettings.Object, JsonSerializerOptions);
+            //Mock the Aggie Enterprise Service IsAccountValid
+            MockAeService.Setup(a => a.IsAccountValid(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync((string fss, bool a, bool b) => SetValidAccount(fss).Result);
 
-            //Call actual service to parse account
-            KfsAccount rtval = new KfsAccount();
-            MockFinancialService.Setup(a => a.Parse(It.IsAny<string>()))
-                .Callback<string>(a => rtval = realFinancialService.Parse(a)).Returns(() => rtval);
+            var realAeService = new AggieEnterpriseService(MockAeSettings.Object);
 
-
-            //var isValidRtn = new AccountValidationModel();
-            MockFinancialService.Setup(a => a.IsValid(It.IsAny<string>()))
-                .Callback<string>(a => rtval = realFinancialService.Parse(a)).Returns(async () => await SetValidAccount(rtval));
+            //Call the real Aggie Enterprise Service ReplaceNaturalAccount
+            MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na) => realAeService.ReplaceNaturalAccount(fss, na));
 
         }
-
-        private Task<AccountValidationModel> SetValidAccount(KfsAccount kfsAccount, bool setIsValid = true)
+        
+        private Task<AccountValidationModel> SetValidAccount(string coa, bool setIsValid = true)
         {
             var rtValue = new AccountValidationModel();
-            rtValue.KfsAccount = kfsAccount;
+            rtValue.KfsAccount = null;
+            rtValue.FinancialSegmentString = coa;
+            rtValue.CoaChartType = FinancialChartStringType.Ppm;
             rtValue.IsValid = setIsValid;
             if (!setIsValid)
             {
-                rtValue.Messages.Add("Fake Message");
+                rtValue.Messages.Add("Fake Message");                
             }
             return Task.FromResult(rtValue);
         }
@@ -167,7 +167,7 @@ namespace Test.TestsServices
         [InlineData(1, Invoice.Statuses.Completed)]
         [InlineData(1, Invoice.Statuses.Pending)]
         [InlineData(99, Invoice.Statuses.Pending)]
-        [InlineData(1, Invoice.Statuses.Created, Skip = "This one would fall through")]
+        //[InlineData(1, Invoice.Statuses.Created, Skip = "This one would fall through")]
         public async Task MoveMoneyReturnsErrorWhenCreatedInvoiceNotFound(int id, string status)
         {
             SetupGenericData();
@@ -217,7 +217,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = -0.004m;
             invoice.Expenses.Add(expense);
             MockData();
@@ -235,16 +235,12 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
             MockData();
 
-            var mockFinancialSettings = new Mock<IOptions<FinancialLookupSettings>>();
-            var realFinancialService = new FinancialService(mockFinancialSettings.Object, JsonSerializerOptions);
-            KfsAccount rtval = new KfsAccount();
-            MockFinancialService.Setup(a => a.IsValid(It.IsAny<string>()))
-                .Callback<string>(a => rtval = realFinancialService.Parse(a)).Returns(async () => await SetValidAccount(rtval, false));
+            MockAeService.Setup(a => a.IsAccountValid(It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync(SetValidAccount("KP0953010U-301001-ADNO001-532303", false).Result);
 
             invoice.Transfers.ShouldBeNull();
             invoice.Status.ShouldBe(Invoice.Statuses.Created);
@@ -252,7 +248,7 @@ namespace Test.TestsServices
             var rtValue = await SlothService.MoveMoney(invoice.Id);
             rtValue.ShouldNotBeNull();
             rtValue.IsError.ShouldBeTrue();
-            rtValue.Message.ShouldBe("ProcessDebits Failed");
+            rtValue.Message.ShouldBe("Account KP0953010U-301001-ADNO001-770006 is not a valid Aggie Enterprise CoA");
         }
 
         [Fact]
@@ -262,14 +258,14 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = -1.00m;
             invoice.Expenses.Add(expense);
             invoice.Project.Accounts = new List<Account>();
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(1, "3-CRU9033"));
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(2, "3-CRU9034"));
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(3, "3-CRU9035"));
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(4, "3-CRU9036"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(1, $"KP0953010U-301001-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(2, $"KP0953010U-301001-ADNO002-{AeOptions.NormalCoaNaturalAccount}"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(3, $"KP0953010U-301001-ADNO003-{AeOptions.PassthroughCoaNaturalAccount}"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(4, $"KP0953010U-301001-ADNO004-{AeOptions.PassthroughCoaNaturalAccount}"));
 
             invoice.Project.Accounts[0].Percentage = 98m;
             invoice.Project.Accounts[1].Percentage = 1m;
@@ -294,7 +290,7 @@ namespace Test.TestsServices
             invoice.Transfers.Count(a => a.IsProjectAccount).ShouldBe(2);
             invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[0].Number).Total.ShouldBe(0.98m);
             invoice.Transfers.Single(a => a.Account == invoice.Project.Accounts[1].Number).Total.ShouldBe(0.02m);
-            invoice.Transfers.Single(a => a.Account == expense.Account.Substring(0, 9)).Total.ShouldBe(1m);
+            invoice.Transfers.Single(a => a.Account == expense.Account).Total.ShouldBe(1m);
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
         }
@@ -306,7 +302,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
             MockData();
@@ -337,7 +333,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = 990.00m;
             invoice.Expenses.Add(expense);
             invoice.Project.ChargedTotal = 5.00m;
@@ -372,24 +368,25 @@ namespace Test.TestsServices
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
             var expense = CreateValidEntities.Expense(1, 1);
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000";
             expense.Total = 990.00m;
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(1, 1);
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000";
             expense.Total = 100.00m;
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(1, 1);
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO002-775001-64-000-0000000000-000000-0000-000000-000000";
             expense.Total = 50.00m;
             expense.IsPassthrough = true;
             invoice.Expenses.Add(expense);
 
-            expense = CreateValidEntities.Expense(1, 1); //Same as first expense except not passthrough and object code different 3-FRMRATE--RAY9
+            expense = CreateValidEntities.Expense(1, 1); //Same as first expense except not passthrough and object code different (For KFS this was true, but for AE it will have a different account
+            expense.Account = "3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000";
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
 
@@ -429,7 +426,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
             MockData();
@@ -462,7 +459,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
             MockData();
@@ -495,7 +492,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = 10.00m;
             invoice.Expenses.Add(expense);
             MockData();
@@ -524,7 +521,7 @@ namespace Test.TestsServices
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = -10.00m;
             invoice.Expenses.Add(expense);
             MockData();
@@ -550,7 +547,7 @@ namespace Test.TestsServices
         }
 
         [Fact]
-        public async Task MoveMoneyUpdatesWhenThereIsARefundWithTwoPiAccounts()
+        public async Task MoveMoneyUpdatesWhenThereIsArefundWithTwoPiAccounts()
         {
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);
@@ -559,7 +556,7 @@ namespace Test.TestsServices
             var expense = CreateValidEntities.Expense(1, 1);
             expense.Total = -10.00m;
             invoice.Expenses.Add(expense);
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: $"KP0953010U-301077-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
             MockData();
@@ -588,22 +585,22 @@ namespace Test.TestsServices
         }
 
         [Fact]
-        public async Task MoveMoneyUpdatesWhenThereIsARefundWithTwoPiAccountsAndTwoRefundAccounts()
+        public async Task MoveMoneyUpdatesWhenThereIsArefundWithTwoPiAccountsAndTwoRefundAccounts()
         {
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = -10.00m;
             invoice.Expenses.Add(expense);
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: $"KP0953010U-301077-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
 
-            expense = CreateValidEntities.Expense(2, 1);
+            expense = CreateValidEntities.Expense(2, 1, true);
             expense.Total = -20m;
-            expense.Account = "3-RRACRES--RAS5";
+            expense.Account = "3110-13U20-ADNO004-410003-64-000-0000000000-000000-0000-000000-000000"; //Diff from the one defaulted in the first expense
             invoice.Expenses.Add(expense);
             MockData();
 
@@ -618,29 +615,27 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
-            invoice.Transfers.Count.ShouldBe(6);
-            //There are 4 credits because the expense object codes (2) and pi accounts (2)
+            invoice.Transfers.Count.ShouldBe(4);
+            //2 for the project accounts and 2 for the expense accounts. This is different from the KFS way, but is correct
             var creditAccounts1 = invoice.Transfers
-                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number).ToArray();
+                .Where(a => a.IsProjectAccount && a.Account.StartsWith(invoice.Project.Accounts[0].Number.Substring(0,20))).ToArray();
             var creditAccounts2 = invoice.Transfers
-                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number).ToArray();
-            creditAccounts1.Length.ShouldBe(2);
+                .Where(a => a.IsProjectAccount && a.Account.StartsWith(invoice.Project.Accounts[1].Number.Substring(0, 20))).ToArray();
+            creditAccounts1.Length.ShouldBe(1);
             creditAccounts1.ShouldAllBe(a => a.Type == "Credit");
-            creditAccounts1[0].Total.ShouldBe(7.5m);
-            creditAccounts1[1].Total.ShouldBe(15m);
+            creditAccounts1[0].Total.ShouldBe(22.5m);
 
-            creditAccounts2.Length.ShouldBe(2);
+            creditAccounts2.Length.ShouldBe(1);
             creditAccounts2.ShouldAllBe(a => a.Type == "Credit");
-            creditAccounts2[0].Total.ShouldBe(2.5m);
-            creditAccounts2[1].Total.ShouldBe(5m);
+            creditAccounts2[0].Total.ShouldBe(7.5m);
 
             var debitAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
             debitAccounts.Length.ShouldBe(2);
             debitAccounts.ShouldAllBe(a => a.Type == "Debit");
             debitAccounts[0].Total.ShouldBe(10m);
-            debitAccounts[0].Account.ShouldBe("3-FRMRATE");
+            debitAccounts[0].Account.ShouldBe("3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000");
             debitAccounts[1].Total.ShouldBe(20m);
-            debitAccounts[1].Account.ShouldBe("3-RRACRES");
+            debitAccounts[1].Account.ShouldBe("3110-13U20-ADNO004-410003-64-000-0000000000-000000-0000-000000-000000");
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
@@ -648,27 +643,27 @@ namespace Test.TestsServices
         }
 
         [Fact]
-        public async Task MoveMoneyUpdatesWhenThereIsARefundWithTwoPiAccountsAndTwoRefundAccountsAndANormalExpense()
+        public async Task MoveMoneyUpdatesWhenThereIsArefundWithTwoPiAccountsAndTwoRefundAccountsAndANormalExpense()
         {
             SetupGenericData();
             var invoice = Invoices.Single(a => a.Id == 1);
             invoice.Status = Invoice.Statuses.Created;
             invoice.Expenses = new List<Expense>();
-            var expense = CreateValidEntities.Expense(1, 1);
+            var expense = CreateValidEntities.Expense(1, 1, true);
             expense.Total = -10.00m;
             invoice.Expenses.Add(expense);
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: $"KP0953010U-301077-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
 
             expense = CreateValidEntities.Expense(2, 1);
             expense.Total = -20m;
-            expense.Account = "3-RRACRES--RAS5";
+            expense.Account = "3110-13U20-ADNO005-410003-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(3, 1);
             expense.Total = 100m;
-            expense.Account = "3-APSNFLP--RAPB";
+            expense.Account = "3110-13U20-ADNO006-410003-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
             MockData();
 
@@ -683,41 +678,39 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
-            invoice.Transfers.Count.ShouldBe(9);
-            //There are 4 credits because the expense object codes (2) and pi accounts (2)
+            invoice.Transfers.Count.ShouldBe(7);
+
             var creditPiAccounts1 = invoice.Transfers
-                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[0].Number && a.Type == "Credit").ToArray();
+                .Where(a => a.IsProjectAccount && a.Type == "Credit" && a.Account.StartsWith(invoice.Project.Accounts[0].Number.Substring(0, 20))).ToArray();
             var creditPiAccounts2 = invoice.Transfers
-                .Where(a => a.IsProjectAccount && a.Account == invoice.Project.Accounts[1].Number && a.Type == "Credit").ToArray();
+                .Where(a => a.IsProjectAccount && a.Type == "Credit" && a.Account.StartsWith(invoice.Project.Accounts[1].Number.Substring(0, 20))).ToArray();
 
             var debitPiAccounts1 = invoice.Transfers
                 .Where(a => a.IsProjectAccount && a.Type == "Debit").ToArray();
 
-            creditPiAccounts1.Length.ShouldBe(2);
-            creditPiAccounts1[0].Total.ShouldBe(7.5m);
-            creditPiAccounts1[1].Total.ShouldBe(15m);
+            creditPiAccounts1.Length.ShouldBe(1);
+            creditPiAccounts1[0].Total.ShouldBe(22.5m);
 
-            creditPiAccounts2.Length.ShouldBe(2);
-            creditPiAccounts2[0].Total.ShouldBe(2.5m);
-            creditPiAccounts2[1].Total.ShouldBe(5m);
+            creditPiAccounts2.Length.ShouldBe(1);
+            creditPiAccounts2[0].Total.ShouldBe(7.5m);
 
             debitPiAccounts1.Length.ShouldBe(2);
             debitPiAccounts1[0].Total.ShouldBe(75m);
-            debitPiAccounts1[0].Account.ShouldBe(invoice.Project.Accounts[0].Number);
+            debitPiAccounts1[0].Account.ShouldStartWith(invoice.Project.Accounts[0].Number.Substring(0,21));
             debitPiAccounts1[1].Total.ShouldBe(25m);
-            debitPiAccounts1[1].Account.ShouldBe(invoice.Project.Accounts[1].Number);
+            debitPiAccounts1[1].Account.ShouldStartWith(invoice.Project.Accounts[1].Number.Substring(0,21));
 
             var debitHarvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount && a.Type == "Debit").ToArray();
             debitHarvestAccounts.Length.ShouldBe(2);
             debitHarvestAccounts[0].Total.ShouldBe(10m);
-            debitHarvestAccounts[0].Account.ShouldBe("3-FRMRATE");
+            debitHarvestAccounts[0].Account.ShouldBe("3110-13U20-ADNO003-410003-64-000-0000000000-000000-0000-000000-000000");
             debitHarvestAccounts[1].Total.ShouldBe(20m);
-            debitHarvestAccounts[1].Account.ShouldBe("3-RRACRES");
+            debitHarvestAccounts[1].Account.ShouldBe("3110-13U20-ADNO005-410003-64-000-0000000000-000000-0000-000000-000000");
 
             var creditHarvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount && a.Type == "Credit").ToArray();
             creditHarvestAccounts.Length.ShouldBe(1);
             creditHarvestAccounts[0].Total.ShouldBe(100m);
-            creditHarvestAccounts[0].Account.ShouldBe("3-APSNFLP");
+            creditHarvestAccounts[0].Account.ShouldBe("3110-13U20-ADNO006-410003-64-000-0000000000-000000-0000-000000-000000");
 
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
@@ -736,13 +729,13 @@ namespace Test.TestsServices
             var expense = CreateValidEntities.Expense(1, 1);
             expense.Total = 10.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(2, 1);
             expense.Total = 20.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             //expense = CreateValidEntities.Expense(4, 1); //Next test will add this expense, and with grouping, total transfers remains the same
@@ -754,10 +747,10 @@ namespace Test.TestsServices
             expense = CreateValidEntities.Expense(3, 1);
             expense.Total = 5.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--RAY9";
+            expense.Account = "3110-13U20-ADNO005-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: $"KP0953010U-301077-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
             MockData();
@@ -773,35 +766,29 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
-            invoice.Transfers.Count.ShouldBe(7);
+            invoice.Transfers.Count.ShouldBe(5);
 
             var piAccounts = invoice.Transfers.Where(a => a.IsProjectAccount).ToArray();
-            piAccounts.Length.ShouldBe(4);
+            piAccounts.Length.ShouldBe(2);
             piAccounts.ShouldAllBe(a => a.Type == "Debit");
-            piAccounts[0].Total.ShouldBe(22.5m);
-            piAccounts[0].Account.ShouldBe(invoice.Project.Accounts[0].Number);
+            piAccounts[0].Total.ShouldBe(26.25m);
+            piAccounts[0].Account.ShouldBe("KP0953010U-301001-ADNO001-770002");
 
-            piAccounts[1].Total.ShouldBe(7.5m);
-            piAccounts[1].Account.ShouldBe(invoice.Project.Accounts[1].Number);
-
-            piAccounts[2].Total.ShouldBe(3.75m);
-            piAccounts[2].Account.ShouldBe(invoice.Project.Accounts[0].Number);
-
-            piAccounts[3].Total.ShouldBe(1.25m);
-            piAccounts[3].Account.ShouldBe(invoice.Project.Accounts[1].Number);
+            piAccounts[1].Total.ShouldBe(8.75m);
+            piAccounts[1].Account.ShouldBe("KP0953010U-301077-ADNO001-770002");
 
             var harvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
             harvestAccounts.Length.ShouldBe(3);
             harvestAccounts.ShouldAllBe(a => a.Type == "Credit");
 
             harvestAccounts[0].Total.ShouldBe(10m);
-            harvestAccounts[0].Account.ShouldBe("3-FRMRATE");
+            harvestAccounts[0].Account.ShouldBe("3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000");
 
             harvestAccounts[1].Total.ShouldBe(20m);
-            harvestAccounts[1].Account.ShouldBe("3-APSNFLP");
+            harvestAccounts[1].Account.ShouldBe("3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000");
 
             harvestAccounts[2].Total.ShouldBe(5m);
-            harvestAccounts[2].Account.ShouldBe("3-APSNFLP");
+            harvestAccounts[2].Account.ShouldBe("3110-13U20-ADNO005-775001-64-000-0000000000-000000-0000-000000-000000");
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
@@ -818,28 +805,28 @@ namespace Test.TestsServices
             var expense = CreateValidEntities.Expense(1, 1);
             expense.Total = 10.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-FRMRATE--80RS";
+            expense.Account = "3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(2, 1);
             expense.Total = 20.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(4, 1); //Test above didn't have this one. Shows grouping
             expense.Total = 100.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--80RS";
+            expense.Account = "3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
             expense = CreateValidEntities.Expense(3, 1);
             expense.Total = 5.00m;
             expense.IsPassthrough = true;
-            expense.Account = "3-APSNFLP--RAY9";
+            expense.Account = "3110-13U20-ADNO005-775001-64-000-0000000000-000000-0000-000000-000000";
             invoice.Expenses.Add(expense);
 
-            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "3-CRUEQIP"));
+            invoice.Project.Accounts.Add(CreateValidEntities.Account(77, acctNumber: "KP0953010U-301077-ADNO001-770002"));
             invoice.Project.Accounts[0].Percentage = 75m;
             invoice.Project.Accounts[1].Percentage = 25m;
             MockData();
@@ -855,35 +842,30 @@ namespace Test.TestsServices
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
 
-            invoice.Transfers.Count.ShouldBe(7);
+            invoice.Transfers.Count.ShouldBe(5);
 
             var piAccounts = invoice.Transfers.Where(a => a.IsProjectAccount).ToArray();
-            piAccounts.Length.ShouldBe(4);
+            piAccounts.Length.ShouldBe(2);
             piAccounts.ShouldAllBe(a => a.Type == "Debit");
-            piAccounts[0].Total.ShouldBe(97.5m);
-            piAccounts[0].Account.ShouldBe(invoice.Project.Accounts[0].Number);
+            piAccounts[0].Total.ShouldBe(101.25m);
+            piAccounts[0].Account.ShouldBe("KP0953010U-301001-ADNO001-770002");
 
-            piAccounts[1].Total.ShouldBe(32.5m);
-            piAccounts[1].Account.ShouldBe(invoice.Project.Accounts[1].Number);
+            piAccounts[1].Total.ShouldBe(33.75m);
+            piAccounts[1].Account.ShouldBe("KP0953010U-301077-ADNO001-770002");
 
-            piAccounts[2].Total.ShouldBe(3.75m);
-            piAccounts[2].Account.ShouldBe(invoice.Project.Accounts[0].Number);
-
-            piAccounts[3].Total.ShouldBe(1.25m);
-            piAccounts[3].Account.ShouldBe(invoice.Project.Accounts[1].Number);
 
             var harvestAccounts = invoice.Transfers.Where(a => !a.IsProjectAccount).ToArray();
             harvestAccounts.Length.ShouldBe(3);
             harvestAccounts.ShouldAllBe(a => a.Type == "Credit");
 
             harvestAccounts[0].Total.ShouldBe(10m);
-            harvestAccounts[0].Account.ShouldBe("3-FRMRATE");
+            harvestAccounts[0].Account.ShouldBe("3110-13U20-ADNO003-775001-64-000-0000000000-000000-0000-000000-000000");
 
             harvestAccounts[1].Total.ShouldBe(120m);
-            harvestAccounts[1].Account.ShouldBe("3-APSNFLP");
+            harvestAccounts[1].Account.ShouldBe("3110-13U20-ADNO004-775001-64-000-0000000000-000000-0000-000000-000000");
 
             harvestAccounts[2].Total.ShouldBe(5m);
-            harvestAccounts[2].Account.ShouldBe("3-APSNFLP");
+            harvestAccounts[2].Account.ShouldBe("3110-13U20-ADNO005-775001-64-000-0000000000-000000-0000-000000-000000");
 
             invoice.Status.ShouldBe(Invoice.Statuses.Pending);
             invoice.KfsTrackingNumber.ShouldBe("0000000192");
