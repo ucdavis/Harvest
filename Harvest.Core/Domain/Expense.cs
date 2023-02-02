@@ -1,7 +1,5 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using Harvest.Core.Models.SystemModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
