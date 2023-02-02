@@ -31,7 +31,15 @@ namespace Harvest.Core.Services
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
-            _aggieClient = GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+            try
+            {
+                _aggieClient = GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error creating Aggie Enterprise Client");
+                _aggieClient = null;
+            }
         }
 
         /// <summary>
