@@ -195,7 +195,7 @@ export const AccountsInput = (props: Props) => {
         options={searchResultAccounts}
       />
       {usecoa === true && (
-        <button className="btn btn-primary" onClick={() => lookupcoa()}>
+        <button className="btn btn-primary" onClick={lookupcoa}>
           COA Picker
         </button>
       )}

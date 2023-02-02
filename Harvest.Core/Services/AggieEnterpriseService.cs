@@ -205,16 +205,6 @@ namespace Harvest.Core.Services
         }
 
 
-        //public class AccountValidationInfo
-        //{
-        //    public bool IsValid { get; set; }
-        //    public FinancialChartStringType FinancialStringType { get; set; }
-
-        //    public GlSegments GlSegments { get; set; }
-        //    public PpmSegments PpmSegments { get; set; }
-
-        //}
-
         public class FinancialOfficerDetails
         {
             public string FinancialOfficerId { get; set; }
