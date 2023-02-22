@@ -96,7 +96,7 @@ namespace Harvest.Core.Services
 
                 rtValue.GlSegments = FinancialChartValidation.GetGlSegments(financialSegmentString);
                 
-                rtValue.CoaDescription = $"{data.GlValidateChartstring.SegmentNames.DepartmentName} - {data.GlValidateChartstring.SegmentNames.FundName}";
+                rtValue.Description = $"{data.GlValidateChartstring.SegmentNames.DepartmentName} - {data.GlValidateChartstring.SegmentNames.FundName}";
                 //TODO: Financial Officer for GL?
                 
                 
@@ -165,7 +165,7 @@ namespace Harvest.Core.Services
             {
                 rtValue.AccountManager = data.PpmProjectByNumber.PrimaryProjectManagerName;
                 rtValue.AccountManagerEmail = data.PpmProjectByNumber.PrimaryProjectManagerEmail;
-                rtValue.CoaDescription = data.PpmProjectByNumber.Name;
+                rtValue.Description = data.PpmProjectByNumber.Name;
             }
             return;  
         }

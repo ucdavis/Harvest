@@ -83,7 +83,7 @@ namespace Harvest.Web.Controllers.Api
                     return Ok(new Account
                     {
                         //TODO: Use PI name instead of account manager when it is available from the API
-                        Name = validationModel.CoaChartType == FinancialChartStringType.Ppm ? $"PPM: {validationModel.CoaDescription} ({validationModel.AccountManager})" : $"GL: {validationModel.CoaDescription}",
+                        Name = validationModel.CoaChartType == FinancialChartStringType.Ppm ? $"PPM: {validationModel.Description} ({validationModel.AccountManager})" : $"GL: {validationModel.Description}",
                         AccountManagerName = validationModel.AccountManager,
                         AccountManagerEmail = validationModel.AccountManagerEmail, 
                         Number = validationModel.FinancialSegmentString
