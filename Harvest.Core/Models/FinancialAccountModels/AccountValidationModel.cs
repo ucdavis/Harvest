@@ -21,7 +21,7 @@ namespace Harvest.Core.Models.FinancialAccountModels
 
         public string AccountManager { get; set; }
         public string AccountManagerEmail { get; set; }
-        public string ProjectName { get; set; }
+        public string CoaDescription { get; set; }
 
         /// <summary>
         /// Return Segment info.
