@@ -94,7 +94,7 @@ namespace Harvest.Core.Services
                         var coa = await _aggieEnterpriseService.ConvertKfsAccount(account.Number);
                         if(coa != null)
                         {
-                            Log.Warning("Project Account not updated to COA, using KFS Convert. Project: {id}, KFS Account: {kfs}, COA: {coa}", account.ProjectId, account.Number, coa);
+                            Log.Warning("Project Account updated to COA, using KFS Convert. Project: {id}, KFS Account: {kfs}, COA: {coa}", account.ProjectId, account.Number, coa);
                             account.Number = coa; // Assign it here so we can follow through with the validation. Will this get updated in the DB if everything else goes though I think.
 
                         }
