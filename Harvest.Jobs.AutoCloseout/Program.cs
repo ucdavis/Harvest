@@ -102,7 +102,7 @@ namespace Harvest.Jobs.AutoCloseout
             services.AddScoped<ISlothService, SlothService>();
             services.AddTransient<IDateTimeService, DateTimeService>();
 
-            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>(); //Don't really know if this is needed for this job...
+            services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>(); //Don't really know if this is needed for this job...
 
 
             return services.BuildServiceProvider();

@@ -25,7 +25,7 @@ namespace Harvest.Web.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
         private readonly IFinancialService _financialService;
-        private readonly IAggieEnterpriseService _aggieEnterpriseService;
+        private IAggieEnterpriseService _aggieEnterpriseService;
         private readonly AggieEnterpriseOptions _aeSettings;
 
         public RateController(AppDbContext dbContext, IUserService userService, IFinancialService financialService, IAggieEnterpriseService aggieEnterpriseService, IOptions<AggieEnterpriseOptions> options)

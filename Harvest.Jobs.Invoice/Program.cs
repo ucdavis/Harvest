@@ -75,7 +75,7 @@ namespace Harvest.Jobs.Invoice
             services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddTransient<IDateTimeService, DateTimeService>();
-            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
+            services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();
 
             return services.BuildServiceProvider();
         }

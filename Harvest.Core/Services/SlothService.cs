@@ -35,7 +35,7 @@ namespace Harvest.Core.Services
         private readonly IProjectHistoryService _historyService;
         private readonly IEmailService _emailService;
         private readonly IHttpClientFactory _clientFactory;
-        private readonly IAggieEnterpriseService _aggieEnterpriseService;
+        private IAggieEnterpriseService _aggieEnterpriseService;
         private readonly AggieEnterpriseOptions _aeSettings;
 
         public SlothService(AppDbContext dbContext, IOptions<SlothSettings> slothSettings, IFinancialService financialService,

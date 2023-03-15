@@ -25,24 +25,28 @@ namespace Harvest.Core.Services
         Task<string> ConvertKfsAccount(string account);
     }
 
-    public class AggieEnterpriseService : IAggieEnterpriseService{
+    public class AggieEnterpriseService : IAggieEnterpriseService
+    {
 
-        private readonly IAggieEnterpriseClient _aggieClient;
+        private IAggieEnterpriseClient _aggieClient;
 
         public AggieEnterpriseOptions Options { get; set;}
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
+            Options = options.Value;
             try
             {
-                _aggieClient = GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+                //_aggieClient = GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+                _aggieClient = GraphQlClient.Get(Options.GraphQlUrl, Options.TokenEndpoint, Options.ConsumerKey, Options.ConsumerSecret, $"{Options.ScopeApp}-{Options.ScopeEnv}");
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "Error creating Aggie Enterprise Client");
+                Log.Information("Aggie Enterprise Scope {scope}", $"{Options.ScopeApp}-{Options.ScopeEnv}");
                 _aggieClient = null;
             }
-            Options = options.Value;
+
         }
 
         /// <summary>
