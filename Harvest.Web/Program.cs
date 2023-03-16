@@ -58,7 +58,8 @@ namespace Harvest.Web
             {
                 loggerConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
                 {
-                    IndexFormat = "aspnet-harvest-{0:yyyy.MM}"
+                    IndexFormat = "aspnet-harvest-{0:yyyy.MM}",
+                    TypeName = null
                 });
             }
 

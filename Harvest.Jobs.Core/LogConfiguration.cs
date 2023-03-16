@@ -82,7 +82,8 @@ namespace Harvest.Jobs.Core
             {
                 return logConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
                 {
-                    IndexFormat = "aspnet-harvest-{0:yyyy.MM}"
+                    IndexFormat = "aspnet-harvest-{0:yyyy.MM}",
+                    TypeName = null
                 });
             }
 
@@ -92,7 +93,8 @@ namespace Harvest.Jobs.Core
             //{
             //    //AutoRegisterTemplate = true,
             //    //AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7
-            //    IndexFormat = "aspnet-harvest-{0:yyyy.MM.dd}"
+            //    IndexFormat = "aspnet-harvest-{0:yyyy.MM.dd}",
+            //    TypeName = null
             //});
         }
     }
