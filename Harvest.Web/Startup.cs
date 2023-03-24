@@ -247,7 +247,7 @@ namespace Harvest.Web
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(account|rate|permissions|crop|home|system|help|error|report)" }
+                    constraints: new { controller = "(account|rate|permissions|crop|home|system|help|error|report|test)" }
                 );
 
                 // API routes map to all other controllers

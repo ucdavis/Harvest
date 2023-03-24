@@ -21,14 +21,22 @@ namespace Harvest.Web.Controllers
         private readonly IUserService _userService;
         private readonly INotificationService _notificationService;
         private readonly IEmailService _emailService;
+        private readonly IAggieEnterpriseService aggieEnterpriseService;
 
         public TestController(AppDbContext dbContext, IUserService userService,
-            INotificationService notificationService, IEmailService emailService)
+            INotificationService notificationService, IEmailService emailService, IAggieEnterpriseService aggieEnterpriseService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _notificationService = notificationService;
             _emailService = emailService;
+            this.aggieEnterpriseService = aggieEnterpriseService;
+        }
+
+        public async Task<IActionResult> Test()
+        {
+            var rt = await aggieEnterpriseService.Test();
+            return Content(rt.AccountManagerEmail);
         }
         public async Task<IActionResult> TestBody()
         {

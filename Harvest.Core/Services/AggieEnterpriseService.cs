@@ -23,6 +23,8 @@ namespace Harvest.Core.Services
         string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount);
 
         Task<string> ConvertKfsAccount(string account);
+
+        Task<AccountValidationModel> Test();
     }
 
     public class AggieEnterpriseService : IAggieEnterpriseService
@@ -159,9 +161,22 @@ namespace Harvest.Core.Services
             return rtValue;
         }
 
+        public async Task<AccountValidationModel> Test()
+        {
+            var rtValue = new AccountValidationModel();
+            rtValue.PpmSegments = new PpmSegments(null, null, null, null);
+            rtValue.PpmSegments.Project = "K302300049";
+
+            await GetPpmAccountManager(rtValue);
+            return rtValue;
+        }
+
         private async Task GetPpmAccountManager(AccountValidationModel rtValue)
         {
+            try { 
+            //var aggieClient = GraphQlClient.Get(Options.GraphQlUrl, Options.TokenEndpoint, Options.ConsumerKey, Options.ConsumerSecret, $"{Options.ScopeApp}-{Options.ScopeEnv}");
             var result = await _aggieClient.PpmProjectManager.ExecuteAsync(rtValue.PpmSegments.Project);
+
 
             var data = result.ReadData();
 
@@ -170,6 +185,11 @@ namespace Harvest.Core.Services
                 rtValue.AccountManager = data.PpmProjectByNumber.PrimaryProjectManagerName;
                 rtValue.AccountManagerEmail = data.PpmProjectByNumber.PrimaryProjectManagerEmail;
                 rtValue.Description = data.PpmProjectByNumber.Name;
+            } }
+            catch (Exception ex)
+            {
+                var xxx = ex;
+                Log.Error("PPM Acct Manager {ex}", ex);
             }
             return;  
         }
