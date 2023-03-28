@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using AggieEnterpriseApi.Validation;
 using Harvest.Core.Data;
@@ -8,6 +9,7 @@ using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Serilog;
 
 namespace Harvest.Web.Controllers.Api
 {
@@ -56,9 +58,17 @@ namespace Harvest.Web.Controllers.Api
                         account = ppmSegments.ToSegmentString();
                     }
                 }
-                
-                //Now Validate...
-                validationModel = await _aggieEnterpriseService.IsAccountValid(account);
+
+                try
+                {
+                    //Now Validate...
+                    validationModel = await _aggieEnterpriseService.IsAccountValid(account);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Error looking up account info. {account} - Exception: {ex}", account, ex);
+                    return Ok(null); //This will at least display something to the user.
+                }
             }
             else
             {
