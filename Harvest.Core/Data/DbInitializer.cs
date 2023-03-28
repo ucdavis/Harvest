@@ -24,7 +24,7 @@ namespace Harvest.Core.Data
                 //do what needs to be done?
             }
 
-            var team = await CheckCreateTeam("caes");
+            var team = await CheckCreateTeam(1, "caes");
 
             //Make sure roles exist
             await CheckCreateRole(Role.Codes.System);
@@ -900,13 +900,13 @@ namespace Harvest.Core.Data
             }
         }
         
-        private async Task<Team> CheckCreateTeam(string team)
+        private async Task<Team> CheckCreateTeam(int id, string team)
         {
-            var existingTeam = await _dbContext.Teams.SingleOrDefaultAsync(a => a.Slug == team);
+            var existingTeam = await _dbContext.Teams.SingleOrDefaultAsync(a => a.Id == id);
             
             if (existingTeam == null)
             {
-                var teamToCreate = new Team {Name = team, Slug = team};
+                var teamToCreate = new Team {Id = id, Name = team, Slug = team};
                 await _dbContext.Teams.AddAsync(teamToCreate);
 
                 return teamToCreate;
