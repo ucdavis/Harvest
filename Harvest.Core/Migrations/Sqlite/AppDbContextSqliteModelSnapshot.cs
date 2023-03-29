@@ -119,7 +119,7 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Property<string>("Account")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(80)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Activity")
@@ -296,12 +296,17 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("TeamId");
 
                     b.HasIndex("UserId");
 
@@ -619,6 +624,33 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.Team", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Teams", (string)null);
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
                 {
                     b.Property<int>("Id")
@@ -768,7 +800,7 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Property<string>("Account")
                         .IsRequired()
-                        .HasMaxLength(50)
+                        .HasMaxLength(80)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("InvoiceId")
@@ -878,7 +910,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .IsRequired();
 
                     b.HasOne("Harvest.Core.Domain.Rate", "Rate")
-                        .WithMany()
+                        .WithMany("Expenses")
                         .HasForeignKey("RateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -906,7 +938,7 @@ namespace Harvest.Core.Migrations.Sqlite
             modelBuilder.Entity("Harvest.Core.Domain.Invoice", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.Project", "Project")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -933,6 +965,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Harvest.Core.Domain.Team", "Team")
+                        .WithMany("Permissions")
+                        .HasForeignKey("TeamId");
+
                     b.HasOne("Harvest.Core.Domain.User", "User")
                         .WithMany("Permissions")
                         .HasForeignKey("UserId")
@@ -940,6 +976,8 @@ namespace Harvest.Core.Migrations.Sqlite
                         .IsRequired();
 
                     b.Navigation("Role");
+
+                    b.Navigation("Team");
 
                     b.Navigation("User");
                 });
@@ -1175,6 +1213,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Navigation("Fields");
 
+                    b.Navigation("Invoices");
+
                     b.Navigation("Quotes");
 
                     b.Navigation("Tickets");
@@ -1187,7 +1227,14 @@ namespace Harvest.Core.Migrations.Sqlite
 
             modelBuilder.Entity("Harvest.Core.Domain.Rate", b =>
                 {
+                    b.Navigation("Expenses");
+
                     b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.Team", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
