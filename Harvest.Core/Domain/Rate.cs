@@ -72,6 +72,8 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // TODO: temporary for migrations
+            modelBuilder.Entity<Rate>().Property(a => a.TeamId).HasDefaultValue(1);
             modelBuilder.Entity<Rate>().HasIndex(a => a.TeamId);
             
             modelBuilder.Entity<Rate>().HasIndex(a => a.Type);
