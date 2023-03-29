@@ -12,6 +12,10 @@ namespace Harvest.Core.Domain
     {
         [Key] public int Id { get; set; }
 
+        [Required] public int TeamId { get; set; } = 1;
+
+        public Team Team { get; set; }
+
         public bool IsActive { get; set; } = true;
 
         [Required]
@@ -68,6 +72,8 @@ namespace Harvest.Core.Domain
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Rate>().HasIndex(a => a.TeamId);
+            
             modelBuilder.Entity<Rate>().HasIndex(a => a.Type);
             modelBuilder.Entity<Rate>().HasIndex(a => a.Description);
             modelBuilder.Entity<Rate>().HasIndex(a => a.CreatedById);
