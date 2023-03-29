@@ -414,6 +414,11 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("TeamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.HasKey("Id");
 
                     b.HasIndex("AcreageRateId");
@@ -429,6 +434,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("PrincipalInvestigatorId");
 
                     b.HasIndex("QuoteId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("Projects");
                 });
@@ -609,6 +616,11 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("TeamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -629,6 +641,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Description");
+
+                    b.HasIndex("TeamId");
 
                     b.HasIndex("Type");
 
@@ -1057,6 +1071,12 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasForeignKey("QuoteId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Harvest.Core.Domain.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("AcreageRate");
 
                     b.Navigation("CreatedBy");
@@ -1066,6 +1086,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Navigation("PrincipalInvestigator");
 
                     b.Navigation("Quote");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.ProjectAttachment", b =>
@@ -1144,6 +1166,12 @@ namespace Harvest.Core.Migrations.SqlServer
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Harvest.Core.Domain.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Harvest.Core.Domain.User", "UpdatedBy")
                         .WithMany("UpdatedRates")
                         .HasForeignKey("UpdatedById")
@@ -1151,6 +1179,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Team");
 
                     b.Navigation("UpdatedBy");
                 });
