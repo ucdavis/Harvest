@@ -55,7 +55,14 @@ namespace Harvest.Core.Services
 
         public async Task<Result<SlothResponseModel>> MoveMoney(int invoiceId)
         {
-            var token = _slothSettings.ApiKey;
+            var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
+                .Include(a => a.Project).ThenInclude(a => a.Accounts).SingleOrDefaultAsync(); //TODO: Get team from project too
+            if (invoice == null)
+            {
+                return Result.Error("Invoice not found: {invoiceId}", invoiceId);
+            }
+
+            var token = invoice.Project.Team.ApiKey;
             var url = _slothSettings.ApiUrl;
             if(_aeSettings.UseCoA)
             {
@@ -71,12 +78,7 @@ namespace Harvest.Core.Services
                 Log.Error("Sloth Token missing");               
             }
 
-            var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
-                .Include(a => a.Project).ThenInclude(a => a.Accounts).SingleOrDefaultAsync();
-            if (invoice == null)
-            {
-                return Result.Error("Invoice not found: {invoiceId}", invoiceId);
-            }
+
 
             if (invoice.Project.Accounts.Count == 0)
             {
@@ -682,14 +684,21 @@ namespace Harvest.Core.Services
                 Log.Information("No pending invoices to process");
                 return;
             }
-            using var client = _clientFactory.CreateClient();
-            client.BaseAddress = new Uri($"{url}Transactions/");
-            client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
+
 
             Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
             var updatedCount = 0;
             var rolledBackCount = 0;
-            foreach (var invoice in pendingInvoices)
+
+            //TODO: We want to group the invoices by team when that is available, then set the client to the team's API key
+            foreach(var team in pendingInvoices)
+            {
+                using var client = _clientFactory.CreateClient();
+                client.BaseAddress = new Uri($"{url}Transactions/");
+                client.DefaultRequestHeaders.Add("X-Auth-Token", team.ApiKey); //Set the client to the team's Sloth API key
+
+
+                foreach (var invoice in pendingInvoices)
             {
                 if (string.IsNullOrWhiteSpace(invoice.SlothTransactionId))
                 {
@@ -753,7 +762,7 @@ namespace Harvest.Core.Services
                         invoice.Id, response.StatusCode, invoice.SlothTransactionId); //TODO: Log it
                 }
             }
-
+            }
             await _dbContext.SaveChangesAsync();
             Log.Information("Updated {updatedCount} orders. Rolled back {rolledBackCount} orders.", updatedCount, rolledBackCount);
         }
