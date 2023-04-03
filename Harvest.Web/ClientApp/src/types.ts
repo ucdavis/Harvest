@@ -76,6 +76,12 @@ export interface Invoice {
   transfers: Transfer[];
 }
 
+export interface Team {
+    id: number;
+    name: string;
+    slug: string;
+}
+
 export interface User {
   id: number;
   firstName?: string;

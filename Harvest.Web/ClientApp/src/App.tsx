@@ -29,6 +29,7 @@ import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { CloseoutContainer } from "./Closeout/CloseoutContainer";
 import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationContainer";
 import { AdhocProject } from "./Projects/AdhocProject";
+import {TeamPicker} from "./Teams/TeamPicker";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -48,8 +49,13 @@ function App() {
             />
             <Route exact path="/" component={HomeContainer} />
             <Route
+                exact
+                path="/request/create/"
+                component={TeamPicker}
+            />
+            <Route
               exact
-              path="/request/create/:projectId?"
+              path="/:team/request/create/:projectId?"
               component={RequestContainer}
             />
             <ConditionalRoute
