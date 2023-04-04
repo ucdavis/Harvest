@@ -13,10 +13,30 @@ import {
   DropdownItem,
 } from "reactstrap";
 import AppContext from "./Shared/AppContext";
+import { useParams } from "react-router";
+import { useLocation } from "react-router-dom";
+
+const getTeam = (pathName: string) => {
+  // return the first path token in the pathName
+  if (!pathName) {
+    return "";
+  } else {
+    const pathSegments = pathName.split("/");
+
+    if (pathSegments.length > 1) {
+      return pathSegments[1];
+    } else {
+      return "";
+    }
+  }
+};
 
 export const AppNav = () => {
   const user = useContext(AppContext).user;
   const [isOpen, setIsOpen] = useState(false);
+
+  const location = useLocation();
+  const team = getTeam(location.pathname);
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -29,7 +49,7 @@ export const AppNav = () => {
             <Nav navbar>
               <ShowFor roles={["FieldManager", "Supervisor"]}>
                 <NavItem>
-                  <NavLink href="/project">All Projects</NavLink>
+                  <NavLink href={`/${team}/project`}>All Projects</NavLink>
                 </NavItem>
               </ShowFor>
               <ShowFor roles={["PI"]}>
@@ -39,7 +59,7 @@ export const AppNav = () => {
               </ShowFor>
               <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
                 <NavItem>
-                  <NavLink href="/expense/entry">Expenses</NavLink>
+                  <NavLink href={`/${team}/expense/entry`}>Expenses</NavLink>
                 </NavItem>
               </ShowFor>
               <ShowFor roles={["FieldManager", "Supervisor"]}>
@@ -49,42 +69,46 @@ export const AppNav = () => {
                   </DropdownToggle>
                   <DropdownMenu right>
                     <ShowFor roles={["FieldManager"]}>
-                      <DropdownItem href="/Permissions/Index">
+                      <DropdownItem href={`/${team}/Permissions/Index`}>
                         Permissions
                       </DropdownItem>
                     </ShowFor>
-                    <DropdownItem href="/Rate/Index">Rates</DropdownItem>
+                    <DropdownItem href={`/${team}/Rate/Index`}>
+                      Rates
+                    </DropdownItem>
                     <ShowFor roles={["FieldManager"]}>
-                      <DropdownItem href="/Crop/Index">Crops</DropdownItem>
+                      <DropdownItem href={`/${team}/Crop/Index`}>
+                        Crops
+                      </DropdownItem>
                     </ShowFor>
                     <ShowFor roles={["FieldManager"]}>
                       <DropdownItem divider />
-                      <DropdownItem href="/project/adhocproject">
+                      <DropdownItem href={`/${team}/project/adhocproject`}>
                         Ad-Hoc Project
                       </DropdownItem>
                     </ShowFor>
                     <DropdownItem divider />
-                    <DropdownItem href="/Project/Completed">
+                    <DropdownItem href={`/${team}/Project/Completed`}>
                       Completed Projects
                     </DropdownItem>
-                    <DropdownItem href="/Project/NeedsAttention">
+                    <DropdownItem href={`/${team}/Project/NeedsAttention`}>
                       Projects Needing Attention
                     </DropdownItem>
-                    <DropdownItem href="/Ticket/NeedsAttention">
+                    <DropdownItem href={`/${team}/Ticket/NeedsAttention`}>
                       Open Tickets
                     </DropdownItem>
                     <ShowFor roles={["System"]}>
                       <DropdownItem divider />
-                      <DropdownItem href="/System/UpdatePendingExpenses">
+                      <DropdownItem href={`/System/UpdatePendingExpenses`}>
                         Unprocessed Expenses
                       </DropdownItem>
-                      <DropdownItem href="/System/Emulate">
+                      <DropdownItem href={`/System/Emulate`}>
                         Emulate
                       </DropdownItem>
-                      <DropdownItem href="/Report/AllProjects">
+                      <DropdownItem href={`/Report/AllProjects`}>
                         Reports - Projects
                       </DropdownItem>
-                      <DropdownItem href="/Report/HistoricalRateActivity">
+                      <DropdownItem href={`/Report/HistoricalRateActivity`}>
                         Reports - Historical Rate Activity
                       </DropdownItem>
                     </ShowFor>
@@ -93,7 +117,7 @@ export const AppNav = () => {
               </ShowFor>
 
               <NavItem>
-                <NavLink href="/Help">Help</NavLink>
+                <NavLink href={`/Help`}>Help</NavLink>
               </NavItem>
             </Nav>
             <div className="d-flex align-items-center user-sign-in">

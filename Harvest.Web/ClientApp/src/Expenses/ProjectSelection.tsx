@@ -5,6 +5,11 @@ import { FormGroup, Input } from "reactstrap";
 import { Project } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
+import { useParams } from "react-router-dom";
+
+interface RouteParams {
+  team?: string;
+}
 
 interface Props {
   selectedProject: (projectId: number) => void;
@@ -13,11 +18,15 @@ interface Props {
 export const ProjectSelection = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>();
 
+  const { team } = useParams<RouteParams>();
+
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get list of projects
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Active`);
+      const response = await authenticatedFetch(
+        `/api/Project/Active?team=${team}`
+      );
 
       if (response.ok) {
         const projects = await response.json();

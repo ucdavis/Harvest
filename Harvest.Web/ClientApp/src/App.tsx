@@ -139,7 +139,7 @@ function App() {
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path="/ticket/needsAttention"
+              path="/:team/ticket/needsAttention"
             >
               <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
             </ConditionalRoute>
@@ -157,6 +157,11 @@ function App() {
             <Route
               path="/project/details/:projectId"
               component={ProjectDetailContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor", "Worker"]}
+              path="/:team/expense/entry/"
+              component={ExpenseEntryContainer}
             />
             <ConditionalRoute
               roles={["FieldManager", "Supervisor", "Worker"]}

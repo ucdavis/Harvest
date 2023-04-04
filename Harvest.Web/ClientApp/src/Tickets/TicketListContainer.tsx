@@ -4,6 +4,11 @@ import { Ticket } from "../types";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
+import { useParams } from "react-router";
+
+interface RouteParams {
+  team?: string;
+}
 
 interface Props {
   projectSource: string;
@@ -12,11 +17,15 @@ interface Props {
 export const TicketListContainer = (props: Props) => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
+  const { team } = useParams<RouteParams>();
+
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch(props.projectSource);
+      const response = await authenticatedFetch(
+        `${props.projectSource}?team=${team}`
+      );
 
       if (response.ok) {
         getIsMounted() && setTickets(await response.json());

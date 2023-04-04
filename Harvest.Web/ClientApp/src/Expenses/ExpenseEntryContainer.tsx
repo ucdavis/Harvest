@@ -33,6 +33,7 @@ import { convertCamelCase } from "../Util/StringFormatting";
 
 interface RouteParams {
   projectId?: string;
+  team?: string;
 }
 
 const getDefaultActivity = (id: number) => ({
@@ -51,7 +52,7 @@ const getDefaultActivity = (id: number) => ({
 export const ExpenseEntryContainer = () => {
   const history = useHistory();
 
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<RouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
   const context = useOrCreateValidationContext(validatorOptions);
@@ -85,7 +86,9 @@ export const ExpenseEntryContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch("/api/Rate/Active");
+      const response = await authenticatedFetch(
+        `/api/Rate/Active?team=${team}`
+      );
 
       if (response.ok) {
         const rates: Rate[] = await response.json();
@@ -102,7 +105,9 @@ export const ExpenseEntryContainer = () => {
   useEffect(() => {
     // get project in order to determine if it can accept new expenses
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const project = (await response.json()) as Project;
