@@ -98,13 +98,13 @@ namespace Harvest.Web.Controllers.Api
         // Get just the total of unbilled expenses for the current project
         [Authorize(Policy = AccessCodes.WorkerAccess)]
         [HttpGet]
-        public async Task<ActionResult> GetRecentExpensedProjects()
+        public async Task<ActionResult> GetRecentExpensedProjects(string team)
         {
             var user = await _userService.GetCurrentUser();
 
             // get projects where user has entered an expense in the last month
             var projects = await _dbContext.Projects.AsNoTracking()
-                .Where(p => p.IsActive && p.Expenses.Any(e => e.CreatedById == user.Id && e.CreatedOn > DateTime.UtcNow.AddMonths(-1)))
+                .Where(p => p.IsActive && p.Team.Slug == team && p.Expenses.Any(e => e.CreatedById == user.Id && e.CreatedOn > DateTime.UtcNow.AddMonths(-1)))
                 .OrderByDescending(a => a.CreatedOn)
                 .Select(p => new { p.Id, p.Status, p.Name })
                 .Take(4) // limit to 4 projects

@@ -4,14 +4,23 @@ import { Link } from "react-router-dom";
 import { Project } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
+import { useParams } from "react-router";
+
+interface RouteParams {
+  team?: string;
+}
 
 export const WorkerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
+  const { team } = useParams<RouteParams>();
+
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
-      const response = await authenticatedFetch("/api/expense/GetRecentExpensedProjects");
+      const response = await authenticatedFetch(
+        `/api/expense/GetRecentExpensedProjects?team=${team}`
+      );
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
         getIsMounted() && setProjects(projects);
@@ -26,7 +35,9 @@ export const WorkerHome = () => {
       <h5>Quick Actions</h5>
       <ul className="list-group quick-actions">
         <li className="list-group-item">
-          <Link to="/expense/entry">Enter Expenses for Any Project</Link>
+          <Link to={`/${team}/expense/entry`}>
+            Enter Expenses for Any Project
+          </Link>
         </li>
         {projects.map((project) => (
           <li key={project.id} className="list-group-item">

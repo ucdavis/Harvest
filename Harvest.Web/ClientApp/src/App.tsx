@@ -108,35 +108,38 @@ function App() {
               path="/project/closeoutconfirmation/:projectId"
               component={CloseoutConfirmationContainer}
             />
+            <ConditionalRoute exact roles={["PI"]} path="/project/mine">
+              <ProjectListContainer projectSource="/api/Project/GetMine" />
+            </ConditionalRoute>
+            
+            <ConditionalRoute
+                roles={["FieldManager", "Supervisor", "PI"]}
+                path="/ticket/create/:projectId"
+                component={TicketCreate}
+            />
+            
+            {/* admin routes requiring team context */}
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path="/project"
+              path=":team/project"
             >
               <ProjectListContainer projectSource="/api/Project/All" />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path="/project/needsAttention"
+              path=":team/project/needsAttention"
             >
               <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path="/project/completed"
+              path=":team/project/completed"
             >
               <ProjectListContainer projectSource="/api/Project/GetCompleted" />
             </ConditionalRoute>
-            <ConditionalRoute exact roles={["PI"]} path="/project/mine">
-              <ProjectListContainer projectSource="/api/Project/GetMine" />
-            </ConditionalRoute>
-            <ConditionalRoute
-              roles={["FieldManager", "Supervisor", "PI"]}
-              path="/ticket/create/:projectId"
-              component={TicketCreate}
-            />
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}

@@ -13,7 +13,9 @@ export const PIHome = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWaitingForMe = async () => {
-      const response = await authenticatedFetch("/api/project/RequiringPIAttention");
+      const response = await authenticatedFetch(
+        "/api/project/RequiringPIAttention"
+      );
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
         getIsMounted() && setProjects(projects);
@@ -25,7 +27,9 @@ export const PIHome = () => {
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
-      const response = await authenticatedFetch("/api/ticket/RequiringPIAttention?limit=3");
+      const response = await authenticatedFetch(
+        "/api/ticket/RequiringPIAttention?limit=3"
+      );
       if (getIsMounted()) {
         const tickets: Ticket[] = await response.json();
         getIsMounted() && setTickets(tickets);
