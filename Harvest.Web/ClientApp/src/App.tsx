@@ -29,7 +29,7 @@ import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { CloseoutContainer } from "./Closeout/CloseoutContainer";
 import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationContainer";
 import { AdhocProject } from "./Projects/AdhocProject";
-import {TeamPicker} from "./Teams/TeamPicker";
+import { TeamPicker } from "./Teams/TeamPicker";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -54,11 +54,7 @@ function App() {
             <Route exact path="/:team/team/" component={HomeContainer} />
 
             {/* Creating a new request requires first picking a team */}
-            <Route
-                exact
-                path="/request/create/"
-                component={TeamPicker}
-            />
+            <Route exact path="/request/create/" component={TeamPicker} />
             <Route
               exact
               path="/:team/request/create/:projectId?"
@@ -111,32 +107,32 @@ function App() {
             <ConditionalRoute exact roles={["PI"]} path="/project/mine">
               <ProjectListContainer projectSource="/api/Project/GetMine" />
             </ConditionalRoute>
-            
+
             <ConditionalRoute
-                roles={["FieldManager", "Supervisor", "PI"]}
-                path="/ticket/create/:projectId"
-                component={TicketCreate}
+              roles={["FieldManager", "Supervisor", "PI"]}
+              path="/ticket/create/:projectId"
+              component={TicketCreate}
             />
-            
+
             {/* admin routes requiring team context */}
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path=":team/project"
+              path="/:team/project"
             >
               <ProjectListContainer projectSource="/api/Project/All" />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path=":team/project/needsAttention"
+              path="/:team/project/needsAttention"
             >
               <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
-              path=":team/project/completed"
+              path="/:team/project/completed"
             >
               <ProjectListContainer projectSource="/api/Project/GetCompleted" />
             </ConditionalRoute>

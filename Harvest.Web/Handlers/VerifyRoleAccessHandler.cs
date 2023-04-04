@@ -24,7 +24,8 @@ namespace Harvest.Web.Handlers
             _httpContext = httpContext;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, VerifyRoleAccess requirement)
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+            VerifyRoleAccess requirement)
         {
             var userIamId = context.User.Claims.SingleOrDefault(c => c.Type == UserService.IamIdClaimType)?.Value;
 
@@ -32,7 +33,9 @@ namespace Harvest.Web.Handlers
             {
                 return;
             }
-            
+
+            var nonPiRequirements = requirement.RoleStrings.Where(r => r != Role.Codes.PI);
+
             var projectId = _httpContext.GetProjectId();
 
             // if we have a project context, we need to check if the user is a PI on that project or has a valid team role, depending on the requirement
@@ -41,15 +44,13 @@ namespace Harvest.Web.Handlers
                 // check for a PI
                 if (requirement.RoleStrings.Contains(Role.Codes.PI))
                 {
-                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
+                    if (await _dbContext.Projects.AnyAsync(a =>
+                            a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
                     {
                         context.Succeed(requirement);
                         return;
                     }
                 }
-                
-                // not a PI requirement so check for team roles
-                var nonPiRequirements = requirement.RoleStrings.Where(r => r != Role.Codes.PI);
 
                 var teamIdForProject = await _dbContext.Projects
                     .Where(p => p.Id == projectId)
@@ -65,7 +66,21 @@ namespace Harvest.Web.Handlers
                     return;
                 }
             }
-            
+
+            var team = _httpContext.GetTeam();
+
+            if (team != null)
+            {
+                // if we are in a team context, make sure the user has the requested role on that team
+                if (await _dbContext.Permissions.AnyAsync(p =>
+                        p.User.Iam == userIamId && p.Team.Slug == team &&
+                        nonPiRequirements.Contains(p.Role.Name)))
+                {
+                    context.Succeed(requirement);
+                    return;
+                }
+            }
+
             // nothing else worked so check for system role
             if (await _dbContext.Permissions.AnyAsync(p => p.User.Iam == userIamId && p.Role.Name == Role.Codes.System))
             {
