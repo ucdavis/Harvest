@@ -85,6 +85,11 @@ export const fakeProject: Project = {
     description: "",
     isPassthrough: false,
   },
+  team: {
+    id: 1,
+    name: "Team 1",
+    slug: "team-1",
+  }
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -124,6 +129,11 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       description: "",
       isPassthrough: false,
     },
+    team: {
+      id: 1,
+      name: "Team 1",
+      slug: "team-1",
+    }
   },
   quote: null,
 };

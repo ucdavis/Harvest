@@ -341,6 +341,10 @@ namespace Harvest.Web.Controllers.Api
                 Requirements = project.Requirements,
                 Status = Project.Statuses.Requested
             };
+            
+            // ensure team is set
+            var teamId = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).Select(t => t.Id).SingleAsync();
+            newProject.TeamId = teamId;
 
             if (project.Id > 0)
             {

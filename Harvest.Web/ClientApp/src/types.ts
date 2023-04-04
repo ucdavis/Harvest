@@ -54,6 +54,7 @@ export interface Project {
   attachments: BlobFile[];
   acreageRate: Rate;
   acres: number;
+  team: Team;
 }
 
 export interface BlobFile {

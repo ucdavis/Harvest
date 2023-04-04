@@ -129,6 +129,7 @@ namespace Harvest.Web.Controllers.Api
         {
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
+                .Include(a => a.Team)
                 .Include(a => a.Attachments)
                 .Include(p => p.Accounts)
                 .Include(p => p.PrincipalInvestigator)

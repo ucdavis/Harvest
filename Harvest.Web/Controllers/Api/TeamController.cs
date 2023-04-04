@@ -1,4 +1,5 @@
-﻿using Harvest.Core.Data;
+﻿using System.Linq;
+using Harvest.Core.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Harvest.Core.Domain;
@@ -21,6 +22,13 @@ namespace Harvest.Web.Controllers.Api
         {
             // return all teams
             return await _dbContext.Teams.ToArrayAsync();
+        }
+        
+        [Route("api/team/{id}")]
+        [ResponseCache(Duration = 300)]
+        public async Task<Team> Get(int id)
+        {
+            return await _dbContext.Teams.SingleOrDefaultAsync(t => t.Id == id);
         }
     }
 }

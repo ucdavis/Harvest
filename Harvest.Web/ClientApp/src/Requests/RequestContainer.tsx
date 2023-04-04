@@ -8,7 +8,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import { Project, CropType } from "../types";
+import {Project, CropType, Team} from "../types";
 import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -19,16 +19,20 @@ import { validatorOptions } from "../constants";
 
 interface RouteParams {
   projectId?: string;
+  team?: string;
 }
 
 export const RequestContainer = () => {
   const history = useHistory();
   const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
 
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<RouteParams>();
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
+    team: {
+      slug: team || ""
+    } as Team,
     principalInvestigator: userDetail,
   } as Project);
   const [originalProject, setOriginalProject] = useState<Project>();
