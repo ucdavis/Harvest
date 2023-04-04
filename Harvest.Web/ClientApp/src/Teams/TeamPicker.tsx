@@ -23,7 +23,7 @@ export const TeamPicker = () => {
             
             // if there is only one team, redirect to that team's page immediately
             if (data.length === 1) {
-                history.push(`/${data[0].slug}${location.pathname}`);
+                history.replace(`/${data[0].slug}${location.pathname}`);
             }
         };
         getTeams();
