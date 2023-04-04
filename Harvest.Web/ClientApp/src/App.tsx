@@ -48,6 +48,12 @@ function App() {
               component={Empty}
             />
             <Route exact path="/" component={HomeContainer} />
+
+            {/* Visitors with non-PI roles will require selecting a team */}
+            <Route exact path="/team" component={TeamPicker} />
+            <Route exact path="/:team/team/" component={HomeContainer} />
+
+            {/* Creating a new request requires first picking a team */}
             <Route
                 exact
                 path="/request/create/"
