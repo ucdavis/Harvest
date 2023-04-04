@@ -196,7 +196,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/request/create/${project.id}`}
+          to={`/${project.team?.slug}/request/create/${project.id}`}
         >
           Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
         </Link>

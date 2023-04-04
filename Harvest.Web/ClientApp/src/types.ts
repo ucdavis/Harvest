@@ -54,6 +54,7 @@ export interface Project {
   attachments: BlobFile[];
   acreageRate: Rate;
   acres: number;
+  team: Team;
 }
 
 export interface BlobFile {
@@ -74,6 +75,12 @@ export interface Invoice {
   status: string;
   expenses: Expense[];
   transfers: Transfer[];
+}
+
+export interface Team {
+    id: number;
+    name: string;
+    slug: string;
 }
 
 export interface User {

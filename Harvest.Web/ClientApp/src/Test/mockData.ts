@@ -5,7 +5,7 @@ import {
   Invoice,
   Project,
   ProjectWithQuote,
-  Rate,
+  Rate, Team,
   Ticket,
 } from "../types";
 
@@ -49,6 +49,12 @@ export const fakeAppContext: AppContextShape = {
   usecoa: false,
 };
 
+export const fakeTeam: Team = {
+  id: 1,
+  name: "Team 1",
+  slug: "team1",
+};
+
 export const fakeProject: Project = {
   id: 3,
   start: new Date("2021-03-15T00:00:00"),
@@ -85,6 +91,11 @@ export const fakeProject: Project = {
     description: "",
     isPassthrough: false,
   },
+  team: {
+    id: 1,
+    name: "Team 1",
+    slug: "team-1",
+  }
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -124,6 +135,11 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       description: "",
       isPassthrough: false,
     },
+    team: {
+      id: 1,
+      name: "Team 1",
+      slug: "team-1",
+    }
   },
   quote: null,
 };

@@ -21,7 +21,7 @@ namespace Harvest.Core.Services
     {
         Task<User> GetUser(Claim[] userClaims);
         Task<User> GetCurrentUser();
-        Task<IEnumerable<string>> GetCurrentRoles();
+        Task<IEnumerable<TeamRoles>> GetCurrentRoles();
         Task<bool> HasAccess(string accessCode);
     }
 
@@ -83,14 +83,14 @@ namespace Harvest.Core.Services
             return await GetUser(userClaims);
         }
 
-        public async Task<IEnumerable<string>> GetCurrentRoles()
+        public async Task<IEnumerable<TeamRoles>> GetCurrentRoles()
         {
             var projectId = _httpContextAccessor.GetProjectId();
             string iamId = _httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == IamIdClaimType).Value;
 
             var userRoles = await _dbContext.Permissions
                 .Where(p => p.User.Iam == iamId)
-                .Select(p => p.Role.Name)
+                .Select(p => new TeamRoles(p.Role.Name, p.Team.Name))
                 .ToArrayAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
@@ -98,20 +98,33 @@ namespace Harvest.Core.Services
 
             if (isPrincipalInvestigator)
             {
-                return userRoles.Append(Role.Codes.PI);
+                return userRoles.Append(new TeamRoles(Role.Codes.PI, null));
             }
 
             return userRoles;
         }
 
+        // TODO: need to extend this to check for team roles
         public async Task<bool> HasAccess(string accessCode)
         {
             var roles = _roleResolver(accessCode).Concat(_roleResolver(AccessCodes.SystemAccess));
             var userRoles = await GetCurrentRoles();
-            return userRoles.Any(r => roles.Contains(r));
+            return userRoles.Any(r => roles.Contains(r.Role));
         }
 
         public const string IamIdClaimType = "ucdPersonIAMID";
+    }
+
+    public class TeamRoles
+    {
+        public TeamRoles(string role, string teamSlug)
+        {
+            Role = role;
+            TeamSlug = teamSlug;
+        }
+        
+        public string Role { get; set; }
+        public string TeamSlug { get; set; }
     }
 
     public static class UserServiceExtensions
@@ -119,22 +132,7 @@ namespace Harvest.Core.Services
         public static async Task<bool> HasAnyRoles(this IUserService userService, IEnumerable<string> roles)
         {
             var userRoles = await userService.GetCurrentRoles();
-            return userRoles.Any(roles.Contains);
-        }
-
-        public static Task<bool> HasAnyRoles(this IUserService userService, string role, params string[] additionalRoles)
-        {
-            return HasAnyRoles(userService, additionalRoles.Append(role));
-        }
-
-        public static async Task<bool> HasOnlyRole(this IUserService userService, string role)
-        {
-            var userRoles = await userService.GetCurrentRoles();
-            if (!userRoles.Contains(role))
-            {
-                return false;
-            }
-            return !userRoles.Any(r => r != role);
+            return userRoles.Any(r => roles.Contains(r.Role));
         }
     }
 }
