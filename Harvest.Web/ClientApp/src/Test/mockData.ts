@@ -5,7 +5,7 @@ import {
   Invoice,
   Project,
   ProjectWithQuote,
-  Rate,
+  Rate, Team,
   Ticket,
 } from "../types";
 
@@ -47,6 +47,12 @@ export const fakeAppContext: AppContextShape = {
     roles: ["System", "FieldManager", "PI"],
   },
   usecoa: false,
+};
+
+export const fakeTeam: Team = {
+  id: 1,
+  name: "Team 1",
+  slug: "team1",
 };
 
 export const fakeProject: Project = {
