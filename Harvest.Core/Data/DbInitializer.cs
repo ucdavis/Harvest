@@ -82,6 +82,8 @@ namespace Harvest.Core.Data
             };
             await CheckOrCreatePermission(systemRole, user);
 
+            await UpdateTeamPermissions();
+
             await CheckCreateSampleRates();
             await _dbContext.SaveChangesAsync();
 
@@ -89,6 +91,15 @@ namespace Harvest.Core.Data
             await _dbContext.SaveChangesAsync();
 
             return;
+        }
+
+        private async Task UpdateTeamPermissions()
+        {
+            var permissions = await _dbContext.Permissions.Include(a => a.Role).Where(a => a.TeamId == null && a.Role.Name != Role.Codes.System).ToListAsync();
+            foreach (var permission in permissions)
+            {
+                permission.TeamId = 1;
+            }
         }
 
         private async Task CheckCreateCropLookups()
