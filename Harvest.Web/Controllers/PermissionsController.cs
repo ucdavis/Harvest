@@ -15,12 +15,15 @@ using Microsoft.EntityFrameworkCore.Query;
 
 namespace Harvest.Web.Controllers
 {
+
     [Authorize(Policy = AccessCodes.FieldManagerAccess)]
     public class PermissionsController : SuperController
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
         private readonly IUserService _userService;
+
+        public string TeamSlug => ControllerContext.RouteData.Values["team"] as string;
 
         public PermissionsController(AppDbContext dbContext, IIdentityService identityService, IUserService userService)
         {
@@ -30,6 +33,14 @@ namespace Harvest.Web.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if(team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }   
+
             IQueryable<Permission> permissionsQuery = _dbContext.Permissions
                 .Include(a => a.User)
                 .Include(a => a.Role);
@@ -43,6 +54,7 @@ namespace Harvest.Web.Controllers
             var permissions = await permissionsQuery.ToListAsync();
 
             var viewModel = new UserPermissionsListModel();
+            viewModel.Team = team;
             foreach (var permission in permissions)
             {
                 if (viewModel.UserRoles.Any(a => a.User.Id == permission.User.Id))
