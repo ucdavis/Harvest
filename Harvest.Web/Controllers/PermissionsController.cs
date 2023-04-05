@@ -43,12 +43,13 @@ namespace Harvest.Web.Controllers
 
             IQueryable<Permission> permissionsQuery = _dbContext.Permissions
                 .Include(a => a.User)
-                .Include(a => a.Role);
+                .Include(a => a.Role)
+                .Where(a => a.TeamId == null || a.TeamId == team.Id);
             
             //If you have System, show system.
             if (!await _userService.HasAccess(AccessCodes.SystemAccess))
             {
-                permissionsQuery = permissionsQuery.Where(a => a.Role.Name != Role.Codes.System);
+                permissionsQuery = permissionsQuery.Where(a => a.Role.Name != Role.Codes.System && a.TeamId == team.Id);
             }
             
             var permissions = await permissionsQuery.ToListAsync();
