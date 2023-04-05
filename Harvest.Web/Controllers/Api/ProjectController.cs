@@ -39,46 +39,50 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.WorkerAccess)]
-        public async Task<ActionResult> All()
+        public async Task<ActionResult> All(string team)
         {
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
-                .Where(p => p.IsActive)
+                .Include(a => a.Team)
+                .Where(p => p.IsActive && p.Team.Slug == team)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
         [Authorize(Policy = AccessCodes.WorkerAccess)]
-        public async Task<ActionResult> Active()
+        public async Task<ActionResult> Active(string team)
         {
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
-                .Where(p => p.IsActive && p.Status == Project.Statuses.Active)
+                .Include(a => a.Team)
+                .Where(p => p.IsActive && p.Team.Slug == team && p.Status == Project.Statuses.Active)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> GetCompleted()
+        public async Task<ActionResult> GetCompleted(string team)
         {
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
-                .Where(p => p.IsActive && p.Status == Project.Statuses.Completed)
+                .Include(a => a.Team)
+                .Where(p => p.IsActive && p.Team.Slug == team && p.Status == Project.Statuses.Completed)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> RequiringManagerAttention()
+        public async Task<ActionResult> RequiringManagerAttention(string team)
         {
             // return basic info on projects which are waiting for manager attention
             var attentionStatuses = new string[] { Project.Statuses.Requested, Project.Statuses.ChangeRequested, Project.Statuses.QuoteRejected }.ToArray();
 
             return Ok(await _dbContext.Projects.AsNoTracking()
                 .Include(p => p.PrincipalInvestigator)
-                .Where(p => p.IsActive && attentionStatuses.Contains(p.Status))
+                .Include(a => a.Team)
+                .Where(p => p.IsActive && p.Team.Slug == team && attentionStatuses.Contains(p.Status))
                 .OrderBy(p => p.CreatedOn) // older is more important, so it should be first
                 .ToArrayAsync());
         }

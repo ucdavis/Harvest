@@ -70,11 +70,11 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> RequiringManagerAttention(int? limit)
+        public async Task<ActionResult> RequiringManagerAttention(string team, int? limit)
         {
             // Get list of top N open tickets in all projects
             var openTickets = _dbContext.Tickets
-                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive)
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.Team.Slug == team)
                 .OrderByDescending(a => a.UpdatedOn);
 
             if (limit.HasValue)

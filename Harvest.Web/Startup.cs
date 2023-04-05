@@ -242,12 +242,20 @@ namespace Harvest.Web
             
             app.UseEndpoints(endpoints =>
             {
+                // team routes for server-side endpoints
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "/{team}/{controller}/{action}/{id?}",
+                    defaults: new { action = "Index" },
+                    constraints: new { controller = "(rate|permissions)" }
+                );
+                
                 // default for MVC server-side endpoints
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(account|rate|permissions|crop|home|system|help|error|report)" }
+                    constraints: new { controller = "(account|crop|home|system|help|error|report)" }
                 );
 
                 // API routes map to all other controllers

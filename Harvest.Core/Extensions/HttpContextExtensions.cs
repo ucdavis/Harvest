@@ -26,5 +26,16 @@ namespace Harvest.Core.Extensions
 
             return null;
         }
+        
+        public static string GetTeam(this IHttpContextAccessor httpContextAccessor)
+        {
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return null;
+            }
+
+            return (string)httpContext.Request.Query["team"] ?? httpContext.GetRouteValue("team") as string;
+        }
     }
 }

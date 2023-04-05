@@ -8,6 +8,11 @@ import { authenticatedFetch } from "../Util/Api";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { useParams } from "react-router";
+
+interface RouteParams {
+  team?: string;
+}
 
 interface Props {
   projectSource: string;
@@ -27,11 +32,15 @@ const getListTitle = (projectSource: string) => {
 export const ProjectListContainer = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>([]);
 
+  const { team } = useParams<RouteParams>();
+
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch(props.projectSource);
+      const response = await authenticatedFetch(
+        `${props.projectSource}?team=${team}`
+      );
 
       if (response.ok) {
         getIsMounted() && setProjects(await response.json());
