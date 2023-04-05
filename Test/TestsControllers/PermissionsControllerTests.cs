@@ -44,7 +44,7 @@ namespace Test.TestsControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(5);
+            ControllerReflection.ControllerPublicMethods(6);
         }
 
         [Fact]
@@ -72,6 +72,8 @@ namespace Test.TestsControllers
             //3-2
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 2, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Delete", countAdjustment + 2, isSecondMethod: true);
+
+            ControllerReflection.MethodExpectedNoAttribute("get_TeamSlug");
         }
     }
 }
