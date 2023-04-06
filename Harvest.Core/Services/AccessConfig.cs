@@ -22,6 +22,10 @@ namespace Harvest.Core.Services
                 AccessCodes.SupervisorAccess => new[] { Role.Codes.Supervisor, Role.Codes.FieldManager },
                 // Worker can access anything restricted to Worker role
                 AccessCodes.WorkerAccess => new[] { Role.Codes.Worker, Role.Codes.Supervisor, Role.Codes.FieldManager },
+                //Rate controller. Worker needs because of the API call
+                AccessCodes.RateAccess => new[] { Role.Codes.Worker, Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.Finance },
+                //Finance just system and finance
+                AccessCodes.FinanceAccess => new[] { Role.Codes.Finance },
                 // PI can access anything restricted to PI role
                 AccessCodes.PrincipalInvestigator => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager },
                 AccessCodes.PrincipalInvestigatorOnly => new [] {Role.Codes.PI},

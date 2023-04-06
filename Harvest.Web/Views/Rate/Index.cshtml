@@ -7,96 +7,106 @@
 }
 <div class="row justify-content-between mb-3">
     <div class="col">
-<h1>Rates</h1>
+        <h1>Rates for Team: @ViewBag.TeamName</h1>
     </div>
-    <div class="col text-right">
- <a class="btn btn-sm btn-primary" asp-action="Create">Create New <i class="fas fa-plus fa-xs"></i></a>
-    </div> 
-    </div>
+    @if (allowEdit)
+    {
+        <div class="col text-right">
+            <a class="btn btn-sm btn-primary" asp-action="Create">Create New <i class="fas fa-plus fa-xs"></i></a>
+        </div>
+    }
+</div>
 
 <table class="table harvest-table table-striped table-bordered">
     <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Type)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.IsPassthrough)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Unit)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.BillingUnit)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Account)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Price)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.UpdatedOn)
-        </th>
-        <th>Actions</th>
-    </tr>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsPassthrough)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BillingUnit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdatedOn)
+            </th>
+            <th>Actions</th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsPassthrough)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Unit)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BillingUnit)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Account)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @item.UpdatedOn.ToPacificTime().Format("d")
-            </td>
-            <td>
-                @if(allowEdit)
-                {
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span> |</span>
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) <span> |</span>
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
-                }
-                else
-                {
-                    @Html.ActionLink("Details", "Details", new {id=item.Id })
-                }
-            </td>
-        </tr>
-    }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IsPassthrough)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Unit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BillingUnit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @item.UpdatedOn.ToPacificTime().Format("d")
+                </td>
+                <td>
+                    @if (allowEdit)
+                    {
+                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) <span> |</span>
+                        @Html.ActionLink("Details", "Details", new { id = item.Id }) <span> |</span>
+                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    }
+                    else
+                    {
+                        @Html.ActionLink("Details", "Details", new {id=item.Id })
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 
 @section Styles
-{
-    @{ await Html.RenderPartialAsync("_ReportStylesPartial");}
-    @{ await Html.RenderPartialAsync("_FaStylesPartial");}
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
 }
 
 @section Scripts
-{
-    @{ await Html.RenderPartialAsync("_ReportScriptsPartial");}
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
 
     <script type="text/javascript">
         var table = $('.table').DataTable({

@@ -11,5 +11,7 @@ namespace Harvest.Web.Models.RateModels
     {
         public Rate Rate { get; set; }
         public AccountValidationModel AccountValidation { get; set; }
+
+        public string TeamName { get; set; }
     }
 }

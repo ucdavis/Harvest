@@ -90,7 +90,7 @@ namespace Harvest.Core.Services
 
             var userRoles = await _dbContext.Permissions
                 .Where(p => p.User.Iam == iamId)
-                .Select(p => new TeamRoles(p.Role.Name, p.Team.Name))
+                .Select(p => new TeamRoles(p.Role.Name, p.Team.Slug))
                 .ToArrayAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
@@ -129,10 +129,17 @@ namespace Harvest.Core.Services
 
     public static class UserServiceExtensions
     {
+        [Obsolete("Use HasAnyTeamRoles instead")]
         public static async Task<bool> HasAnyRoles(this IUserService userService, IEnumerable<string> roles)
         {
             var userRoles = await userService.GetCurrentRoles();
             return userRoles.Any(r => roles.Contains(r.Role));
+        }
+        public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string teamSlug, IEnumerable<string> roles)
+        {
+            var userRoles = await userService.GetCurrentRoles();
+
+            return userRoles.Where(a => a.Role == Role.Codes.System || a.TeamSlug == teamSlug).Any(r => roles.Contains(r.Role));
         }
     }
 }
