@@ -8,6 +8,7 @@ import {
   WorkItemImpl,
   ExpenseQueryParams,
   Project,
+  CommonRouteParams,
 } from "../types";
 import { ProjectSelection } from "./ProjectSelection";
 import { ActivityForm } from "../Quotes/ActivityForm";
@@ -31,11 +32,6 @@ import { validatorOptions } from "../constants";
 import { authenticatedFetch } from "../Util/Api";
 import { convertCamelCase } from "../Util/StringFormatting";
 
-interface RouteParams {
-  projectId?: string;
-  team?: string;
-}
-
 const getDefaultActivity = (id: number) => ({
   id,
   name: "Generic Activity",
@@ -52,7 +48,7 @@ const getDefaultActivity = (id: number) => ({
 export const ExpenseEntryContainer = () => {
   const history = useHistory();
 
-  const { projectId, team } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
   const context = useOrCreateValidationContext(validatorOptions);
@@ -78,7 +74,7 @@ export const ExpenseEntryContainer = () => {
       if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
         history.goBack();
       } else {
-        history.push(`/project/details/${projectId}`);
+        history.push(`/${team}/project/details/${projectId}`);
       }
     }
   }, [projectId, history, query, roles]);
@@ -141,7 +137,7 @@ export const ExpenseEntryContainer = () => {
 
   const changeProject = (projectId: number) => {
     // want to go to /expense/entry/[projectId]
-    history.push(`/expense/entry/${projectId}`);
+    history.push(`/${team}/expense/entry/${projectId}`);
   };
 
   const submit = async () => {
@@ -238,7 +234,7 @@ export const ExpenseEntryContainer = () => {
         <div className="card-content">
           <h1>
             Add Expenses for{" "}
-            <Link to={`/project/details/${projectId}`}>
+            <Link to={`/${team}/project/details/${projectId}`}>
               Project {projectId}
             </Link>
           </h1>

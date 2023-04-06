@@ -5,7 +5,8 @@ import {
   Invoice,
   Project,
   ProjectWithQuote,
-  Rate, Team,
+  Rate,
+  Team,
   Ticket,
 } from "../types";
 
@@ -95,7 +96,7 @@ export const fakeProject: Project = {
     id: 1,
     name: "Team 1",
     slug: "team-1",
-  }
+  },
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -139,7 +140,7 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       id: 1,
       name: "Team 1",
       slug: "team-1",
-    }
+    },
   },
   quote: null,
 };
@@ -188,6 +189,7 @@ export const fakeTickets: Ticket[] = [
     attachments: [],
     status: "Requested",
     createdOn: new Date("2021-01-15T00:00:00"),
+    project: fakeProject,
   },
   {
     id: 2,
@@ -199,6 +201,7 @@ export const fakeTickets: Ticket[] = [
     attachments: [],
     status: "Requested",
     createdOn: new Date("2021-01-15T00:00:00"),
+    project: fakeProject,
   },
   {
     id: 3,
@@ -210,6 +213,7 @@ export const fakeTickets: Ticket[] = [
     attachments: [],
     status: "Requested",
     createdOn: new Date("2021-01-15T00:00:00"),
+    project: fakeProject,
   },
   {
     id: 4,
@@ -221,6 +225,7 @@ export const fakeTickets: Ticket[] = [
     attachments: [],
     status: "Requested",
     createdOn: new Date("2021-01-15T00:00:00"),
+    project: fakeProject,
   },
 ];
 
