@@ -95,7 +95,7 @@ namespace Harvest.Core.Data
 
         private async Task UpdateTeamPermissions()
         {
-            var permissions = await _dbContext.Permissions.Include(a => a.Role).Where(a => a.TeamId == null && a.Role.Name != Role.Codes.System).ToListAsync();
+            var permissions = await _dbContext.Permissions.Where(a => a.TeamId == null && a.Role.Name != Role.Codes.System).ToListAsync();
             foreach (var permission in permissions)
             {
                 permission.TeamId = 1;
