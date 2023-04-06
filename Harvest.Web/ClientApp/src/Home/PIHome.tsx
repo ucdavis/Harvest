@@ -73,7 +73,7 @@ export const PIHome = () => {
             {tickets.map((ticket) => (
               <li key={ticket.id} className="list-group-item">
                 <Link
-                  to={`${ticket.project.team.slug}/ticket/details/${ticket.projectId}/${ticket.id}`}
+                  to={`/${ticket.project.team.slug}/ticket/details/${ticket.projectId}/${ticket.id}`}
                 >
                   View ticket: "{ticket.name}"
                 </Link>

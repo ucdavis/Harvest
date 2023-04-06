@@ -141,7 +141,7 @@ function App() {
             >
               <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
             </ConditionalRoute>
-            <ConditionalRoute exact roles={["PI"]} path="/:team/ticket/mine">
+            <ConditionalRoute exact roles={["PI"]} path="/:team?/ticket/mine">
               <TicketListContainer projectSource="/api/ticket/RequiringPIAttention" />
             </ConditionalRoute>
             <Route
