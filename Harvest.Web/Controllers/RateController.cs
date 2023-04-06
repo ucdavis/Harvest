@@ -367,7 +367,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Delete/5
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Delete(int id)
         {
             var rate = await _dbContext.Rates
