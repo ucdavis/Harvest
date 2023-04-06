@@ -49,6 +49,7 @@ namespace Harvest.Web.Controllers
 
             var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == team.Id).ToListAsync();
             ViewBag.AllowEdit = await _userService.HasAnyTeamRoles(TeamSlug, new string[] { Role.Codes.System, Role.Codes.FieldManager });
+            ViewBag.TeamName = team.Name;
             return View(rates);
         }
 
@@ -56,6 +57,7 @@ namespace Harvest.Web.Controllers
         // GET: RateController/Active
         public async Task<ActionResult> Active()
         {
+            //TODO: Use team to filter rates 
             var rates = await _dbContext.Rates.Where(a => a.IsActive).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
             return Ok(rates);
         }
@@ -63,11 +65,19 @@ namespace Harvest.Web.Controllers
         // GET: RateController/Details/5
         public async Task<ActionResult> Details(int id)
         {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
             var rate = await _dbContext.Rates
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
-                .SingleAsync(a => a.Id == id);
-            var model = new RateDetailsModel { Rate = rate };
+                .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
+            var model = new RateDetailsModel { Rate = rate, TeamName = team.Name };
             if (_aeSettings.UseCoA)
             {
                 model.AccountValidation = await _aggieEnterpriseService.IsAccountValid(rate.Account, validateRate: true);
@@ -76,6 +86,7 @@ namespace Harvest.Web.Controllers
             {
                 model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
             }
+            
             return View(model);
         }
 
