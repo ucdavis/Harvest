@@ -31,6 +31,7 @@ namespace Harvest.Core.Data
             await CheckCreateRole(Role.Codes.FieldManager);
             await CheckCreateRole(Role.Codes.Supervisor);
             await CheckCreateRole(Role.Codes.Worker);
+            await CheckCreateRole(Role.Codes.Finance);
 
             await _dbContext.SaveChangesAsync();
 
