@@ -13,10 +13,9 @@ import {
   DropdownItem,
 } from "reactstrap";
 import AppContext from "./Shared/AppContext";
-import { useParams } from "react-router";
 import { useLocation } from "react-router-dom";
 
-const getTeam = (pathName: string) => {
+const getFirstPath = (pathName: string) => {
   // return the first path token in the pathName
   if (!pathName) {
     return "";
@@ -36,7 +35,12 @@ export const AppNav = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const location = useLocation();
-  const team = getTeam(location.pathname);
+  const firstPath = getFirstPath(location.pathname).toLowerCase();
+
+  const team = firstPath;
+
+  const nonTeamPage =
+    firstPath === "system" || firstPath === "report" || firstPath === "project";
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -47,9 +51,9 @@ export const AppNav = () => {
           <NavbarToggler onClick={toggle} />
           <Collapse className="justify-content-between" isOpen={isOpen} navbar>
             <Nav navbar>
-              <ShowFor roles={["FieldManager", "Supervisor"]}>
+              <ShowFor roles={["System"]} condition={nonTeamPage}>
                 <NavItem>
-                  <NavLink href={`/${team}/project`}>All Projects</NavLink>
+                  <NavLink href="/">Home</NavLink>
                 </NavItem>
               </ShowFor>
               <ShowFor roles={["PI"]}>
@@ -57,69 +61,80 @@ export const AppNav = () => {
                   <NavLink href="/project/mine">My Projects</NavLink>
                 </NavItem>
               </ShowFor>
-              <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
-                <NavItem>
-                  <NavLink href={`/${team}/expense/entry`}>Expenses</NavLink>
-                </NavItem>
-              </ShowFor>
-              <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
-                <UncontrolledDropdown nav inNavbar>
-                  <DropdownToggle nav caret>
-                    Admin
-                  </DropdownToggle>
-                  <DropdownMenu right>
-                    <ShowFor roles={["FieldManager"]}>
-                      <DropdownItem href={`/${team}/Permissions/Index`}>
-                        Permissions
-                      </DropdownItem>
-                    </ShowFor>
-                    <ShowFor roles={["Finance"]}>
+              <ShowFor condition={!nonTeamPage}>
+                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                  <NavItem>
+                    <NavLink href={`/${team}/project`}>All Projects</NavLink>
+                  </NavItem>
+                </ShowFor>
+                <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
+                  <NavItem>
+                    <NavLink href={`/${team}/expense/entry`}>Expenses</NavLink>
+                  </NavItem>
+                </ShowFor>
+                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                  <UncontrolledDropdown nav inNavbar>
+                    <DropdownToggle nav caret>
+                      Team Admin
+                    </DropdownToggle>
+                    <DropdownMenu right>
+                      <ShowFor roles={["FieldManager"]}>
+                        <DropdownItem href={`/${team}/Permissions/Index`}>
+                          Permissions
+                        </DropdownItem>
+                      </ShowFor>
                       <DropdownItem href={`/${team}/Rate/Index`}>
                         Rates
                       </DropdownItem>
-                    </ShowFor>
-                    <ShowFor roles={["FieldManager"]}>
-                      <DropdownItem href={`/${team}/Crop/Index`}>
-                        Crops
-                      </DropdownItem>
-                    </ShowFor>
-                    <ShowFor roles={["FieldManager"]}>
+                      <ShowFor roles={["FieldManager"]}>
+                        <DropdownItem href={`/${team}/Crop/Index`}>
+                          Crops
+                        </DropdownItem>
+                      </ShowFor>
+                      <ShowFor roles={["FieldManager"]}>
+                        <DropdownItem divider />
+                        <DropdownItem href={`/${team}/project/adhocproject`}>
+                          Ad-Hoc Project
+                        </DropdownItem>
+                      </ShowFor>
                       <DropdownItem divider />
-                      <DropdownItem href={`/${team}/project/adhocproject`}>
-                        Ad-Hoc Project
+                      <DropdownItem href={`/${team}/Project/Completed`}>
+                        Completed Projects
                       </DropdownItem>
-                    </ShowFor>
-                    <DropdownItem divider />
-                    <DropdownItem href={`/${team}/Project/Completed`}>
-                      Completed Projects
+                      <DropdownItem href={`/${team}/Project/NeedsAttention`}>
+                        Projects Needing Attention
+                      </DropdownItem>
+                      <DropdownItem href={`/${team}/Ticket/NeedsAttention`}>
+                        Open Tickets
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </ShowFor>
+              </ShowFor>
+              <ShowFor roles={["System"]}>
+                <UncontrolledDropdown nav inNavbar>
+                  <DropdownToggle nav caret>
+                    System Admin
+                  </DropdownToggle>
+                  <DropdownMenu right>
+                    <DropdownItem href={`/System/UpdatePendingExpenses`}>
+                      Unprocessed Expenses
                     </DropdownItem>
-                    <DropdownItem href={`/${team}/Project/NeedsAttention`}>
-                      Projects Needing Attention
+                    <DropdownItem href={`/System/Emulate`}>
+                      Emulate
                     </DropdownItem>
-                    <DropdownItem href={`/${team}/Ticket/NeedsAttention`}>
-                      Open Tickets
+                    <DropdownItem href={`/Report/AllProjects`}>
+                      Reports - Projects
                     </DropdownItem>
-                    <ShowFor roles={["System"]}>
-                      <DropdownItem divider />
-                      <DropdownItem href={`/System/UpdatePendingExpenses`}>
-                        Unprocessed Expenses
-                      </DropdownItem>
-                      <DropdownItem href={`/System/Emulate`}>
-                        Emulate
-                      </DropdownItem>
-                      <DropdownItem href={`/Report/AllProjects`}>
-                        Reports - Projects
-                      </DropdownItem>
-                      <DropdownItem href={`/Report/HistoricalRateActivity`}>
-                        Reports - Historical Rate Activity
-                      </DropdownItem>
-                    </ShowFor>
+                    <DropdownItem href={`/Report/HistoricalRateActivity`}>
+                      Reports - Historical Rate Activity
+                    </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
               </ShowFor>
 
               <NavItem>
-                <NavLink href={`/Help`}>Help</NavLink>
+                <NavLink href={`/${team}/Help`}>Help</NavLink>
               </NavItem>
             </Nav>
             <div className="d-flex align-items-center user-sign-in">

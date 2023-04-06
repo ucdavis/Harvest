@@ -99,6 +99,8 @@ namespace Harvest.Web.Controllers.Api
                 var attentionStatuses = new string[] { Project.Statuses.PendingApproval, Project.Statuses.PendingAccountApproval }.ToArray();
 
                 return Ok(await _dbContext.Projects.AsNoTracking()
+                    .Include(p => p.PrincipalInvestigator)
+                    .Include(a => a.Team)
                     .Where(p => p.PrincipalInvestigatorId == user.Id && p.IsActive && attentionStatuses.Contains(p.Status))
                     .OrderBy(a => a.CreatedOn) // Oldest first?
                     .Select(p => new { p.Id, p.Status, p.Name })
@@ -123,6 +125,7 @@ namespace Harvest.Web.Controllers.Api
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.Team)
                 .Where(p => p.IsActive && p.PrincipalInvestigatorId == user.Id)
                 .ToArrayAsync());
         }

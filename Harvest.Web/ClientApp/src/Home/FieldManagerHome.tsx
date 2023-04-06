@@ -3,19 +3,15 @@ import { Link, Redirect } from "react-router-dom";
 
 import { authenticatedFetch } from "../Util/Api";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
-import { Project, Ticket } from "../types";
+import { CommonRouteParams, Project, Ticket } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useParams } from "react-router";
-
-interface RouteParams {
-  team?: string;
-}
 
 export const FieldManagerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
 
@@ -74,7 +70,7 @@ export const FieldManagerHome = () => {
         </li>
         {projects.slice(0, 3).map((project) => (
           <li key={project.id} className="list-group-item">
-            <Link to={`/project/details/${project.id}`}>
+            <Link to={`/${project.team.slug}/project/details/${project.id}`}>
               Quick jump to {project.name}{" "}
               <span
                 className={`badge badge-primary badge-status-${project.status}`}
@@ -97,7 +93,9 @@ export const FieldManagerHome = () => {
             </li>
             {tickets.map((ticket) => (
               <li key={ticket.id} className="list-group-item">
-                <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
+                <Link
+                  to={`/${ticket.project.team.slug}/ticket/details/${ticket.projectId}/${ticket.id}`}
+                >
                   View ticket: "{ticket.name}"
                 </Link>
               </li>

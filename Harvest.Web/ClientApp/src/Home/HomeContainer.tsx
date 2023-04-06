@@ -5,13 +5,9 @@ import { WorkerHome } from "./WorkerHome";
 import { FieldManagerHome } from "./FieldManagerHome";
 import { SupervisorHome } from "./SupervisorHome";
 import { PIHome } from "./PIHome";
-import { RoleName } from "../types";
+import { CommonRouteParams, RoleName } from "../types";
 import { useParams } from "react-router";
 import { Redirect } from "react-router-dom";
-
-interface RouteParams {
-  team?: string;
-}
 
 const ShowCustomActions = (roles: RoleName[]) => {
   if (roles.includes("FieldManager")) {
@@ -29,7 +25,7 @@ const ShowCustomActions = (roles: RoleName[]) => {
 export const HomeContainer = () => {
   const userInfo = useContext(AppContext);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   // if team is null but we have a non-PI role, go to team picker
   const nonPIRoles = userInfo.user.roles.filter((role) => role !== "PI");

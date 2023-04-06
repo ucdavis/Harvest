@@ -298,6 +298,8 @@ export interface ProjectAccount {
 export interface Ticket {
   id: number;
   projectId: number;
+
+  project: Project;
   name: string;
   requirements: string;
   dueDate?: Date;
@@ -379,4 +381,10 @@ export interface Result<T> {
   value: T;
   isError: boolean;
   message: string;
+}
+
+export interface CommonRouteParams {
+  team?: string;
+  projectId?: string;
+  ticketId?: string;
 }

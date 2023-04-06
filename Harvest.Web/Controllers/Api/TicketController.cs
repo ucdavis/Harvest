@@ -40,7 +40,7 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(policy: AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetList(int projectId, int? maxRows)
         {
-            var ticketsQuery = _dbContext.Tickets.Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
+            var ticketsQuery = _dbContext.Tickets.Include(a => a.Project.Team).Where(a => a.ProjectId == projectId).OrderByDescending(a => a.UpdatedOn);
             if (maxRows.HasValue)
             {
                 //I actually don't like this take 5, too easy to loose that there maybe uncompleted tickets not showing here. but worry about it later.
@@ -57,6 +57,7 @@ namespace Harvest.Web.Controllers.Api
 
             // Get list of top N open tickets in PI projects
             var openTickets = _dbContext.Tickets
+                .Include(a => a.Project.Team)
                 .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.PrincipalInvestigatorId == user.Id)
                 .OrderByDescending(a => a.UpdatedOn);
 
@@ -74,6 +75,7 @@ namespace Harvest.Web.Controllers.Api
         {
             // Get list of top N open tickets in all projects
             var openTickets = _dbContext.Tickets
+                .Include(a => a.Project.Team)
                 .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.Team.Slug == team)
                 .OrderByDescending(a => a.UpdatedOn);
 

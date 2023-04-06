@@ -58,7 +58,7 @@ export const SupervisorHome = () => {
         </li>
         {projects.slice(0, 3).map((project) => (
           <li key={project.id} className="list-group-item">
-            <Link to={`/project/details/${project.id}`}>
+            <Link to={`/${project.team.slug}/project/details/${project.id}`}>
               Quick jump to {project.name}{" "}
               <span
                 className={`badge badge-primary badge-status-${project.status}`}
@@ -81,7 +81,9 @@ export const SupervisorHome = () => {
             </li>
             {tickets.map((ticket) => (
               <li key={ticket.id} className="list-group-item">
-                <Link to={`/ticket/details/${ticket.projectId}/${ticket.id}`}>
+                <Link
+                  to={`/${ticket.project.team.slug}/ticket/details/${ticket.projectId}/${ticket.id}`}
+                >
                   View ticket: "{ticket.name}"
                 </Link>
               </li>
