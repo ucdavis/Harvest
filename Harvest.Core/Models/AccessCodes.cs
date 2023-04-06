@@ -7,6 +7,8 @@ namespace Harvest.Core.Models
         public const string FieldManagerAccess = "FieldManagerAccess";
         public const string SupervisorAccess = "SupervisorAccess";
         public const string WorkerAccess = "WorkerAccess";
+        public const string RateAccess = "RateAccess";
+        public const string FinanceAccess = "FinanceAccess";
         /// <summary>
         /// When using this Authentication, the projectId must be in the parameters.
         /// </summary>

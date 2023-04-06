@@ -34,7 +34,7 @@ namespace Test.TestsControllers
             ControllerReflection.ControllerInherits("SuperController");
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
             var attributes = ControllerReflection.ClassExpectedAttribute<AuthorizeAttribute>(3, showListOfAttributes: false);
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.WorkerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.RateAccess);
 
             ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3);
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
@@ -65,15 +65,17 @@ namespace Test.TestsControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Details", countAdjustment + 1);
 
             //4 - 1
-            var attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", countAdjustment + 0, isSecondMethod: false);
+            var attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", countAdjustment + 2, isSecondMethod: false);
             attributes.ShouldNotBeNull();
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FinanceAccess);
+
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Create", countAdjustment + 2, isSecondMethod: false);
 
             //4-2
             attributes = null;
             attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Create", countAdjustment + 3, isSecondMethod: true);
             attributes.ShouldNotBeNull();
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FinanceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Create", countAdjustment + 3, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Create", countAdjustment + 3, isSecondMethod: true);
 
@@ -81,14 +83,14 @@ namespace Test.TestsControllers
             attributes = null;
             attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Edit", countAdjustment + 2, isSecondMethod: false);
             attributes.ShouldNotBeNull();
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FinanceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Edit", countAdjustment + 2, isSecondMethod: false);
 
             //5-2
             attributes = null;
             attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Edit", countAdjustment + 3, isSecondMethod: true);
             attributes.ShouldNotBeNull();
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FinanceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Edit", countAdjustment + 3, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Edit", countAdjustment + 3, isSecondMethod: true);
 
@@ -96,14 +98,14 @@ namespace Test.TestsControllers
             attributes = null;
             attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Delete", countAdjustment + 2, isSecondMethod: false);
             attributes.ShouldNotBeNull();
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FinanceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 2, isSecondMethod: false);
 
             //6-2
             attributes = null;
             attributes = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Delete", countAdjustment + 3, isSecondMethod: true);
             attributes.ShouldNotBeNull();
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.FinanceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 3, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Delete", countAdjustment + 3, isSecondMethod: true);
         }

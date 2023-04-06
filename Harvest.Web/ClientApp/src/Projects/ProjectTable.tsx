@@ -29,7 +29,9 @@ export const ProjectTable = (props: Props) => {
         Cell: (data: Cell<Project>) => (
           <div>
             <p>
-              <Link to={`/project/details/${data.row.original.id}`}>
+              <Link
+                to={`/${data.row.original.team.slug}/project/details/${data.row.original.id}`}
+              >
                 #{data.row.original.id} {data.row.original.name}
               </Link>
             </p>
