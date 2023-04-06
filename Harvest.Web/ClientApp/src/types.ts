@@ -78,9 +78,9 @@ export interface Invoice {
 }
 
 export interface Team {
-    id: number;
-    name: string;
-    slug: string;
+  id: number;
+  name: string;
+  slug: string;
 }
 
 export interface User {
@@ -378,4 +378,10 @@ export interface Result<T> {
   value: T;
   isError: boolean;
   message: string;
+}
+
+export interface CommonRouteParams {
+  team?: string;
+  projectId?: string;
+  ticketId?: string;
 }

@@ -3,19 +3,15 @@ import { Link, Redirect } from "react-router-dom";
 
 import { authenticatedFetch } from "../Util/Api";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
-import { Project, Ticket } from "../types";
+import { CommonRouteParams, Project, Ticket } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { useParams } from "react-router";
-
-interface RouteParams {
-  team?: string;
-}
 
 export const FieldManagerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
 

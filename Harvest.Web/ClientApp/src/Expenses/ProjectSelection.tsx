@@ -2,14 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import { FormGroup, Input } from "reactstrap";
 
-import { Project } from "../types";
+import { CommonRouteParams, Project } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
 import { useParams } from "react-router-dom";
-
-interface RouteParams {
-  team?: string;
-}
 
 interface Props {
   selectedProject: (projectId: number) => void;
@@ -18,7 +14,7 @@ interface Props {
 export const ProjectSelection = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>();
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
