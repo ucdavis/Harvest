@@ -233,7 +233,15 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Edit(int id)
         {
-            var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id);
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateEditModel { Rate = rate, TypeList = Rate.Types.TypeList };
             model.UseCoA = _aeSettings.UseCoA;
 
@@ -245,6 +253,14 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Edit(int id, RateEditModel model)
         {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
             model.Rate.Id = id;
             model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
             model.UseCoA = _aeSettings.UseCoA;
@@ -310,7 +326,7 @@ namespace Harvest.Web.Controllers
             }
 
 
-            var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id);
+            var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id && a.TeamId == team.Id);
 
             var user = await _userService.GetCurrentUser();
 
@@ -370,10 +386,18 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Delete(int id)
         {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
             var rate = await _dbContext.Rates
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
-                .SingleAsync(a => a.Id == id);
+                .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateDetailsModel { Rate = rate }; 
             if (_aeSettings.UseCoA)
             {
@@ -392,7 +416,15 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
-            var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive);
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive && a.TeamId == team.Id);
             var user = await _userService.GetCurrentUser();
 
             rateToDelete.IsActive  = false;
