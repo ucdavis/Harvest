@@ -13,7 +13,6 @@ interface Props {
 }
 
 export const InvoiceTable = (props: Props) => {
-  console.log(props);
   const invoiceData = useMemo(() => props.invoices, [props.invoices]);
   const columns: Column<Invoice>[] = useMemo(
     () => [
