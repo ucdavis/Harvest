@@ -28,12 +28,15 @@ namespace Test.TestsControllers
         {
             ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(2);
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
+            ControllerReflection.MethodExpectedNoAttribute("get_TeamSlug");
         }
 
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(4);
+            ControllerReflection.ControllerPublicMethods(5);
         }
+
+        
     }
 }

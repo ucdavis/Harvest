@@ -21,9 +21,7 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
-        private readonly IUserService _userService;
-
-        public string TeamSlug => ControllerContext.RouteData.Values["team"] as string;
+        private readonly IUserService _userService;        
 
         public PermissionsController(AppDbContext dbContext, IIdentityService identityService, IUserService userService)
         {
