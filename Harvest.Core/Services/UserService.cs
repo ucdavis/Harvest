@@ -138,8 +138,8 @@ namespace Harvest.Core.Services
         public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string teamSlug, IEnumerable<string> roles)
         {
             var userRoles = await userService.GetCurrentRoles();
-            //Scott, does this sound correct? Need to check for null teamSlug because System Admins don't have a teamSlug
-            return userRoles.Where(a => a.TeamSlug == null || a.TeamSlug.Equals(teamSlug, StringComparison.OrdinalIgnoreCase)).Any(r => roles.Contains(r.Role));
+
+            return userRoles.Where(a => a.Role == Role.Codes.System || a.TeamSlug == teamSlug).Any(r => roles.Contains(r.Role));
         }
     }
 }
