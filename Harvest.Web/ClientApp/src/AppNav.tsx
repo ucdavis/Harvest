@@ -72,7 +72,7 @@ export const AppNav = () => {
                     <NavLink href={`/${team}/expense/entry`}>Expenses</NavLink>
                   </NavItem>
                 </ShowFor>
-                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
                   <UncontrolledDropdown nav inNavbar>
                     <DropdownToggle nav caret>
                       Team Admin
@@ -83,9 +83,11 @@ export const AppNav = () => {
                           Permissions
                         </DropdownItem>
                       </ShowFor>
-                      <DropdownItem href={`/${team}/Rate/Index`}>
-                        Rates
-                      </DropdownItem>
+                      <ShowFor roles={["Finance"]}>
+                        <DropdownItem href={`/${team}/Rate/Index`}>
+                          Rates
+                        </DropdownItem>
+                      </ShowFor>
                       <ShowFor roles={["FieldManager"]}>
                         <DropdownItem href={`/${team}/Crop/Index`}>
                           Crops
@@ -97,16 +99,18 @@ export const AppNav = () => {
                           Ad-Hoc Project
                         </DropdownItem>
                       </ShowFor>
-                      <DropdownItem divider />
-                      <DropdownItem href={`/${team}/Project/Completed`}>
-                        Completed Projects
-                      </DropdownItem>
-                      <DropdownItem href={`/${team}/Project/NeedsAttention`}>
-                        Projects Needing Attention
-                      </DropdownItem>
-                      <DropdownItem href={`/${team}/Ticket/NeedsAttention`}>
-                        Open Tickets
-                      </DropdownItem>
+                      <ShowFor roles={["FieldManager", "Supervisor"]}>
+                        <DropdownItem divider />
+                        <DropdownItem href={`/${team}/Project/Completed`}>
+                          Completed Projects
+                        </DropdownItem>
+                        <DropdownItem href={`/${team}/Project/NeedsAttention`}>
+                          Projects Needing Attention
+                        </DropdownItem>
+                        <DropdownItem href={`/${team}/Ticket/NeedsAttention`}>
+                          Open Tickets
+                        </DropdownItem>
+                      </ShowFor>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </ShowFor>
