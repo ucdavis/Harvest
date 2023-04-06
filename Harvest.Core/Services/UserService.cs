@@ -90,7 +90,7 @@ namespace Harvest.Core.Services
 
             var userRoles = await _dbContext.Permissions
                 .Where(p => p.User.Iam == iamId)
-                .Select(p => new TeamRoles(p.Role.Name, p.Team.Name))
+                .Select(p => new TeamRoles(p.Role.Name, p.Team.Slug))
                 .ToArrayAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
@@ -138,7 +138,8 @@ namespace Harvest.Core.Services
         public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string teamSlug, IEnumerable<string> roles)
         {
             var userRoles = await userService.GetCurrentRoles();
-            return userRoles.Where(a => a.TeamSlug.Equals(teamSlug, StringComparison.OrdinalIgnoreCase)).Any(r => roles.Contains(r.Role));
+            //Scott, does this sound correct? Need to check for null teamSlug because System Admins don't have a teamSlug
+            return userRoles.Where(a => a.TeamSlug == null || a.TeamSlug.Equals(teamSlug, StringComparison.OrdinalIgnoreCase)).Any(r => roles.Contains(r.Role));
         }
     }
 }
