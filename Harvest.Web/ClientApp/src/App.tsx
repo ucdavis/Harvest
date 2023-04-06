@@ -43,7 +43,7 @@ function App() {
         <main role="main" className="main-content-wrapper container">
           <Switch>
             {/* Match any server-side routes and send empty content to let MVC return the view details */}
-            <Route path="/:team/(rate|permissions)" component={Empty} />
+            <Route path="/:team/(rate|permissions|help)" component={Empty} />
             <Route
               path="/(account|crop|home|system|help|report)"
               component={Empty}
