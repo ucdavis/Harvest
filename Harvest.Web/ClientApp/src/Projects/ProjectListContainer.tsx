@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Project } from "../types";
+import { CommonRouteParams, Project } from "../types";
 import { ProjectTable } from "./ProjectTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
@@ -9,10 +9,6 @@ import { authenticatedFetch } from "../Util/Api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router";
-
-interface RouteParams {
-  team?: string;
-}
 
 interface Props {
   projectSource: string;
@@ -32,7 +28,7 @@ const getListTitle = (projectSource: string) => {
 export const ProjectListContainer = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -50,6 +46,8 @@ export const ProjectListContainer = (props: Props) => {
     cb();
   }, [props.projectSource, getIsMounted]);
 
+  const requestUrl = !team ? "/request/create" : `/${team}/request/create`;
+
   return (
     <div className="projectlisttable-wrapper">
       <div className="row justify-content-between mb-3">
@@ -57,7 +55,7 @@ export const ProjectListContainer = (props: Props) => {
           <h1>{getListTitle(props.projectSource)}</h1>
         </div>
         <div className="col text-right">
-          <Link to="/request/create" className="btn btn-sm btn-primary ">
+          <Link to={requestUrl} className="btn btn-sm btn-primary ">
             Create New <FontAwesomeIcon icon={faPlus} />
           </Link>
         </div>

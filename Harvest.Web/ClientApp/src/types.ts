@@ -297,6 +297,8 @@ export interface ProjectAccount {
 export interface Ticket {
   id: number;
   projectId: number;
+
+  project: Project;
   name: string;
   requirements: string;
   dueDate?: Date;

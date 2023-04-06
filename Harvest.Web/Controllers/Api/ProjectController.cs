@@ -123,6 +123,7 @@ namespace Harvest.Web.Controllers.Api
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.Team)
                 .Where(p => p.IsActive && p.PrincipalInvestigatorId == user.Id)
                 .ToArrayAsync());
         }

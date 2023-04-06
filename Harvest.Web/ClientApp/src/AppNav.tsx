@@ -13,7 +13,6 @@ import {
   DropdownItem,
 } from "reactstrap";
 import AppContext from "./Shared/AppContext";
-import { useParams } from "react-router";
 import { useLocation } from "react-router-dom";
 
 const getTeam = (pathName: string) => {
@@ -117,7 +116,7 @@ export const AppNav = () => {
               </ShowFor>
 
               <NavItem>
-                <NavLink href={`/Help`}>Help</NavLink>
+                <NavLink href={`/${team}/Help`}>Help</NavLink>
               </NavItem>
             </Nav>
             <div className="d-flex align-items-center user-sign-in">

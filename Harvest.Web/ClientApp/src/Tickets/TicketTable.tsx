@@ -18,7 +18,7 @@ export const TicketTable = (props: Props) => {
         Cell: (data: Cell<Ticket>) => (
           <div>
             <Link
-              to={`/ticket/details/${data.row.original.projectId}/${data.row.original.id}`}
+              to={`/${data.row.original.project.team.slug}/ticket/details/${data.row.original.projectId}/${data.row.original.id}`}
             >
               #{data.row.original.id}
             </Link>
