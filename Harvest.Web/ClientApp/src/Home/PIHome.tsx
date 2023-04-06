@@ -51,7 +51,7 @@ export const PIHome = () => {
         </li>
         {projects.map((project) => (
           <li key={project.id} className="list-group-item">
-            <Link to={`/${project.team.slug}/project/details/${project.id}`}>
+            <Link to={`/${project.team?.slug}/project/details/${project.id}`}>
               View project {project.name}{" "}
               <span
                 className={`badge badge-primary badge-status-${project.status}`}
