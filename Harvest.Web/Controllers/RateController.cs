@@ -92,9 +92,17 @@ namespace Harvest.Web.Controllers
 
         // GET: RateController/Create
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public ActionResult Create()
+        public async Task<ActionResult> Create()
         {
-            var model = new RateEditModel { Rate = new Rate(), TypeList = Rate.Types.TypeList, UseCoA = _aeSettings.UseCoA };
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = new RateEditModel { Rate = new Rate(), TypeList = Rate.Types.TypeList, UseCoA = _aeSettings.UseCoA, TeamName = team.Name };
             if (!_aeSettings.UseCoA)
             {
                 model.Rate.Account = "3-";
@@ -108,6 +116,15 @@ namespace Harvest.Web.Controllers
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> Create(RateEditModel model)
         {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+            model.TeamName = team.Name;
+
             model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
             model.UseCoA = _aeSettings.UseCoA;
             if (!ModelState.IsValid)
@@ -180,7 +197,7 @@ namespace Harvest.Web.Controllers
             rateToCreate.IsActive  = true;
             rateToCreate.CreatedBy = user;
             rateToCreate.CreatedOn = rateToCreate.UpdatedOn;
-
+            rateToCreate.TeamId = team.Id;
 
             try
             {

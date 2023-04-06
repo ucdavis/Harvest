@@ -9,5 +9,7 @@ namespace Harvest.Web.Models.RateModels
         public List<string> TypeList { get; set; }
 
         public bool UseCoA { get; set; }
+
+        public string TeamName { get; set; }
     }
 }
