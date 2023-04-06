@@ -323,7 +323,11 @@ export const ProjectDetailContainer = () => {
       <div>
         {project.status !== "ChangeRequested" && (
           <div className="card-content">
-            <RecentTicketsContainer compact={true} projectId={projectId} />
+            <RecentTicketsContainer
+              compact={true}
+              projectId={projectId}
+              team={team}
+            />
 
             <RecentInvoicesContainer
               compact={true}

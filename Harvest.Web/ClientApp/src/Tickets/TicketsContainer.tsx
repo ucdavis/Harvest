@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Project, Ticket } from "../types";
+import { CommonRouteParams, Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { TicketTable } from "./TicketTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 export const TicketsContainer = () => {
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>();
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
@@ -59,7 +55,7 @@ export const TicketsContainer = () => {
         <div className="row justify-content-between">
           <h3>List of all tickets for your project</h3>
 
-          <Link to={`/ticket/create/${projectId}`}>Create Ticket</Link>
+          <Link to={`/${team}/ticket/create/${projectId}`}>Create Ticket</Link>
         </div>
         <div className="row justify-content-center">
           <TicketTable compact={false} tickets={tickets} />
