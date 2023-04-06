@@ -62,7 +62,7 @@ export const AppNav = () => {
                   <NavLink href={`/${team}/expense/entry`}>Expenses</NavLink>
                 </NavItem>
               </ShowFor>
-              <ShowFor roles={["FieldManager", "Supervisor"]}>
+              <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
                 <UncontrolledDropdown nav inNavbar>
                   <DropdownToggle nav caret>
                     Admin
@@ -72,10 +72,12 @@ export const AppNav = () => {
                       <DropdownItem href={`/${team}/Permissions/Index`}>
                         Permissions
                       </DropdownItem>
-                    </ShowFor>
+                                      </ShowFor>
+                                      <ShowFor roles={["Finance"]}>
                     <DropdownItem href={`/${team}/Rate/Index`}>
                       Rates
-                    </DropdownItem>
+                                          </DropdownItem>
+                                      </ShowFor>
                     <ShowFor roles={["FieldManager"]}>
                       <DropdownItem href={`/${team}/Crop/Index`}>
                         Crops

@@ -19,7 +19,7 @@ using Microsoft.Extensions.Options;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.WorkerAccess)]
+    [Authorize(Policy = AccessCodes.RateAccess)]
     public class RateController : SuperController
     {
         private readonly AppDbContext _dbContext;
@@ -48,7 +48,7 @@ namespace Harvest.Web.Controllers
             }
 
             var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == team.Id).ToListAsync();
-            ViewBag.AllowEdit = await _userService.HasAnyTeamRoles(TeamSlug, new string[] { Role.Codes.System, Role.Codes.FieldManager });
+            ViewBag.AllowEdit = await _userService.HasAnyTeamRoles(TeamSlug, new string[] { Role.Codes.System, Role.Codes.Finance });
             ViewBag.TeamName = team.Name;
             return View(rates);
         }
@@ -91,7 +91,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Create
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Create()
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -113,7 +113,7 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Create
         [HttpPost]
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Create(RateEditModel model)
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -230,7 +230,7 @@ namespace Harvest.Web.Controllers
         }
 
         // GET: RateController/Edit/5
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Edit(int id)
         {
             var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id);
@@ -242,7 +242,7 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Edit/5
         [HttpPost]
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Edit(int id, RateEditModel model)
         {
             model.Rate.Id = id;
@@ -389,7 +389,7 @@ namespace Harvest.Web.Controllers
 
         // POST: RateController/Delete/5
         [HttpPost]
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.FinanceAccess)]
         public async Task<ActionResult> Delete(int id, IFormCollection collection)
         {
             var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive);

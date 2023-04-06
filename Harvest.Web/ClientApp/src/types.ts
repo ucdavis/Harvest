@@ -16,6 +16,7 @@ export type RoleName =
   | "FieldManager"
   | "Supervisor"
   | "Worker"
+  | "Finance"
   | "PI";
 
 export type ProjectStatus =
