@@ -79,9 +79,9 @@ export interface Invoice {
 }
 
 export interface Team {
-    id: number;
-    name: string;
-    slug: string;
+  id: number;
+  name: string;
+  slug: string;
 }
 
 export interface User {

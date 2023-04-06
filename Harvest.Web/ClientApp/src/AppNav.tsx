@@ -72,12 +72,12 @@ export const AppNav = () => {
                       <DropdownItem href={`/${team}/Permissions/Index`}>
                         Permissions
                       </DropdownItem>
-                                      </ShowFor>
-                                      <ShowFor roles={["Finance"]}>
-                    <DropdownItem href={`/${team}/Rate/Index`}>
-                      Rates
-                                          </DropdownItem>
-                                      </ShowFor>
+                    </ShowFor>
+                    <ShowFor roles={["Finance"]}>
+                      <DropdownItem href={`/${team}/Rate/Index`}>
+                        Rates
+                      </DropdownItem>
+                    </ShowFor>
                     <ShowFor roles={["FieldManager"]}>
                       <DropdownItem href={`/${team}/Crop/Index`}>
                         Crops
