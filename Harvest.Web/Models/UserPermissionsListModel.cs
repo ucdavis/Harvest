@@ -10,12 +10,13 @@ namespace Harvest.Web.Models
 {
     public class UserPermissionsListModel
     {
+        public Team Team { get; set; }
         public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 
     public class UserRole
     {
-        public User User { get; set; }
+        public User User { get; set; }        
 
         public IList<Role> Roles { get; set; }
 

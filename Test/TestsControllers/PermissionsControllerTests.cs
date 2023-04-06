@@ -72,6 +72,7 @@ namespace Test.TestsControllers
             //3-2
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 2, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Delete", countAdjustment + 2, isSecondMethod: true);
+            
         }
     }
 }

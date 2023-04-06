@@ -17,5 +17,7 @@ namespace Harvest.Web.Models
         public string UserEmail { get; set; }
 
         public List<Role> Roles { get; set; }
+
+        public string TeamName { get; set; }
     }
 }
