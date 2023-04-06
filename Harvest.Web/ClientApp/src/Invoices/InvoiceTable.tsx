@@ -8,10 +8,12 @@ import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   invoices: Invoice[];
+  team: string;
   compact?: boolean;
 }
 
 export const InvoiceTable = (props: Props) => {
+  console.log(props);
   const invoiceData = useMemo(() => props.invoices, [props.invoices]);
   const columns: Column<Invoice>[] = useMemo(
     () => [
@@ -19,7 +21,7 @@ export const InvoiceTable = (props: Props) => {
         Cell: (data: Cell<Invoice>) => (
           <div>
             <Link
-              to={`/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}
+              to={`/${props.team}/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}
             >
               #{data.row.original.id}
             </Link>
@@ -45,7 +47,7 @@ export const InvoiceTable = (props: Props) => {
         accessor: (row) => "$" + formatCurrency(row.total),
       },
     ],
-    []
+    [props.team]
   );
 
   const initialState: Partial<TableState<any>> = {

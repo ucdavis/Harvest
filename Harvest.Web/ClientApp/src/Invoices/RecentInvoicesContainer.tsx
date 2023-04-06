@@ -49,6 +49,7 @@ export const RecentInvoicesContainer = (props: Props) => {
         <InvoiceTable
           compact={props.compact}
           invoices={invoices}
+          team={props.team}
         ></InvoiceTable>
       </div>
     </ShowFor>
