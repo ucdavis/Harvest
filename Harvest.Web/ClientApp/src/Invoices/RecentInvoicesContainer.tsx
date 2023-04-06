@@ -9,6 +9,7 @@ import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   projectId?: string;
+  team: string;
   compact: boolean;
 }
 
@@ -39,7 +40,9 @@ export const RecentInvoicesContainer = (props: Props) => {
             <h3>Recent Invoices</h3>
           </div>
           <div className="col text-right">
-            <Link to={`/project/invoices/${props.projectId}`}>View All</Link>
+            <Link to={`/${props.team}/project/invoices/${props.projectId}`}>
+              View All
+            </Link>
           </div>
         </div>
 

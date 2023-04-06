@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { Project, Ticket } from "../types";
+import { CommonRouteParams, Project, Ticket } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import DatePicker from "react-datepicker";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -13,12 +13,8 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { useInputValidator } from "use-input-validator";
 import { validatorOptions } from "../constants";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 export const TicketCreate = () => {
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>();
   const [ticket, setTicket] = useState<Ticket>({
     requirements: "",
@@ -43,7 +39,9 @@ export const TicketCreate = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -68,17 +66,20 @@ export const TicketCreate = () => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Ticket/Create?projectId=${projectId}`, {
-      method: "POST",
-      body: JSON.stringify(ticket),
-    });
+    const request = authenticatedFetch(
+      `/api/Ticket/Create?projectId=${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(ticket),
+      }
+    );
     setNotification(request, "Creating Ticket", "Ticket Created");
 
     const response = await request;
 
     if (response.ok) {
       const data = await response.json();
-      history.push(`/Project/Details/${data.id}`);
+      history.push(`/${team}/Project/Details/${data.id}`);
     }
   };
 

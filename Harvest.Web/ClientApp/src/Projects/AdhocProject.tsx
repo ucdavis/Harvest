@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import {
   Activity,
   Expense,
@@ -11,6 +11,7 @@ import {
   ProjectAccount,
   QuoteContent,
   QuoteContentImpl,
+  CommonRouteParams,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
 import { Button, FormGroup, Input, Label } from "reactstrap";
@@ -47,6 +48,7 @@ const getDefaultActivity = (id: number) => ({
 
 export const AdhocProject = () => {
   const history = useHistory();
+  const { team } = useParams<CommonRouteParams>();
   const { detail: userDetail } = useContext(AppContext).user; //Only FM can do this, so we don't care about roles like we would in the project request
   const [project, setProject] = useState<Project>({
     id: 0,
@@ -193,7 +195,7 @@ export const AdhocProject = () => {
 
     if (response.ok) {
       const data = await response.json();
-      history.push(`/Project/Details/${data.id}`);
+      history.push(`/${team}/Project/Details/${data.id}`);
     }
   };
 

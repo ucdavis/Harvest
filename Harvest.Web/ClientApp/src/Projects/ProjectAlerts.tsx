@@ -44,6 +44,8 @@ interface StatusDetail {
 }
 
 const getStatusDetail = (project: Project): StatusDetail => {
+  const team = project.team.slug;
+
   // switch return different classname based on status
   switch (project.status) {
     case "Requested":
@@ -55,7 +57,7 @@ const getStatusDetail = (project: Project): StatusDetail => {
           "This project is waiting for a quote. Use the 'edit quote' button to create one.",
         actionText: "Create Quote",
         linkClass: "btn-secondary",
-        linkTo: `/quote/create/${project.id}`,
+        linkTo: `/${team}/quote/create/${project.id}`,
       };
     case "PendingApproval":
       return {
@@ -65,7 +67,7 @@ const getStatusDetail = (project: Project): StatusDetail => {
           "This project has a quote waiting for your approval. Use the 'view quote' button to view it.",
         actionText: "View Quote",
         linkClass: "btn-sunflower",
-        linkTo: `/request/approve/${project.id}`,
+        linkTo: `/${team}/request/approve/${project.id}`,
       };
     case "QuoteRejected":
       return {
@@ -75,7 +77,7 @@ const getStatusDetail = (project: Project): StatusDetail => {
           "The PI has rejected the quote and is waiting for an updated quote. Use the 'edit quote' button to create one.",
         actionText: "Create Quote",
         linkClass: "btn-danger",
-        linkTo: `/quote/create/${project.id}`,
+        linkTo: `/${team}/quote/create/${project.id}`,
       };
     default:
       return {

@@ -4,6 +4,7 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   projectId: number;
+  team: string;
 }
 
 export const ReturnToProject = (props: Props) => (
@@ -12,7 +13,7 @@ export const ReturnToProject = (props: Props) => (
       <div className="row justify-content-between">
         <div className="col-12 margin-left-fixer">
           <Link
-            to={`/project/details/${props.projectId}`}
+            to={`/${props.team}/project/details/${props.projectId}`}
             className="btn btn-sm btn-link"
           >
             Back to project details <FontAwesomeIcon icon={faArrowLeft} />

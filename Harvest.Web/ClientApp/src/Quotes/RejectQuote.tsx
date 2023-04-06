@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 
-import { Project } from "../types";
+import { CommonRouteParams, Project } from "../types";
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
@@ -13,6 +13,7 @@ interface Props {
 
 export const RejectQuote = (props: Props) => {
   const history = useHistory();
+  const { team } = useParams<CommonRouteParams>();
   const [reason, setReason] = useState("");
 
   const [notification, setNotification] = usePromiseNotification();
@@ -50,17 +51,20 @@ export const RejectQuote = (props: Props) => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Request/RejectQuote/${props.project.id}`, {
-      method: "POST",
-      body: JSON.stringify({ reason }),
-    });
+    const request = authenticatedFetch(
+      `/api/Request/RejectQuote/${props.project.id}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }
+    );
 
     setNotification(request, "Saving", "Quote Rejection Saved");
 
     const response = await request;
 
     if (response.ok) {
-      history.replace(`/project/details/${props.project.id}`);
+      history.replace(`/${team}/project/details/${props.project.id}`);
     }
   };
   return (

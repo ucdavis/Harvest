@@ -1,7 +1,12 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { Expense, ExpenseQueryParams, Project } from "../types";
+import {
+  CommonRouteParams,
+  Expense,
+  ExpenseQueryParams,
+  Project,
+} from "../types";
 import { ExpenseTable } from "./ExpenseTable";
 import { ShowFor } from "../Shared/ShowFor";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -14,10 +19,6 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
   hideProjectHeader?: boolean;
@@ -26,7 +27,7 @@ interface Props {
 }
 
 export const UnbilledExpensesContainer = (props: Props) => {
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [project, setProject] = useState<Project>();
   const [total, setTotal] = useState(0);
@@ -147,7 +148,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
               condition={project.status !== "PendingCloseoutApproval"}
             >
               <Link
-                to={`/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
+                to={`/${team}/expense/entry/${projectId}?${ExpenseQueryParams.ReturnOnSubmit}=true`}
                 className="btn btn btn-primary "
               >
                 Enter New <FontAwesomeIcon icon={faPlus} />

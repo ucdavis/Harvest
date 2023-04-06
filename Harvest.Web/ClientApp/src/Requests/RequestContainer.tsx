@@ -8,7 +8,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import {Project, CropType, Team} from "../types";
+import { Project, CropType, Team } from "../types";
 import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -31,7 +31,7 @@ export const RequestContainer = () => {
     id: 0,
     cropType: "Row" as CropType,
     team: {
-      slug: team || ""
+      slug: team || "",
     } as Team,
     principalInvestigator: userDetail,
   } as Project);
@@ -118,7 +118,7 @@ export const RequestContainer = () => {
       if (data.principalInvestigator.id !== data.createdBy.id) {
         history.push("/");
       } else {
-        history.push(`/Project/Details/${data.id}`);
+        history.push(`/${team}/Project/Details/${data.id}`);
       }
     }
   };
@@ -141,7 +141,10 @@ export const RequestContainer = () => {
       {originalProject !== undefined && (
         <div className="alert alert-info">
           You are making a change request for {project.name}{" "}
-          <Link className="alert-link" to={`/project/details/${project.id}`}>
+          <Link
+            className="alert-link"
+            to={`/${team}/project/details/${project.id}`}
+          >
             Click here to go back to the project details page
           </Link>
         </div>

@@ -1,7 +1,12 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { Project, ProjectAccount, ProjectWithQuote } from "../types";
+import {
+  CommonRouteParams,
+  Project,
+  ProjectAccount,
+  ProjectWithQuote,
+} from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "../Quotes/QuoteDisplay";
@@ -15,13 +20,9 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 // Lazy load quote pdf link since it's a large JS file and causes a console warning
 const QuotePDFLink = React.lazy(() => import("../Pdf/QuotePDFLink"));
 
-interface RouteParams {
-  projectId?: string;
-}
-
 export const ApprovalContainer = () => {
   const history = useHistory();
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]); // TODO: better to have part of project obj?
   const [disabled, setDisabled] = useState<boolean>(true);
@@ -31,7 +32,9 @@ export const ApprovalContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await authenticatedFetch(`/api/Quote/Get/${projectId}`);
+      const quoteResponse = await authenticatedFetch(
+        `/api/Quote/Get/${projectId}`
+      );
 
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
@@ -40,7 +43,9 @@ export const ApprovalContainer = () => {
 
         // can only approve pendingApproval projects
         if (projectWithQuote.project.status !== "PendingApproval") {
-          history.push(`/Project/Details/${projectWithQuote.project.id}`);
+          history.push(
+            `/${team}/Project/Details/${projectWithQuote.project.id}`
+          );
         }
       }
     };
@@ -62,7 +67,7 @@ export const ApprovalContainer = () => {
 
     if (response.ok) {
       const proj: Project = await response.json();
-      history.replace(`/Project/Details/${proj.id}`);
+      history.replace(`/${team}/Project/Details/${proj.id}`);
     }
   };
 

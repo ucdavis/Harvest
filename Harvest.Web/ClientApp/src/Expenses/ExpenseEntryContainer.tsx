@@ -136,7 +136,6 @@ export const ExpenseEntryContainer = () => {
   }, [project, leavePage]);
 
   const changeProject = (projectId: number) => {
-    // want to go to /expense/entry/[projectId]
     history.push(`/${team}/expense/entry/${projectId}`);
   };
 
