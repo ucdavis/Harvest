@@ -129,10 +129,16 @@ namespace Harvest.Core.Services
 
     public static class UserServiceExtensions
     {
+        [Obsolete("Use HasAnyTeamRoles instead")]
         public static async Task<bool> HasAnyRoles(this IUserService userService, IEnumerable<string> roles)
         {
             var userRoles = await userService.GetCurrentRoles();
             return userRoles.Any(r => roles.Contains(r.Role));
+        }
+        public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string teamSlug, IEnumerable<string> roles)
+        {
+            var userRoles = await userService.GetCurrentRoles();
+            return userRoles.Where(a => a.TeamSlug.Equals(teamSlug, StringComparison.OrdinalIgnoreCase)).Any(r => roles.Contains(r.Role));
         }
     }
 }

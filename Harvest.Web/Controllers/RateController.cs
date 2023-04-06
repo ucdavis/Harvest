@@ -39,8 +39,16 @@ namespace Harvest.Web.Controllers
         // GET: RateController
         public async Task<ActionResult> Index()
         {
-            var rates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
-            ViewBag.AllowEdit = await _userService.HasAnyRoles(new string[] { Role.Codes.System, Role.Codes.FieldManager });
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == team.Id).ToListAsync();
+            ViewBag.AllowEdit = await _userService.HasAnyTeamRoles(TeamSlug, new string[] { Role.Codes.System, Role.Codes.FieldManager });
             return View(rates);
         }
 
