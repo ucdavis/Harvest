@@ -24,6 +24,11 @@ namespace Harvest.Core.Domain
 
         public const string SlugRegex = "^([a-z0-9]+[a-z0-9\\-]?)+[a-z0-9]$";
 
+        [StringLength(128)] //Probably doesn't need to be this big...
+        public string SlothApiKey { get; set; }
+        [MaxLength(50)]
+        public string SlothSource { get; set; } = "Harvest Recharge"; //This is configurable in sloth, but it can probably remain the same for all teams
+
         [JsonIgnore]
         public IList<Permission> Permissions { get; set; }
         
