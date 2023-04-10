@@ -26,6 +26,8 @@ namespace Harvest.Core.Data
 
             await CheckCreateTeam("caes");
 
+            await CheckTeamHasTeamDetails();
+
             //Make sure roles exist
             await CheckCreateRole(Role.Codes.System);
             await CheckCreateRole(Role.Codes.FieldManager);
@@ -92,6 +94,23 @@ namespace Harvest.Core.Data
             await _dbContext.SaveChangesAsync();
 
             return;
+        }
+
+        private async Task CheckTeamHasTeamDetails()
+        {
+            var teams = await _dbContext.Teams.Where(a => a.TeamDetail == null || a.TeamDetailId == 0).ToListAsync();
+            foreach (var team in teams)
+            {
+                team.TeamDetail = new TeamDetail();
+                team.TeamDetail.TeamId = team.Id;
+            }
+            await _dbContext.SaveChangesAsync();
+            var teamDetails = await _dbContext.TeamDetails.ToListAsync();
+            foreach (var teamDetail in teamDetails)
+            {
+                teams.Where(a => a.Id == teamDetail.TeamId).Single().TeamDetailId = teamDetail.Id;
+            }
+            await _dbContext.SaveChangesAsync();
         }
 
         private async Task UpdateTeamPermissions()
@@ -919,6 +938,7 @@ namespace Harvest.Core.Data
             if (existingTeam == null)
             {
                 var teamToCreate = new Team {Name = team, Slug = team};
+                teamToCreate.TeamDetail = new TeamDetail { Team = teamToCreate};
                 await _dbContext.Teams.AddAsync(teamToCreate);
 
                 return teamToCreate;
