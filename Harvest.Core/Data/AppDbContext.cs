@@ -47,6 +47,7 @@ namespace Harvest.Core.Data
         public virtual DbSet<Rate> Rates { get; set; }
         
         public virtual DbSet<Team> Teams { get; set; }
+        public virtual DbSet<TeamDetail> TeamDetails { get; set; }
         public virtual DbSet<Ticket> Tickets { get; set; }
         public virtual DbSet<TicketMessage> TicketMessages { get; set; }
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
@@ -71,6 +72,7 @@ namespace Harvest.Core.Data
             Transfer.OnModelCreating(modelBuilder);
             Rate.OnModelCreating(modelBuilder);
             Team.OnModelCreating(modelBuilder);
+            TeamDetail.OnModelCreating(modelBuilder);
             Ticket.OnModelCreating(modelBuilder);
             TicketMessage.OnModelCreating(modelBuilder);
             TicketAttachment.OnModelCreating(modelBuilder);
