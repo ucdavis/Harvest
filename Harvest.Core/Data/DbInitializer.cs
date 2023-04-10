@@ -106,9 +106,9 @@ namespace Harvest.Core.Data
             }
             await _dbContext.SaveChangesAsync();
             var teamDetails = await _dbContext.TeamDetails.ToListAsync();
-            foreach (var teamDetail in teamDetails)
+            foreach (var team in teams)
             {
-                teams.Where(a => a.Id == teamDetail.TeamId).Single().TeamDetailId = teamDetail.Id;
+                team.TeamDetailId = teamDetails.Single(a => a.TeamId == team.Id).Id;
             }
             await _dbContext.SaveChangesAsync();
         }
