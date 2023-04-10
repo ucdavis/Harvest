@@ -48,6 +48,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.Accounts)
+                .Include(p => p.Team)
                 .AsNoTracking()
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
