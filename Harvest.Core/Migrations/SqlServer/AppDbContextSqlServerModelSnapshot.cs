@@ -690,6 +690,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(40)
                         .HasColumnType("nvarchar(40)");
 
+                    b.Property<int>("TeamDetailId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
@@ -699,6 +702,35 @@ namespace Harvest.Core.Migrations.SqlServer
                         .IsUnique();
 
                     b.ToTable("Teams", (string)null);
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.TeamDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("SlothApiKey")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("SlothSource")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("TeamId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId")
+                        .IsUnique();
+
+                    b.ToTable("TeamDetails");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
@@ -1185,6 +1217,17 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Navigation("UpdatedBy");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.TeamDetail", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Team", "Team")
+                        .WithOne("TeamDetail")
+                        .HasForeignKey("Harvest.Core.Domain.TeamDetail", "TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
@@ -1312,6 +1355,8 @@ namespace Harvest.Core.Migrations.SqlServer
             modelBuilder.Entity("Harvest.Core.Domain.Team", b =>
                 {
                     b.Navigation("Permissions");
+
+                    b.Navigation("TeamDetail");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Ticket", b =>
