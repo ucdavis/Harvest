@@ -20,7 +20,9 @@ export const InvoiceListContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Invoice/List/?projectId=${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Invoice/List/?projectId=${projectId}`
+      );
 
       if (response.ok) {
         getIsMounted() && setInvoices(await response.json());
@@ -33,7 +35,9 @@ export const InvoiceListContainer = () => {
   }, [projectId, getIsMounted]);
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -60,7 +64,10 @@ export const InvoiceListContainer = () => {
       ></ProjectHeader>
       <div className="card-content">
         <h3>Invoices</h3>
-        <InvoiceTable invoices={invoices}></InvoiceTable>
+        <InvoiceTable
+          invoices={invoices}
+          team={project.team?.slug}
+        ></InvoiceTable>
       </div>
     </div>
   );

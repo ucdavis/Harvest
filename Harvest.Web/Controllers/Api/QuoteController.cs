@@ -31,8 +31,11 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> Get(int projectId)
         {
-            var project = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(p => p.Accounts).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
-            var openQuote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).Select(q => QuoteDetail.Deserialize(q.Text)).SingleOrDefaultAsync();
+            var project = await _dbContext.Projects.Include(p => p.Team).Include(p => p.PrincipalInvestigator)
+                .Include(p => p.Accounts)
+                .Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
+            var openQuote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null)
+                .Select(q => QuoteDetail.Deserialize(q.Text)).SingleOrDefaultAsync();
 
             var model = new QuoteModel { Project = project, Quote = openQuote };
 

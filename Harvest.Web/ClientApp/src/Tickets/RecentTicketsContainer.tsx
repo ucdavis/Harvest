@@ -8,6 +8,7 @@ import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   projectId?: string;
+  team: string;
   compact: boolean;
 }
 
@@ -37,10 +38,15 @@ export const RecentTicketsContainer = (props: Props) => {
           <h3>Recent Tickets</h3>
         </div>
         <div className="col text-right">
-          <Link className="mr-4" to={`/ticket/create/${props.projectId}`}>
+          <Link
+            className="mr-4"
+            to={`/${props.team}/ticket/create/${props.projectId}`}
+          >
             Create Ticket
           </Link>
-          <Link to={`/ticket/List/${props.projectId}`}>View All</Link>
+          <Link to={`/${props.team}/ticket/List/${props.projectId}`}>
+            View All
+          </Link>
         </div>
       </div>
 

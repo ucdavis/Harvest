@@ -41,7 +41,7 @@ export const WorkerHome = () => {
         </li>
         {projects.map((project) => (
           <li key={project.id} className="list-group-item">
-            <Link to={`/expense/entry/${project.id}`}>
+            <Link to={`/${team}/expense/entry/${project.id}`}>
               Enter Expenses for {project.name}{" "}
               <span className="badge badge-light">Recent</span>
             </Link>

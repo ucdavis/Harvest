@@ -132,7 +132,9 @@ export const ProjectHeader = (props: Props) => {
           </div>
         </div>
       </div>
-      {!props.hideBack && <ReturnToProject projectId={project.id} />}
+      {!props.hideBack && (
+        <ReturnToProject projectId={project.id} team={project.team.slug} />
+      )}
     </div>
   );
 };

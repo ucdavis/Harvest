@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
 import {
+  CommonRouteParams,
   Project,
   ProjectWithQuote,
   QuoteContent,
@@ -26,13 +27,9 @@ import { ShowFor } from "../Shared/ShowFor";
 import { validatorOptions } from "../constants";
 import { Button } from "reactstrap";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 export const QuoteContainer = () => {
   const history = useHistory();
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>();
   const [inputErrors, setInputErrors] = useState<string[]>([]);
 
@@ -54,7 +51,9 @@ export const QuoteContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await authenticatedFetch(`/api/Quote/Get/${projectId}`);
+      const quoteResponse = await authenticatedFetch(
+        `/api/Quote/Get/${projectId}`
+      );
       const pricingResponse = await authenticatedFetch("/api/Rate/Active");
 
       if (quoteResponse.ok && pricingResponse.ok) {
@@ -70,7 +69,7 @@ export const QuoteContainer = () => {
             projectWithQuote.project.status !== "QuoteRejected"
           ) {
             // can only create quote for newly requests projects or change requests.
-            history.push(`/Project/Details/${projectId}`);
+            history.push(`/${team}/Project/Details/${projectId}`);
           }
 
           if (projectWithQuote.quote) {
@@ -204,10 +203,13 @@ export const QuoteContainer = () => {
       }
     }
 
-    const request = authenticatedFetch(`/api/Quote/Save/${projectId}?submit=${submit}`, {
-      method: "POST",
-      body: JSON.stringify(quote),
-    });
+    const request = authenticatedFetch(
+      `/api/Quote/Save/${projectId}?submit=${submit}`,
+      {
+        method: "POST",
+        body: JSON.stringify(quote),
+      }
+    );
 
     if (submit) {
       setNotification(request, "Submitting Quote", "Quote Submitted");
@@ -219,7 +221,7 @@ export const QuoteContainer = () => {
     const saveResponse = await request;
 
     if (saveResponse.ok) {
-      history.push(`/Project/Details/${projectId}`);
+      history.push(`/${team}/Project/Details/${projectId}`);
     }
   };
 

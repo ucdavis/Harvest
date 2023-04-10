@@ -75,11 +75,15 @@ export const ProjectFields = () => {
                     new Date(field.project.end)
                   )}
                 </p>
-                <Link to={`/project/details/${field.projectId}`}>
+                <Link
+                  to={`/${field.project.team.slug}/project/details/${field.projectId}`}
+                >
                   Project Details
                 </Link>
                 <br />
-                <Link to={`/expense/entry/${field.projectId}`}>
+                <Link
+                  to={`/${field.project.team.slug}/expense/entry/${field.projectId}`}
+                >
                   Project Expenses
                 </Link>
               </div>

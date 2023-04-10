@@ -16,7 +16,7 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
-import { BlobFile, Project } from "../types";
+import { BlobFile, CommonRouteParams, Project } from "../types";
 import { ShowFor, useFor } from "../Shared/ShowFor";
 import { ShowForPiOnly, useForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -25,12 +25,8 @@ import { useHistory } from "react-router-dom";
 import { ProjectAlerts } from "./ProjectAlerts";
 import { authenticatedFetch } from "../Util/Api";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 export const ProjectDetailContainer = () => {
-  const { projectId } = useParams<RouteParams>();
+  const { projectId } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({} as Project);
   const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -61,6 +57,8 @@ export const ProjectDetailContainer = () => {
       cb();
     }
   }, [projectId, getIsMounted]);
+
+  const team = project.team?.slug;
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(`/api/Request/Files/${projectId}`, {
@@ -105,7 +103,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/expense/entry/${project.id}`}
+          to={`/${team}/expense/entry/${project.id}`}
         >
           Enter Expenses <FontAwesomeIcon icon={faEdit} />
         </Link>
@@ -120,7 +118,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/quote/create/${project.id}`}
+          to={`/${team}/quote/create/${project.id}`}
         >
           Edit Quote <FontAwesomeIcon icon={faEdit} />
         </Link>
@@ -148,7 +146,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/project/closeout/${project.id}`}
+          to={`/${team}/project/closeout/${project.id}`}
         >
           Close Out Project <FontAwesomeIcon icon={faCheck} />
         </Link>
@@ -160,7 +158,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/project/closeoutconfirmation/${project.id}`}
+          to={`/${team}/project/closeoutconfirmation/${project.id}`}
         >
           Confirm Close Out
         </Link>
@@ -172,7 +170,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/request/approve/${project.id}`}
+          to={`/${team}/request/approve/${project.id}`}
         >
           View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
@@ -184,7 +182,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/request/changeAccount/${project.id}`}
+          to={`/${team}/request/changeAccount/${project.id}`}
         >
           Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
         </Link>
@@ -196,7 +194,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/${project.team?.slug}/request/create/${project.id}`}
+          to={`/${team}/request/create/${project.id}`}
         >
           Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
         </Link>
@@ -214,7 +212,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/quote/details/${project.id}`}
+          to={`/${team}/quote/details/${project.id}`}
         >
           View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
@@ -315,6 +313,7 @@ export const ProjectDetailContainer = () => {
               {" "}
               <ProjectUnbilledButton
                 projectId={project.id}
+                team={team}
                 remaining={project.quoteTotal - project.chargedTotal}
               />
             </div>
@@ -324,9 +323,17 @@ export const ProjectDetailContainer = () => {
       <div>
         {project.status !== "ChangeRequested" && (
           <div className="card-content">
-            <RecentTicketsContainer compact={true} projectId={projectId} />
+            <RecentTicketsContainer
+              compact={true}
+              projectId={projectId}
+              team={team}
+            />
 
-            <RecentInvoicesContainer compact={true} projectId={projectId} />
+            <RecentInvoicesContainer
+              compact={true}
+              projectId={projectId}
+              team={team}
+            />
           </div>
         )}
       </div>

@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { Project, ProjectAccount } from "../types";
+import { CommonRouteParams, Project, ProjectAccount } from "../types";
 import { AccountsInput } from "./AccountsInput";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
-interface RouteParams {
-  projectId?: string;
-}
-
 export const AccountChangeContainer = () => {
-  const { projectId } = useParams<RouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [accounts, setAccounts] = useState<ProjectAccount[]>([]);
   const [disabled, setDisabled] = useState<boolean>(true);
@@ -24,7 +20,9 @@ export const AccountChangeContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/Project/Get/${projectId}`
+      );
 
       if (response.ok) {
         const proj: Project = await response.json();
@@ -42,10 +40,13 @@ export const AccountChangeContainer = () => {
 
   //TODO: require PI or supervisor access after updating auth policies
   const changeAccounts = async () => {
-    const request = authenticatedFetch(`/api/Request/ChangeAccount/${projectId}`, {
-      method: "POST",
-      body: JSON.stringify({ Accounts: accounts }),
-    });
+    const request = authenticatedFetch(
+      `/api/Request/ChangeAccount/${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ Accounts: accounts }),
+      }
+    );
 
     setNotification(request, "Updating Accounts", "Accounts Updated");
 
@@ -53,7 +54,7 @@ export const AccountChangeContainer = () => {
 
     if (response.ok) {
       const data = await response.json();
-      history.push(`/Project/Details/${data.id}`);
+      history.push(`/${team}/Project/Details/${data.id}`);
     }
   };
 
