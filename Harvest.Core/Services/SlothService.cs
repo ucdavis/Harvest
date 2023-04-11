@@ -55,7 +55,16 @@ namespace Harvest.Core.Services
 
         public async Task<Result<SlothResponseModel>> MoveMoney(int invoiceId)
         {
-            var token = _slothSettings.ApiKey;
+            var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
+                .Include(a => a.Project).ThenInclude(a => a.Accounts).Include(a => a.Project).ThenInclude(a => a.Team).ThenInclude(a => a.TeamDetail).SingleOrDefaultAsync(); 
+            if (invoice == null)
+            {
+                return Result.Error("Invoice not found: {invoiceId}", invoiceId);
+            }
+
+            var token = invoice.Project.Team.TeamDetail.SlothApiKey;
+            var sourceName = invoice.Project.Team.TeamDetail.SlothSource;
+
             var url = _slothSettings.ApiUrl;
             if(_aeSettings.UseCoA)
             {
@@ -71,8 +80,7 @@ namespace Harvest.Core.Services
                 Log.Error("Sloth Token missing");               
             }
 
-            var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
-                .Include(a => a.Project).ThenInclude(a => a.Accounts).SingleOrDefaultAsync();
+
             if (invoice == null)
             {
                 return Result.Error("Invoice not found: {invoiceId}", invoiceId);
@@ -117,8 +125,9 @@ namespace Harvest.Core.Services
             var model = new TransactionViewModel
             {
                 MerchantTrackingNumber = invoiceId.ToString(),
-                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoice.ProjectId}/{invoiceId}", //Invoice/Details/ but maybe instead an admin page view of the invoice
+                MerchantTrackingUrl = $"{_slothSettings.MerchantTrackingUrl}/{invoice.Project.Team.Slug}/Invoice/Details/{invoice.ProjectId}/{invoiceId}", //Invoice/Details/ but maybe instead an admin page view of the invoice
                 Description = $"Proj: {invoice.Project.Name} Inv: {invoiceId}",
+                Source = sourceName,
                 //TODO: Use the meta Data?
                 //Maybe the PI? If so, need to include it.
             };
