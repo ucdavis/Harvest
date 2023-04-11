@@ -98,6 +98,8 @@ export const ProjectHeader = (props: Props) => {
                     {new Date(project.start).toLocaleDateString()} through{" "}
                     {new Date(project.end).toLocaleDateString()}
                   </p>
+                  <p className="lede">Team</p>
+                  <p>{project.team.name}</p>
                   <p className="lede">Crops</p>
                   <p>{crops}</p>
                 </div>
