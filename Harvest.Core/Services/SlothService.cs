@@ -56,7 +56,7 @@ namespace Harvest.Core.Services
         public async Task<Result<SlothResponseModel>> MoveMoney(int invoiceId)
         {
             var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
-                .Include(a => a.Project).ThenInclude(a => a.Accounts).Include(a => a.Project).ThenInclude(a => a.Team).ThenInclude(a => a.TeamDetail).SingleOrDefaultAsync(); 
+                .Include(a => a.Project).ThenInclude(a => a.Accounts).Include(a => a.Project).ThenInclude(a => a.Team).ThenInclude(a => a.TeamDetail).SingleOrDefaultAsync();
             if (invoice == null)
             {
                 return Result.Error("Invoice not found: {invoiceId}", invoiceId);
@@ -66,7 +66,7 @@ namespace Harvest.Core.Services
             var sourceName = invoice.Project.Team.TeamDetail.SlothSource;
 
             var url = _slothSettings.ApiUrl;
-            if(_aeSettings.UseCoA)
+            if (_aeSettings.UseCoA)
             {
                 url = $"{url}v2/";
             }
@@ -77,7 +77,7 @@ namespace Harvest.Core.Services
 
             if (string.IsNullOrWhiteSpace(token))
             {
-                Log.Error("Sloth Token missing");               
+                Log.Error("Sloth Token missing");
             }
 
 
@@ -96,18 +96,18 @@ namespace Harvest.Core.Services
                 //Do an early check to make sure project account(s) are valid
                 foreach (var account in invoice.Project.Accounts)
                 {
-                    if(FinancialChartValidation.GetFinancialChartStringType(account.Number) == FinancialChartStringType.Invalid)
+                    if (FinancialChartValidation.GetFinancialChartStringType(account.Number) == FinancialChartStringType.Invalid)
                     {
                         //Ok, it is an invalid COA format, so 99.99% chance this is still a KFS account. Lets try and convert it:
                         var coa = await _aggieEnterpriseService.ConvertKfsAccount(account.Number);
-                        if(coa != null)
+                        if (coa != null)
                         {
                             Log.Warning("Project Account updated to COA, using KFS Convert. Project: {id}, KFS Account: {kfs}, COA: {coa}", account.ProjectId, account.Number, coa);
                             account.Number = coa; // Assign it here so we can follow through with the validation. Will this get updated in the DB if everything else goes though I think.
 
                         }
                     }
-                    
+
                     var accountValidation = await _aggieEnterpriseService.IsAccountValid(account.Number);
                     if (!accountValidation.IsValid)
                     {
@@ -131,9 +131,11 @@ namespace Harvest.Core.Services
                 //TODO: Use the meta Data?
                 //Maybe the PI? If so, need to include it.
             };
+            model.AddMetadata("Team", invoice.Project.Team.Name);
+            model.AddMetadata("Project", invoice.Project.Name);
 
 
-            var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(),2);
+            var grandTotal = Math.Round(invoice.Expenses.Select(a => a.Total).Sum(), 2);
             if (invoice.Total != grandTotal)
             {
                 Log.Information("Invoice Total {invoiceTotal} != GrandTotal {grandTotal}", invoice.Total, grandTotal);
@@ -186,7 +188,7 @@ namespace Harvest.Core.Services
                         transfer.Account = transferViewModel.FinancialSegmentString;
                         transfer.IsProjectAccount =
                             invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.PassthroughCoaNaturalAccount))
-                            || 
+                            ||
                             invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.NormalCoaNaturalAccount));
                     }
                     else
@@ -261,13 +263,13 @@ namespace Harvest.Core.Services
 
                 var localTransfers = new List<TransferViewModel>();
                 foreach (var debExpenseGroup in debExpenseGroups) //At most, this will contain 2 items
-                {                    
+                {
                     foreach (var projectAccount in invoice.Project.Accounts)
                     {
                         //Replace the natural Account/Expenditure type with 
                         var tvm = new TransferViewModel
                         {
-                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount), 
+                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount),
                             Amount = Math.Round(debExpenseGroup.total * (projectAccount.Percentage / 100), 2),
                             Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                             Direction = TransferViewModel.Directions.Credit,
@@ -392,7 +394,7 @@ namespace Harvest.Core.Services
             //Ok, so this should happen before anything else...
             var debAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Debit).Sum(a => a.Amount);
             var credAmount = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Sum(a => a.Amount);
-            if ( debAmount != credAmount)
+            if (debAmount != credAmount)
             {
                 Log.Information("Refunds don't balance invoice {id} Deb {deb} Cred {crd}", invoice.Id, debAmount, credAmount);
                 var lastCredTmv = model.Transfers.Last(a => a.Direction == TransferViewModel.Directions.Credit);
@@ -463,7 +465,7 @@ namespace Harvest.Core.Services
 
 
                     //Go through them all and adjust the last record so the total of them matches the grandtotal (throw an exception if it is zero or negative)
-                    var debitTotal = localTransfers                        
+                    var debitTotal = localTransfers
                         .Select(a => a.Amount).Sum();
                     if (expenseGroup.total != debitTotal)
                     {
@@ -655,7 +657,7 @@ namespace Harvest.Core.Services
                     }
                 }
             }
-            
+
             var creditTotal = model.Transfers.Where(a => a.Direction == TransferViewModel.Directions.Credit).Select(a => a.Amount).Sum();
             if (grandTotal != creditTotal)
             {
@@ -685,88 +687,105 @@ namespace Harvest.Core.Services
             }
 
             Log.Information("Beginning ProcessTransferUpdates");
-            var pendingInvoices = await _dbContext.Invoices.Include(a => a.Project).Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
+            var pendingInvoices = await _dbContext.Invoices.Include(a => a.Project)
+                .ThenInclude(a => a.Team)
+                .ThenInclude(a => a.TeamDetail)
+                .Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
             if (pendingInvoices.Count == 0)
             {
                 Log.Information("No pending invoices to process");
                 return;
             }
-            using var client = _clientFactory.CreateClient();
-            client.BaseAddress = new Uri($"{url}Transactions/");
-            client.DefaultRequestHeaders.Add("X-Auth-Token", _slothSettings.ApiKey);
 
-            Log.Information("Processing {invoiceCount} transfers", pendingInvoices.Count);
-            var updatedCount = 0;
-            var rolledBackCount = 0;
-            foreach (var invoice in pendingInvoices)
+            var invoiceGroup = pendingInvoices.GroupBy(a => a.Project.Team);
+            foreach (var invoices in invoiceGroup)
             {
-                if (string.IsNullOrWhiteSpace(invoice.SlothTransactionId))
+                Log.Information("Processing {count} pending invoices for team {slug}", invoices.Count(), invoices.Key.Slug);
+                using var client = _clientFactory.CreateClient();
+                client.BaseAddress = new Uri($"{url}Transactions/");
+                client.DefaultRequestHeaders.Add("X-Auth-Token", invoices.Key.TeamDetail.SlothApiKey);
+                var updatedCount = 0;
+                var rolledBackCount = 0;
+                var pendingApprovalCount = 0;
+
+                foreach (var invoice in invoices)
                 {
-                    Log.Information("Invoice {transferId} missing SlothTransactionId", invoice.Id); //TODO: Log it
-                    continue;
-                }
-                var response = await client.GetAsync(invoice.SlothTransactionId);
-                if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    Log.Information("Invoice {transferId} NotFound. SlothTransactionId {transactionId}",
-                        invoice.Id, invoice.SlothTransactionId); //TODO: Log it
-                    continue;
-                }
-                if (response.StatusCode == HttpStatusCode.NoContent)
-                {
-                    Log.Information("Invoice {transferId} NoContent. SlothTransactionId {transactionId}",
-                        invoice.Id, invoice.SlothTransactionId); //TODO: Log it
-                    continue;
-                }
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var slothResponse = JsonSerializer.Deserialize<SlothResponseModel>(content, _serializerOptions);
-                    Log.Information("Invoice {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
-                        invoice.Id, slothResponse.Status, invoice.SlothTransactionId);
-                    switch (slothResponse.Status)
+                    if (string.IsNullOrWhiteSpace(invoice.SlothTransactionId))
                     {
-                        case SlothStatuses.Completed:
-                            updatedCount++;
+                        Log.Information("Invoice {transferId} missing SlothTransactionId", invoice.Id); //TODO: Log it
+                        continue;
+                    }
+                    var response = await client.GetAsync(invoice.SlothTransactionId);
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        Log.Information("Invoice {transferId} NotFound. SlothTransactionId {transactionId}",
+                            invoice.Id, invoice.SlothTransactionId); //TODO: Log it
+                        continue;
+                    }
+                    if (response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        Log.Information("Invoice {transferId} NoContent. SlothTransactionId {transactionId}",
+                            invoice.Id, invoice.SlothTransactionId); //TODO: Log it
+                        continue;
+                    }
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var content = await response.Content.ReadAsStringAsync();
+                        var slothResponse = JsonSerializer.Deserialize<SlothResponseModel>(content, _serializerOptions);
+                        Log.Information("Invoice {transferId} SlothResponseModel status {status}. SlothTransactionId {transactionId}",
+                            invoice.Id, slothResponse.Status, invoice.SlothTransactionId);
+                        switch (slothResponse.Status)
+                        {
+                            case SlothStatuses.Completed:
+                                updatedCount++;
 
-                            invoice.Status = Invoice.Statuses.Completed;
-                            await _historyService.InvoiceCompleted(invoice.ProjectId, invoice);
-                            if (invoice.Project.Status == Project.Statuses.FinalInvoicePending)
-                            {
-                                invoice.Project.UpdateStatus(Project.Statuses.Completed);
-                                await _historyService.ProjectCompleted(invoice.ProjectId, invoice.Project);
-                            }
-                            await _dbContext.SaveChangesAsync();
+                                invoice.Status = Invoice.Statuses.Completed;
+                                await _historyService.InvoiceCompleted(invoice.ProjectId, invoice);
+                                if (invoice.Project.Status == Project.Statuses.FinalInvoicePending)
+                                {
+                                    invoice.Project.UpdateStatus(Project.Statuses.Completed);
+                                    await _historyService.ProjectCompleted(invoice.ProjectId, invoice.Project);
+                                }
+                                await _dbContext.SaveChangesAsync();
 
-                            await _emailService.InvoiceDone(invoice, invoice.Status);
+                                await _emailService.InvoiceDone(invoice, invoice.Status);
 
-                            break;
-                        case SlothStatuses.Cancelled:
-                            Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
-                            await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
+                                break;
+                            case SlothStatuses.Cancelled:
+                                Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
+                                await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
 
-                            //await _emailService.InvoiceDone(invoice, SlothStatuses.Cancelled); //Email the PI that it was canceled? 
-                            //Probably what we want to do is to set the expense invoiceIds to null, then delete the invoice
-                            //Then send a notification to the FM and maybe us?
+                                //await _emailService.InvoiceDone(invoice, SlothStatuses.Cancelled); //Email the PI that it was canceled? 
+                                //Probably what we want to do is to set the expense invoiceIds to null, then delete the invoice
+                                //Then send a notification to the FM and maybe us?
 
-                            rolledBackCount++;
-                            //TODO: Write to the notes field? Trigger off an email?
-                            break;
+                                rolledBackCount++;
+                                //TODO: Write to the notes field? Trigger off an email?
+                                break;
 
-                            //TODO: Check for rejected and email Brian? Us?
+                                //TODO: Check for rejected and email Brian? Us?
+                            case SlothStatuses.PendingApproval:
+                                pendingApprovalCount++;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        Log.Information("Invoice {transferId} Not Successful. Response code {statusCode}. SlothTransactionId {transactionId}",
+                            invoice.Id, response.StatusCode, invoice.SlothTransactionId); //TODO: Log it
                     }
                 }
-                else
-                {
-                    Log.Information("Invoice {transferId} Not Successful. Response code {statusCode}. SlothTransactionId {transactionId}",
-                        invoice.Id, response.StatusCode, invoice.SlothTransactionId); //TODO: Log it
-                }
+                Log.Information("Pending Approval Count for team {slug}:{count}", invoices.Key.Slug, pendingApprovalCount);
+                await _dbContext.SaveChangesAsync();
+                Log.Information("Updated {updatedCount} orders. Rolled back {rolledBackCount} orders. for team {slug}", updatedCount, rolledBackCount, invoices.Key.Slug);
+
             }
 
-            await _dbContext.SaveChangesAsync();
-            Log.Information("Updated {updatedCount} orders. Rolled back {rolledBackCount} orders.", updatedCount, rolledBackCount);
+
+
+
         }
 
-        
+
     }
 }
