@@ -22,6 +22,7 @@ beforeEach(() => {
   });
 
   (global as any).Harvest = fakeAppContext;
+
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -29,7 +30,7 @@ beforeEach(() => {
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
       "/api/Project": projectResponse,
-      "/api/undefined/Rate/Active": rateResponse,
+      "/api/team1/Rate/Active": rateResponse,
     })
   );
 });
@@ -49,8 +50,8 @@ describe("Expense Entry Container", () => {
   it("Generic Activity Default", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={["/expense/entry/3"]}>
-          <Route path="/expense/entry/:projectId">
+        <MemoryRouter initialEntries={["/team1/expense/entry/3"]}>
+          <Route path="/:team/expense/entry/:projectId">
             <ExpenseEntryContainer />
           </Route>
         </MemoryRouter>,
@@ -67,8 +68,8 @@ describe("Expense Entry Container", () => {
   it("Rate Reflection", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={["/expense/entry/3"]}>
-          <Route path="/expense/entry/:projectId">
+        <MemoryRouter initialEntries={["/team1/expense/entry/3"]}>
+          <Route path="/:team/expense/entry/:projectId">
             <ExpenseEntryContainer />
           </Route>
         </MemoryRouter>,
@@ -92,8 +93,8 @@ describe("Expense Entry Container", () => {
   it("Total Value", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={["/expense/entry/3"]}>
-          <Route path="/expense/entry/:projectId">
+        <MemoryRouter initialEntries={["/team1/expense/entry/3"]}>
+          <Route path="/:team/expense/entry/:projectId">
             <ExpenseEntryContainer />
           </Route>
         </MemoryRouter>,
