@@ -687,9 +687,7 @@ namespace Harvest.Core.Services
             }
 
             Log.Information("Beginning ProcessTransferUpdates");
-            var pendingInvoices = await _dbContext.Invoices.Include(a => a.Project)
-                .ThenInclude(a => a.Team)
-                .ThenInclude(a => a.TeamDetail)
+            var pendingInvoices = await _dbContext.Invoices.Include(a => a.Project).Include(a => a.Project.Team.TeamDetail)                
                 .Where(a => a.Status == Invoice.Statuses.Pending).ToListAsync();
             if (pendingInvoices.Count == 0)
             {
