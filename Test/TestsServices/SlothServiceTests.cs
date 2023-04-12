@@ -121,6 +121,13 @@ namespace Test.TestsServices
             project.Accounts = new List<Account>();
             project.Accounts.Add(CreateValidEntities.Account(1));
 
+            project.Team = new Team();
+            project.Team.Slug = "fakeslug";
+            project.Team.Name = "faketeam";
+            project.Team.TeamDetail = new TeamDetail();
+            project.Team.TeamDetail.SlothSource = "Harvest Recharge";
+            project.Team.TeamDetail.SlothApiKey = "fakeApi";
+
             for (int i = 0; i < 3; i++)
             {
                 var invoice = CreateValidEntities.Invoice(i + 1, project.Id);
