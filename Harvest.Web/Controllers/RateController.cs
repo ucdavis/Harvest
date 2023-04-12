@@ -59,13 +59,12 @@ namespace Harvest.Web.Controllers
         [Route("api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Active()
         {
-            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
-            if (team == null)
+            if (await _dbContext.Teams.AnyAsync(t => t.Slug == TeamSlug))
             {
                 return BadRequest();
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == team.Id).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.Team.Slug == TeamSlug).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
             return Ok(rates);
         }
 
