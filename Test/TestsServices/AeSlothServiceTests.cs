@@ -123,6 +123,12 @@ namespace Test.TestsServices
 
             project.Accounts = new List<Account>();
             project.Accounts.Add(CreateValidEntities.Account(1, acctNumber: $"KP0953010U-301001-ADNO001-{AeOptions.NormalCoaNaturalAccount}"));
+            project.Team = new Team();
+            project.Team.Slug = "fakeslug";
+            project.Team.Name = "faketeam";
+            project.Team.TeamDetail = new TeamDetail();
+            project.Team.TeamDetail.SlothSource = "Harvest Recharge";
+            project.Team.TeamDetail.SlothApiKey = "fakeApi";
 
             for (int i = 0; i < 3; i++)
             {
