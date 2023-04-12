@@ -59,7 +59,11 @@ namespace Test.TestsControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Index", countAdjustment + 1);
 
             //2
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Active", countAdjustment + 1);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Active", countAdjustment + 2);
+            var RouteAttributes = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("Active", countAdjustment + 2);
+            RouteAttributes.ShouldNotBeNull();
+            RouteAttributes.ElementAt(0).Template.ShouldBe("api/{team}/{controller}/{action}");
+
 
             //3
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Details", countAdjustment + 1);
