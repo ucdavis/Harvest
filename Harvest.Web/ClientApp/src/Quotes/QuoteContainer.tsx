@@ -54,7 +54,9 @@ export const QuoteContainer = () => {
       const quoteResponse = await authenticatedFetch(
         `/api/Quote/Get/${projectId}`
       );
-      const pricingResponse = await authenticatedFetch("/api/Rate/Active");
+      const pricingResponse = await authenticatedFetch(
+        `/api/${team}/Rate/Active`
+      );
 
       if (quoteResponse.ok && pricingResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();

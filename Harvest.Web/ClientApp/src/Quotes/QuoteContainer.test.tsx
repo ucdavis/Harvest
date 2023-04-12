@@ -43,7 +43,7 @@ beforeEach(() => {
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
       "/api/Quote/Get/": quoteResponse,
-      "/api/Rate/Active": rateResponse,
+      "/api/team1/Rate/Active": rateResponse,
     })
   );
 });
@@ -76,13 +76,13 @@ describe("Quote Container", () => {
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
           "/api/Quote/Get/": notOkProjectResponse,
-          "/api/Rate/Active": notOkRateResponse,
+          "/api/team1/Rate/Active": notOkRateResponse,
         })
       );
 
       render(
-        <MemoryRouter initialEntries={["/quote/create/1"]}>
-          <Route path="/quote/create/:projectId">
+        <MemoryRouter initialEntries={["/team1/quote/create/1"]}>
+          <Route path="/:team/quote/create/:projectId">
             <QuoteContainer />
           </Route>
         </MemoryRouter>,
@@ -96,8 +96,8 @@ describe("Quote Container", () => {
   it("loads field request", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={["/quote/create/3"]}>
-          <Route path="/quote/create/:projectId">
+        <MemoryRouter initialEntries={["/team1/quote/create/3"]}>
+          <Route path="/:team/quote/create/:projectId">
             <QuoteContainer />
           </Route>
         </MemoryRouter>,
