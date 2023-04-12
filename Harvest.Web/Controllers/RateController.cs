@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Harvest.Core.Models.Settings;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Routing;
 
 namespace Harvest.Web.Controllers
 {
@@ -55,10 +56,16 @@ namespace Harvest.Web.Controllers
 
         // Returns the Active rates via API
         // GET: RateController/Active
+        [Route("api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Active()
         {
-            //TODO: Use team to filter rates 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            if (team == null)
+            {
+                return BadRequest();
+            }
+
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == team.Id).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
             return Ok(rates);
         }
 

@@ -83,7 +83,7 @@ export const ExpenseEntryContainer = () => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Rate/Active?team=${team}`
+          `/api/${team}/Rate/Active`
       );
 
       if (response.ok) {
