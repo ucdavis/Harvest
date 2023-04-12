@@ -29,7 +29,7 @@ beforeEach(() => {
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
       "/api/Project": projectResponse,
-      "/api/Rate/Active": rateResponse,
+      "/api/undefined/Rate/Active": rateResponse,
     })
   );
 });
