@@ -82,9 +82,7 @@ export const ExpenseEntryContainer = () => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch(
-          `/api/${team}/Rate/Active`
-      );
+      const response = await authenticatedFetch(`/api/${team}/Rate/Active`);
 
       if (response.ok) {
         const rates: Rate[] = await response.json();
