@@ -56,7 +56,7 @@ namespace Harvest.Core.Services
         public async Task<Result<SlothResponseModel>> MoveMoney(int invoiceId)
         {
             var invoice = await _dbContext.Invoices.Where(a => a.Id == invoiceId && a.Status == Invoice.Statuses.Created).Include(a => a.Expenses)
-                .Include(a => a.Project).ThenInclude(a => a.Accounts).Include(a => a.Project).ThenInclude(a => a.Team).ThenInclude(a => a.TeamDetail).SingleOrDefaultAsync();
+                .Include(a => a.Project).Include(a => a.Project.Accounts).Include(a => a.Project.Team.TeamDetail).SingleOrDefaultAsync();
             if (invoice == null)
             {
                 return Result.Error("Invoice not found: {invoiceId}", invoiceId);
