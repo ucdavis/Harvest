@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.FinanceAccess)]
+    [Authorize(Policy = AccessCodes.ReportAccess)]
     public class ReportController : SuperController
     {
         private readonly AppDbContext _dbContext;

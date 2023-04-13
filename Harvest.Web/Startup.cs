@@ -133,6 +133,9 @@ namespace Harvest.Web
                 options.AddPolicy(AccessCodes.FinanceAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.FinanceAccess))));
 
+                options.AddPolicy(AccessCodes.ReportAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.ReportAccess))));
+
                 options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigator))));
                 options.AddPolicy(AccessCodes.PrincipalInvestigatorOnly, policy => policy.Requirements.Add(
