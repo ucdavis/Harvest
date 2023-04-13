@@ -59,7 +59,7 @@ namespace Harvest.Web.Controllers
         [Route("api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Active()
         {
-            if (await _dbContext.Teams.AnyAsync(t => t.Slug == TeamSlug))
+            if (await _dbContext.Teams.AnyAsync(t => t.Slug == TeamSlug) == false)
             {
                 return BadRequest();
             }
