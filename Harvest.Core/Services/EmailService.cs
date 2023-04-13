@@ -68,7 +68,9 @@ namespace Harvest.Core.Services
         }
         public async Task<bool> ProfessorQuoteReady(Project project, Quote quote)
         {
-            var url = $"{_emailSettings.BaseUrl}/request/approve/";
+            project = await CheckForMissingDataForProject(project);            
+
+            var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/request/approve/";
             if (quote == null)
             {
                 throw new Exception("No quote.");
@@ -89,7 +91,7 @@ namespace Harvest.Core.Services
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(project.TeamId), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -103,7 +105,10 @@ namespace Harvest.Core.Services
 
         public async Task<bool> SupervisorSavedQuote(Project project, Quote quote)
         {
-            var url = $"{_emailSettings.BaseUrl}/quote/create/";
+            project = await CheckForMissingDataForProject(project);
+
+            var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/quote/create/";
+
             if (quote == null)
             {
                 throw new Exception("No quote.");
@@ -125,7 +130,7 @@ namespace Harvest.Core.Services
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification( await FieldManagersEmails(), null, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Supervisor Saved Quote");
+                await _notificationService.SendNotification( await FieldManagersEmails(project.TeamId), null, emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Supervisor Saved Quote");
             }
             catch (Exception e)
             {
@@ -137,20 +142,22 @@ namespace Harvest.Core.Services
 
         }
 
-        private async Task<string[]> FieldManagersEmails()
+        private async Task<string[]> FieldManagersEmails(int teamId)
         {
-            return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
+            return await _dbContext.Permissions.Where(a => a.TeamId == teamId && a.Role.Name == Role.Codes.FieldManager).Select(a => a.User.Email).ToArrayAsync();
         }
 
-        private async Task<string[]> FieldManagersAndSupervisorEmails()
+        private async Task<string[]> FieldManagersAndSupervisorEmails(int teamId)
         {
-            return await _dbContext.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager || a.Role.Name == Role.Codes.Supervisor).Select(a => a.User.Email).Distinct().ToArrayAsync();
+            return await _dbContext.Permissions.Where(a => a.TeamId == teamId && (a.Role.Name == Role.Codes.FieldManager || a.Role.Name == Role.Codes.Supervisor)).Select(a => a.User.Email).Distinct().ToArrayAsync();
         }
 
 
         public async Task<bool> NewFieldRequest(Project project)
         {
-            var url = $"{_emailSettings.BaseUrl}/project/details/";
+            project = await CheckForMissingDataForProject(project);
+
+            var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/project/details/";
 
             var model = new NewFieldRequestModel()
             {
@@ -168,7 +175,7 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/NewFieldRequest.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), new []{project.PrincipalInvestigator.Email}, emailBody, "A new field request has been made.", "Harvest Notification - New Field Request");
             }
             catch (Exception e)
             {
@@ -181,8 +188,10 @@ namespace Harvest.Core.Services
 
         public async Task<bool> ChangeRequest(Project project)
         {
-            var quoteUrl   = $"{_emailSettings.BaseUrl}/quote/create/";
-            var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+            project = await CheckForMissingDataForProject(project);
+
+            var quoteUrl   = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/quote/create/";
+            var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
 
             var model = new ChangeRequestModel()
             {
@@ -203,7 +212,7 @@ namespace Harvest.Core.Services
 
                 var textVersion = $"A change request has been made by {model.PI} for project {model.ProjectName}.";
 
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(), null, emailBody, textVersion, "Harvest Notification - Change Request");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), null, emailBody, textVersion, "Harvest Notification - Change Request");
             }
             catch (Exception e)
             {
@@ -216,7 +225,9 @@ namespace Harvest.Core.Services
 
         private async Task<bool> QuoteDecision(Project project, string reason, bool approved)
         {
-            var url = $"{_emailSettings.BaseUrl}/Project/Details/";
+            project = await CheckForMissingDataForProject(project);
+
+            var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
 
             var model = new QuoteDecisionModel()
             {
@@ -236,7 +247,7 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), new []{project.PrincipalInvestigator.Email}, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersEmails(project.TeamId), new []{project.PrincipalInvestigator.Email}, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
@@ -295,7 +306,9 @@ namespace Harvest.Core.Services
 
         public async Task<bool> InvoiceExceedsQuote(Project project, decimal invoiceAmount, decimal quoteRemaining)
         {
-            var url = $"{_emailSettings.BaseUrl}/Project/Details/";
+            project = await CheckForMissingDataForProject(project);
+
+            var url = $"{_emailSettings.BaseUrl}/{[project.Team.Slug]}/Project/Details/";
 
             var model = new InvoiceExceedsQuoteModel()
             {
@@ -314,7 +327,7 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Invoice/InvoiceExceedsRemainingAmount.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
+                await _notificationService.SendNotification(await FieldManagersEmails(project.TeamId), null, emailBody, textVersion, $"Harvest Notification - Invoice can't be created");
             }
             catch (Exception e)
             {
@@ -327,10 +340,12 @@ namespace Harvest.Core.Services
 
         public async Task<bool> NewTicketCreated(Project project, Ticket ticket)
         {
+            project = await CheckForMissingDataForProject(project);
+
             try
             {
-                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var model = new NewTicketModel()
                 {
                     ProjectName = project.NameAndId,
@@ -344,7 +359,7 @@ namespace Harvest.Core.Services
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
-                await _notificationService.SendNotification(await FieldManagersEmails(), null, emailBody, textVersion, "Harvest Notification - New Ticket");
+                await _notificationService.SendNotification(await FieldManagersEmails(project.TeamId), null, emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
@@ -358,16 +373,18 @@ namespace Harvest.Core.Services
 
         public async Task<bool> TicketReplyAdded(Project project, Ticket ticket, TicketMessage ticketMessage)
         {
+            project = await CheckForMissingDataForProject(project);
+
             //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
             try
             {
-                var emailTo = await FieldManagersEmails();
+                var emailTo = await FieldManagersEmails(project.TeamId);
                 if (ticketMessage.CreatedById != project.PrincipalInvestigatorId)
                 {
                     emailTo = new[] {project.PrincipalInvestigator.Email};
                 }
-                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var model = new TicketReplyModel()
                 {
                     ProjectName = project.NameAndId,
@@ -394,17 +411,19 @@ namespace Harvest.Core.Services
 
         public async Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
         {
+            project = await CheckForMissingDataForProject(project);
+
             //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
-                        try
+            try
             {
-                var emailTo = await FieldManagersEmails();
+                var emailTo = await FieldManagersEmails(project.TeamId);
                 var firstAttachment = ticketAttachments.First();
                 if (firstAttachment.CreatedById != project.PrincipalInvestigatorId)
                 {
                     emailTo = new[] {project.PrincipalInvestigator.Email};
                 }
-                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var model = new TicketAttachmentModel()
                 {
                     ProjectName = project.NameAndId,
@@ -431,23 +450,25 @@ namespace Harvest.Core.Services
 
         public async Task<bool> TicketClosed(Project project, Ticket ticket, User closedBy)
         {
+            project = await CheckForMissingDataForProject(project);
+
             try
             {
                 string[] emailTo = null;
                 string[] ccEmails = null;
                 if (ticket.Project.PrincipalInvestigatorId == closedBy.Id)
                 {
-                    emailTo = await FieldManagersEmails();
+                    emailTo = await FieldManagersEmails(project.TeamId);
                     ccEmails = new[] {project.PrincipalInvestigator.Email};
                 }
                 else
                 {
                     emailTo = new[] {project.PrincipalInvestigator.Email};
-                    ccEmails = await FieldManagersEmails();
+                    ccEmails = await FieldManagersEmails(project.TeamId);
                 }
 
-                var ticketUrl = $"{_emailSettings.BaseUrl}/Ticket/Details/";
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
+                var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var model = new TicketReplyModel()
                 {
                     ProjectName = project.NameAndId,
@@ -471,25 +492,34 @@ namespace Harvest.Core.Services
 
         public async Task<int> SendExpiringProjectsNotification(int days = 7)
         {
+            var total = 0;
             try
             {
-                var emailTo = await FieldManagersEmails();
-                var model = await _dbContext.Projects.Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.End <= DateTime.UtcNow.AddDays(days))
-                    .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
-                    {
-                        EndDate = s.End.ToShortDateString(),
-                        Name = s.NameAndId,
-                        ProjectUrl = $"{_emailSettings.BaseUrl}/Project/Details/{s.Id}"
-                    }).ToArrayAsync();
-                if (model == null || model.Length == 0)
+                //Could use fancy groupby here, but don't really see the need.
+                var teams = await _dbContext.Teams.ToArrayAsync();
+                foreach (var team in teams)
                 {
-                    Log.Information($"No projects have expired or will expire in {days} days");
-                    return 0;
+                    var model = await _dbContext.Projects.Where(a => a.IsActive && a.TeamId == team.Id && a.Status == Project.Statuses.Active && a.End <= DateTime.UtcNow.AddDays(days))
+                        .OrderBy(a => a.End).Select(s => new ExpiringProjectsModel
+                        {
+                            EndDate = s.End.ToShortDateString(),
+                            Name = s.NameAndId,
+                            ProjectUrl = $"{_emailSettings.BaseUrl}/{team.Slug}/Project/Details/{s.Id}"
+                        }).ToArrayAsync();
+                    if (model == null || model.Length == 0)
+                    {
+                        Log.Information($"No projects for team {team.Name} have expired or will expire in {days} days");
+                        continue;
+                    }
+                    var emailTo = await FieldManagersEmails(team.Id);
+                    var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ExpiringProjects.cshtml", model);
+                    var textVersion = $"One or more projects for team {team.Name} have expired or will expire in {days} days.";
+                    await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, $"Harvest Notification - Expiring Projects for Team {team.Name}");
+                    Log.Information($"Projects for team {team.Slug} close to closeout: {model.Length}");
+                    total += model.Length;
                 }
-                var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ExpiringProjects.cshtml", model);
-                var textVersion = $"One or more projects have expired or will expire in {days} days.";
-                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Expiring Projects");
-                return model.Length;
+
+                return total;
             }
             catch (Exception ex)
             {
@@ -729,13 +759,18 @@ namespace Harvest.Core.Services
         {
             if (project == null)
             {
-                throw new Exception("Pjoject is null");
+                throw new Exception("Project is null");
             }
 
             if (project.PrincipalInvestigator == null || project.Accounts == null)
             {
                 project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == project.Id);
+            }
+
+            if(project.Team == null)
+            {
+                project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
             }
 
             return project;
