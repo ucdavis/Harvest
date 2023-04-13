@@ -48,7 +48,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.Team.Id == team.Id).ToListAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == team.Id).ToListAsync();
             ViewBag.AllowEdit = await _userService.HasAnyTeamRoles(TeamSlug, new string[] { Role.Codes.System, Role.Codes.Finance });
             ViewBag.TeamName = team.Name;
             return View(rates);
@@ -82,7 +82,7 @@ namespace Harvest.Web.Controllers
             var rate = await _dbContext.Rates
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
-                .SingleAsync(a => a.Id == id && a.Team.Id == team.Id);
+                .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateDetailsModel { Rate = rate, TeamName = team.Name };
             if (_aeSettings.UseCoA)
             {
@@ -247,7 +247,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.Team.Id == team.Id);
+            var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateEditModel { Rate = rate, TypeList = Rate.Types.TypeList };
             model.UseCoA = _aeSettings.UseCoA;
             model.TeamName = team.Name;
@@ -334,7 +334,7 @@ namespace Harvest.Web.Controllers
             }
 
 
-            var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id && a.Team.Id == team.Id);
+            var rateToEdit = await _dbContext.Rates.Include(a => a.UpdatedBy).Include(a => a.CreatedBy).SingleAsync(a => a.Id == id && a.TeamId == team.Id);
 
             var user = await _userService.GetCurrentUser();
 
@@ -405,7 +405,7 @@ namespace Harvest.Web.Controllers
             var rate = await _dbContext.Rates
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
-                .SingleAsync(a => a.Id == id && a.Team.Id == team.Id);
+                .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateDetailsModel { Rate = rate }; 
             model.TeamName = team.Name;
             if (_aeSettings.UseCoA)
@@ -433,7 +433,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive && a.Team.Id == team.Id);
+            var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive && a.TeamId == team.Id);
             var user = await _userService.GetCurrentUser();
 
             rateToDelete.IsActive  = false;
