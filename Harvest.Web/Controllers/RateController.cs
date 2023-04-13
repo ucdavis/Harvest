@@ -250,6 +250,7 @@ namespace Harvest.Web.Controllers
             var rate = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateEditModel { Rate = rate, TypeList = Rate.Types.TypeList };
             model.UseCoA = _aeSettings.UseCoA;
+            model.TeamName = team.Name;
 
             return View(model);
         }
@@ -271,6 +272,7 @@ namespace Harvest.Web.Controllers
             model.TypeList = Rate.Types.TypeList; //Set it here in case the model isn't valid
             model.UseCoA = _aeSettings.UseCoA;
             model.Rate.Account = model.Rate.Account?.ToUpper().Trim();
+            model.TeamName = team.Name;
             
             if (!ModelState.IsValid)
             {
@@ -405,6 +407,7 @@ namespace Harvest.Web.Controllers
                 .Include(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
             var model = new RateDetailsModel { Rate = rate }; 
+            model.TeamName = team.Name;
             if (_aeSettings.UseCoA)
             {
                 model.AccountValidation = await _aggieEnterpriseService.IsAccountValid(model.Rate.Account, validateRate: true);
