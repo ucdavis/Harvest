@@ -308,7 +308,7 @@ namespace Harvest.Core.Services
         {
             project = await CheckForMissingDataForProject(project);
 
-            var url = $"{_emailSettings.BaseUrl}/{[project.Team.Slug]}/Project/Details/";
+            var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
 
             var model = new InvoiceExceedsQuoteModel()
             {
@@ -515,6 +515,7 @@ namespace Harvest.Core.Services
                     var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ExpiringProjects.cshtml", model);
                     var textVersion = $"One or more projects for team {team.Name} have expired or will expire in {days} days.";
                     await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, $"Harvest Notification - Expiring Projects for Team {team.Name}");
+
                     Log.Information($"Projects for team {team.Slug} close to closeout: {model.Length}");
                     total += model.Length;
                 }
@@ -531,11 +532,14 @@ namespace Harvest.Core.Services
 
         public async Task<bool> InvoiceCreated(Invoice invoice)
         {
+            
             try
             {
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
-                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
                 var project = await CheckForMissingDataForInvoice(invoice);
+
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
+                
                 var emailTo = new string[] {project.PrincipalInvestigator.Email};
                 //CC field managers? I'd say no....
 
@@ -569,9 +573,11 @@ namespace Harvest.Core.Services
         {
             try
             {
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
-                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
                 var project = await CheckForMissingDataForInvoice(invoice);
+
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
+                
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
                 //CC field managers? I'd say no....
 
@@ -605,11 +611,13 @@ namespace Harvest.Core.Services
         {
             try
             {
-                var projectUrl = $"{_emailSettings.BaseUrl}/Request/ChangeAccount/";
-                var invoiceUrl = $"{_emailSettings.BaseUrl}/Invoice/Details/";
                 var project = await CheckForMissingDataForInvoice(invoice);
+
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Request/ChangeAccount/";
+                var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
+                
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
-                var ccEmails = await FieldManagersEmails();
+                var ccEmails = await FieldManagersEmails(project.TeamId);
 
 
                 var model = new InvoiceErrorModel()
@@ -654,10 +662,12 @@ namespace Harvest.Core.Services
         {
             try
             {
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
-                var closeoutUrl = $"{_emailSettings.BaseUrl}/Project/CloseoutConfirmation/";
+                project = await CheckForMissingDataForProject(project);
+
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
+                var closeoutUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/CloseoutConfirmation/";
                 var emailTo = new string[] { project.PrincipalInvestigator.Email };
-                var ccEmails = ccFieldManagers ? await FieldManagersEmails() : null;
+                var ccEmails = ccFieldManagers ? await FieldManagersEmails(project.TeamId) : null;
 
                 var model = new CloseoutConfirmationModel()
                 {
@@ -688,7 +698,7 @@ namespace Harvest.Core.Services
         public async Task<int> SendCloseoutNotifications()
         {
             var count = 0;
-            var projectsAwaitingCloseout = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval).ToArrayAsync();
+            var projectsAwaitingCloseout = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).Where(a => a.IsActive && a.Status == Project.Statuses.PendingCloseoutApproval).ToArrayAsync();
             if (projectsAwaitingCloseout.Any())
             {
                 foreach(var project in projectsAwaitingCloseout)
@@ -709,8 +719,8 @@ namespace Harvest.Core.Services
             {
                 project = await CheckForMissingDataForProject(project);
 
-                var projectUrl = $"{_emailSettings.BaseUrl}/Project/Details/";
-                var emailTo = await FieldManagersEmails();
+                var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
+                var emailTo = await FieldManagersEmails(project.TeamId);
                 var ccEmails = new string[] { project.PrincipalInvestigator.Email };
 
                 var model = new ProjectClosedModel()
@@ -751,6 +761,10 @@ namespace Harvest.Core.Services
                 project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
                     .SingleAsync(a => a.Id == invoice.ProjectId);
             }
+            if (project.Team == null)
+            {
+                project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
+            }
 
             return project;
         }
@@ -778,7 +792,9 @@ namespace Harvest.Core.Services
 
         public async Task<bool> AdhocProjectCreated(Project project)
         {
-            var url = $"{_emailSettings.BaseUrl}/project/details/";
+            project = await CheckForMissingDataForProject(project);
+
+            var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/project/details/";
 
             var model = new NewFieldRequestModel()
             {
@@ -796,7 +812,7 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/AdhocProjectCreated.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(), new[] { project.PrincipalInvestigator.Email }, emailBody, "An Ad-hoc project for billing purposes has been created", "Harvest Notification - Ad-hoc project created");
+                await _notificationService.SendNotification(await FieldManagersEmails(project.TeamId), new[] { project.PrincipalInvestigator.Email }, emailBody, "An Ad-hoc project for billing purposes has been created", "Harvest Notification - Ad-hoc project created");
             }
             catch (Exception e)
             {
