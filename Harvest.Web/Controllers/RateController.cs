@@ -48,7 +48,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.Team.Slug == TeamSlug).ToListAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.Team.Id == team.Id).ToListAsync();
             ViewBag.AllowEdit = await _userService.HasAnyTeamRoles(TeamSlug, new string[] { Role.Codes.System, Role.Codes.Finance });
             ViewBag.TeamName = team.Name;
             return View(rates);
