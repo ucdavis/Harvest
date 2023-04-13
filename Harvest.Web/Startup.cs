@@ -253,7 +253,7 @@ namespace Harvest.Web
                     name: "default",
                     pattern: "/{team}/{controller}/{action}/{id?}",
                     defaults: new { action = "Index" },
-                    constraints: new { controller = "(help|rate|permissions|crop)" }
+                    constraints: new { controller = "(help|rate|permissions|crop|report)" }
                 );
                 
                 // default for MVC server-side endpoints
@@ -261,7 +261,7 @@ namespace Harvest.Web
                     name: "default",
                     pattern: "{controller}/{action}/{id?}",
                     defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(account|crop|home|system|help|error|report)" }
+                    constraints: new { controller = "(account|crop|home|system|help|error)" }
                 );
 
                 // API routes map to all other controllers

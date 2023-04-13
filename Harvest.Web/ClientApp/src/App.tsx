@@ -43,11 +43,11 @@ function App() {
         <main role="main" className="main-content-wrapper container">
           <Switch>
             {/* Match any server-side routes and send empty content to let MVC return the view details */}
-            <Route path="/:team/(rate|permissions|crop|help)" component={Empty} />
             <Route
-              path="/(account|home|system|help|report)"
+              path="/:team/(rate|permissions|crop|help|report)"
               component={Empty}
             />
+            <Route path="/(account|home|system|help)" component={Empty} />
             {/* Home route */}
             <Route exact path="/" component={HomeContainer} />
             {/* Visitors with non-PI roles will require selecting a team */}

@@ -39,8 +39,7 @@ export const AppNav = () => {
 
   const team = firstPath;
 
-  const nonTeamPage =
-    firstPath === "system" || firstPath === "report" || firstPath === "project";
+  const nonTeamPage = firstPath === "system" || firstPath === "project";
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -110,6 +109,17 @@ export const AppNav = () => {
                         <DropdownItem href={`/${team}/Ticket/NeedsAttention`}>
                           Open Tickets
                         </DropdownItem>
+                        <ShowFor roles={["FieldManager", "Finance"]}>
+                          <DropdownItem divider />
+                          <DropdownItem href={`/${team}/Report/AllProjects`}>
+                            Reports - Projects
+                          </DropdownItem>
+                          <DropdownItem
+                            href={`/${team}/Report/HistoricalRateActivity`}
+                          >
+                            Reports - Historical Rate Activity
+                          </DropdownItem>
+                        </ShowFor>
                       </ShowFor>
                     </DropdownMenu>
                   </UncontrolledDropdown>
@@ -126,12 +136,6 @@ export const AppNav = () => {
                     </DropdownItem>
                     <DropdownItem href={`/System/Emulate`}>
                       Emulate
-                    </DropdownItem>
-                    <DropdownItem href={`/Report/AllProjects`}>
-                      Reports - Projects
-                    </DropdownItem>
-                    <DropdownItem href={`/Report/HistoricalRateActivity`}>
-                      Reports - Historical Rate Activity
                     </DropdownItem>
                   </DropdownMenu>
                 </UncontrolledDropdown>
