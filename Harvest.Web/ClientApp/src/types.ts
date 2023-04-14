@@ -82,6 +82,8 @@ export interface Team {
   id: number;
   name: string;
   slug: string;
+  description: string;
+  fieldManagers?: string;
 }
 
 export interface User {
