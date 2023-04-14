@@ -36,24 +36,28 @@ export const TeamPicker = () => {
 
   // show the list of teams in big boxes
   return (
-    <div className="row">
-      {teams.map((team) => (
-        <div className="col-12 col-md-6 col-lg-4 col-xl-3" key={team.id}>
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">{team.name}</h5>
-              <p className="card-text">FieldManagers: {team.fieldManagers}</p>
-              <p className="card-text">{team.description}</p>
-              <a
-                href={`/${team.slug}${location.pathname}`}
-                className="btn btn-primary"
-              >
-                Use {team.name}
-              </a>
+    <div>
+      <h2>Choose Team</h2>
+      <hr />
+      <div className="row">
+        {teams.map((team) => (
+          <div className="col-md-6" key={team.id}>
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">{team.name}</h5>
+                <p className="card-text">FieldManagers: {team.fieldManagers}</p>
+                <p className="card-text">{team.description}</p>
+                <a
+                  href={`/${team.slug}${location.pathname}`}
+                  className="btn btn-primary"
+                >
+                  Use {team.name}
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
