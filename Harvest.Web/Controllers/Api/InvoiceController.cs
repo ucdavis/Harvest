@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
 {
-    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+    [Authorize(Policy = AccessCodes.InvoiceAccess)]
     public class InvoiceController : SuperController
     {
         private readonly AppDbContext _dbContext;
