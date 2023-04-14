@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { useHistory, useLocation } from "react-router-dom";
 import { Team } from "../types";
@@ -49,9 +51,9 @@ export const TeamPicker = () => {
                 <p className="card-text">{team.description}</p>
                 <a
                   href={`/${team.slug}${location.pathname}`}
-                  className="btn btn-primary"
+                  className="btn-link"
                 >
-                  Use {team.name}
+                  <FontAwesomeIcon icon={faCheck} /> Use this team
                 </a>
               </div>
             </div>
