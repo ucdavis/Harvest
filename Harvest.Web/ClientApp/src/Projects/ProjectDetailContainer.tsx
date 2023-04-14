@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, Redirect, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -44,9 +44,18 @@ export const ProjectDetailContainer = () => {
       );
 
       if (response.ok) {
-        const project = (await response.json()) as Project;
-        getIsMounted() && setProject(project);
-        setIsLoading(false);
+        try {
+          const project = (await response.json()) as Project;
+          getIsMounted() && setProject(project);
+          setIsLoading(false);
+        } catch (error) {
+          var errorResponse = await response;
+          if (errorResponse.redirected) {
+            window.location.replace(errorResponse.url);
+          } else {
+            setNotification(response, "Loading", "Error Loading Project");
+          }
+        }
       } else {
         setNotification(response, "Loading", "Error Loading Project");
         //history.push("/"); //If we redirect to the home page, we will have to fix the tests
