@@ -24,9 +24,6 @@ namespace Harvest.Core.Domain
 
         public const string SlugRegex = "^([a-z0-9]+[a-z0-9\\-]?)+[a-z0-9]$";
 
-        [StringLength(256)]
-        public string Description { get; set; }
-
         public int TeamDetailId { get; set; }
         public TeamDetail TeamDetail { get; set; }
 

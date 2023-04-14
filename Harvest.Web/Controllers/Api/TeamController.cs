@@ -22,12 +22,12 @@ namespace Harvest.Web.Controllers.Api
         public async Task<TeamPicker[]> Index()
         {
             // return all teams
-            var teams = await _dbContext.Teams.Select(t => new TeamPicker()
+            var teams = await _dbContext.Teams.Include(a => a.TeamDetail).Select(t => new TeamPicker()
             {
                 Id = t.Id,
                 Name = t.Name,
                 Slug = t.Slug,
-                Description = t.Description,
+                Description = t.TeamDetail.Description,
                 FieldManagers = string.Join(", ", t.Permissions.Where(a => a.Role.Name == Role.Codes.FieldManager).Take(3).Select(fm => fm.User.Name))
             }).ToArrayAsync();
 

@@ -15,6 +15,9 @@ namespace Harvest.Core.Domain
 
         public Team Team { get; set; }
 
+        [StringLength(256)]
+        public string Description { get; set; }
+
         [StringLength(128)] //Probably doesn't need to be this big...
         public string SlothApiKey { get; set; }
         [MaxLength(50)]
