@@ -14,6 +14,8 @@ namespace Harvest.Web.Models.ReportModels
         [DataType(DataType.Date)]
         public DateTime? End { get; set; }
         public List<HistoricalRateActivityModel> HistoricalRates { get; set; }
+
+        public string TeamName { get; set; }
     }
     public class HistoricalRateActivityModel
     {

@@ -16,6 +16,8 @@ namespace Harvest.Web.Models.ReportModels
         public DateTime? End { get; set; }
 
         public List<ProjectInvoiceSummaryModel> ProjectInvoiceSummaries { get; set; }
+
+        public string TeamName { get; set; }
     }
     
     public class ProjectInvoiceSummaryModel
