@@ -30,6 +30,8 @@ namespace Harvest.Core.Services
                 AccessCodes.ReportAccess => new[] {Role.Codes.Finance, Role.Codes.FieldManager},
                 // PI can access anything restricted to PI role
                 AccessCodes.PrincipalInvestigator => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager },
+                // InvoiceAccess is the same as PI, but also needs Finance role
+                AccessCodes.InvoiceAccess => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.Finance },
                 AccessCodes.PrincipalInvestigatorOnly => new [] {Role.Codes.PI},
                 _ => throw new ArgumentException($"{nameof(accessCode)} is not a valid {nameof(AccessCodes)} constant")
             };
