@@ -445,3 +445,9 @@ input[type="radio" i] {
 .dropdown-item:active {
   background-color: $primary-color;
 }
+
+.card-no-underline {
+    a {
+        text-decoration: none;
+    }
+}

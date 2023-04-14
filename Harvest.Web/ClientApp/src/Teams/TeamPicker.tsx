@@ -43,20 +43,19 @@ export const TeamPicker = () => {
       <hr />
       <div className="row">
         {teams.map((team) => (
-          <div className="col-md-6" key={team.id}>
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{team.name}</h5>
-                <p className="card-text">FieldManagers: {team.fieldManagers}</p>
-                <p className="card-text">{team.description}</p>
-                <a
-                  href={`/${team.slug}${location.pathname}`}
-                  className="btn-link"
-                >
+          <div className="col-md-6 card-no-underline" key={team.id}>
+            <a href={`/${team.slug}${location.pathname}`}>
+              <div className="card">
+                <div className="card-body">
+                  <h5 className="card-title">{team.name}</h5>
+                  <p className="card-text">
+                    FieldManagers: {team.fieldManagers}
+                  </p>
+                  <p className="card-text">{team.description}</p>
                   <FontAwesomeIcon icon={faCheck} /> Use this team
-                </a>
+                </div>
               </div>
-            </div>
+            </a>
           </div>
         ))}
       </div>
