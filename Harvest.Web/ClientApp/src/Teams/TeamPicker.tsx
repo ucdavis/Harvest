@@ -42,7 +42,8 @@ export const TeamPicker = () => {
           <div className="card">
             <div className="card-body">
               <h5 className="card-title">{team.name}</h5>
-              <p className="card-text">{team.name}</p>
+              <p className="card-text">FieldManagers: {team.fieldManagers}</p>
+              <p className="card-text">{team.description}</p>
               <a
                 href={`/${team.slug}${location.pathname}`}
                 className="btn btn-primary"

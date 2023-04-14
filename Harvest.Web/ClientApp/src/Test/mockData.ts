@@ -54,6 +54,7 @@ export const fakeTeam: Team = {
   id: 1,
   name: "Team 1",
   slug: "team1",
+  description: "Team 1",
 };
 
 export const fakeProject: Project = {
@@ -96,6 +97,7 @@ export const fakeProject: Project = {
     id: 1,
     name: "Team 1",
     slug: "team-1",
+    description: "Team 1",
   },
 };
 
@@ -140,6 +142,7 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       id: 1,
       name: "Team 1",
       slug: "team-1",
+      description: "Team 1",
     },
   },
   quote: null,
