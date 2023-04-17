@@ -39,7 +39,8 @@ export const AppNav = () => {
 
   const team = firstPath;
 
-  const nonTeamPage = firstPath === "system" || firstPath === "project";
+  const nonTeamPage =
+    firstPath === "system" || firstPath === "project" || firstPath === "team";
 
   const toggle = () => setIsOpen(!isOpen);
 
