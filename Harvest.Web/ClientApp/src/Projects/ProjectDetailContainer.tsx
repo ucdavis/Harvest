@@ -42,22 +42,15 @@ export const ProjectDetailContainer = () => {
       const response = await authenticatedFetch(
         `/api/Project/Get/${projectId}`
       );
-
       if (response.ok) {
-        try {
-          const project = (await response.json()) as Project;
-          getIsMounted() && setProject(project);
-          setIsLoading(false);
-        } catch (error) {
-          var errorResponse = await response;
-          if (errorResponse.redirected) {
-            window.location.replace(errorResponse.url);
-          } else {
-            setNotification(response, "Loading", "Error Loading Project");
-          }
-        }
+        const project = (await response.json()) as Project;
+        getIsMounted() && setProject(project);
+        setIsLoading(false);
       } else {
         setNotification(response, "Loading", "Error Loading Project");
+        if (response.status === 403) {
+          window.location.replace("/Account/AccessDenied");
+        }
         //history.push("/"); //If we redirect to the home page, we will have to fix the tests
       }
     };

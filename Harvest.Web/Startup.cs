@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Elastic.Apm.NetCoreAll;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
@@ -71,7 +72,29 @@ namespace Harvest.Web
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-            .AddCookie()
+                //.AddCookie()
+            .AddCookie(options =>
+            {
+                options.Events.OnRedirectToAccessDenied = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = 403;
+                    }
+
+                    return Task.CompletedTask;
+                };
+
+                options.Events.OnRedirectToLogin = context =>
+                {
+                    if (context.Request.Path.StartsWithSegments("/api"))
+                    {
+                        context.Response.StatusCode = 401;
+                    }
+
+                    return Task.CompletedTask;
+                };
+            })
             .AddOpenIdConnect(oidc =>
             {
                 oidc.ClientId = Configuration["Authentication:ClientId"];
