@@ -712,6 +712,10 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
                     b.Property<string>("SlothApiKey")
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
