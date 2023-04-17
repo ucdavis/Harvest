@@ -5,10 +5,12 @@ import { convertCamelCase } from "../Util/StringFormatting";
 
 interface Props {
   project: Project;
+  extraText?: string;
 }
 
 export const ProjectAlerts = (props: Props) => {
   const { project } = props;
+  const { extraText } = props;
 
   const statusDetail = useMemo(() => {
     return getStatusDetail(project);
@@ -23,6 +25,7 @@ export const ProjectAlerts = (props: Props) => {
       <div className="card-content">
         <h4>Current Status: {convertCamelCase(project.status)}</h4>
         <p>{statusDetail.statusText} </p>
+        {extraText && <p>{extraText}</p>}
         {/* <Link
           to={statusDetail.linkTo}
           className={`btn ${statusDetail.linkClass} btn-sm`}
