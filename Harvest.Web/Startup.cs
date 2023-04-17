@@ -72,7 +72,6 @@ namespace Harvest.Web
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
             })
-                //.AddCookie()
             .AddCookie(options =>
             {
                 options.Events.OnRedirectToAccessDenied = context =>
