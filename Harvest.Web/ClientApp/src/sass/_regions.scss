@@ -207,6 +207,9 @@
 // team picker
 
 .team-card {
+  a {
+    text-decoration: none;
+  }
   .card {
     min-height: 230px;
   }

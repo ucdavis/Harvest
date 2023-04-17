@@ -43,7 +43,7 @@ export const TeamPicker = () => {
       <hr />
       <div className="row">
         {teams.map((team) => (
-          <div className="col-md-6 card-no-underline team-card" key={team.id}>
+          <div className="col-md-6 team-card" key={team.id}>
             <a href={`/${team.slug}${location.pathname}`}>
               <div className="card">
                 <div className="card-body d-flex flex-column">
