@@ -204,3 +204,10 @@
 .ticket-timestamp {
   color: $tertiary-font;
 }
+// team picker
+
+.team-card {
+  .card {
+    min-height: 230px;
+  }
+}
