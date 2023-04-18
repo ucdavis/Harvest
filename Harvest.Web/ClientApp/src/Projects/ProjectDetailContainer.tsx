@@ -197,7 +197,7 @@ export const ProjectDetailContainer = () => {
       roles: ["System"],
       condition:
         project.status === "PendingApproval" &&
-        addDays(new Date(project.lastStatusUpdatedOn), 30) <= new Date(),
+        addDays(new Date(project.lastStatusUpdatedOn), 18) <= new Date(),
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
