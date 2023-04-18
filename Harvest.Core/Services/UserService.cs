@@ -23,6 +23,7 @@ namespace Harvest.Core.Services
         Task<User> GetCurrentUser();
         Task<IEnumerable<TeamRoles>> GetCurrentRoles();
         Task<bool> HasAccess(string accessCode);
+        Task<bool> HasAccess(string[] accessCodes);
     }
 
     public class UserService : IUserService
@@ -104,10 +105,20 @@ namespace Harvest.Core.Services
             return userRoles;
         }
 
-        // TODO: need to extend this to check for team roles
         public async Task<bool> HasAccess(string accessCode)
         {
             var roles = _roleResolver(accessCode).Concat(_roleResolver(AccessCodes.SystemAccess));
+            var userRoles = await GetCurrentRoles();
+            return userRoles.Any(r => roles.Contains(r.Role));
+        }
+
+        public async Task<bool> HasAccess(string[] accessCodes)
+        {
+            IEnumerable<string> roles = _roleResolver(AccessCodes.SystemAccess);
+            foreach (var accessCode in accessCodes)
+            {
+                roles = roles.Concat(_roleResolver(accessCode));
+            }
             var userRoles = await GetCurrentRoles();
             return userRoles.Any(r => roles.Contains(r.Role));
         }

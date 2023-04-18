@@ -59,7 +59,8 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> List(int projectId, int? maxRows)
         {
             var user = await _userService.GetCurrentUser();
-            var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess) || await _userService.HasAccess(AccessCodes.FinanceAccess);
+            //var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess) || await _userService.HasAccess(AccessCodes.FinanceAccess);
+            var hasAccess = await _userService.HasAccess(new []{ AccessCodes.FieldManagerAccess, AccessCodes.FinanceAccess});
 
             var invoiceQuery = _dbContext.Invoices.Where(a =>
                     a.ProjectId == projectId
