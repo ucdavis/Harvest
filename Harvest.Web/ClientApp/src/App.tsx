@@ -61,12 +61,12 @@ function App() {
               component={RequestContainer}
             />
             <ConditionalRoute
-              roles={["PI", "System", "Finance"]}
+              roles={["PI", "Finance"]}
               path="/:team/request/approve/:projectId"
               component={ApprovalContainer}
             />
             <ConditionalRoute
-              roles={["PI"]}
+              roles={["PI", "Finance"]}
               path="/:team/request/changeAccount/:projectId"
               component={AccountChangeContainer}
             />
@@ -85,7 +85,7 @@ function App() {
               component={QuoteContainer}
             />
             <ConditionalRoute
-              roles={["PI", "FieldManager"]}
+              roles={["PI", "FieldManager", "Finance"]}
               path="/:team/quote/details/:projectId"
               component={QuoteDisplayContainer}
             />
