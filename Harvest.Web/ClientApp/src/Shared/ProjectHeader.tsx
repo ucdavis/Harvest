@@ -11,6 +11,8 @@ import {
 import { convertCamelCase } from "../Util/StringFormatting";
 import { ReturnToProject } from "../Shared/ReturnToProject";
 import { formatCurrency } from "../Util/NumberFormatting";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   project: Project;
@@ -50,10 +52,26 @@ export const ProjectHeader = (props: Props) => {
           <div className="col-md-6">
             <h2 id="request-title">{title}</h2>
             <h3>{project.name}</h3>
-            <p className="lede">PI: {project.principalInvestigator.name}</p>
+            <p className="lede">
+              PI: {project.principalInvestigator.name}{" "}
+              <a
+                href={`https://who.ucdavis.edu/Detail/${project.principalInvestigator.kerberos}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <FontAwesomeIcon icon={faEye} />
+              </a>
+            </p>
             <p>
               Created {new Date(project.createdOn).toDateString()} by{" "}
-              {project.createdBy.name}
+              {project.createdBy.name}{" "}
+              <a
+                href={`https://who.ucdavis.edu/Detail/${project.createdBy.kerberos}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <FontAwesomeIcon icon={faEye} />
+              </a>
             </p>
             {project.accounts.length > 0 && <p className="lede">Accounts</p>}
 
