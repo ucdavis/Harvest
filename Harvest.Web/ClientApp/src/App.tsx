@@ -61,7 +61,7 @@ function App() {
               component={RequestContainer}
             />
             <ConditionalRoute
-              roles={["PI"]}
+              roles={["PI", "System", "Finance"]}
               path="/:team/request/approve/:projectId"
               component={ApprovalContainer}
             />

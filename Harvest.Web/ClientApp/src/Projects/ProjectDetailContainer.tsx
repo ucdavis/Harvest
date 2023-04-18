@@ -194,7 +194,7 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["System"],
+      roles: ["System", "Finance"],
       condition:
         project.status === "PendingApproval" &&
         addDays(new Date(project.lastStatusUpdatedOn), 18) <= new Date(),
@@ -203,19 +203,19 @@ export const ProjectDetailContainer = () => {
           className="btn btn-primary btn-sm mr-4"
           to={`/${team}/request/approve/${project.id}`}
         >
-          System View Quote <FontAwesomeIcon icon={faEye} />
+          Override View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
       ),
     }),
     useFor({
-      roles: ["System"],
+      roles: ["System", "Finance"],
       condition: project.status === "Active",
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
           to={`/${team}/request/changeAccount/${project.id}`}
         >
-          System Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
+          Override Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
         </Link>
       ),
     }),
@@ -279,7 +279,7 @@ export const ProjectDetailContainer = () => {
         <ProjectAlerts project={project} />
       </ShowForPiOnly>
       <ShowFor
-        roles={["System"]}
+        roles={["System", "Finance"]}
         condition={project.status === "PendingApproval"}
       >
         <ProjectAlerts

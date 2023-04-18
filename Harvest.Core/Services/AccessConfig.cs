@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Harvest.Core.Domain;
+﻿using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using System;
 
 namespace Harvest.Core.Services
 {
@@ -34,6 +31,7 @@ namespace Harvest.Core.Services
                 AccessCodes.InvoiceAccess => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.Finance },
                 AccessCodes.ProjectAccess => new[] { Role.Codes.Finance, Role.Codes.Worker, Role.Codes.Supervisor, Role.Codes.FieldManager },
                 AccessCodes.PrincipalInvestigatorOnly => new [] {Role.Codes.PI},
+                AccessCodes.PIandFinance => new[] { Role.Codes.PI, Role.Codes.Finance },
                 _ => throw new ArgumentException($"{nameof(accessCode)} is not a valid {nameof(AccessCodes)} constant")
             };
         }

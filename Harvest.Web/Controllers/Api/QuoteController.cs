@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
 {
-    [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+    [Authorize(Policy = AccessCodes.InvoiceAccess)] //Need a better name for this.
     public class QuoteController : SuperController
     {
         private readonly AppDbContext _dbContext;
