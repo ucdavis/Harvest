@@ -232,7 +232,7 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["PI", "FieldManager"],
+      roles: ["PI", "FieldManager", "Finance", "System"],
       condition:
         // all statuses with approved quotes
         project.status === "Active" ||
