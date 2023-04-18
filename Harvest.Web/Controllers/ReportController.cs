@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Harvest.Core.Domain.Project;
 
 namespace Harvest.Web.Controllers
 {
@@ -92,6 +93,32 @@ namespace Harvest.Web.Controllers
                 .ToListAsync();
 
             return View(model);
+        }
+
+        public async Task<IActionResult> StaleProjects()
+        {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+            var staleDate = DateTime.UtcNow.AddDays(-18);
+            var statuses = new string[] { Statuses.PendingApproval, Statuses.PendingCloseoutApproval };
+
+            var model = new StaleProjectsListModel();
+            model.TeamName = team.Name;
+            model.StaleProjects = await _dbContext.Projects
+                .Include(a => a.PrincipalInvestigator)
+                .Include(a => a.Team)
+                .Where(a => a.TeamId == team.Id && statuses.Contains(a.Status) && a.LastStatusUpdatedOn <= staleDate)
+                .Select(StaleProjectModel.Projection())
+                .ToListAsync();
+
+
+            return View(model);
+
         }
     }
 }
