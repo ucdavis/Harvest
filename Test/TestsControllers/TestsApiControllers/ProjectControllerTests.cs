@@ -57,14 +57,14 @@ namespace Test.TestsControllers.TestsApiControllers
             //1
             var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("All", countAdjustment + 2);
             attribute.ShouldNotBeNull();
-            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.WorkerAccess);
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.ProjectAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("All", countAdjustment + 2);
 
             //2
             attribute = null;
             attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Active", countAdjustment + 2);
             attribute.ShouldNotBeNull();
-            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.WorkerAccess);
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.ProjectAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Active", countAdjustment + 2);
 
             //3
@@ -84,7 +84,7 @@ namespace Test.TestsControllers.TestsApiControllers
             attribute = null;
             attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 2);
             attribute.ShouldNotBeNull();
-            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
 
             //7
