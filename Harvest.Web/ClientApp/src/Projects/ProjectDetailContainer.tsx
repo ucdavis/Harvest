@@ -208,6 +208,18 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
+      roles: ["System"],
+      condition: project.status === "Active",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/${team}/request/changeAccount/${project.id}`}
+        >
+          System Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
+        </Link>
+      ),
+    }),
+    useFor({
       roles: ["PI", "FieldManager"],
       condition: project.status === "Active",
       children: (
