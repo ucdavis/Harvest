@@ -1,0 +1,89 @@
+﻿@model Harvest.Web.Models.ReportModels.StaleProjectsListModel
+@{
+    ViewData["Title"] = "Stale Projects";
+}
+
+<div>
+    <div> 
+        <h1>Projects for Team: @Model.TeamName</h1>
+    </div>
+</div>
+
+
+<table class="table harvest-table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].Id)</th>
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].ProjectName)</th> 
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].Status)</th>
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].PrincipalInvestigatorName)</th>
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].PrincipalInvestigatorEmail)</th>
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].LastStatusUpdatedOn)</th>
+            <th>@Html.DisplayNameFor(model => model.StaleProjects[0].DaysOld)</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.StaleProjects)
+        {
+            <tr>
+                <td><a href=@($"/{item.Slug}/project/details/{item.Id}") target="_blank">Details @Html.DisplayFor(modelItem => item.Id)</a> </td>
+                <td>@Html.DisplayFor(modelItem => item.ProjectName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Status)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrincipalInvestigatorName)</td>
+                <td>@Html.DisplayFor(modelItem => item.PrincipalInvestigatorEmail)</td>
+                <td>@Html.DisplayFor(modelItem => item.LastStatusUpdatedOn)</td>
+                <td>@Html.DisplayFor(modelItem => item.DaysOld)</td>                
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Styles
+    {
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+    }
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('.table').DataTable({
+            "dom": 'lBfrtip',
+            "buttons": [
+                {
+                    extend: 'copyHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'excelHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'csvHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+            ],
+            columnDefs: [{
+                type: "date",
+                targets: [5]
+            }]
+        });
+    </script>
+}
