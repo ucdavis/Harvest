@@ -47,6 +47,7 @@ export interface Project {
   chargedTotal: number;
   createdBy: User;
   createdOn: Date;
+  lastStatusUpdatedOn: Date;
   status: ProjectStatus;
   currentAccountVersion: number;
   isActive: boolean;

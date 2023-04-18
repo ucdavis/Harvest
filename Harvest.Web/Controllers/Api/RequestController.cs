@@ -28,6 +28,8 @@ namespace Harvest.Web.Controllers.Api
         private readonly IEmailService _emailService;
         private readonly IExpenseService _expenseService;
 
+        private const int MinimumStaleDays = 18; 
+
         public RequestController(AppDbContext dbContext, 
             IUserService userService, 
             IOptions<StorageSettings> storageSettings, 
@@ -80,6 +82,15 @@ namespace Harvest.Web.Controllers.Api
             {
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
                 var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+
+                if (changeRequestProject.PrincipalInvestigator.Iam != currentUser.Iam)
+                {
+                    var staleDays = (int)((DateTime.UtcNow - changeRequestProject.LastStatusUpdatedOn).TotalDays);
+                    if (staleDays <= MinimumStaleDays)
+                    {
+                        return BadRequest("You are not the principal investigator for this project and it isn't stale enough.");
+                    }
+                }
 
                 // quote for change request
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
@@ -142,6 +153,16 @@ namespace Harvest.Web.Controllers.Api
             {
                 // not a change request, so just get the project
                 project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+
+                
+                if(project.PrincipalInvestigator.Iam != currentUser.Iam)
+                {
+                    var staleDays = (int)((DateTime.UtcNow - project.LastStatusUpdatedOn).TotalDays);
+                    if(staleDays <= MinimumStaleDays)
+                    {
+                        return BadRequest("You are not the principal investigator for this project and it isn't stale enough.");
+                    }
+                }
 
                 var quote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == projectId);
                 quote.Status = Quote.Statuses.Approved;

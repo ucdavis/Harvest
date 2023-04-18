@@ -24,6 +24,8 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { useHistory } from "react-router-dom";
 import { ProjectAlerts } from "./ProjectAlerts";
 import { authenticatedFetch } from "../Util/Api";
+import { addDays } from "../Util/Calculations";
+import { getDaysDiff } from "../Util/Calculations";
 
 export const ProjectDetailContainer = () => {
   const { projectId } = useParams<CommonRouteParams>();
@@ -44,6 +46,7 @@ export const ProjectDetailContainer = () => {
       );
       if (response.ok) {
         const project = (await response.json()) as Project;
+
         getIsMounted() && setProject(project);
         setIsLoading(false);
       } else {
@@ -191,6 +194,32 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
+      roles: ["System"],
+      condition:
+        project.status === "PendingApproval" &&
+        addDays(new Date(project.lastStatusUpdatedOn), 18) <= new Date(),
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/${team}/request/approve/${project.id}`}
+        >
+          System View Quote <FontAwesomeIcon icon={faEye} />
+        </Link>
+      ),
+    }),
+    useFor({
+      roles: ["System"],
+      condition: project.status === "Active",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={`/${team}/request/changeAccount/${project.id}`}
+        >
+          System Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
+        </Link>
+      ),
+    }),
+    useFor({
       roles: ["PI", "FieldManager"],
       condition: project.status === "Active",
       children: (
@@ -249,6 +278,20 @@ export const ProjectDetailContainer = () => {
       >
         <ProjectAlerts project={project} />
       </ShowForPiOnly>
+      <ShowFor
+        roles={["System"]}
+        condition={project.status === "PendingApproval"}
+      >
+        <ProjectAlerts
+          project={project}
+          extraText={`Project has not been acted on since ${new Date(
+            project.lastStatusUpdatedOn
+          ).toLocaleDateString()}. ${getDaysDiff(
+            new Date(),
+            new Date(project.lastStatusUpdatedOn)
+          ).toFixed(0)} days.`}
+        />
+      </ShowFor>
       {projectActions.length > 0 && (
         <div className="card-green-bg">
           <div className="card-content">
