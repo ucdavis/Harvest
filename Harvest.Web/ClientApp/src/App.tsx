@@ -75,7 +75,7 @@ function App() {
               component={InvoiceListContainer}
             />
             <ConditionalRoute
-              roles={["FieldManager", "PI"]}
+              roles={["FieldManager", "PI", "Finance"]}
               path="/:team/invoice/details/:projectId/:invoiceId"
               component={InvoiceDetailContainer}
             />

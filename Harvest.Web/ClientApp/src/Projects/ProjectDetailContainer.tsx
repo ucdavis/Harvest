@@ -368,12 +368,13 @@ export const ProjectDetailContainer = () => {
       <div>
         {project.status !== "ChangeRequested" && (
           <div className="card-content">
-            <RecentTicketsContainer
-              compact={true}
-              projectId={projectId}
-              team={team}
-            />
-
+            <ShowFor roles={["PI", "FieldManager", "Supervisor", "System"]}>
+              <RecentTicketsContainer
+                compact={true}
+                projectId={projectId}
+                team={team}
+              />
+            </ShowFor>
             <RecentInvoicesContainer
               compact={true}
               projectId={projectId}

@@ -62,7 +62,7 @@ export const AppNav = () => {
                 </NavItem>
               </ShowFor>
               <ShowFor condition={!nonTeamPage}>
-                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
                   <NavItem>
                     <NavLink href={`/${team}/project`}>All Projects</NavLink>
                   </NavItem>

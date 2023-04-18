@@ -11,6 +11,7 @@ namespace Harvest.Core.Models
         public const string FinanceAccess = "FinanceAccess";
         public const string ReportAccess = "ReportAccess";
         public const string InvoiceAccess = "InvoiceAccess"; //Basically the same as PI, but need to add FinanceRole to just the invoice page.
+        public const string ProjectAccess = "ProjectAccess"; //Need to allow finance to see projects in addition to the workers, but not enter expenses.
         /// <summary>
         /// When using this Authentication, the projectId must be in the parameters.
         /// </summary>

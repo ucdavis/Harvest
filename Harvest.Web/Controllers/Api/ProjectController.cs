@@ -38,7 +38,7 @@ namespace Harvest.Web.Controllers.Api
             _emailService = emailService;
         }
 
-        [Authorize(Policy = AccessCodes.WorkerAccess)]
+        [Authorize(Policy = AccessCodes.ProjectAccess)]
         public async Task<ActionResult> All(string team)
         {
             // TODO: only show projects where between start and end?
@@ -50,7 +50,7 @@ namespace Harvest.Web.Controllers.Api
                 .ToArrayAsync());
         }
 
-        [Authorize(Policy = AccessCodes.WorkerAccess)]
+        [Authorize(Policy = AccessCodes.ProjectAccess)]
         public async Task<ActionResult> Active(string team)
         {
             // TODO: only show projects where between start and end?
@@ -131,7 +131,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Returns JSON info of the project
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)
         public async Task<ActionResult> Get(int projectId)
         {
             var user = await _userService.GetCurrentUser();
