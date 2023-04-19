@@ -64,10 +64,7 @@ export const InvoiceListContainer = () => {
       ></ProjectHeader>
       <div className="card-content">
         <h3>Invoices</h3>
-        <InvoiceTable
-          invoices={invoices}
-          team={project.team?.slug}
-        ></InvoiceTable>
+        <InvoiceTable invoices={invoices}></InvoiceTable>
       </div>
     </div>
   );

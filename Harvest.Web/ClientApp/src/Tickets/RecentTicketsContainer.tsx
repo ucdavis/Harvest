@@ -8,7 +8,7 @@ import { authenticatedFetch } from "../Util/Api";
 
 interface Props {
   projectId?: string;
-  team: string;
+  team?: string;
   compact: boolean;
 }
 

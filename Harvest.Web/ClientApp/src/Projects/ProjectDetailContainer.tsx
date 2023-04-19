@@ -28,7 +28,7 @@ import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
 
 export const ProjectDetailContainer = () => {
-  const { projectId } = useParams<CommonRouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({} as Project);
   const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -42,7 +42,7 @@ export const ProjectDetailContainer = () => {
     const cb = async () => {
       setIsLoading(true);
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -62,8 +62,6 @@ export const ProjectDetailContainer = () => {
       cb();
     }
   }, [projectId, getIsMounted]);
-
-  const team = project.team?.slug;
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(`/api/Request/Files/${projectId}`, {
@@ -375,11 +373,7 @@ export const ProjectDetailContainer = () => {
                 team={team}
               />
             </ShowFor>
-            <RecentInvoicesContainer
-              compact={true}
-              projectId={projectId}
-              team={team}
-            />
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
           </div>
         )}
       </div>

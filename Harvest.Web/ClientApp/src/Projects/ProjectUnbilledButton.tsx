@@ -6,7 +6,7 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   projectId: number;
-  team: string;
+  team?: string;
   remaining: number;
 }
 

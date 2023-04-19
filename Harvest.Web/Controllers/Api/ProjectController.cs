@@ -134,8 +134,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Returns JSON info of the project
-        [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)        
         public async Task<ActionResult> Get(int projectId)
         {
             var user = await _userService.GetCurrentUser();
@@ -146,7 +145,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.AcreageRate)
-                .SingleOrDefaultAsync(p => p.Id == projectId);
+                .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
             if (project == null)
             {
