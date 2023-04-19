@@ -21,7 +21,7 @@ export const ProjectSelection = (props: Props) => {
     // get list of projects
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Active?team=${team}`
+          `/api/${team}/Project/Active`
       );
 
       if (response.ok) {
