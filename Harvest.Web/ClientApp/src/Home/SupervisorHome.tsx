@@ -21,7 +21,7 @@ export const SupervisorHome = () => {
     // get info on projects requiring approval
     const getProjects = async () => {
       const response = await authenticatedFetch(
-        `/api/project/RequiringManagerAttention?team=${team}`
+        `/api/${team}/project/RequiringManagerAttention`
       );
       if (getIsMounted()) {
         const projects: Project[] = await response.json();

@@ -31,7 +31,7 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> Get(int projectId, int invoiceId)
         {
-            var xxx = TeamSlug;
+            var xxx = TeamSlug; //just for debugging
             var invoice = await _dbContext.Invoices
                 .Include(a => a.Transfers)
                 .Include(i => i.Expenses)
@@ -57,6 +57,7 @@ namespace Harvest.Web.Controllers.Api
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
         [HttpGet]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> List(int projectId, int? maxRows)
         {
             var user = await _userService.GetCurrentUser();

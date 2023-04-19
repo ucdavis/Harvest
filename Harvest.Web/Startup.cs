@@ -295,9 +295,12 @@ namespace Harvest.Web
                 );
 
                 // API routes map to all other controllers
+                //endpoints.MapControllerRoute(
+                //    name: "API",
+                //    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
                 endpoints.MapControllerRoute(
                     name: "API",
-                    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
+                    pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
 
                 // any other nonfile route should be handled by the spa, except leave the sockjs route alone if we are in dev mode (hot reloading)
                 if (env.IsDevelopment()) {

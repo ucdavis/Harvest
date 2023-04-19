@@ -39,42 +39,43 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.ProjectAccess)]
-        public async Task<ActionResult> All(string team)
+
+        public async Task<ActionResult> All()
         {
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(a => a.Team)
-                .Where(p => p.IsActive && p.Team.Slug == team)
+                .Where(p => p.IsActive && p.Team.Slug == TeamSlug)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
         [Authorize(Policy = AccessCodes.ProjectAccess)]
-        public async Task<ActionResult> Active(string team)
+        public async Task<ActionResult> Active()
         {
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(a => a.Team)
-                .Where(p => p.IsActive && p.Team.Slug == team && p.Status == Project.Statuses.Active)
+                .Where(p => p.IsActive && p.Team.Slug == TeamSlug && p.Status == Project.Statuses.Active)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> GetCompleted(string team)
+        public async Task<ActionResult> GetCompleted()
         {
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(a => a.Team)
-                .Where(p => p.IsActive && p.Team.Slug == team && p.Status == Project.Statuses.Completed)
+                .Where(p => p.IsActive && p.Team.Slug == TeamSlug && p.Status == Project.Statuses.Completed)
                 .OrderBy(p => p.Name)
                 .ToArrayAsync());
         }
 
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> RequiringManagerAttention(string team)
+        public async Task<ActionResult> RequiringManagerAttention()
         {
             // return basic info on projects which are waiting for manager attention
             var attentionStatuses = new string[] { Project.Statuses.Requested, Project.Statuses.ChangeRequested, Project.Statuses.QuoteRejected }.ToArray();
@@ -82,11 +83,12 @@ namespace Harvest.Web.Controllers.Api
             return Ok(await _dbContext.Projects.AsNoTracking()
                 .Include(p => p.PrincipalInvestigator)
                 .Include(a => a.Team)
-                .Where(p => p.IsActive && p.Team.Slug == team && attentionStatuses.Contains(p.Status))
+                .Where(p => p.IsActive && p.Team.Slug == TeamSlug && attentionStatuses.Contains(p.Status))
                 .OrderBy(p => p.CreatedOn) // older is more important, so it should be first
                 .ToArrayAsync());
         }
 
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> RequiringPIAttention()
         {
             try
@@ -118,6 +120,7 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> GetMine()
         {
             var user = await _userService.GetCurrentUser();
@@ -132,6 +135,7 @@ namespace Harvest.Web.Controllers.Api
 
         // Returns JSON info of the project
         [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> Get(int projectId)
         {
             var user = await _userService.GetCurrentUser();
@@ -160,6 +164,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> GetFields()
         {
             var fields = await _dbContext.Fields.Where(f => f.IsActive && f.Project.Status == Project.Statuses.Active).Include(f => f.Project).ToListAsync();
@@ -169,6 +174,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> AccountApproval(int projectId)
         {
             var project = await _dbContext.Projects.Include(p => p.Accounts).SingleAsync(p => p.Id == projectId);
@@ -177,6 +183,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<IActionResult> RefreshTotal(int projectId)
         {
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
@@ -198,6 +205,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
         {
             var currentUser = await _userService.GetCurrentUser();
