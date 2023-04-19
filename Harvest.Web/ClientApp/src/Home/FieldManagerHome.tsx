@@ -28,7 +28,7 @@ export const FieldManagerHome = () => {
     };
 
     getProjects();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
@@ -42,7 +42,7 @@ export const FieldManagerHome = () => {
     };
 
     getTicketsWaitingForMe();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   if (!team) {
     return <Redirect to="/team" />;

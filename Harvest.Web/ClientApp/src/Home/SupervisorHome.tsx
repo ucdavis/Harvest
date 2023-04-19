@@ -30,7 +30,7 @@ export const SupervisorHome = () => {
     };
 
     getProjects();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
@@ -44,7 +44,7 @@ export const SupervisorHome = () => {
     };
 
     getTicketsWaitingForMe();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   return (
     <>

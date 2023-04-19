@@ -28,7 +28,7 @@ export const WorkerHome = () => {
     };
 
     getProjectsWithRecentExpenses();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   return (
     <>
