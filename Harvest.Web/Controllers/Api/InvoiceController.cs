@@ -29,6 +29,7 @@ namespace Harvest.Web.Controllers.Api
 
         // Get info on the project as well as invoice
         [HttpGet]
+        [Route("api/{team}/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> Get(int projectId, int invoiceId)
         {
             var xxx = TeamSlug;

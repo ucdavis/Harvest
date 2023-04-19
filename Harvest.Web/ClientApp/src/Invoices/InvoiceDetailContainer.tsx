@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { ProjectWithInvoice } from "../types";
+import { ProjectWithInvoice, CommonRouteParams } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { InvoiceDisplay } from "./InvoiceDisplay";
 import { useIsMounted } from "../Shared/UseIsMounted";
@@ -17,6 +17,7 @@ interface RouteParams {
 
 export const InvoiceDetailContainer = () => {
   const { projectId, invoiceId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [projectAndInvoice, setProjectAndInvoice] =
     useState<ProjectWithInvoice>();
 
@@ -24,7 +25,7 @@ export const InvoiceDetailContainer = () => {
   useEffect(() => {
     const cb = async () => {
       const invoiceResponse = await authenticatedFetch(
-        `/api/Invoice/Get/${projectId}?invoiceId=${invoiceId}`
+        `/api/${team}/Invoice/Get/${projectId}?invoiceId=${invoiceId}`
       );
 
       if (invoiceResponse.ok) {
