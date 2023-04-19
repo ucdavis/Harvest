@@ -21,9 +21,9 @@ namespace Harvest.Core.Services
     {
         Task<User> GetUser(Claim[] userClaims);
         Task<User> GetCurrentUser();
-        Task<IEnumerable<TeamRoles>> GetCurrentRoles();
-        Task<bool> HasAccess(string accessCode);
-        Task<bool> HasAccess(string[] accessCodes);
+        Task<IEnumerable<TeamRoles>> GetCurrentRoles(string slug);
+        Task<bool> HasAccess(string accessCode, string slug);
+        Task<bool> HasAccess(IEnumerable<string> accessCodes, string slug);
     }
 
     public class UserService : IUserService
@@ -84,13 +84,13 @@ namespace Harvest.Core.Services
             return await GetUser(userClaims);
         }
 
-        public async Task<IEnumerable<TeamRoles>> GetCurrentRoles()
+        public async Task<IEnumerable<TeamRoles>> GetCurrentRoles(string slug)
         {
             var projectId = _httpContextAccessor.GetProjectId();
             string iamId = _httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == IamIdClaimType).Value;
 
             var userRoles = await _dbContext.Permissions
-                .Where(p => p.User.Iam == iamId)
+                .Where(p => p.User.Iam == iamId && (p.Role.Name == Role.Codes.System || p.Team.Slug == slug))
                 .Select(p => new TeamRoles(p.Role.Name, p.Team.Slug))
                 .ToArrayAsync();
 
@@ -105,21 +105,21 @@ namespace Harvest.Core.Services
             return userRoles;
         }
 
-        public async Task<bool> HasAccess(string accessCode)
+        public async Task<bool> HasAccess(string accessCode, string slug)
         {
             var roles = _roleResolver(accessCode).Concat(_roleResolver(AccessCodes.SystemAccess));
-            var userRoles = await GetCurrentRoles();
+            var userRoles = await GetCurrentRoles(slug);
             return userRoles.Any(r => roles.Contains(r.Role));
         }
 
-        public async Task<bool> HasAccess(string[] accessCodes)
+        public async Task<bool> HasAccess(IEnumerable<string> accessCodes, string slug)
         {
             IEnumerable<string> roles = _roleResolver(AccessCodes.SystemAccess);
             foreach (var accessCode in accessCodes)
             {
                 roles = roles.Concat(_roleResolver(accessCode));
             }
-            var userRoles = await GetCurrentRoles();
+            var userRoles = (await GetCurrentRoles(slug));
             return userRoles.Any(r => roles.Contains(r.Role));
         }
 
@@ -140,17 +140,17 @@ namespace Harvest.Core.Services
 
     public static class UserServiceExtensions
     {
-        [Obsolete("Use HasAnyTeamRoles instead")]
-        public static async Task<bool> HasAnyRoles(this IUserService userService, IEnumerable<string> roles)
-        {
-            var userRoles = await userService.GetCurrentRoles();
-            return userRoles.Any(r => roles.Contains(r.Role));
-        }
+        //[Obsolete("Use HasAnyTeamRoles instead")]
+        //public static async Task<bool> HasAnyRoles(this IUserService userService, IEnumerable<string> roles)
+        //{
+        //    var userRoles = await userService.GetCurrentRoles();
+        //    return userRoles.Any(r => roles.Contains(r.Role));
+        //}
         public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string teamSlug, IEnumerable<string> roles)
         {
-            var userRoles = await userService.GetCurrentRoles();
+            var userRoles = await userService.GetCurrentRoles(teamSlug);
 
-            return userRoles.Where(a => a.Role == Role.Codes.System || a.TeamSlug == teamSlug).Any(r => roles.Contains(r.Role));
+            return userRoles.Any(r => roles.Contains(r.Role));
         }
     }
 }

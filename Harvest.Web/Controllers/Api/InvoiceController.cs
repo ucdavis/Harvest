@@ -31,6 +31,7 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> Get(int projectId, int invoiceId)
         {
+            var xxx = TeamSlug;
             var invoice = await _dbContext.Invoices
                 .Include(a => a.Transfers)
                 .Include(i => i.Expenses)
@@ -60,7 +61,7 @@ namespace Harvest.Web.Controllers.Api
         {
             var user = await _userService.GetCurrentUser();
             //var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess) || await _userService.HasAccess(AccessCodes.FinanceAccess);
-            var hasAccess = await _userService.HasAccess(new []{ AccessCodes.FieldManagerAccess, AccessCodes.FinanceAccess});
+            var hasAccess = await _userService.HasAccess(new []{ AccessCodes.FieldManagerAccess, AccessCodes.FinanceAccess}, TeamSlug);
 
             var invoiceQuery = _dbContext.Invoices.Where(a =>
                     a.ProjectId == projectId

@@ -73,7 +73,11 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
         {
             // only FM is allowed to submit a quote, anyone with access can save
-            if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess)) { return Unauthorized(); }
+            if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
+            {
+                return Unauthorized();
+            }
+
 
             // Use existing quote if it exists, otherwise create new one
             var quote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).SingleOrDefaultAsync();
@@ -105,7 +109,7 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 await _historyService.QuoteSaved(projectId, quote);
-                if(!await _userService.HasAccess(AccessCodes.FieldManagerAccess))
+                if(!await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
                 {
                     await _emailService.SupervisorSavedQuote(project, quote);
                 }

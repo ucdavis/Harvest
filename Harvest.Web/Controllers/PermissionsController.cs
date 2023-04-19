@@ -45,7 +45,7 @@ namespace Harvest.Web.Controllers
                 .Where(a => a.TeamId == null || a.TeamId == team.Id);
             
             //If you have System, show system.
-            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 permissionsQuery = permissionsQuery.Where(a => a.Role.Name != Role.Codes.System && a.TeamId == team.Id);
             }
@@ -83,7 +83,7 @@ namespace Harvest.Web.Controllers
             IQueryable<Role> rolesQuery = _dbContext.Roles;
 
             //If you have System, show system.
-            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 rolesQuery = rolesQuery.Where(a => a.Name != Role.Codes.System);
             }
@@ -110,7 +110,7 @@ namespace Harvest.Web.Controllers
             IQueryable<Role> rolesQuery = _dbContext.Roles;
 
             //If you have System, show system.
-            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 rolesQuery = rolesQuery.Where(a => a.Name != Role.Codes.System);
             }
@@ -141,7 +141,7 @@ namespace Harvest.Web.Controllers
             }
 
             var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Id == model.RoleId);
-            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 if (role == null || role.Name == Role.Codes.System)
                 {
@@ -248,7 +248,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (await _userService.HasAccess(AccessCodes.SystemAccess))
+            if (await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 var viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions.Where(w => w.TeamId == null || w.TeamId == team.Id))
                     .ThenInclude(a => a.Role).SingleAsync();
@@ -280,7 +280,7 @@ namespace Harvest.Web.Controllers
 
             //TODO: Make sure you don't remove your own roles?
             var user = await _dbContext.Users.Where(a => a.Id == userId).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync();
-            if (!await _userService.HasAccess(AccessCodes.SystemAccess))
+            if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 if (await _dbContext.Roles.AnyAsync(a => a.Name == Role.Codes.System && roles.Contains(a.Id)))
                 {
