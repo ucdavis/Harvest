@@ -31,6 +31,7 @@ namespace Harvest.Web.Controllers.Api
 
         // Get info on the project as well as current proposed quote
         [HttpGet]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> Get(string account)
         {
             //TODO: Call AE validation/lookup.
