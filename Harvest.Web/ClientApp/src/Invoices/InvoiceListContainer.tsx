@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { Invoice, Project } from "../types";
+import { Invoice, Project, CommonRouteParams } from "../types";
 import { InvoiceTable } from "./InvoiceTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -13,6 +13,7 @@ interface RouteParams {
 
 export const InvoiceListContainer = () => {
   const { projectId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
@@ -21,7 +22,7 @@ export const InvoiceListContainer = () => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Invoice/List/?projectId=${projectId}`
+        `/api/${team}/Invoice/List/?projectId=${projectId}`
       );
 
       if (response.ok) {
@@ -32,11 +33,11 @@ export const InvoiceListContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -46,7 +47,7 @@ export const InvoiceListContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   if (project === undefined) {
     return <div>Loading...</div>;

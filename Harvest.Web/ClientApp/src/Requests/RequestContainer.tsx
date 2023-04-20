@@ -57,7 +57,7 @@ export const RequestContainer = () => {
     // load original request if this is a change request
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -78,7 +78,7 @@ export const RequestContainer = () => {
     if (projectId !== undefined) {
       cb();
     }
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   const create = async () => {
     // TODO: validation, loading spinner

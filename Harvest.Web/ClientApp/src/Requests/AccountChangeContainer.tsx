@@ -21,7 +21,7 @@ export const AccountChangeContainer = () => {
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -32,7 +32,7 @@ export const AccountChangeContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   if (project === undefined) {
     return <div>Loading ...</div>;
@@ -41,7 +41,7 @@ export const AccountChangeContainer = () => {
   //TODO: require PI or supervisor access after updating auth policies
   const changeAccounts = async () => {
     const request = authenticatedFetch(
-      `/api/Request/ChangeAccount/${projectId}`,
+      `/api/${team}/Request/ChangeAccount/${projectId}`,
       {
         method: "POST",
         body: JSON.stringify({ Accounts: accounts }),
