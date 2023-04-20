@@ -15,7 +15,7 @@ export const TicketsContainer = () => {
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -25,12 +25,12 @@ export const TicketsContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Ticket/GetList?projectId=${projectId}`
+        `/api/${team}/Ticket/GetList?projectId=${projectId}`
       );
 
       if (response.ok) {
@@ -39,7 +39,7 @@ export const TicketsContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   if (project === undefined || tickets === undefined) {
     return <div>Loading...</div>;

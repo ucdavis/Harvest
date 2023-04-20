@@ -8,7 +8,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import { Project, CropType, Team } from "../types";
+import { Project, CropType, Team, CommonRouteParams } from "../types";
 import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -26,7 +26,8 @@ export const RequestContainer = () => {
   const history = useHistory();
   const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
 
-  const { projectId, team } = useParams<RouteParams>();
+  const { projectId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
