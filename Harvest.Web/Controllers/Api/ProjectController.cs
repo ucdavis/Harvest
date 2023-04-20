@@ -163,10 +163,9 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> GetFields()
         {
-            var fields = await _dbContext.Fields.Where(f => f.IsActive && f.Project.Status == Project.Statuses.Active).Include(f => f.Project).ToListAsync();
+            var fields = await _dbContext.Fields.Where(f => f.IsActive && f.Project.Team.Slug == TeamSlug && f.Project.Status == Project.Statuses.Active).Include(f => f.Project).ToListAsync();
 
             return Ok(fields);
         }
