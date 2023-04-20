@@ -271,6 +271,7 @@ namespace Harvest.Core.Services
         public Task<bool> ApproveAccounts(Project project, string[] emails)
         {
             throw new NotImplementedException();
+            //If ever implemented, this will need the team
             // var url = $"{_emailSettings.BaseUrl}/Project/AccountApproval/";
 
             // var model = new AccountPendingApprovalModel()

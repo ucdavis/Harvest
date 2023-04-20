@@ -172,7 +172,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Obsolete("This was never implemented. If it is, stuff like team route need to be configured")]
         public async Task<ActionResult> AccountApproval(int projectId)
         {
             var project = await _dbContext.Projects.Include(p => p.Accounts).SingleAsync(p => p.Id == projectId);
@@ -181,11 +181,10 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<IActionResult> RefreshTotal(int projectId)
         {
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
-            var invoiceTotal = await _dbContext.Invoices.Where(a =>
+            var invoiceTotal = await _dbContext.Invoices.Where(a => a.Project.Team.Slug == TeamSlug &&
                     a.ProjectId == projectId &&
                     (a.Status == Invoice.Statuses.Pending || a.Status == Invoice.Statuses.Completed)).Select(a => a.Total).SumAsync();
             var originalTotal = project.ChargedTotal;
@@ -203,9 +202,16 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
         {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
             var currentUser = await _userService.GetCurrentUser();
 
             using (var txn = await _dbContext.Database.BeginTransactionAsync())
@@ -223,6 +229,7 @@ namespace Harvest.Web.Controllers.Api
                     IsActive = true,
                     IsApproved = true,
                     Requirements = postModel.Project.Requirements,
+                    TeamId = team.Id,
                 };
 
                 // create PI if needed and assign to project

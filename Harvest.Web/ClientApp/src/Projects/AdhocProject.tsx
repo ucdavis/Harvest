@@ -183,7 +183,7 @@ export const AdhocProject = () => {
     };
 
     //TODO: Change to new api
-    const request = authenticatedFetch(`/api/Project/CreateAdhoc`, {
+    const request = authenticatedFetch(`/api/${team}/Project/CreateAdhoc`, {
       method: "POST",
       body: JSON.stringify(adhoc), //TODO: use correct model
     });
