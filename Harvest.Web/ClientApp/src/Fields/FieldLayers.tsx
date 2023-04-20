@@ -22,7 +22,7 @@ export const FieldLayers = (props: Props) => {
       const projectId = props.project.id;
 
       const activeFieldResponse = await authenticatedFetch(
-        `/api${team}/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}&projectId=${projectId}`
+        `/api/${team}/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}&projectId=${projectId}`
       );
 
       if (activeFieldResponse.ok) {
