@@ -53,7 +53,7 @@ namespace Harvest.Web.Controllers.Api
         {
             var statuses = new string[]
                 {Project.Statuses.ChangeRequested, Project.Statuses.Requested, Project.Statuses.QuoteRejected};
-            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.IsActive && statuses.Contains(a.Status));
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug && a.IsActive && statuses.Contains(a.Status));
             project.IsActive = false;
             project.UpdateStatus(Project.Statuses.Canceled);
             var quote = await _dbContext.Quotes.SingleOrDefaultAsync(a => a.ProjectId == projectId);
@@ -69,6 +69,7 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project);
         }
 
+ 
         [HttpPost]
         [Authorize(Policy = AccessCodes.PIandFinance)] 
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
@@ -81,7 +82,7 @@ namespace Harvest.Web.Controllers.Api
             if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
-                var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+                var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
                 if (changeRequestProject.PrincipalInvestigator.Iam != currentUser.Iam)
                 {
@@ -152,7 +153,7 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 // not a change request, so just get the project
-                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
                 
                 if(project.PrincipalInvestigator.Iam != currentUser.Iam)
@@ -241,7 +242,7 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest();
             }
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var quote = await _dbContext.Quotes.SingleAsync(a => a.ProjectId == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
@@ -273,7 +274,7 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var currentUser = await _userService.GetCurrentUser();
 
             var percentage = 0.0m;
@@ -314,7 +315,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Files(int projectId, [FromBody] ProjectFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
-            var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.Attachments).Include(p => p.PrincipalInvestigator).Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var projectAttachmentsToCreate = new List<ProjectAttachment>();
 
             foreach (var attachment in model.Attachments)
@@ -342,8 +343,9 @@ namespace Harvest.Web.Controllers.Api
             return Ok(projectAttachmentsToCreate);
         }
 
-
+        //TODO: Test if this works with the team api...
         [HttpPost]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> Create([FromBody] Project project)
         {
             var currentUser = await _userService.GetCurrentUser();

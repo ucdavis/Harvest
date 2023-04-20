@@ -64,10 +64,13 @@ export const ProjectDetailContainer = () => {
   }, [projectId, getIsMounted, team, setNotification]);
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const request = authenticatedFetch(`/api/Request/Files/${projectId}`, {
-      method: "POST",
-      body: JSON.stringify({ Attachments: attachments }),
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Request/Files/${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ Attachments: attachments }),
+      }
+    );
 
     setNotification(request, "Saving File(s)", "File(s) Saved");
 
@@ -85,9 +88,12 @@ export const ProjectDetailContainer = () => {
 
   //cancel the project
   const cancelProject = async () => {
-    const request = authenticatedFetch(`/api/Request/Cancel/${projectId}`, {
-      method: "POST",
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Request/Cancel/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
     setNotification(request, "Canceling", "Project Request Canceled");
     const response = await request;
     if (response.ok) {
@@ -309,7 +315,7 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row">
             <div className="col-md-6">
-              <h2>Project Attachements</h2>
+              <h2>Project Attachments</h2>
               <FileUpload
                 disabled={notification.pending}
                 files={newFiles}
