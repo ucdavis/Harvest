@@ -31,14 +31,14 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> Get(int projectId, int invoiceId)
         {
-            var xxx = TeamSlug; //just for debugging
+
             var invoice = await _dbContext.Invoices
                 .Include(a => a.Transfers)
                 .Include(i => i.Expenses)
                 .ThenInclude(e => e.Rate)
                 .AsNoTracking()
                 .AsSplitQuery()
-                .SingleAsync(i => i.Id == invoiceId);
+                .SingleAsync(i => i.Id == invoiceId && i.Project.Team.Slug == TeamSlug);
 
             if (invoice.ProjectId != projectId)
             {
@@ -52,12 +52,11 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.Team)
                 .AsNoTracking()
                 .AsSplitQuery()
-                .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
+                .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId && p.Team.Slug == TeamSlug);
 
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
         [HttpGet]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> List(int projectId, int? maxRows)
         {
             var user = await _userService.GetCurrentUser();
@@ -65,7 +64,7 @@ namespace Harvest.Web.Controllers.Api
             var hasAccess = await _userService.HasAccess(new []{ AccessCodes.FieldManagerAccess, AccessCodes.FinanceAccess}, TeamSlug);
 
             var invoiceQuery = _dbContext.Invoices.Where(a =>
-                    a.ProjectId == projectId
+                    a.ProjectId == projectId && a.Project.Team.Slug == TeamSlug
                     && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
                     .OrderByDescending(a => a.CreatedOn);
 

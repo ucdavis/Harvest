@@ -94,7 +94,7 @@ export const CloseoutContainer = () => {
     }
 
     const request = authenticatedFetch(
-      `/api/Invoice/InitiateCloseout/${projectId}`,
+      `/api/${team}/Invoice/InitiateCloseout/${projectId}`,
       {
         method: "POST",
       }

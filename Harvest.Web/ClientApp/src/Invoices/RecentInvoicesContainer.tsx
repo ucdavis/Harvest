@@ -21,7 +21,7 @@ export const RecentInvoicesContainer = (props: Props) => {
     const cb = async () => {
       // TODO: only fetch first 5 instead of chopping off client-side
       const response = await authenticatedFetch(
-        `/api/Invoice/List/?projectId=${props.projectId}&maxRows=5`
+        `/api/${team}/Invoice/List/?projectId=${props.projectId}&maxRows=5`
       );
 
       if (response.ok) {
@@ -30,7 +30,7 @@ export const RecentInvoicesContainer = (props: Props) => {
     };
 
     cb();
-  }, [props.projectId, getIsMounted]);
+  }, [props.projectId, getIsMounted, team]);
 
   return (
     <ShowFor roles={["FieldManager", "Supervisor", "PI", "Finance"]}>
