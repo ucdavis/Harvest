@@ -20,6 +20,7 @@ namespace Harvest.Web.Controllers.Api
             this._identityService = identityService;
         }
 
+        //TODO: Replace the get parameter and use a route?
         // Search people based on kerb or email
         [HttpGet("/api/people/search")]
         public async Task<ActionResult> Search(string query)

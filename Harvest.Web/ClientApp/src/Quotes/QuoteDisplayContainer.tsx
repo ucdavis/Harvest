@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
-import { ProjectWithQuote } from "../types";
+import { ProjectWithQuote, CommonRouteParams } from "../types";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { QuoteDisplay } from "./QuoteDisplay";
 import { authenticatedFetch } from "../Util/Api";
@@ -19,12 +19,15 @@ interface RouteParams {
 export const QuoteDisplayContainer = () => {
   const history = useHistory();
   const { projectId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [projectAndQuote, setProjectAndQuote] = useState<ProjectWithQuote>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const quoteResponse = await authenticatedFetch(`/api/Quote/GetApproved/${projectId}`);
+      const quoteResponse = await authenticatedFetch(
+        `/api/${team}/Quote/GetApproved/${projectId}`
+      );
 
       if (quoteResponse.ok) {
         const projectWithQuote: ProjectWithQuote = await quoteResponse.json();
@@ -34,7 +37,7 @@ export const QuoteDisplayContainer = () => {
     };
 
     cb();
-  }, [history, projectId, getIsMounted]);
+  }, [history, projectId, getIsMounted, team]);
 
   if (projectAndQuote === undefined) {
     return <div>Loading ...</div>;

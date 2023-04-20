@@ -52,7 +52,7 @@ export const QuoteContainer = () => {
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await authenticatedFetch(
-        `/api/Quote/Get/${projectId}`
+        `/api/${team}/Quote/Get/${projectId}`
       );
       const pricingResponse = await authenticatedFetch(
         `/api/${team}/Rate/Active`
@@ -206,7 +206,7 @@ export const QuoteContainer = () => {
     }
 
     const request = authenticatedFetch(
-      `/api/Quote/Save/${projectId}?submit=${submit}`,
+      `/api/${team}/Quote/Save/${projectId}?submit=${submit}`,
       {
         method: "POST",
         body: JSON.stringify(quote),
