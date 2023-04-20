@@ -51,7 +51,7 @@ export const ApprovalContainer = () => {
     };
 
     cb();
-  }, [history, projectId, getIsMounted]);
+  }, [history, projectId, getIsMounted, team]);
 
   const approve = async () => {
     const model = { accounts };

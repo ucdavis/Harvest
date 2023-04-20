@@ -33,7 +33,7 @@ export const TicketListContainer = (props: Props) => {
     };
 
     cb();
-  }, [getIsMounted, props.projectSource]);
+  }, [getIsMounted, props.projectSource, team]);
 
   return (
     <div>

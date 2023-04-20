@@ -37,7 +37,7 @@ export const InvoiceDetailContainer = () => {
     };
 
     cb();
-  }, [invoiceId, getIsMounted, projectId]);
+  }, [invoiceId, getIsMounted, projectId, team]);
 
   if (projectAndInvoice === undefined) {
     return <div>Loading ...</div>;

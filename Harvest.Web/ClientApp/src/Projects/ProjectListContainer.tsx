@@ -47,7 +47,7 @@ export const ProjectListContainer = (props: Props) => {
     };
 
     cb();
-  }, [props.projectSource, getIsMounted]);
+  }, [props.projectSource, props.hasTeamRoute, getIsMounted, team]);
 
   const requestUrl = !team ? "/request/create" : `/${team}/request/create`;
 

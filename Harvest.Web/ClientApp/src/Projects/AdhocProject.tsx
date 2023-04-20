@@ -10,7 +10,6 @@ import {
   CropType,
   ProjectAccount,
   QuoteContent,
-  QuoteContentImpl,
   CommonRouteParams,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
@@ -92,7 +91,7 @@ export const AdhocProject = () => {
     };
 
     cb();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   const submit = async () => {
     const inputErrors = await context.validateAll();
