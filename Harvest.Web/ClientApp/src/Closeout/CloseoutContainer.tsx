@@ -4,7 +4,7 @@ import { Button } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-import { Project, Result } from "../types";
+import { Project, Result, CommonRouteParams } from "../types";
 import { UnbilledExpensesContainer } from "../Expenses/UnbilledExpensesContainer";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -25,6 +25,7 @@ interface FinalAcreageExpense {
 
 export const CloseoutContainer = () => {
   const { projectId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [notification, setNotification] = usePromiseNotification();
   const [finalAcreageExpense, setFinalAcreageExpense] =
@@ -36,7 +37,9 @@ export const CloseoutContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/${team}/Project/Get/${projectId}`
+      );
       if (response.ok) {
         const proj: Project = await response.json();
         getIsMounted() && setProject(proj);
@@ -44,7 +47,7 @@ export const CloseoutContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   useEffect(() => {
     if (!project) {
@@ -90,9 +93,12 @@ export const CloseoutContainer = () => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Invoice/InitiateCloseout/${projectId}`, {
-      method: "POST",
-    });
+    const request = authenticatedFetch(
+      `/api/Invoice/InitiateCloseout/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
 
     setNotification(
       request,
