@@ -44,9 +44,9 @@ export const CloseoutConfirmationContainer = () => {
 
   useEffect(() => {
     if (closeoutRequested) {
-      history.push(`/project/details/${projectId}`);
+      history.push(`/${team}/project/details/${projectId}`);
     }
-  }, [closeoutRequested, history, projectId]);
+  }, [closeoutRequested, history, projectId, team]);
 
   const [getConfirmation] = useConfirmationDialog({
     title: "Approve Closeout",
@@ -70,9 +70,12 @@ export const CloseoutConfirmationContainer = () => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Invoice/DoCloseout/${projectId}`, {
-      method: "POST",
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Invoice/DoCloseout/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
 
     setNotification(
       request,

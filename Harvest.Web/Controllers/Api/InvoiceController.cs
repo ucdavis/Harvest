@@ -79,6 +79,11 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> InitiateCloseout(int projectId)
         {
+            if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.Team.Slug != TeamSlug))
+            {
+                return BadRequest("Project not associated with the current team");
+            }
+
             var result = await _invoiceService.InitiateCloseout(projectId);
             return Ok(result);
         }
@@ -87,7 +92,8 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> DoCloseout(int projectId)
         {
-            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            //Some of these may fail from old emails...
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
             await _historyService.ProjectCloseoutApproved(projectId, project); //Deal with this if the result has errors? I think logging that they approved it is fine, even if it fails.
             await _dbContext.SaveChangesAsync();
 
