@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { authenticatedFetch } from "../Util/Api";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { CommonRouteParams } from "../types";
 
 interface Props {
   projectId: number;
-  team?: string;
   remaining: number;
 }
 
 export const ProjectUnbilledButton = (props: Props) => {
   const [total, setTotal] = useState<number>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/expense/getunbilledtotal/${props.projectId}`
+        `/api/${team}/expense/getunbilledtotal/${props.projectId}`
       );
 
       if (response.ok) {
@@ -27,7 +28,7 @@ export const ProjectUnbilledButton = (props: Props) => {
     };
 
     cb();
-  }, [props.projectId, getIsMounted]);
+  }, [props.projectId, getIsMounted, team]);
 
   if (total === 0) {
     return (
@@ -39,7 +40,7 @@ export const ProjectUnbilledButton = (props: Props) => {
   if (total === undefined || (total !== 0 && total <= props.remaining)) {
     return (
       <Link
-        to={`/${props.team}/expense/unbilled/${props.projectId}`}
+        to={`/${team}/expense/unbilled/${props.projectId}`}
         className="btn btn-lg btn-outline"
       >
         View Unbilled Expenses - $
@@ -50,7 +51,7 @@ export const ProjectUnbilledButton = (props: Props) => {
 
   return (
     <Link
-      to={`/${props.team}/expense/unbilled/${props.projectId}`}
+      to={`/${team}/expense/unbilled/${props.projectId}`}
       className="btn btn-lg  btn-outline-danger"
     >
       View Unbilled Expenses - $

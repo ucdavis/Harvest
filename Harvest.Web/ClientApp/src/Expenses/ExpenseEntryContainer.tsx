@@ -179,10 +179,13 @@ export const ExpenseEntryContainer = () => {
         )
     );
 
-    const request = authenticatedFetch(`/api/Expense/Create/${projectId}`, {
-      method: "POST",
-      body: JSON.stringify(expensesBody),
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Expense/Create/${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(expensesBody),
+      }
+    );
 
     setNotification(request, "Saving Expenses", "Expenses Saved");
 

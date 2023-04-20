@@ -356,7 +356,6 @@ export const ProjectDetailContainer = () => {
               {" "}
               <ProjectUnbilledButton
                 projectId={project.id}
-                team={team}
                 remaining={project.quoteTotal - project.chargedTotal}
               />
             </div>

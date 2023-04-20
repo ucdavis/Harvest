@@ -19,7 +19,7 @@ export const WorkerHome = () => {
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
       const response = await authenticatedFetch(
-        `/api/expense/GetRecentExpensedProjects?team=${team}`
+        `/api/${team}/expense/GetRecentExpensedProjects`
       );
       if (getIsMounted()) {
         const projects: Project[] = await response.json();

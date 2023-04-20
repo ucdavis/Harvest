@@ -33,7 +33,7 @@ namespace Harvest.Web.Controllers.Api
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId);
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             if (project.Status != Project.Statuses.Active
                 && project.Status != Project.Statuses.AwaitingCloseout
                 && project.Status != Project.Statuses.PendingCloseoutApproval)
@@ -66,7 +66,8 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public async Task<ActionResult> Delete(int expenseId)
         {
-            var expense = await _dbContext.Expenses.FindAsync(expenseId);
+            //var expense = await _dbContext.Expenses.FindAsync(expenseId);
+            var expense = await _dbContext.Expenses.SingleOrDefaultAsync(a => a.Id == expenseId && a.Project.Team.Slug == TeamSlug);
 
             if (expense == null)
             {
@@ -85,6 +86,8 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> GetUnbilled(int projectId)
         {
+            //TODO: Revisit this once everything is working....
+            //Care about the team? The auth policy should take care of that
             return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId).ToArrayAsync());
         }
 
@@ -92,19 +95,20 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> GetUnbilledTotal(int projectId)
         {
+            //Care about the team? The auth policy should take care of that
             return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId).SumAsync(e => e.Total));
         }
 
         // Get just the total of unbilled expenses for the current project
         [Authorize(Policy = AccessCodes.WorkerAccess)]
         [HttpGet]
-        public async Task<ActionResult> GetRecentExpensedProjects(string team)
+        public async Task<ActionResult> GetRecentExpensedProjects()
         {
             var user = await _userService.GetCurrentUser();
 
             // get projects where user has entered an expense in the last month
             var projects = await _dbContext.Projects.AsNoTracking()
-                .Where(p => p.IsActive && p.Team.Slug == team && p.Expenses.Any(e => e.CreatedById == user.Id && e.CreatedOn > DateTime.UtcNow.AddMonths(-1)))
+                .Where(p => p.IsActive && p.Team.Slug == TeamSlug && p.Expenses.Any(e => e.CreatedById == user.Id && e.CreatedOn > DateTime.UtcNow.AddMonths(-1)))
                 .OrderByDescending(a => a.CreatedOn)
                 .Select(p => new { p.Id, p.Status, p.Name })
                 .Take(4) // limit to 4 projects
