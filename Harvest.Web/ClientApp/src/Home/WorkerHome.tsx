@@ -6,6 +6,7 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
 import { useParams } from "react-router";
 
+//TODO: Replace this with the common route params
 interface RouteParams {
   team?: string;
 }

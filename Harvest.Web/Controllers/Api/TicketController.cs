@@ -51,6 +51,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
+        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
         public async Task<ActionResult> RequiringPIAttention(int? limit)
         {
             var user = await _userService.GetCurrentUser();
@@ -71,12 +72,12 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> RequiringManagerAttention(string team, int? limit)
+        public async Task<ActionResult> RequiringManagerAttention(int? limit)
         {
             // Get list of top N open tickets in all projects
             var openTickets = _dbContext.Tickets
                 .Include(a => a.Project.Team)
-                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.Team.Slug == team)
+                .Where(a => a.Status != Ticket.Statuses.Complete && a.Project.IsActive && a.Project.Team.Slug == TeamSlug)
                 .OrderByDescending(a => a.UpdatedOn);
 
             if (limit.HasValue)
@@ -91,6 +92,7 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
         {
+            //TODO: Check slug too? Don't think it is needed
             var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
             var oldWorkNotes = ticketToUpdate.WorkNotes;
             var currentUser = await _userService.GetCurrentUser();
@@ -111,7 +113,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Create(int projectId, [FromBody] Ticket ticket)
         {
 
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
             var currentUser = await _userService.GetCurrentUser();
 
             //TODO: Any authentication? 
@@ -152,7 +154,6 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project);
         }
 
-        [HttpGet("/api/[controller]/[action]/{projectId}/{ticketId}")]
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> Get(int projectId, int ticketId)
         {

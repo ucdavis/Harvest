@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link, Redirect, useParams } from "react-router-dom";
 
 import { authenticatedFetch } from "../Util/Api";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
 import { CommonRouteParams, Project, Ticket } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { useParams } from "react-router";
 
 export const FieldManagerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -33,7 +32,7 @@ export const FieldManagerHome = () => {
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
       const response = await authenticatedFetch(
-        `/api/ticket/RequiringManagerAttention?team=${team}&limit=3`
+        `/api/${team}/ticket/RequiringManagerAttention?limit=3`
       );
       if (getIsMounted()) {
         const tickets: Ticket[] = await response.json();

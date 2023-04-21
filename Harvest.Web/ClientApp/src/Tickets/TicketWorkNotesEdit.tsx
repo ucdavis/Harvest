@@ -1,7 +1,8 @@
-﻿import { TicketDetails } from "../types";
+﻿import { TicketDetails, CommonRouteParams } from "../types";
 import { Button, FormGroup, Input } from "reactstrap";
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
+import { useParams } from "react-router-dom";
 
 interface Props {
   ticket: TicketDetails;
@@ -11,6 +12,7 @@ interface Props {
 
 export const TicketWorkNotesEdit = (props: Props) => {
   const { ticket, setNotes } = props;
+  const { team } = useParams<CommonRouteParams>();
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -18,7 +20,7 @@ export const TicketWorkNotesEdit = (props: Props) => {
     // TODO: validation
 
     const request = authenticatedFetch(
-      `/api/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
+      `/api/${team}/Ticket/UpdateWorkNotes?projectId=${props.projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
         body: JSON.stringify(ticket.workNotes),

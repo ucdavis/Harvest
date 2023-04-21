@@ -38,6 +38,7 @@ export const ProjectListContainer = (props: Props) => {
     if (props.hasTeamRoute) {
       url = `/api/${team}${props.projectSource}`;
     }
+
     const cb = async () => {
       const response = await authenticatedFetch(url);
 

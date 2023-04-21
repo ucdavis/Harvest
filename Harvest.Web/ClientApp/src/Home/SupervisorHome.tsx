@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Project, Ticket } from "../types";
+import { Link, useParams } from "react-router-dom";
+import { Project, Ticket, CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { useParams } from "react-router";
-
-interface RouteParams {
-  team?: string;
-}
 
 export const SupervisorHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -35,7 +30,7 @@ export const SupervisorHome = () => {
   useEffect(() => {
     const getTicketsWaitingForMe = async () => {
       const response = await authenticatedFetch(
-        `/api/ticket/RequiringManagerAttention?team=${team}&limit=3`
+        `/api/${team}/ticket/RequiringManagerAttention?limit=3`
       );
       if (getIsMounted()) {
         const tickets: Ticket[] = await response.json();
