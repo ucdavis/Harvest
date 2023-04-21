@@ -155,6 +155,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [HttpGet("/api/{team}/[controller]/[action]/{projectId}/{ticketId}")]
         public async Task<ActionResult> Get(int projectId, int ticketId)
         {
             var ticket = await _dbContext.Tickets
