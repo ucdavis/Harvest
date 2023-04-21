@@ -88,7 +88,7 @@ namespace Harvest.Web.Controllers.Api
                 .ToArrayAsync());
         }
 
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Route("/api/{controller}/{action}")]
         public async Task<ActionResult> RequiringPIAttention()
         {
             try
@@ -100,14 +100,16 @@ namespace Harvest.Web.Controllers.Api
                 }
                 var attentionStatuses = new string[] { Project.Statuses.PendingApproval, Project.Statuses.PendingAccountApproval }.ToArray();
 
-                return Ok(await _dbContext.Projects.AsNoTracking()
+                var rtValue = await _dbContext.Projects.AsNoTracking()
                     .Include(p => p.PrincipalInvestigator)
                     .Include(a => a.Team)
                     .Where(p => p.PrincipalInvestigatorId == user.Id && p.IsActive && attentionStatuses.Contains(p.Status))
                     .OrderBy(a => a.CreatedOn) // Oldest first?
-                    .Select(p => new { p.Id, p.Status, p.Name })
+                    .Select(p => new { p.Id, p.Status, p.Name, p.Team })
                     .Take(4)
-                    .ToArrayAsync());
+                    .ToArrayAsync();
+
+                return Ok(rtValue);
 
             }
             catch (Exception e)
