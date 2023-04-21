@@ -19,14 +19,14 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Route("/api/{controller}/{action}")]
         public string GetUploadDetails()
         {
             return fileService.GetUploadUrl(storageSettings.ContainerName).AbsoluteUri;
         }
 
         [HttpGet]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Route("/api/{controller}/{action}")]
         public string GetReadDetails()
         {
             // TODO: need to know what blob they want to read
