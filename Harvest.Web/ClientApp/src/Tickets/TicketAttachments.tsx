@@ -1,12 +1,18 @@
 ﻿import { useMemo, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
-import { TicketAttachment, TicketDetails, BlobFile } from "../types";
+import {
+  TicketAttachment,
+  TicketDetails,
+  BlobFile,
+  CommonRouteParams,
+} from "../types";
 import { FormGroup, Label } from "reactstrap";
 import { FileUpload } from "../Shared/FileUpload";
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { useParams } from "react-router-dom";
 
 interface Props {
   ticket: TicketDetails;
@@ -17,9 +23,11 @@ interface Props {
 
 export const TicketAttachments = (props: Props) => {
   const { ticket, setTicket, projectId } = props;
-  const ticketAttachments = useMemo(() => props.attachments, [
-    props.attachments,
-  ]);
+  const { team } = useParams<CommonRouteParams>();
+  const ticketAttachments = useMemo(
+    () => props.attachments,
+    [props.attachments]
+  );
 
   const [ticketLoc, setTicketLoc] = useState<TicketDetails>(
     {} as TicketDetails
@@ -30,7 +38,7 @@ export const TicketAttachments = (props: Props) => {
   const getIsMounted = useIsMounted();
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(
-      `/api/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
+      `/api/${team}/Ticket/UploadFiles/${projectId}/${props.ticket.id}/`,
       {
         method: "POST",
         body: JSON.stringify({ Attachments: attachments }),

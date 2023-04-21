@@ -210,8 +210,8 @@ namespace Harvest.Web.Controllers.Api
             _dbContext.Tickets.Update(ticket);
             await _historyService.TicketReplyCreated(ticket.ProjectId, ticketMessageToCreate);
             await _dbContext.SaveChangesAsync();
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
-                .SingleAsync(a => a.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).Include(a => a.Team)
+                .SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
 
             await _emailService.TicketReplyAdded(project, ticket, ticketMessageToCreate);
 
@@ -223,11 +223,11 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
-        [HttpPost("/api/[controller]/[action]/{projectId}/{ticketId}")]
+        [HttpPost("/api/{team}/[controller]/[action]/{projectId}/{ticketId}")]
         public async Task<ActionResult> UploadFiles(int projectId, int ticketId, [FromBody] TicketFilesModel model)
         {
             var currentUser = await _userService.GetCurrentUser();
-            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId && !a.Completed);
+            var ticket = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId && a.Project.Team.Slug == TeamSlug && !a.Completed);
 
             var ticketAttachmentsToCreate = new List<TicketAttachment>();
             foreach (var attachment in model.Attachments)
@@ -254,7 +254,7 @@ namespace Harvest.Web.Controllers.Api
             await _historyService.TicketFilesAttached(projectId, ticketAttachmentsToCreate);
             await _dbContext.SaveChangesAsync();
 
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator)
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team)
                 .SingleAsync(a => a.Id == projectId);
 
             var addedIds = ticketAttachmentsToCreate.Select(a => a.Id).ToArray();
