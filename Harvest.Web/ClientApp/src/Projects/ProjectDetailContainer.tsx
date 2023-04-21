@@ -61,7 +61,7 @@ export const ProjectDetailContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted, team, setNotification]);
+  }, [projectId, getIsMounted, team]);
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(
