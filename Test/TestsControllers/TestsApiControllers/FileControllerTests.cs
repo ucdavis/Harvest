@@ -60,7 +60,7 @@ namespace Test.TestsControllers.TestsApiControllers
             //2
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetReadDetails", countAdjustment + 1);
             routeAttributes = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetReadDetails", countAdjustment + 1);
-            routeAttributes.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}}");
+            routeAttributes.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
         }
     }
 }

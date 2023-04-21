@@ -55,41 +55,43 @@ namespace Test.TestsControllers.TestsApiControllers
 #endif
 
             //1
-            var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("All", countAdjustment + 2);
+            var attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("All", countAdjustment + 2, testMessage: "All");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.ProjectAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("All", countAdjustment + 2);
 
             //2
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Active", countAdjustment + 2);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Active", countAdjustment + 2, testMessage: "Active");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.ProjectAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Active", countAdjustment + 2);
 
             //3
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("RequiringManagerAttention", countAdjustment + 2);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("RequiringManagerAttention", countAdjustment + 2, testMessage: "RequiringManagerAttention");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RequiringManagerAttention", countAdjustment + 2);
 
             //4
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RequiringPIAttention", countAdjustment + 1);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RequiringPIAttention", countAdjustment + 2, testMessage: "RequiringPIAttention");
+            var routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("RequiringPIAttention", countAdjustment + 2, testMessage: "RequiringPIAttention");
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
 
             //5
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetMine", countAdjustment + 1);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetMine", countAdjustment + 1, testMessage: "GetMine");
 
             //6
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 2);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 2, testMessage: "Get");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
 
             //7
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetFields", countAdjustment + 3);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetFields", countAdjustment + 3, testMessage: "GetFields");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetFields", countAdjustment + 3);
@@ -97,7 +99,7 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //8
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("AccountApproval", countAdjustment + 3);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("AccountApproval", countAdjustment + 3, testMessage: "AccountApproval");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("AccountApproval", countAdjustment + 3);
@@ -105,7 +107,7 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //9
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("RefreshTotal", countAdjustment + 2);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("RefreshTotal", countAdjustment + 2, testMessage: "RefreshTotal");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RefreshTotal", countAdjustment + 2);
@@ -113,7 +115,7 @@ namespace Test.TestsControllers.TestsApiControllers
             //10
             methodName = "GetCompleted";
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 2);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 2, testMessage: "GetCompleted");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
@@ -121,7 +123,7 @@ namespace Test.TestsControllers.TestsApiControllers
             //11
             methodName = "CreateAdhoc";
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3, testMessage: "CreateAdHoc");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
