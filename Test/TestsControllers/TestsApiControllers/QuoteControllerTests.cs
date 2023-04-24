@@ -35,7 +35,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
             var attributes = ControllerReflection.ClassExpectedAttribute<AuthorizeAttribute>(3, showListOfAttributes: true);
             attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
-            ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); //TODO: Enable when this gets added.
+            ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); 
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
         }
 

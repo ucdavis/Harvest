@@ -343,7 +343,6 @@ namespace Harvest.Web.Controllers.Api
             return Ok(projectAttachmentsToCreate);
         }
 
-        //TODO: Test if this works with the team api...
         [HttpPost]
         [Route("/api/{controller}/{action}")]
         public async Task<ActionResult> Create([FromBody] Project project)
