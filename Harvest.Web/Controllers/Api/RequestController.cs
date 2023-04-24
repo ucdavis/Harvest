@@ -366,12 +366,22 @@ namespace Harvest.Web.Controllers.Api
             };
             
             // ensure team is set
-            var teamId = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).Select(t => t.Id).SingleAsync();
-            newProject.TeamId = teamId;
+            var team = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).SingleAsync();
+            newProject.TeamId = team.Id;
 
             if (project.Id > 0)
             {
                 // this project already exists, so we are requesting a change
+                //Make sure the project exists and the user is the PI
+                if (!await _dbContext.Projects.AnyAsync(p => p.Id == project.Id && p.PrincipalInvestigator.Iam == currentUser.Iam))
+                {
+                    //OK, PI is not initiating this change, so we need to check if they are a member of the team in the Field Manager role.
+                    if(!await _userService.HasAnyTeamRoles(team.Slug, new[] { Role.Codes.FieldManager }))
+                    {
+                        return BadRequest("Not Authorized");
+                    }
+                }
+
                 changeRequest = true;
                 newProject.UpdateStatus(Project.Statuses.ChangeRequested);
                 newProject.OriginalProjectId = project.Id;
