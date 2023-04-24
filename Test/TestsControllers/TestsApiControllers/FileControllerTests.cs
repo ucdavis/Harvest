@@ -53,10 +53,14 @@ namespace Test.TestsControllers.TestsApiControllers
 #endif
 
             //1
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUploadDetails", countAdjustment + 0);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUploadDetails", countAdjustment + 1);
+            var routeAttributes = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetUploadDetails", countAdjustment + 1);
+            routeAttributes.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
 
             //2
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetReadDetails", countAdjustment + 0);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetReadDetails", countAdjustment + 1);
+            routeAttributes = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetReadDetails", countAdjustment + 1);
+            routeAttributes.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
         }
     }
 }

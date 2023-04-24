@@ -6,6 +6,7 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
 import { useParams } from "react-router";
 
+//TODO: Replace this with the common route params
 interface RouteParams {
   team?: string;
 }
@@ -19,7 +20,7 @@ export const WorkerHome = () => {
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
       const response = await authenticatedFetch(
-        `/api/expense/GetRecentExpensedProjects?team=${team}`
+        `/api/${team}/expense/GetRecentExpensedProjects`
       );
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
@@ -28,7 +29,7 @@ export const WorkerHome = () => {
     };
 
     getProjectsWithRecentExpenses();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   return (
     <>

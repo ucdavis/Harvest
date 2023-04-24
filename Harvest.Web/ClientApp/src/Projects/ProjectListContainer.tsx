@@ -12,13 +12,14 @@ import { useParams } from "react-router";
 
 interface Props {
   projectSource: string;
+  hasTeamRoute: boolean;
 }
 
 const getListTitle = (projectSource: string) => {
   switch (projectSource) {
-    case "/api/Project/RequiringManagerAttention":
+    case "/Project/RequiringManagerAttention":
       return "Projects Requiring Manager Attention";
-    case "/api/Project/GetCompleted":
+    case "/Project/GetCompleted":
       return "Completed Projects";
     default:
       return "Projects";
@@ -33,10 +34,13 @@ export const ProjectListContainer = (props: Props) => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
+    let url = props.projectSource;
+    if (props.hasTeamRoute) {
+      url = `/api/${team}${props.projectSource}`;
+    }
+
     const cb = async () => {
-      const response = await authenticatedFetch(
-        `${props.projectSource}?team=${team}`
-      );
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         getIsMounted() && setProjects(await response.json());
@@ -44,7 +48,7 @@ export const ProjectListContainer = (props: Props) => {
     };
 
     cb();
-  }, [props.projectSource, getIsMounted]);
+  }, [props.projectSource, props.hasTeamRoute, getIsMounted, team]);
 
   const requestUrl = !team ? "/request/create" : `/${team}/request/create`;
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { GeoJSON, MapContainer, TileLayer, Popup } from "react-leaflet";
-import { Project } from "../types";
+import { Project, CommonRouteParams } from "../types";
 import { getBoundingBox } from "../Util/Geography";
 import { LatLngBoundsExpression } from "leaflet";
 import { useIsMounted } from "../Shared/UseIsMounted";
@@ -19,11 +19,14 @@ interface ProjectField {
 
 export const ProjectFields = () => {
   const [fields, setFields] = useState<ProjectField[]>([]);
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getFields = async () => {
-      const response = await authenticatedFetch("/api/Project/GetFields");
+      const response = await authenticatedFetch(
+        `/api/${team}/Project/GetFields`
+      );
 
       if (response.ok) {
         const result = await response.json();
@@ -33,7 +36,7 @@ export const ProjectFields = () => {
     };
 
     getFields();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   const bounds: LatLngBoundsExpression = useMemo(() => {
     const bounds = getBoundingBox(fields.map((f) => f.location));
@@ -75,15 +78,11 @@ export const ProjectFields = () => {
                     new Date(field.project.end)
                   )}
                 </p>
-                <Link
-                  to={`/${field.project.team.slug}/project/details/${field.projectId}`}
-                >
+                <Link to={`/${team}/project/details/${field.projectId}`}>
                   Project Details
                 </Link>
                 <br />
-                <Link
-                  to={`/${field.project.team.slug}/expense/entry/${field.projectId}`}
-                >
+                <Link to={`/${team}/expense/entry/${field.projectId}`}>
                   Project Expenses
                 </Link>
               </div>

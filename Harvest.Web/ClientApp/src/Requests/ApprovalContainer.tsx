@@ -33,7 +33,7 @@ export const ApprovalContainer = () => {
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await authenticatedFetch(
-        `/api/Quote/Get/${projectId}`
+        `/api/${team}/Quote/Get/${projectId}`
       );
 
       if (quoteResponse.ok) {
@@ -51,15 +51,18 @@ export const ApprovalContainer = () => {
     };
 
     cb();
-  }, [history, projectId, getIsMounted]);
+  }, [history, projectId, getIsMounted, team]);
 
   const approve = async () => {
     const model = { accounts };
 
-    const request = authenticatedFetch(`/api/Request/Approve/${projectId}`, {
-      method: "POST",
-      body: JSON.stringify(model),
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Request/Approve/${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(model),
+      }
+    );
 
     setNotification(request, "Saving Approval", "Project Approved");
 

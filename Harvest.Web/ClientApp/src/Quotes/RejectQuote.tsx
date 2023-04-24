@@ -52,7 +52,7 @@ export const RejectQuote = (props: Props) => {
     }
 
     const request = authenticatedFetch(
-      `/api/Request/RejectQuote/${props.project.id}`,
+      `/api/${team}/Request/RejectQuote/${props.project.id}`,
       {
         method: "POST",
         body: JSON.stringify({ reason }),

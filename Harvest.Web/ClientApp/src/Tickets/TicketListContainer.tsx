@@ -12,6 +12,7 @@ interface RouteParams {
 
 interface Props {
   projectSource: string;
+  hasTeamRoute: boolean;
 }
 
 export const TicketListContainer = (props: Props) => {
@@ -23,9 +24,11 @@ export const TicketListContainer = (props: Props) => {
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
-      const response = await authenticatedFetch(
-        `${props.projectSource}?team=${team}`
-      );
+      let url = props.projectSource;
+      if (props.hasTeamRoute) {
+        url = `/api/${team}${props.projectSource}`;
+      }
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         getIsMounted() && setTickets(await response.json());
@@ -33,7 +36,7 @@ export const TicketListContainer = (props: Props) => {
     };
 
     cb();
-  }, [getIsMounted, props.projectSource]);
+  }, [getIsMounted, props.projectSource, props.hasTeamRoute, team]);
 
   return (
     <div>

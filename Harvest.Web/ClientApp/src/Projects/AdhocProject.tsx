@@ -10,7 +10,6 @@ import {
   CropType,
   ProjectAccount,
   QuoteContent,
-  QuoteContentImpl,
   CommonRouteParams,
 } from "../types";
 import { ActivityForm } from "../Quotes/ActivityForm";
@@ -92,7 +91,7 @@ export const AdhocProject = () => {
     };
 
     cb();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   const submit = async () => {
     const inputErrors = await context.validateAll();
@@ -184,7 +183,7 @@ export const AdhocProject = () => {
     };
 
     //TODO: Change to new api
-    const request = authenticatedFetch(`/api/Project/CreateAdhoc`, {
+    const request = authenticatedFetch(`/api/${team}/Project/CreateAdhoc`, {
       method: "POST",
       body: JSON.stringify(adhoc), //TODO: use correct model
     });

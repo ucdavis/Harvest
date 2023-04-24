@@ -20,9 +20,7 @@ export const ProjectSelection = (props: Props) => {
   useEffect(() => {
     // get list of projects
     const cb = async () => {
-      const response = await authenticatedFetch(
-        `/api/Project/Active?team=${team}`
-      );
+      const response = await authenticatedFetch(`/api/${team}/Project/Active`);
 
       if (response.ok) {
         const projects = await response.json();
@@ -32,7 +30,7 @@ export const ProjectSelection = (props: Props) => {
     };
 
     cb();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   if (projects === undefined) {
     return <div>Loading...</div>;

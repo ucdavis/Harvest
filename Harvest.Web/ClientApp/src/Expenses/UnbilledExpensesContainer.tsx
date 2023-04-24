@@ -45,7 +45,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
 
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Expense/GetUnbilled/${projectId}`
+        `/api/${team}/Expense/GetUnbilled/${projectId}`
       );
 
       if (response.ok) {
@@ -61,13 +61,13 @@ export const UnbilledExpensesContainer = (props: Props) => {
     };
 
     cb();
-  }, [projectId, newExpenseCount, getIsMounted, setTotalUnbilled]);
+  }, [projectId, newExpenseCount, getIsMounted, setTotalUnbilled, team]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -79,7 +79,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
@@ -92,7 +92,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
     }
 
     const request = authenticatedFetch(
-      `/api/Expense/Delete?expenseId=${expense.id}`,
+      `/api/${team}/Expense/Delete?expenseId=${expense.id}`,
       {
         method: "POST",
       }

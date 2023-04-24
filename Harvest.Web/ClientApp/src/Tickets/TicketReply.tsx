@@ -1,9 +1,10 @@
 ﻿import React, { useState } from "react";
 import { Button, FormGroup, Input } from "reactstrap";
-import { TicketDetails, TicketMessage } from "../types";
+import { TicketDetails, TicketMessage, CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { useParams } from "react-router-dom";
 
 interface Props {
   ticket: TicketDetails;
@@ -16,6 +17,7 @@ export const TicketReply = (props: Props) => {
   const [ticketMessage, setTicketMessage] = useState<TicketMessage>({
     message: "",
   } as TicketMessage);
+  const { team } = useParams<CommonRouteParams>();
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -24,7 +26,7 @@ export const TicketReply = (props: Props) => {
     // TODO: validation
 
     const request = authenticatedFetch(
-      `/api/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
+      `/api/${team}/Ticket/Reply?projectId=${projectId}&ticketId=${ticket.id}`,
       {
         method: "POST",
         body: JSON.stringify(ticketMessage),

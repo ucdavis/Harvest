@@ -33,7 +33,7 @@ namespace Harvest.Web.Controllers.Api
         {
             var project = await _dbContext.Projects.Include(p => p.Team).Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Accounts)
-                .Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId);
+                .Include(p => p.CreatedBy).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var openQuote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null)
                 .Select(q => QuoteDetail.Deserialize(q.Text)).SingleOrDefaultAsync();
 
@@ -52,7 +52,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Accounts)
                 .Include(p => p.CreatedBy)
-                .SingleAsync(p => p.Id == projectId);
+                .SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
             var model = new QuoteModel
             {
@@ -73,11 +73,15 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
         {
             // only FM is allowed to submit a quote, anyone with access can save
-            if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess)) { return Unauthorized(); }
+            if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
+            {
+                return Unauthorized();
+            }
+
 
             // Use existing quote if it exists, otherwise create new one
             var quote = await _dbContext.Quotes.Where(q => q.ProjectId == projectId && q.ApprovedOn == null).SingleOrDefaultAsync();
-            var project = await _dbContext.Projects.Include(a => a.Quote).SingleAsync(a => a.Id == projectId);
+            var project = await _dbContext.Projects.Include(a => a.Quote).SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
 
             if (quote == null)
             {
@@ -105,7 +109,7 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 await _historyService.QuoteSaved(projectId, quote);
-                if(!await _userService.HasAccess(AccessCodes.FieldManagerAccess))
+                if(!await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
                 {
                     await _emailService.SupervisorSavedQuote(project, quote);
                 }
@@ -116,7 +120,7 @@ namespace Harvest.Web.Controllers.Api
             if (submit)
             {
                 //Email needs the quote and PI
-                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId);
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).SingleAsync(p => p.Id == projectId);
                 await _emailService.ProfessorQuoteReady(project, quote);
             }
 
