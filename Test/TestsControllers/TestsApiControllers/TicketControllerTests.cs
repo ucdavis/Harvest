@@ -83,7 +83,7 @@ namespace Test.TestsControllers.TestsApiControllers
             methodName = "Get";
             var getAttributes = ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
             getAttributes.ShouldNotBeNull();
-            getAttributes.ElementAt(0).Template.ShouldBe("/api/[controller]/[action]/{projectId}/{ticketId}");
+            getAttributes.ElementAt(0).Template.ShouldBe("/api/{team}/[controller]/[action]/{projectId}/{ticketId}");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
@@ -101,7 +101,7 @@ namespace Test.TestsControllers.TestsApiControllers
             methodName = "UploadFiles";
             var postAttributes = ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
             postAttributes.ShouldNotBeNull();
-            postAttributes.ElementAt(0).Template.ShouldBe("/api/[controller]/[action]/{projectId}/{ticketId}");
+            postAttributes.ElementAt(0).Template.ShouldBe("/api/{team}/[controller]/[action]/{projectId}/{ticketId}");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
@@ -109,7 +109,7 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //7
             methodName = "Close";
-            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3, testMessage: "Close");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
@@ -117,12 +117,15 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //8
             methodName = "RequiringPIAttention";
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3, testMessage: "RequiringPIAttention");
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+            var routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>(methodName, countAdjustment + 3);
+            routeAttribute.ShouldNotBeNull();
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
 
             //9
             methodName = "RequiringManagerAttention";
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 3, testMessage: "RequiringManagerAttention");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);

@@ -51,7 +51,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Route("/api/{controller}/{action}")]
         public async Task<ActionResult> RequiringPIAttention(int? limit)
         {
             var user = await _userService.GetCurrentUser();

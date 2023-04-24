@@ -3,6 +3,7 @@ using Harvest.Web.Controllers.Api;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shouldly;
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using TestHelpers.Helpers;
@@ -80,7 +81,9 @@ namespace Test.TestsControllers.TestsApiControllers
             routeAttribute.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
 
             //5
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetMine", countAdjustment + 1, testMessage: "GetMine");
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetMine", countAdjustment + 2, testMessage: "GetMine");
+            routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetMine", countAdjustment + 2, testMessage: "GetMine");
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
 
             //6
             attribute = null;
@@ -99,11 +102,12 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //8
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("AccountApproval", countAdjustment + 3, testMessage: "AccountApproval");
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("AccountApproval", countAdjustment + 4, testMessage: "AccountApproval");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("AccountApproval", countAdjustment + 3);
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("AccountApproval", countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("AccountApproval", countAdjustment + 4);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("AccountApproval", countAdjustment + 4);
+            ControllerReflection.MethodExpectedAttribute<ObsoleteAttribute>("AccountApproval", countAdjustment + 4);
 
             //9
             attribute = null;

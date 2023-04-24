@@ -345,7 +345,7 @@ namespace Harvest.Web.Controllers.Api
 
         //TODO: Test if this works with the team api...
         [HttpPost]
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Route("/api/{controller}/{action}")]
         public async Task<ActionResult> Create([FromBody] Project project)
         {
             var currentUser = await _userService.GetCurrentUser();

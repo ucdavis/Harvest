@@ -122,7 +122,7 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
-        [Route("/api/{controller=Project}/{action=Index}/{projectId?}")]
+        [Route("/api/{controller}/{action}")]
         public async Task<ActionResult> GetMine()
         {
             var user = await _userService.GetCurrentUser();
