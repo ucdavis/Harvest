@@ -35,7 +35,7 @@ beforeEach(() => {
   document.body.appendChild(container);
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
-      "/api/Project": projectResponse,
+      "/api/team1/Project": projectResponse,
       "/api/File/": fileResponse,
       "/api/Crop": cropResponse,
     })
@@ -57,8 +57,8 @@ describe("Request Container", () => {
   it("Populate form", async () => {
     await act(async () => {
       render(
-        <MemoryRouter initialEntries={["/request/create/3"]}>
-          <Route path="/request/create/:projectId?">
+        <MemoryRouter initialEntries={["team1/request/create/3"]}>
+          <Route path=":team/request/create/:projectId?">
             <RequestContainer />
           </Route>
         </MemoryRouter>,
