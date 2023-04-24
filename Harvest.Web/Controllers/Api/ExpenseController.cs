@@ -93,7 +93,6 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> GetUnbilledTotal(int projectId)
         {
-            //Care about the team? The auth policy should take care of that
             return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).SumAsync(e => e.Total));
         }
 
