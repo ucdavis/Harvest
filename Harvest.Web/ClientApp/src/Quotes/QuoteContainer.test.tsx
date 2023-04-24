@@ -42,7 +42,7 @@ beforeEach(() => {
 
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
-      "/api/Quote/Get/": quoteResponse,
+      "/api/team1/Quote/Get/": quoteResponse,
       "/api/team1/Rate/Active": rateResponse,
     })
   );
@@ -75,7 +75,7 @@ describe("Quote Container", () => {
     await act(async () => {
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
-          "/api/Quote/Get/": notOkProjectResponse,
+          "/api/team1/Quote/Get/": notOkProjectResponse,
           "/api/team1/Rate/Active": notOkRateResponse,
         })
       );
