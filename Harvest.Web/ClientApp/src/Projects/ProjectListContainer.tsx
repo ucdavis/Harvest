@@ -17,9 +17,9 @@ interface Props {
 
 const getListTitle = (projectSource: string) => {
   switch (projectSource) {
-    case "/Project/RequiringManagerAttention":
+    case "Project/RequiringManagerAttention":
       return "Projects Requiring Manager Attention";
-    case "/Project/GetCompleted":
+    case "Project/GetCompleted":
       return "Completed Projects";
     default:
       return "Projects";
@@ -36,7 +36,7 @@ export const ProjectListContainer = (props: Props) => {
     // get rates so we can load up all expense types and info
     let url = props.projectSource;
     if (props.hasTeamRoute) {
-      url = `/api/${team}${props.projectSource}`;
+      url = `/api/${team}/${props.projectSource}`;
     }
 
     const cb = async () => {

@@ -122,7 +122,7 @@ function App() {
               path="/:team/project"
             >
               <ProjectListContainer
-                projectSource="/Project/All"
+                projectSource="Project/All"
                 hasTeamRoute={true}
               />
             </ConditionalRoute>
@@ -132,7 +132,7 @@ function App() {
               path="/:team/project/needsAttention"
             >
               <ProjectListContainer
-                projectSource="/Project/RequiringManagerAttention"
+                projectSource="Project/RequiringManagerAttention"
                 hasTeamRoute={true}
               />
             </ConditionalRoute>
@@ -142,7 +142,7 @@ function App() {
               path="/:team/project/completed"
             >
               <ProjectListContainer
-                projectSource="/Project/GetCompleted"
+                projectSource="Project/GetCompleted"
                 hasTeamRoute={true}
               />
             </ConditionalRoute>
@@ -152,7 +152,7 @@ function App() {
               path="/:team/ticket/needsAttention"
             >
               <TicketListContainer
-                projectSource="/ticket/RequiringManagerAttention"
+                projectSource="ticket/RequiringManagerAttention"
                 hasTeamRoute={true}
               />
             </ConditionalRoute>

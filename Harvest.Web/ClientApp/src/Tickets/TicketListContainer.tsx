@@ -26,7 +26,7 @@ export const TicketListContainer = (props: Props) => {
     const cb = async () => {
       let url = props.projectSource;
       if (props.hasTeamRoute) {
-        url = `/api/${team}${props.projectSource}`;
+        url = `/api/${team}/${props.projectSource}`;
       }
       const response = await authenticatedFetch(url);
 
