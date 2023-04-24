@@ -271,7 +271,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorandFinance)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
