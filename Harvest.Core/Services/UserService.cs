@@ -21,9 +21,9 @@ namespace Harvest.Core.Services
     {
         Task<User> GetUser(Claim[] userClaims);
         Task<User> GetCurrentUser();
-        Task<IEnumerable<TeamRoles>> GetCurrentRoles(string slug);
-        Task<bool> HasAccess(string accessCode, string slug);
-        Task<bool> HasAccess(IEnumerable<string> accessCodes, string slug);
+        Task<IEnumerable<TeamRoles>> GetCurrentRoles(string team);
+        Task<bool> HasAccess(string accessCode, string team);
+        Task<bool> HasAccess(IEnumerable<string> accessCodes, string team);
     }
 
     public class UserService : IUserService
@@ -84,13 +84,13 @@ namespace Harvest.Core.Services
             return await GetUser(userClaims);
         }
 
-        public async Task<IEnumerable<TeamRoles>> GetCurrentRoles(string slug)
+        public async Task<IEnumerable<TeamRoles>> GetCurrentRoles(string team)
         {
             var projectId = _httpContextAccessor.GetProjectId();
             string iamId = _httpContextAccessor.HttpContext.User.Claims.Single(c => c.Type == IamIdClaimType).Value;
 
             var userRoles = await _dbContext.Permissions
-                .Where(p => p.User.Iam == iamId && (p.Role.Name == Role.Codes.System || p.Team.Slug == slug))
+                .Where(p => p.User.Iam == iamId && (p.Role.Name == Role.Codes.System || p.Team.Slug == team))
                 .Select(p => new TeamRoles(p.Role.Name, p.Team.Slug))
                 .ToArrayAsync();
 
@@ -105,21 +105,33 @@ namespace Harvest.Core.Services
             return userRoles;
         }
 
-        public async Task<bool> HasAccess(string accessCode, string slug)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="accessCode"></param>
+        /// <param name="team">The Team Slug</param>
+        /// <returns></returns>
+        public async Task<bool> HasAccess(string accessCode, string team)
         {
             var roles = _roleResolver(accessCode).Concat(_roleResolver(AccessCodes.SystemAccess));
-            var userRoles = await GetCurrentRoles(slug);
+            var userRoles = await GetCurrentRoles(team);
             return userRoles.Any(r => roles.Contains(r.Role));
         }
 
-        public async Task<bool> HasAccess(IEnumerable<string> accessCodes, string slug)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="accessCodes"></param>
+        /// <param name="team">The Team Slug</param>
+        /// <returns></returns>
+        public async Task<bool> HasAccess(IEnumerable<string> accessCodes, string team)
         {
             IEnumerable<string> roles = _roleResolver(AccessCodes.SystemAccess);
             foreach (var accessCode in accessCodes)
             {
                 roles = roles.Concat(_roleResolver(accessCode));
             }
-            var userRoles = (await GetCurrentRoles(slug));
+            var userRoles = (await GetCurrentRoles(team));
             return userRoles.Any(r => roles.Contains(r.Role));
         }
 
@@ -146,9 +158,9 @@ namespace Harvest.Core.Services
         //    var userRoles = await userService.GetCurrentRoles();
         //    return userRoles.Any(r => roles.Contains(r.Role));
         //}
-        public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string teamSlug, IEnumerable<string> roles)
+        public static async Task<bool> HasAnyTeamRoles(this IUserService userService, string team, IEnumerable<string> roles)
         {
-            var userRoles = await userService.GetCurrentRoles(teamSlug);
+            var userRoles = await userService.GetCurrentRoles(team);
 
             return userRoles.Any(r => roles.Contains(r.Role));
         }
