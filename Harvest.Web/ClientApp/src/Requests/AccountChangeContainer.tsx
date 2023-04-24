@@ -38,7 +38,7 @@ export const AccountChangeContainer = () => {
     return <div>Loading ...</div>;
   }
 
-  //TODO: require PI or supervisor access after updating auth policies
+  //PI or Finance should be able to change accounts
   const changeAccounts = async () => {
     const request = authenticatedFetch(
       `/api/${team}/Request/ChangeAccount/${projectId}`,

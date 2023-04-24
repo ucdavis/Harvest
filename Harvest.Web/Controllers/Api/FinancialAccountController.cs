@@ -34,7 +34,6 @@ namespace Harvest.Web.Controllers.Api
         [Route("/api/{controller}/{action}")]
         public async Task<ActionResult> Get(string account)
         {
-            //TODO: Call AE validation/lookup.
             AccountValidationModel validationModel;
             account = account?.ToUpper().Trim();
             if (_aeSettings.UseCoA)

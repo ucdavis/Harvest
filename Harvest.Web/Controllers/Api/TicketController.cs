@@ -92,7 +92,6 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
         {
-            //TODO: Check slug too? Don't think it is needed
             var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
             var oldWorkNotes = ticketToUpdate.WorkNotes;
             var currentUser = await _userService.GetCurrentUser();
@@ -115,8 +114,6 @@ namespace Harvest.Web.Controllers.Api
 
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
             var currentUser = await _userService.GetCurrentUser();
-
-            //TODO: Any authentication? 
 
             var ticketToCreate = new Ticket();
             ticketToCreate.ProjectId = projectId;

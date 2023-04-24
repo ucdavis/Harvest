@@ -278,7 +278,6 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            //TODO: Make sure you don't remove your own roles?
             var user = await _dbContext.Users.Where(a => a.Id == userId).Include(a => a.Permissions).ThenInclude(a => a.Role).SingleAsync();
             if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {

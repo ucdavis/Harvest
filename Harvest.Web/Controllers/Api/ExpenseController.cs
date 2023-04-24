@@ -83,20 +83,17 @@ namespace Harvest.Web.Controllers.Api
 
         // Get all unbilled expenses for the given project
         [HttpGet]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
+        [Authorize(Policy = AccessCodes.InvoiceAccess)]
         public async Task<ActionResult> GetUnbilled(int projectId)
         {
-            //TODO: Revisit this once everything is working....
-            //Care about the team? The auth policy should take care of that
-            return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId).ToArrayAsync());
+            return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).ToArrayAsync());
         }
 
         // Get just the total of unbilled expenses for the current project
         [HttpGet]
         public async Task<ActionResult> GetUnbilledTotal(int projectId)
         {
-            //Care about the team? The auth policy should take care of that
-            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId).SumAsync(e => e.Total));
+            return Ok(await _dbContext.Expenses.Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).SumAsync(e => e.Total));
         }
 
         // Get just the total of unbilled expenses for the current project

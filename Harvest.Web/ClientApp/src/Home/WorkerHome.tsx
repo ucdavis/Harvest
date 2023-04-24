@@ -1,20 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-import { Project } from "../types";
+import { Project, CommonRouteParams } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
-import { useParams } from "react-router";
-
-//TODO: Replace this with the common route params
-interface RouteParams {
-  team?: string;
-}
 
 export const WorkerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
