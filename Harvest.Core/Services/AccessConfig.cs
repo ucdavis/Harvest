@@ -28,7 +28,7 @@ namespace Harvest.Core.Services
                 // InvoiceAccess is the same as PI, but also needs Finance role  
                 AccessCodes.InvoiceAccess => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager, Role.Codes.Finance },
                 AccessCodes.ProjectAccess => new[] { Role.Codes.Finance, Role.Codes.Worker, Role.Codes.Supervisor, Role.Codes.FieldManager },
-                AccessCodes.PIandFinance => new[] { Role.Codes.PI, Role.Codes.Finance },
+                AccessCodes.PrincipalInvestigatorandFinance => new[] { Role.Codes.PI, Role.Codes.Finance },
                 // PI can access anything restricted to PI role
                 AccessCodes.PrincipalInvestigator => new[] { Role.Codes.PI, Role.Codes.Supervisor, Role.Codes.FieldManager },                
                 AccessCodes.PrincipalInvestigatorOnly => new [] {Role.Codes.PI},                

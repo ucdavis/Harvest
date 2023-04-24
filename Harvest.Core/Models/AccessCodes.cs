@@ -23,6 +23,6 @@ namespace Harvest.Core.Models
         /// <summary>
         /// When using this Authentication, the projectId must be in the parameters.
         /// </summary>
-        public const string PIandFinance = "PIandFinance"; //Allow Finance to override some things if the PI doesn't do them.
+        public const string PrincipalInvestigatorandFinance = "PrincipalInvestigatorandFinance"; //Allow Finance to override some things if the PI doesn't do them.
     }
 }

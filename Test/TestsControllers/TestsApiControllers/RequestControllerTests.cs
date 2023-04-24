@@ -68,7 +68,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3, testMessage: "Approve");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PIandFinance);
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigatorandFinance);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
             //3

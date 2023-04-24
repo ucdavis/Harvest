@@ -71,7 +71,7 @@ namespace Harvest.Web.Controllers.Api
 
  
         [HttpPost]
-        [Authorize(Policy = AccessCodes.PIandFinance)] 
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorandFinance)] 
         public async Task<ActionResult> Approve(int projectId, [FromBody] RequestApprovalModel model)
         {
             Project project;
