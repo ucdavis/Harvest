@@ -52,7 +52,7 @@ export const QuoteContainer = () => {
   useEffect(() => {
     const cb = async () => {
       const quoteResponse = await authenticatedFetch(
-        `/api/Quote/Get/${projectId}`
+        `/api/${team}/Quote/Get/${projectId}`
       );
       const pricingResponse = await authenticatedFetch(
         `/api/${team}/Rate/Active`
@@ -94,7 +94,7 @@ export const QuoteContainer = () => {
               rateJson.find((r) => r.type === "Acreage")?.price || 120;
             quoteToUse.projectName = projectWithQuote.project.name;
 
-            // alwyas at least 1 year worth of acreage, but use max in case there is more
+            // always at least 1 year worth of acreage, but use max in case there is more
             quoteToUse.years = Math.max(
               1,
               new Date(projectWithQuote.project.end).getFullYear() -
@@ -112,7 +112,7 @@ export const QuoteContainer = () => {
     };
 
     cb();
-  }, [history, projectId, getIsMounted]);
+  }, [history, projectId, getIsMounted, team]);
 
   useEffect(() => {
     setQuote((q) => {
@@ -206,7 +206,7 @@ export const QuoteContainer = () => {
     }
 
     const request = authenticatedFetch(
-      `/api/Quote/Save/${projectId}?submit=${submit}`,
+      `/api/${team}/Quote/Save/${projectId}?submit=${submit}`,
       {
         method: "POST",
         body: JSON.stringify(quote),

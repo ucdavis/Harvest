@@ -4,7 +4,7 @@ import { Button, UncontrolledTooltip } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
-import { Project, Result } from "../types";
+import { Project, Result, CommonRouteParams } from "../types";
 import { UnbilledExpensesContainer } from "../Expenses/UnbilledExpensesContainer";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -20,6 +20,7 @@ interface RouteParams {
 
 export const CloseoutConfirmationContainer = () => {
   const { projectId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project | undefined>();
   const [notification, setNotification] = usePromiseNotification();
   const history = useHistory();
@@ -29,7 +30,9 @@ export const CloseoutConfirmationContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(`/api/Project/Get/${projectId}`);
+      const response = await authenticatedFetch(
+        `/api/${team}/Project/Get/${projectId}`
+      );
       if (response.ok) {
         const proj: Project = await response.json();
         getIsMounted() && setProject(proj);
@@ -37,13 +40,13 @@ export const CloseoutConfirmationContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   useEffect(() => {
     if (closeoutRequested) {
-      history.push(`/project/details/${projectId}`);
+      history.push(`/${team}/project/details/${projectId}`);
     }
-  }, [closeoutRequested, history, projectId]);
+  }, [closeoutRequested, history, projectId, team]);
 
   const [getConfirmation] = useConfirmationDialog({
     title: "Approve Closeout",
@@ -67,9 +70,12 @@ export const CloseoutConfirmationContainer = () => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Invoice/DoCloseout/${projectId}`, {
-      method: "POST",
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Invoice/DoCloseout/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
 
     setNotification(
       request,

@@ -1,25 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
-import { Project } from "../types";
+import { Project, CommonRouteParams } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
-import { useParams } from "react-router";
-
-interface RouteParams {
-  team?: string;
-}
 
 export const WorkerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const { team } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const getProjectsWithRecentExpenses = async () => {
       const response = await authenticatedFetch(
-        `/api/expense/GetRecentExpensedProjects?team=${team}`
+        `/api/${team}/expense/GetRecentExpensedProjects`
       );
       if (getIsMounted()) {
         const projects: Project[] = await response.json();
@@ -28,7 +23,7 @@ export const WorkerHome = () => {
     };
 
     getProjectsWithRecentExpenses();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   return (
     <>

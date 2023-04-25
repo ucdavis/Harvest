@@ -77,7 +77,7 @@ export const ExpenseEntryContainer = () => {
         history.push(`/${team}/project/details/${projectId}`);
       }
     }
-  }, [projectId, history, query, roles]);
+  }, [projectId, history, query, roles, team]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
@@ -94,13 +94,13 @@ export const ExpenseEntryContainer = () => {
     };
 
     cb();
-  }, [getIsMounted]);
+  }, [getIsMounted, team]);
 
   useEffect(() => {
     // get project in order to determine if it can accept new expenses
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -112,7 +112,7 @@ export const ExpenseEntryContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   useEffect(() => {
     if (!project) {
@@ -179,10 +179,13 @@ export const ExpenseEntryContainer = () => {
         )
     );
 
-    const request = authenticatedFetch(`/api/Expense/Create/${projectId}`, {
-      method: "POST",
-      body: JSON.stringify(expensesBody),
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Expense/Create/${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify(expensesBody),
+      }
+    );
 
     setNotification(request, "Saving Expenses", "Expenses Saved");
 

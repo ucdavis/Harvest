@@ -79,7 +79,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilled", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetUnbilled", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
 
             //4
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilledTotal", countAdjustment + 2);

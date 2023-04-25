@@ -61,12 +61,12 @@ function App() {
               component={RequestContainer}
             />
             <ConditionalRoute
-              roles={["PI"]}
+              roles={["PI", "Finance"]}
               path="/:team/request/approve/:projectId"
               component={ApprovalContainer}
             />
             <ConditionalRoute
-              roles={["PI"]}
+              roles={["PI", "Finance"]}
               path="/:team/request/changeAccount/:projectId"
               component={AccountChangeContainer}
             />
@@ -75,7 +75,7 @@ function App() {
               component={InvoiceListContainer}
             />
             <ConditionalRoute
-              roles={["FieldManager", "PI"]}
+              roles={["FieldManager", "PI", "Finance"]}
               path="/:team/invoice/details/:projectId/:invoiceId"
               component={InvoiceDetailContainer}
             />
@@ -85,7 +85,7 @@ function App() {
               component={QuoteContainer}
             />
             <ConditionalRoute
-              roles={["PI", "FieldManager"]}
+              roles={["PI", "FieldManager", "Finance"]}
               path="/:team/quote/details/:projectId"
               component={QuoteDisplayContainer}
             />
@@ -105,7 +105,10 @@ function App() {
               component={CloseoutConfirmationContainer}
             />
             <ConditionalRoute exact roles={["PI"]} path="/:team?/project/mine">
-              <ProjectListContainer projectSource="/api/Project/GetMine" />
+              <ProjectListContainer
+                projectSource="/api/Project/GetMine"
+                hasTeamRoute={false}
+              />
             </ConditionalRoute>
             <ConditionalRoute
               roles={["FieldManager", "Supervisor", "PI"]}
@@ -118,31 +121,46 @@ function App() {
               roles={["FieldManager", "Supervisor"]}
               path="/:team/project"
             >
-              <ProjectListContainer projectSource="/api/Project/All" />
+              <ProjectListContainer
+                projectSource="Project/All"
+                hasTeamRoute={true}
+              />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
               path="/:team/project/needsAttention"
             >
-              <ProjectListContainer projectSource="/api/Project/RequiringManagerAttention" />
+              <ProjectListContainer
+                projectSource="Project/RequiringManagerAttention"
+                hasTeamRoute={true}
+              />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
               path="/:team/project/completed"
             >
-              <ProjectListContainer projectSource="/api/Project/GetCompleted" />
+              <ProjectListContainer
+                projectSource="Project/GetCompleted"
+                hasTeamRoute={true}
+              />
             </ConditionalRoute>
             <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
               path="/:team/ticket/needsAttention"
             >
-              <TicketListContainer projectSource="/api/ticket/RequiringManagerAttention" />
+              <TicketListContainer
+                projectSource="ticket/RequiringManagerAttention"
+                hasTeamRoute={true}
+              />
             </ConditionalRoute>
             <ConditionalRoute exact roles={["PI"]} path="/:team?/ticket/mine">
-              <TicketListContainer projectSource="/api/ticket/RequiringPIAttention" />
+              <TicketListContainer
+                projectSource="/api/ticket/RequiringPIAttention"
+                hasTeamRoute={false}
+              />
             </ConditionalRoute>
             <Route
               path="/:team/ticket/list/:projectId"

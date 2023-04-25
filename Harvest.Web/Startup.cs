@@ -149,17 +149,18 @@ namespace Harvest.Web
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.SupervisorAccess))));
                 options.AddPolicy(AccessCodes.WorkerAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.WorkerAccess))));
-
                 options.AddPolicy(AccessCodes.RateAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.RateAccess))));
                 options.AddPolicy(AccessCodes.FinanceAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.FinanceAccess))));
-
                 options.AddPolicy(AccessCodes.ReportAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.ReportAccess))));
                 options.AddPolicy(AccessCodes.InvoiceAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.InvoiceAccess))));
-
+                options.AddPolicy(AccessCodes.ProjectAccess, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.ProjectAccess))));
+                options.AddPolicy(AccessCodes.PrincipalInvestigatorandFinance, policy => policy.Requirements.Add(
+                    new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigatorandFinance))));
                 options.AddPolicy(AccessCodes.PrincipalInvestigator, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.PrincipalInvestigator))));
                 options.AddPolicy(AccessCodes.PrincipalInvestigatorOnly, policy => policy.Requirements.Add(
@@ -292,9 +293,12 @@ namespace Harvest.Web
                 );
 
                 // API routes map to all other controllers
+                //endpoints.MapControllerRoute(
+                //    name: "API",
+                //    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
                 endpoints.MapControllerRoute(
                     name: "API",
-                    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
+                    pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
 
                 // any other nonfile route should be handled by the spa, except leave the sockjs route alone if we are in dev mode (hot reloading)
                 if (env.IsDevelopment()) {

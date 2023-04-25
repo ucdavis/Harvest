@@ -8,7 +8,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import { Project, CropType, Team } from "../types";
+import { Project, CropType, Team, CommonRouteParams } from "../types";
 import AppContext from "../Shared/AppContext";
 import { usePromiseNotification } from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
@@ -26,7 +26,8 @@ export const RequestContainer = () => {
   const history = useHistory();
   const { detail: userDetail, roles: userRoles } = useContext(AppContext).user;
 
-  const { projectId, team } = useParams<RouteParams>();
+  const { projectId } = useParams<RouteParams>();
+  const { team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({
     id: 0,
     cropType: "Row" as CropType,
@@ -57,7 +58,7 @@ export const RequestContainer = () => {
     // load original request if this is a change request
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -78,7 +79,7 @@ export const RequestContainer = () => {
     if (projectId !== undefined) {
       cb();
     }
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   const create = async () => {
     // TODO: validation, loading spinner

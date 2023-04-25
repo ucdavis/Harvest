@@ -1,26 +1,26 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Cell, Column, TableState } from "react-table";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
-import { Invoice } from "../types";
+import { Invoice, CommonRouteParams } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 
 interface Props {
   invoices: Invoice[];
-  team: string;
   compact?: boolean;
 }
 
 export const InvoiceTable = (props: Props) => {
   const invoiceData = useMemo(() => props.invoices, [props.invoices]);
+  const { team } = useParams<CommonRouteParams>();
   const columns: Column<Invoice>[] = useMemo(
     () => [
       {
         Cell: (data: Cell<Invoice>) => (
           <div>
             <Link
-              to={`/${props.team}/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}
+              to={`/${team}/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}
             >
               #{data.row.original.id}
             </Link>
@@ -46,7 +46,7 @@ export const InvoiceTable = (props: Props) => {
         accessor: (row) => "$" + formatCurrency(row.total),
       },
     ],
-    [props.team]
+    [team]
   );
 
   const initialState: Partial<TableState<any>> = {

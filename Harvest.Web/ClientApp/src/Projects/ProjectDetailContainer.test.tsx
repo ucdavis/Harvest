@@ -53,10 +53,10 @@ beforeEach(() => {
 
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
-      "/api/Project/Get/": projectResponse,
-      "/api/Invoice/List/": invoiceResponse,
-      "/api/Ticket/GetList": ticketResponses,
-      "/api/expense/getunbilledtotal/": unbilledResponse,
+      "/api/team1/Project/Get/": projectResponse,
+      "/api/team1/Invoice/List/": invoiceResponse,
+      "/api/team1/Ticket/GetList": ticketResponses,
+      "/api/team1/expense/getunbilledtotal/": unbilledResponse,
       "/api/File/GetUploadDetails": fileResponse,
     })
   );
@@ -84,14 +84,14 @@ describe("Project Detail Container", () => {
       //Clear out the fetch mock and return a not ok for the loading text
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
-          "/api/Project/Get/": notOkProjectResponse,
+          "/api/team1/Project/Get/": notOkProjectResponse,
         })
       );
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -108,8 +108,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -126,8 +126,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -146,8 +146,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -168,8 +168,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -188,8 +188,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -208,8 +208,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>
@@ -230,8 +230,8 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/project/details/3"]}>
-            <Route path="/project/details/:projectId">
+          <MemoryRouter initialEntries={["team1/project/details/3"]}>
+            <Route path=":team/project/details/:projectId">
               <ProjectDetailContainer />
             </Route>
           </MemoryRouter>

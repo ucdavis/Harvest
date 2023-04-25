@@ -62,7 +62,7 @@ export const AppNav = () => {
                 </NavItem>
               </ShowFor>
               <ShowFor condition={!nonTeamPage}>
-                <ShowFor roles={["FieldManager", "Supervisor"]}>
+                <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
                   <NavItem>
                     <NavLink href={`/${team}/project`}>All Projects</NavLink>
                   </NavItem>
@@ -120,6 +120,9 @@ export const AppNav = () => {
                           href={`/${team}/Report/HistoricalRateActivity`}
                         >
                           Reports - Historical Rate Activity
+                        </DropdownItem>
+                        <DropdownItem href={`/${team}/Report/StaleProjects`}>
+                          Reports - Stale Projects
                         </DropdownItem>
                       </ShowFor>
                     </DropdownMenu>

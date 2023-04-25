@@ -34,8 +34,8 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.ControllerInherits("SuperController");
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
             var attributes = ControllerReflection.ClassExpectedAttribute<AuthorizeAttribute>(3, showListOfAttributes: true);
-            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigator);
-            ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); //TODO: Enable when this gets added.
+            attributes.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
+            ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(3); 
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(3);
         }
 

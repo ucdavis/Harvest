@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { LayersControl, GeoJSON, Popup, LayerGroup } from "react-leaflet";
-import { Field, Project } from "../types";
+import { Field, Project, CommonRouteParams } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
 
@@ -10,6 +11,7 @@ interface Props {
 
 export const FieldLayers = (props: Props) => {
   const [fields, setFields] = useState<Field[]>([]);
+  const { team } = useParams<CommonRouteParams>();
   const getIsMounted = useIsMounted();
 
   // load fields for active projects
@@ -20,7 +22,7 @@ export const FieldLayers = (props: Props) => {
       const projectId = props.project.id;
 
       const activeFieldResponse = await authenticatedFetch(
-        `/api/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}&projectId=${projectId}`
+        `/api/${team}/Field/Active?start=${startDate.toLocaleDateString()}&end=${endDate.toLocaleDateString()}&projectId=${projectId}`
       );
 
       if (activeFieldResponse.ok) {
@@ -30,7 +32,13 @@ export const FieldLayers = (props: Props) => {
     };
 
     cb();
-  }, [props.project.end, props.project.start, getIsMounted, props.project.id]);
+  }, [
+    props.project.end,
+    props.project.start,
+    getIsMounted,
+    props.project.id,
+    team,
+  ]);
 
   if (fields.length === 0) {
     return null;

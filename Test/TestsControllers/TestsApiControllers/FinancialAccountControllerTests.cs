@@ -54,8 +54,10 @@ namespace Test.TestsControllers.TestsApiControllers
 #endif
 
             //1
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Get", countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Get", countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 3);
+            var routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("Get", countAdjustment + 3);
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
         }
     }
 }

@@ -28,7 +28,7 @@ import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
 
 export const ProjectDetailContainer = () => {
-  const { projectId } = useParams<CommonRouteParams>();
+  const { projectId, team } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({} as Project);
   const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -42,7 +42,7 @@ export const ProjectDetailContainer = () => {
     const cb = async () => {
       setIsLoading(true);
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -61,15 +61,16 @@ export const ProjectDetailContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted]);
-
-  const team = project.team?.slug;
+  }, [projectId, getIsMounted, team]);
 
   const updateFiles = async (attachments: BlobFile[]) => {
-    const request = authenticatedFetch(`/api/Request/Files/${projectId}`, {
-      method: "POST",
-      body: JSON.stringify({ Attachments: attachments }),
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Request/Files/${projectId}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ Attachments: attachments }),
+      }
+    );
 
     setNotification(request, "Saving File(s)", "File(s) Saved");
 
@@ -87,9 +88,12 @@ export const ProjectDetailContainer = () => {
 
   //cancel the project
   const cancelProject = async () => {
-    const request = authenticatedFetch(`/api/Request/Cancel/${projectId}`, {
-      method: "POST",
-    });
+    const request = authenticatedFetch(
+      `/api/${team}/Request/Cancel/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
     setNotification(request, "Canceling", "Project Request Canceled");
     const response = await request;
     if (response.ok) {
@@ -194,7 +198,7 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["System"],
+      roles: ["System", "Finance"],
       condition:
         project.status === "PendingApproval" &&
         addDays(new Date(project.lastStatusUpdatedOn), 18) <= new Date(),
@@ -203,19 +207,19 @@ export const ProjectDetailContainer = () => {
           className="btn btn-primary btn-sm mr-4"
           to={`/${team}/request/approve/${project.id}`}
         >
-          System View Quote <FontAwesomeIcon icon={faEye} />
+          Override View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
       ),
     }),
     useFor({
-      roles: ["System"],
+      roles: ["System", "Finance"],
       condition: project.status === "Active",
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
           to={`/${team}/request/changeAccount/${project.id}`}
         >
-          System Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
+          Override Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
         </Link>
       ),
     }),
@@ -232,7 +236,7 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["PI", "FieldManager"],
+      roles: ["PI", "FieldManager", "Finance", "System"],
       condition:
         // all statuses with approved quotes
         project.status === "Active" ||
@@ -279,7 +283,7 @@ export const ProjectDetailContainer = () => {
         <ProjectAlerts project={project} />
       </ShowForPiOnly>
       <ShowFor
-        roles={["System"]}
+        roles={["System", "Finance"]}
         condition={project.status === "PendingApproval"}
       >
         <ProjectAlerts
@@ -311,7 +315,7 @@ export const ProjectDetailContainer = () => {
         <div className="card-content">
           <div className="row">
             <div className="col-md-6">
-              <h2>Project Attachements</h2>
+              <h2>Project Attachments</h2>
               <FileUpload
                 disabled={notification.pending}
                 files={newFiles}
@@ -358,7 +362,6 @@ export const ProjectDetailContainer = () => {
               {" "}
               <ProjectUnbilledButton
                 projectId={project.id}
-                team={team}
                 remaining={project.quoteTotal - project.chargedTotal}
               />
             </div>
@@ -368,17 +371,10 @@ export const ProjectDetailContainer = () => {
       <div>
         {project.status !== "ChangeRequested" && (
           <div className="card-content">
-            <RecentTicketsContainer
-              compact={true}
-              projectId={projectId}
-              team={team}
-            />
-
-            <RecentInvoicesContainer
-              compact={true}
-              projectId={projectId}
-              team={team}
-            />
+            <ShowFor roles={["PI", "FieldManager", "Supervisor", "System"]}>
+              <RecentTicketsContainer compact={true} projectId={projectId} />
+            </ShowFor>
+            <RecentInvoicesContainer compact={true} projectId={projectId} />
           </div>
         )}
       </div>

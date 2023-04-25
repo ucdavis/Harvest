@@ -34,8 +34,8 @@ beforeEach(() => {
 
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
-      "/api/Project/Get/": projectResponse,
-      "/api/Ticket/GetList": ticketResponses,
+      "/api/team1/Project/Get/": projectResponse,
+      "/api/team1/Ticket/GetList": ticketResponses,
     })
   );
 });
@@ -68,15 +68,15 @@ describe("Request Container", () => {
       //Clear out the fetch mock and return a not ok for the loading text
       global.fetch = jest.fn().mockImplementation((x) =>
         responseMap(x, {
-          "/api/Project/Get/": notOkProjectResponse,
-          "/api/Ticket/GetList": notOkticketResponses,
+          "/api/team1/Project/Get/": notOkProjectResponse,
+          "/api/team1/Ticket/GetList": notOkticketResponses,
         })
       );
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>
@@ -93,8 +93,8 @@ describe("Request Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>
@@ -111,8 +111,8 @@ describe("Request Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>
@@ -129,8 +129,8 @@ describe("Request Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>
@@ -149,8 +149,8 @@ describe("Request Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>
@@ -169,8 +169,8 @@ describe("Request Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>
@@ -189,8 +189,8 @@ describe("Request Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["/ticket/List/3"]}>
-            <Route path="/ticket/List/:projectId">
+          <MemoryRouter initialEntries={["team1/ticket/List/3"]}>
+            <Route path=":team/ticket/List/:projectId">
               <TicketsContainer />
             </Route>
           </MemoryRouter>

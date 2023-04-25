@@ -40,7 +40,7 @@ export const TicketCreate = () => {
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}`
       );
 
       if (response.ok) {
@@ -53,7 +53,7 @@ export const TicketCreate = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted]);
+  }, [projectId, getIsMounted, team]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
@@ -67,7 +67,7 @@ export const TicketCreate = () => {
     }
 
     const request = authenticatedFetch(
-      `/api/Ticket/Create?projectId=${projectId}`,
+      `/api/${team}/Ticket/Create?projectId=${projectId}`,
       {
         method: "POST",
         body: JSON.stringify(ticket),

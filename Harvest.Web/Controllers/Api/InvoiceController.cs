@@ -31,13 +31,14 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> Get(int projectId, int invoiceId)
         {
+
             var invoice = await _dbContext.Invoices
                 .Include(a => a.Transfers)
                 .Include(i => i.Expenses)
                 .ThenInclude(e => e.Rate)
                 .AsNoTracking()
                 .AsSplitQuery()
-                .SingleAsync(i => i.Id == invoiceId);
+                .SingleAsync(i => i.Id == invoiceId && i.Project.Team.Slug == TeamSlug);
 
             if (invoice.ProjectId != projectId)
             {
@@ -51,7 +52,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.Team)
                 .AsNoTracking()
                 .AsSplitQuery()
-                .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId);
+                .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId && p.Team.Slug == TeamSlug);
 
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
@@ -59,10 +60,11 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> List(int projectId, int? maxRows)
         {
             var user = await _userService.GetCurrentUser();
-            var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess);
+            //var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess) || await _userService.HasAccess(AccessCodes.FinanceAccess);
+            var hasAccess = await _userService.HasAccess(new []{ AccessCodes.FieldManagerAccess, AccessCodes.FinanceAccess}, TeamSlug);
 
             var invoiceQuery = _dbContext.Invoices.Where(a =>
-                    a.ProjectId == projectId
+                    a.ProjectId == projectId && a.Project.Team.Slug == TeamSlug
                     && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
                     .OrderByDescending(a => a.CreatedOn);
 
@@ -77,6 +79,11 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> InitiateCloseout(int projectId)
         {
+            if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.Team.Slug != TeamSlug))
+            {
+                return BadRequest("Project not associated with the current team");
+            }
+
             var result = await _invoiceService.InitiateCloseout(projectId);
             return Ok(result);
         }
@@ -85,7 +92,8 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigator)]
         public async Task<ActionResult> DoCloseout(int projectId)
         {
-            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            //Some of these may fail from old emails...
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
             await _historyService.ProjectCloseoutApproved(projectId, project); //Deal with this if the result has errors? I think logging that they approved it is fine, even if it fails.
             await _dbContext.SaveChangesAsync();
 
