@@ -67,7 +67,7 @@ export const CloseoutContainer = () => {
 
   useEffect(() => {
     if (closeoutRequested) {
-      history.push(`${team}/project/details/${projectId}`);
+      history.push(`/${team}/project/details/${projectId}`);
     }
   }, [closeoutRequested, history, projectId, team]);
 
