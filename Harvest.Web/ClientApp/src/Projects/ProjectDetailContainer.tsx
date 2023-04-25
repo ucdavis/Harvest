@@ -26,7 +26,6 @@ import { ProjectAlerts } from "./ProjectAlerts";
 import { authenticatedFetch } from "../Util/Api";
 import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
-import Condition from "yup/lib/Condition";
 import AppContext from "../Shared/AppContext";
 
 export const ProjectDetailContainer = () => {
