@@ -69,7 +69,7 @@ export const ExpenseEntryContainer = () => {
   const leavePage = useCallback(() => {
     // go to the project page unless you are a worker -- worker can't see the project page
     if (roles.includes("Worker")) {
-      history.push("/");
+      history.push(`/${team}/team`);
     } else {
       if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
         history.goBack();
