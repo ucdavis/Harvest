@@ -67,14 +67,14 @@ export const CloseoutContainer = () => {
 
   useEffect(() => {
     if (closeoutRequested) {
-      history.push(`${team}/project/details/${projectId}`);
+      history.push(`/${team}/project/details/${projectId}`);
     }
   }, [closeoutRequested, history, projectId, team]);
 
   const [getConfirmation] = useConfirmationDialog({
     title: "Initiate Closeout",
     message: (
-      <p>
+      <div>
         Upon PI approval, closeout will result in...
         <ul>
           <li>Generating a final invoice if there are any unbilled expenses</li>
@@ -83,7 +83,7 @@ export const CloseoutContainer = () => {
             on whether there are any pending invoices
           </li>
         </ul>
-      </p>
+      </div>
     ),
   });
 
