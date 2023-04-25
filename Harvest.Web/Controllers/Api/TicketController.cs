@@ -89,7 +89,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public async Task<ActionResult> UpdateWorkNotes(int projectId, int ticketId, [FromBody] string workNotes)
         {
             var ticketToUpdate = await _dbContext.Tickets.SingleAsync(a => a.Id == ticketId && a.ProjectId == projectId);
