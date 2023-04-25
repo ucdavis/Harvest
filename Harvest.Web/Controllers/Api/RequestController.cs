@@ -235,7 +235,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorandFinance)]
         public async Task<ActionResult> RejectQuote(int projectId, [FromBody] QuoteRejectionModel model)
         {
             if (string.IsNullOrWhiteSpace(model.Reason))
@@ -246,6 +246,15 @@ namespace Harvest.Web.Controllers.Api
             var quote = await _dbContext.Quotes.SingleAsync(a => a.ProjectId == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
+
+            if (project.PrincipalInvestigator.Iam != currentUser.Iam)
+            {
+                var staleDays = (int)((DateTime.UtcNow - project.LastStatusUpdatedOn).TotalDays);
+                if (staleDays <= MinimumStaleDays)
+                {
+                    return BadRequest("You are not the principal investigator for this project and it isn't stale enough.");
+                }
+            }
 
             var ticketToCreate = new Ticket();
             ticketToCreate.ProjectId = projectId;

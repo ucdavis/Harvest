@@ -76,7 +76,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3, testMessage: "RejectQuote");
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigatorOnly);
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigatorandFinance);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
 
             //4 (Post of ChangeAccount)
