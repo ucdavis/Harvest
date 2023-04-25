@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,6 +26,8 @@ import { ProjectAlerts } from "./ProjectAlerts";
 import { authenticatedFetch } from "../Util/Api";
 import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
+import Condition from "yup/lib/Condition";
+import AppContext from "../Shared/AppContext";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team } = useParams<CommonRouteParams>();
@@ -33,6 +35,7 @@ export const ProjectDetailContainer = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
   const history = useHistory();
+  const userInfo = useContext(AppContext);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -371,9 +374,23 @@ export const ProjectDetailContainer = () => {
       <div>
         {project.status !== "ChangeRequested" && (
           <div className="card-content">
-            <ShowFor roles={["PI", "FieldManager", "Supervisor", "System"]}>
+            <ShowFor
+              roles={["FieldManager", "Supervisor", "System"]}
+              condition={
+                project.principalInvestigator.iam !== userInfo.user.detail.iam
+              }
+            >
               <RecentTicketsContainer compact={true} projectId={projectId} />
             </ShowFor>
+            <ShowFor
+              roles={["PI"]}
+              condition={
+                project.principalInvestigator.iam === userInfo.user.detail.iam
+              }
+            >
+              <RecentTicketsContainer compact={true} projectId={projectId} />
+            </ShowFor>
+
             <RecentInvoicesContainer compact={true} projectId={projectId} />
           </div>
         )}
