@@ -42,6 +42,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.RateAccount)
             </th>
+            <th>@Html.DisplayNameFor(model => model.TeamSlug)</th>
             <th>
                 @Html.DisplayNameFor(model => model.IsSame)
             </th>
@@ -61,7 +62,7 @@
                     @Html.DisplayFor(modelItem => item.InvoiceStatus)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Description)                    
+                    @Html.DisplayFor(modelItem => item.Description)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Total)
@@ -73,7 +74,10 @@
                     @Html.DisplayFor(modelItem => item.Account)
                 </td>
                 <td>
-                    <a asp-controller="Rate" asp-action="Edit" asp-route-id="@item.RateId" target="_blank">@Html.DisplayFor(modelItem => item.RateAccount)</a>
+                    <a asp-controller="Rate" asp-action="Edit" asp-route-team="@item.TeamSlug" asp-route-id="@item.RateId" target="_blank">@Html.DisplayFor(modelItem => item.RateAccount)</a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TeamSlug)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.IsSame)
@@ -93,7 +97,7 @@
     }
     }
 
-    @section Scripts
+@section Scripts
     {
     @{
         await Html.RenderPartialAsync("_ReportScriptsPartial");
@@ -106,7 +110,7 @@
                     type: "boolean",
                     targets: [5]
                 }
-            ]            
+            ]
         });
     </script>
 }
