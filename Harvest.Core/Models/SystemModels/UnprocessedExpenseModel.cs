@@ -27,6 +27,9 @@ namespace Harvest.Core.Models.SystemModels
         [DisplayName("Same")]
         public string IsSame { get; set; }
 
+        [DisplayName("Team")]
+        public string TeamSlug { get; set; }
+
         public static Expression<Func<Expense, UnprocessedExpensesModel>> Projection()
         {
             return a => new UnprocessedExpensesModel
@@ -41,7 +44,8 @@ namespace Harvest.Core.Models.SystemModels
                 IsPassthrough = a.IsPassthrough,
                 Account = a.Account,
                 RateAccount = a.Rate.Account,
-                IsSame = a.Rate.Account == a.Account ? "Yes" : "No"
+                IsSame = a.Rate.Account == a.Account ? "Yes" : "No",
+                TeamSlug = a.Project.Team.Slug
             };
         }
     }
