@@ -2,6 +2,7 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
 import { act, Simulate } from "react-dom/test-utils";
+import { Input } from "reactstrap";
 
 import { ExpenseEntryContainer } from "./ExpenseEntryContainer";
 import { fakeAppContext, sampleRates, fakeProject } from "../Test/mockData";
@@ -112,7 +113,9 @@ describe("Expense Entry Container", () => {
     Simulate.click(link);
 
     const unitsInput = container.querySelector("#units") as HTMLElement;
-    Simulate.change(unitsInput, { target: { value: "3" } });
+    Simulate.change(unitsInput, {
+      target: { value: "3" } as unknown as EventTarget,
+    });
     const total = container.querySelector(".total-3");
 
     expect(total?.textContent).toContain("$180.00");
