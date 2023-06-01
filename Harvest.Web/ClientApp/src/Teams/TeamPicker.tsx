@@ -29,7 +29,7 @@ export const TeamPicker = () => {
       }
     };
     getTeams();
-  });
+  }, [history, location.pathname]);
 
   // show loading message while we wait for teams
   if (!teams) {
