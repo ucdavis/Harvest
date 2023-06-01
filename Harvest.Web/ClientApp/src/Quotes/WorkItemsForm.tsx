@@ -2,11 +2,9 @@ import React, { useRef } from "react";
 import {
   Button,
   Col,
-  CustomInput,
   FormGroup,
   Input,
   InputGroup,
-  InputGroupAddon,
   InputGroupText,
   Row,
   UncontrolledTooltip,
@@ -184,25 +182,27 @@ const WorkItemForm = (props: WorkItemFormProps) => {
 
       {props.category === "Other" && (
         <div className="col-1 col-md-2">
-          <CustomInput
-            type="switch"
-            id={`markup-${workItem.id}-${workItem.activityId}`}
-            checked={workItem.markup}
-            onChange={(e) => {
-              props.updateWorkItems({
-                ...workItem,
-                markup: e.target.checked,
-              });
-            }}
-          />
+          <div className="form-check form-switch">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              role="switch"
+              id={`markup-${workItem.id}-${workItem.activityId}`}
+              checked={workItem.markup}
+              onChange={(e) => {
+                props.updateWorkItems({
+                  ...workItem,
+                  markup: e.target.checked,
+                });
+              }}
+            />
+          </div>
         </div>
       )}
 
       <div className="col-4 col-md-3">
         <InputGroup>
-          <InputGroupAddon addonType="prepend">
-            <InputGroupText>{workItem.unit || ""}</InputGroupText>
-          </InputGroupAddon>
+          <InputGroupText>{workItem.unit || ""}</InputGroupText>
           <Input
             className={getClassName("quantity")}
             type="number"

@@ -276,39 +276,68 @@ namespace Harvest.Web
             
             app.UseEndpoints(endpoints =>
             {
-                // team routes for server-side endpoints
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "/{team}/{controller}/{action}/{id?}",
-                    defaults: new { action = "Index" },
-                    constraints: new { controller = "(help|rate|permissions|crop|report)" }
-                );
-                
-                // default for MVC server-side endpoints
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(account|crop|home|system|help|error)" }
-                );
+                if (env.IsDevelopment())
+                {
+                    // regex to ignore hot module reload requests
+                    var spaHmrSocketRegex = "^(?!ws|.*?hot-update.js(on)?).*$";
 
-                // API routes map to all other controllers
-                //endpoints.MapControllerRoute(
-                //    name: "API",
-                //    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
-                endpoints.MapControllerRoute(
-                    name: "API",
-                    pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
+                    // team routes for server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "/{team}/{controller}/{action}/{id?}",
+                        defaults: new { action = "Index" },
+                        constraints: new
+                        {
+                            team = spaHmrSocketRegex,
+                            controller = "(help|rate|permissions|crop|report)"
+                        }
+                    );
 
-                // any other nonfile route should be handled by the spa, except leave the sockjs route alone if we are in dev mode (hot reloading)
-                if (env.IsDevelopment()) {
+                    // default for MVC server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller}/{action}/{id?}",
+                        defaults: new { controller = "Home", action = "Index" },
+                        constraints: new { controller = "(account|crop|home|system|help|error)" }
+                    );
+
+                    // API routes map to all other controllers
+                    endpoints.MapControllerRoute(
+                        name: "API",
+                        pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
+
+                    // any other non-file/hmr route should be handled by the spa
                     endpoints.MapControllerRoute(
                         name: "react",
                         pattern: "{*path:nonfile}",
                         defaults: new { controller = "Home", action = "Index" },
-                        constraints: new { path = new RegexRouteConstraint("^(?!sockjs-node).*$") }
+                        constraints: new { path = new RegexRouteConstraint(spaHmrSocketRegex) }
                     );
-                } else {
+                }
+                else
+                {
+                    // team routes for server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "/{team}/{controller}/{action}/{id?}",
+                        defaults: new { action = "Index" },
+                        constraints: new { controller = "(help|rate|permissions|crop|report)" }
+                    );
+
+                    // default for MVC server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller}/{action}/{id?}",
+                        defaults: new { controller = "Home", action = "Index" },
+                        constraints: new { controller = "(account|crop|home|system|help|error)" }
+                    );
+
+                    // API routes map to all other controllers
+                    endpoints.MapControllerRoute(
+                        name: "API",
+                        pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
+
+                    // any other nonfile route should be handled by the spa
                     endpoints.MapControllerRoute(
                         name: "react",
                         pattern: "{*path:nonfile}",
