@@ -38,6 +38,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using MvcReact;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web
 {
@@ -202,6 +204,8 @@ namespace Harvest.Web
                 });
             }
 
+            services.AddMvcReact();
+
             services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
@@ -230,7 +234,7 @@ namespace Harvest.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext, IOptions<MvcReactOptions> mvcReactOptions)
         {
             app.UseAllElasticApm(Configuration);
 
@@ -249,22 +253,7 @@ namespace Harvest.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles(new StaticFileOptions()
-            {
-                OnPrepareResponse = (context) =>
-                {
-                    // cache our static assest, i.e. CSS and JS, for a long time
-                    if (context.Context.Request.Path.Value.StartsWith("/static"))
-                    {
-                        var headers = context.Context.Response.GetTypedHeaders();
-                        headers.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-                        {
-                            Public = true,
-                            MaxAge = TimeSpan.FromDays(365)
-                        };
-                    }
-                }
-            });
+            app.UseMvcReactStaticFiles();
 
             app.UseRouting();
 
@@ -278,9 +267,6 @@ namespace Harvest.Web
             {
                 if (env.IsDevelopment())
                 {
-                    // regex to ignore hot module reload requests
-                    var spaHmrSocketRegex = "^(?!ws|.*?hot-update.js(on)?).*$";
-
                     // team routes for server-side endpoints
                     endpoints.MapControllerRoute(
                         name: "default",
@@ -288,7 +274,7 @@ namespace Harvest.Web
                         defaults: new { action = "Index" },
                         constraints: new
                         {
-                            team = spaHmrSocketRegex,
+                            team = mvcReactOptions.Value.ExcludeHmrPathsRegex,
                             controller = "(help|rate|permissions|crop|report)"
                         }
                     );
@@ -311,7 +297,7 @@ namespace Harvest.Web
                         name: "react",
                         pattern: "{*path:nonfile}",
                         defaults: new { controller = "Home", action = "Index" },
-                        constraints: new { path = new RegexRouteConstraint(spaHmrSocketRegex) }
+                        constraints: new { path = new RegexRouteConstraint(mvcReactOptions.Value.ExcludeHmrPathsRegex) }
                     );
                 }
                 else
@@ -346,16 +332,8 @@ namespace Harvest.Web
                 }
             });
 
-            // SPA needs to kick in for all paths during development
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
-            });
+            // During development, SPA will kick in for all remaining paths
+            app.UseMvcReact();
         }
 
         private void ConfigureDb(AppDbContext dbContext)
