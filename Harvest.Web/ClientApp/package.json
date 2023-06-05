@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@azure/storage-blob": "^12.7.0",
+    "@azure/storage-blob": "^12.14.0",
     "@david.kucsai/react-pdf-table": "^0.4.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
@@ -42,6 +42,8 @@
     "yup": "^0.32.9"
   },
   "devDependencies": {
+    "@azure/core-asynciterator-polyfill": "^1.0.2",
+    "@opentelemetry/api": "^1.4.1",
     "@types/geojson": "^7946.0.8",
     "@types/leaflet": "^1.7.5",
     "@types/react-bootstrap-typeahead": "^5.1.7",
