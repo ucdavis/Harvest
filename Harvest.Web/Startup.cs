@@ -38,6 +38,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using MvcReact;
+using Microsoft.Extensions.Options;
 
 namespace Harvest.Web
 {
@@ -202,6 +204,8 @@ namespace Harvest.Web
                 });
             }
 
+            services.AddMvcReact();
+
             services.Configure<AuthSettings>(Configuration.GetSection("Authentication"));
             services.Configure<FinancialLookupSettings>(Configuration.GetSection("FinancialLookup"));
             services.Configure<SlothSettings>(Configuration.GetSection("Sloth"));
@@ -230,7 +234,7 @@ namespace Harvest.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext dbContext, IOptions<MvcReactOptions> mvcReactOptions)
         {
             app.UseAllElasticApm(Configuration);
 
@@ -249,22 +253,7 @@ namespace Harvest.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles(new StaticFileOptions()
-            {
-                OnPrepareResponse = (context) =>
-                {
-                    // cache our static assest, i.e. CSS and JS, for a long time
-                    if (context.Context.Request.Path.Value.StartsWith("/static"))
-                    {
-                        var headers = context.Context.Response.GetTypedHeaders();
-                        headers.CacheControl = new Microsoft.Net.Http.Headers.CacheControlHeaderValue
-                        {
-                            Public = true,
-                            MaxAge = TimeSpan.FromDays(365)
-                        };
-                    }
-                }
-            });
+            app.UseMvcReactStaticFiles();
 
             app.UseRouting();
 
@@ -276,39 +265,65 @@ namespace Harvest.Web
             
             app.UseEndpoints(endpoints =>
             {
-                // team routes for server-side endpoints
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "/{team}/{controller}/{action}/{id?}",
-                    defaults: new { action = "Index" },
-                    constraints: new { controller = "(help|rate|permissions|crop|report)" }
-                );
-                
-                // default for MVC server-side endpoints
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action}/{id?}",
-                    defaults: new { controller = "Home", action = "Index" },
-                    constraints: new { controller = "(account|crop|home|system|help|error)" }
-                );
+                if (env.IsDevelopment())
+                {
+                    // team routes for server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "/{team}/{controller}/{action}/{id?}",
+                        defaults: new { action = "Index" },
+                        constraints: new
+                        {
+                            team = mvcReactOptions.Value.ExcludeHmrPathsRegex,
+                            controller = "(help|rate|permissions|crop|report)"
+                        }
+                    );
 
-                // API routes map to all other controllers
-                //endpoints.MapControllerRoute(
-                //    name: "API",
-                //    pattern: "/api/{controller=Project}/{action=Index}/{projectId?}");
-                endpoints.MapControllerRoute(
-                    name: "API",
-                    pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
+                    // default for MVC server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller}/{action}/{id?}",
+                        defaults: new { controller = "Home", action = "Index" },
+                        constraints: new { controller = "(account|crop|home|system|help|error)" }
+                    );
 
-                // any other nonfile route should be handled by the spa, except leave the sockjs route alone if we are in dev mode (hot reloading)
-                if (env.IsDevelopment()) {
+                    // API routes map to all other controllers
+                    endpoints.MapControllerRoute(
+                        name: "API",
+                        pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
+
+                    // any other non-file/hmr route should be handled by the spa
                     endpoints.MapControllerRoute(
                         name: "react",
                         pattern: "{*path:nonfile}",
                         defaults: new { controller = "Home", action = "Index" },
-                        constraints: new { path = new RegexRouteConstraint("^(?!sockjs-node).*$") }
+                        constraints: new { path = new RegexRouteConstraint(mvcReactOptions.Value.ExcludeHmrPathsRegex) }
                     );
-                } else {
+                }
+                else
+                {
+                    // team routes for server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "/{team}/{controller}/{action}/{id?}",
+                        defaults: new { action = "Index" },
+                        constraints: new { controller = "(help|rate|permissions|crop|report)" }
+                    );
+
+                    // default for MVC server-side endpoints
+                    endpoints.MapControllerRoute(
+                        name: "default",
+                        pattern: "{controller}/{action}/{id?}",
+                        defaults: new { controller = "Home", action = "Index" },
+                        constraints: new { controller = "(account|crop|home|system|help|error)" }
+                    );
+
+                    // API routes map to all other controllers
+                    endpoints.MapControllerRoute(
+                        name: "API",
+                        pattern: "/api/{team}/{controller=Project}/{action=Index}/{projectId?}");
+
+                    // any other nonfile route should be handled by the spa
                     endpoints.MapControllerRoute(
                         name: "react",
                         pattern: "{*path:nonfile}",
@@ -317,16 +332,8 @@ namespace Harvest.Web
                 }
             });
 
-            // SPA needs to kick in for all paths during development
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
-
-                if (env.IsDevelopment())
-                {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
-                }
-            });
+            // During development, SPA will kick in for all remaining paths
+            app.UseMvcReact();
         }
 
         private void ConfigureDb(AppDbContext dbContext)

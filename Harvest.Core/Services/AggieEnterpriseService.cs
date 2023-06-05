@@ -179,13 +179,13 @@ namespace Harvest.Core.Services
         /// </summary>
         /// <param name="financialSegmentString"></param>
         /// <returns></returns>
-        public async Task<FinancialOfficerDetails> GetFinancialOfficer(string financialSegmentString)
+        public Task<FinancialOfficerDetails> GetFinancialOfficer(string financialSegmentString)
         {
             //TODO: If AE can supply the query....
             var rtValue = new FinancialOfficerDetails();
             rtValue.FinancialOfficerId = null;
 
-            return rtValue;
+            return Task.FromResult(rtValue);
         }
 
         public string GetNaturalAccount(string financialSegmentString)

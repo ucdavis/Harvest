@@ -75,7 +75,9 @@ describe("Request Container", () => {
       ".custom-control.custom-radio"
     )[0];
     const vegetable = container.querySelector(".rbt-input-wrapper");
-    const PI = container.querySelectorAll("input.rbt-input-main");
+    const PI = container.querySelectorAll<HTMLInputElement>(
+      "input.rbt-input-main"
+    );
 
     expect(startDate?.value).toContain("03/15/2021");
     expect(endDate?.value).toContain("03/29/2021");
@@ -107,7 +109,9 @@ describe("Request Container", () => {
       ".custom-control.custom-radio"
     )[0];
     const vegetable = container.querySelector(".rbt-input-wrapper");
-    const PI = container.querySelectorAll("input.rbt-input-main");
+    const PI = container.querySelectorAll<HTMLInputElement>(
+      "input.rbt-input-main"
+    );
     const button = container.querySelector("#Request-Button");
 
     expect(startDate?.value).toContain("");

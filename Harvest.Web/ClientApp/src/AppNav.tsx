@@ -77,7 +77,7 @@ export const AppNav = () => {
                     <DropdownToggle nav caret>
                       Team Admin
                     </DropdownToggle>
-                    <DropdownMenu right>
+                    <DropdownMenu end>
                       <ShowFor roles={["FieldManager"]}>
                         <DropdownItem href={`/${team}/Permissions/Index`}>
                           Permissions
@@ -134,7 +134,7 @@ export const AppNav = () => {
                   <DropdownToggle nav caret>
                     System Admin
                   </DropdownToggle>
-                  <DropdownMenu right>
+                  <DropdownMenu end>
                     <DropdownItem href={`/System/UpdatePendingExpenses`}>
                       Unprocessed Expenses
                     </DropdownItem>
