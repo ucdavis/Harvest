@@ -9,7 +9,7 @@ Harvest Farm Project Tracking Website
 
 Requires .net 5 SDK from https://dotnet.microsoft.com/download
 
-Requires nodeJS, recommended version 14.x
+Requires nodeJS, recommended version 18.x (see badge above)
 
 In the `Harvest.Web/ClientApp` folder, run `npm install --legacy-peer-deps`.  Technically this step is optional but it's useful to do to get things started.
 
