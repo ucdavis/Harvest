@@ -77,7 +77,7 @@ export const ProjectHeader = (props: Props) => {
 
             {project.accounts.map((acc: ProjectAccount) => (
               <div key={acc.id}>
-                <p>
+                <p className="word-wrap">
                   {acc.number} | <b>{acc.percentage}%</b> <br />{" "}
                   <small> {acc.name} </small>
                 </p>
