@@ -3,7 +3,6 @@
     public class AggieEnterpriseOptions
     {
         public string GraphQlUrl { get; set; }
-        public string Token { get; set; }
 
         public string ConsumerKey { get; set; }
         public string ConsumerSecret { get; set; }

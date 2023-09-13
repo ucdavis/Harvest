@@ -48,8 +48,7 @@ namespace Test.TestsServices
         public AggieEnterpriseOptions AeOptions { get;set; } = new AggieEnterpriseOptions()
         {
             UseCoA = false,
-            GraphQlUrl = "http://fake.ucdavis.edu/graphql",
-            Token = "Fake"
+            GraphQlUrl = "http://fake.ucdavis.edu/graphql"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
         private SlothService SlothService { get; set; }
