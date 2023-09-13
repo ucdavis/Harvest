@@ -50,7 +50,6 @@ namespace Test.TestsServices
         {
             UseCoA = true,
             GraphQlUrl = "http://fake.ucdavis.edu/graphql",
-            Token = "Fake",
             NormalCoaNaturalAccount ="770006",
             PassthroughCoaNaturalAccount = "770002"
         };
