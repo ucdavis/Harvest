@@ -171,7 +171,7 @@ export interface WorkItem {
   rateId: number;
   rate: number;
   description: string;
-  quantity: number;
+  quantity: any;
   unit: string;
   markup: boolean;
   total: number;

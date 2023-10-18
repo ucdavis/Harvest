@@ -19,6 +19,7 @@ import { workItemSchema } from "../schemas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { debug } from "console";
 
 interface WorkItemsFormProps {
   adjustment: number;
@@ -205,15 +206,25 @@ const WorkItemForm = (props: WorkItemFormProps) => {
           <InputGroupText>{workItem.unit || ""}</InputGroupText>
           <Input
             className={getClassName("quantity")}
-            type="number"
+            type="text"
             id="units"
             value={workItem.quantity}
-            onChange={onChange("quantity", (e) =>
+            onChange={onChange("quantity", (e) => {
+              if (
+                e.target.value.endsWith(".") ||
+                e.target.value.endsWith(".0")
+              ) {
+                props.updateWorkItems({
+                  ...workItem,
+                  quantity: e.target.value,
+                });
+                return;
+              }
               props.updateWorkItems({
                 ...workItem,
                 quantity: parseFloat(e.target.value ?? 0),
-              })
-            )}
+              });
+            })}
             onBlur={onBlur("quantity")}
             disabled={!workItem.rateId}
           />
