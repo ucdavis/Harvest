@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -84,6 +84,17 @@ namespace Harvest.Core.Data
                 Iam = "1000007413"
             };
             await CheckOrCreatePermission(systemRole, user);
+
+            user = new User
+            {
+                Email = "laholstege@ucdavis.edu",
+                Kerberos = "holstege",
+                FirstName = "River",
+                LastName = "Holstege",
+                Iam = "1000243041"
+            };
+            await CheckOrCreatePermission(systemRole, user);
+
 
             await UpdateTeamPermissions();
 
