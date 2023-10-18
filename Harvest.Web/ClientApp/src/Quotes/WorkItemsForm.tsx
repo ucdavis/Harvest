@@ -19,7 +19,6 @@ import { workItemSchema } from "../schemas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { debug } from "console";
 
 interface WorkItemsFormProps {
   adjustment: number;
