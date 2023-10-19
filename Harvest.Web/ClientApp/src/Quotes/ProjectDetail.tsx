@@ -9,6 +9,7 @@ import { Location } from "../Fields/Location";
 import { useInputValidator } from "use-input-validator";
 import { quoteContentSchema } from "../schemas";
 import { validatorOptions } from "../constants";
+import StatefulInput from "../Shared/StatefulInput";
 
 interface Props {
   rates: Rate[];
@@ -87,7 +88,7 @@ export const ProjectDetail = (props: Props) => {
           <Row className="align-items-baseline">
             <Col md="3">
               <Label for="acres">Number of Acres</Label>
-              <Input
+              <StatefulInput
                 className={getClassName("acres")}
                 type="number"
                 id="acres"
