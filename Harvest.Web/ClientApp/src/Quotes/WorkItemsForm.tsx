@@ -19,6 +19,7 @@ import { workItemSchema } from "../schemas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import StatefulInput from "../Shared/StatefulInput";
 
 interface WorkItemsFormProps {
   adjustment: number;
@@ -203,7 +204,7 @@ const WorkItemForm = (props: WorkItemFormProps) => {
       <div className="col-4 col-md-3">
         <InputGroup>
           <InputGroupText>{workItem.unit || ""}</InputGroupText>
-          <Input
+          <StatefulInput
             className={getClassName("quantity")}
             type="number"
             id="units"
