@@ -17,10 +17,8 @@ const StatefulInput = (props: IProps) => {
     // this could happen on a slow load, or if the parent zero's out the value
     // this is not best practices for how to handle state (should have one source of truth)
     // but it's the easiest way to have a string input for our number field (for floats) and not change the type
-    if (props.value.toString() !== internalValue) {
-      setInternalValue(!!props.value ? props.value.toString() : "");
-    }
-  }, [props.value, internalValue]);
+    setInternalValue(!!props.value ? props.value.toString() : "");
+  }, [props.value]);
 
   return (
     <Input
