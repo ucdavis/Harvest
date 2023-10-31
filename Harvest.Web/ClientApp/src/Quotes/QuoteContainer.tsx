@@ -16,6 +16,7 @@ import { ProjectDetail } from "./ProjectDetail";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
+import { Map } from "../Maps/Map";
 
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -236,14 +237,14 @@ export const QuoteContainer = () => {
   // TODO: we might want to move this all into a separate component
   if (editFields) {
     return (
-      <div>
-        <div className="card-wrapper">
+      <div className="fullHeightWidth">
+        <div className="card-wrapper fullHeightWidth">
           <ProjectHeader
             project={project}
             title={"Field Request #" + (project?.id || "")}
           ></ProjectHeader>
 
-          <div className="card-green-bg">
+          <div className="card-green-bg fullHeightWidth">
             <div className="card-content">
               <div className="row">
                 <div className="col-md-6">
@@ -274,14 +275,15 @@ export const QuoteContainer = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          <FieldContainer
+            <Map />
+            {/* <FieldContainer
             crops={cropArray}
             fields={quote.fields}
             project={project}
             updateFields={(fields) => setQuote({ ...quote, fields })}
-          ></FieldContainer>
+          ></FieldContainer> */}
+          </div>
         </div>
       </div>
     );
