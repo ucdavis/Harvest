@@ -16,7 +16,8 @@ import { ProjectDetail } from "./ProjectDetail";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
-import { Map } from "../Maps/Map";
+import { MapEditWidget } from "../Maps/MapEditWidget";
+import { MapSketchWidget } from "../Maps/MapSketchWidget";
 
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -276,7 +277,8 @@ export const QuoteContainer = () => {
               </div>
             </div>
 
-            <Map />
+            <MapEditWidget />
+            {/* <MapSketchWidget /> */}
             {/* <FieldContainer
             crops={cropArray}
             fields={quote.fields}
