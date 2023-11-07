@@ -39,6 +39,7 @@ export const MapEditWidget = () => {
 
       const featureLayer = new FeatureLayer({
         portalItem: {
+          // the feature layer is not added to the map in ArcGIS Online, but is overlayed here
           id: "66289d4facfb4932a5b1d91db8792c4f",
         },
       });
@@ -65,9 +66,10 @@ export const MapEditWidget = () => {
                 // preserveFieldValuesWhenHidden: false,
                 title: "Edit Field Details",
                 elements: [
+                  // was having trouble with the autocast so this is my workaround
                   new FieldElement({
-                    fieldName: "Name",
-                    label: "Name",
+                    fieldName: "name", // fieldName has to match the case of the field name in the feature layer
+                    label: "Name", // you can check that at Content -> select feature layer -> Data (at top) -> fields
                   }),
                   new FieldElement({
                     fieldName: "Crop",
