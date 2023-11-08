@@ -278,9 +278,9 @@ export const QuoteContainer = () => {
               </div>
             </div>
 
-            {/* <MapEditWidget /> */}
+            <MapEditWidget />
+            {/* <MapEditReactState /> */}
             {/* <MapSketchWidget /> */}
-            <MapEditReactState />
             {/* <FieldContainer
             crops={cropArray}
             fields={quote.fields}
