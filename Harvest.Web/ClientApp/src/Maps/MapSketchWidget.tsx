@@ -10,6 +10,11 @@ import Collection from "@arcgis/core/core/Collection.js";
 import SketchViewModel from "@arcgis/core/widgets/Sketch/SketchViewModel.js";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
+// here i'm trying to use the sketch widget to draw a polygon on the map
+// and then use the reactiveUtils.watch to watch the graphicsLayer.graphics
+// doesn't work yet (and i think we'd use the Edit Widget instead)
+// but i'm interested in the reactiveUtils.watch function
+
 // from: https://github.com/Esri/jsapi-resources/blob/main/esm-samples/jsapi-react/src/App.jsx
 export const MapSketchWidget = () => {
   console.log("Map.tsx");
@@ -65,18 +70,19 @@ export const MapSketchWidget = () => {
       });
       view.ui.add(sketch, "top-right");
 
-      // const handle = reactiveUtils.watch(
-      //   // getValue function
-      //   () => graphicsLayer.graphics,
-      //   // Callback function
-      //   (newValue, oldValue) => {
-      //     console.log("New value: ", newValue, "Old value: ", oldValue);
-      //   },
-      //   // Optional parameters
-      //   {
-      //     // initial: true,
-      //   }
-      // );
+      // https://developers.arcgis.com/javascript/latest/api-reference/esri-core-reactiveUtils.html#watch
+      const handle = reactiveUtils.watch(
+        // getValue function
+        () => graphicsLayer.graphics,
+        // Callback function
+        (newValue, oldValue) => {
+          console.log("New value: ", newValue, "Old value: ", oldValue);
+        },
+        // Optional parameters
+        {
+          // initial: true,
+        }
+      );
     }
   }, [mapDiv]);
 
