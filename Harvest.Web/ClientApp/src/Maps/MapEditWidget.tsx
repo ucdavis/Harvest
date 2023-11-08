@@ -1,11 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import WebMap from "@arcgis/core/WebMap";
-import Bookmarks from "@arcgis/core/widgets/Bookmarks";
-import Expand from "@arcgis/core/widgets/Expand";
 import MapView from "@arcgis/core/views/MapView";
 import Editor from "@arcgis/core/widgets/Editor";
 import FieldElement from "@arcgis/core/form/elements/FieldElement.js";
 import FormTemplate from "@arcgis/core/form/FormTemplate.js";
+import CodedValueDomain from "@arcgis/core/layers/support/CodedValueDomain.js";
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import BasemapToggle from "@arcgis/core/widgets/BasemapToggle";
@@ -74,6 +73,33 @@ export const MapEditWidget = () => {
                   new FieldElement({
                     fieldName: "Crop",
                     label: "Crop",
+                    domain: new CodedValueDomain({
+                      // dropdown list of available crop values
+                      // https://developers.arcgis.com/javascript/latest/api-reference/esri-layers-support-CodedValueDomain.html
+                      // doesnt look like this supports dynamic values, but it's currently a dropdown anyways
+                      codedValues: [
+                        {
+                          name: "Potato",
+                          code: "potato",
+                        },
+                        {
+                          name: "Tomato",
+                          code: "Tomato",
+                        },
+                        {
+                          name: "Corn",
+                          code: "Corn",
+                        },
+                        {
+                          name: "Celery",
+                          code: "Celery",
+                        },
+                        {
+                          name: "Carrot",
+                          code: "Carrot",
+                        },
+                      ],
+                    }),
                   }),
                   new FieldElement({
                     fieldName: "Details",
@@ -88,13 +114,43 @@ export const MapEditWidget = () => {
         // Add the widget to the view
         view.ui.add(editor, "top-right");
       });
-      // bonus - how many bookmarks in the webmap?
+
+      // once the whole webmap is loaded
       webmap.when(() => {
-        if (webmap.bookmarks && webmap.bookmarks.length) {
-          console.log("Bookmarks: ", webmap.bookmarks.length);
+        if (webmap.allLayers && webmap.allLayers.length) {
+          console.log("All layers: ", webmap.allLayers.length);
         } else {
-          console.log("No bookmarks in this webmap.");
+          console.log("No layers in this webmap");
         }
+        if (webmap.allTables && webmap.allTables.length) {
+          console.log("All tables: ", webmap.allTables.length);
+        } else {
+          console.log("No tables in this webmap");
+        }
+
+        // query the features once webmap is loaded
+        featureLayer
+          .queryFeatures()
+          .then((featureSet) => {
+            console.log("features", featureSet.features);
+            // then we can do things like:
+            console.log(
+              "featureSet.features[0].attributes: ",
+              featureSet.features[0].attributes
+            );
+            // and get:
+            // {
+            //   Crop: "Cabbage",
+            //   Details: null,
+            //   OBJECTID: 2,
+            //   Shape__Area: 176921.81640625,
+            //   Shape__Length: 1728.6668691192322,
+            //   name: "cabbages"
+            // }
+          })
+          .catch((error) => {
+            console.error("Error querying features: ", error);
+          });
       });
     }
   }, [mapDiv]);
