@@ -17,7 +17,7 @@ interface FieldAttributes {
 }
 
 // from: https://github.com/Esri/jsapi-resources/blob/main/esm-samples/jsapi-react/src/App.jsx
-export const MapEditWidgetReactState = () => {
+export const MapEditReactState = () => {
   console.log("Map.tsx");
   const mapDiv = useRef(null);
   const [features, setFeatures] = useState<Graphic[]>([]);

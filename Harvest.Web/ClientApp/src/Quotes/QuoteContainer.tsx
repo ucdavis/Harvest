@@ -28,7 +28,7 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { ShowFor } from "../Shared/ShowFor";
 import { validatorOptions } from "../constants";
 import { Button } from "reactstrap";
-import { MapEditWidgetReactState } from "../Maps/MapEditWidgetReactState";
+import { MapEditReactState } from "../Maps/MapEditReactState";
 
 export const QuoteContainer = () => {
   const history = useHistory();
@@ -280,7 +280,7 @@ export const QuoteContainer = () => {
 
             {/* <MapEditWidget /> */}
             {/* <MapSketchWidget /> */}
-            <MapEditWidgetReactState />
+            <MapEditReactState />
             {/* <FieldContainer
             crops={cropArray}
             fields={quote.fields}
