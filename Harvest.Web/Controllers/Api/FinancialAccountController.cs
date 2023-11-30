@@ -101,6 +101,14 @@ namespace Harvest.Web.Controllers.Api
                 }
 
             }
+            else
+            {
+                if(_aeSettings.UseCoA)
+                {
+                    //return a new type with a success false and the error message
+                    return Ok(new { success = false, error = validationModel.Message });
+                }
+            }
 
             return Ok(null);
         }
