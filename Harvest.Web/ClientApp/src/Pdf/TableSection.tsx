@@ -14,6 +14,7 @@ import { ActivityRateTypes } from "../constants";
 
 interface Props {
   tableItem: Activity | Invoice;
+  activityName?: string;
 }
 
 const styles = StyleSheet.create({
@@ -43,7 +44,13 @@ export const TableSection = (props: Props) => (
       if ("workItems" in props.tableItem) {
         data = props.tableItem.workItems.filter((w) => w.type === type);
       } else {
-        data = props.tableItem.expenses.filter((w) => w.type === type);
+        if (props.activityName !== undefined) {
+          data = props.tableItem.expenses.filter(
+            (w) => w.type === type && w.activity === props.activityName
+          );
+        } else {
+          data = props.tableItem.expenses.filter((w) => w.type === type);
+        }
       }
 
       if (data.length > 0) {
