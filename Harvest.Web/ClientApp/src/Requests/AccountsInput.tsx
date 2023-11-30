@@ -140,7 +140,14 @@ export const AccountsInput = (props: Props) => {
           setError("Account Selected is not valid");
           return;
         } else {
-          const accountInfo: ProjectAccount = await response.json();
+          var result = await response.json();
+
+          if (result.success === false) {
+            setError("Account Selected is not valid: " + result.error);
+            return;
+          }
+
+          const accountInfo: ProjectAccount = result;
 
           if (accounts.some((a) => a.number === accountInfo.number)) {
             setError("Account already selected -- choose a different account");

@@ -93,7 +93,7 @@ export const InvoicePDF = (props: Props) => {
               <Text style={styles.activityCost}>
                 {activity} • Activity Total: ${formatCurrency(activityTotal)}
               </Text>
-              <TableSection tableItem={props.invoice} />
+              <TableSection tableItem={props.invoice} activityName={activity} />
             </View>
           );
         })}
