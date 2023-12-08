@@ -114,7 +114,7 @@
 
 
     <footer class="container footer">
-        <p>Copyright &copy; <span id="copywrite-year"></span> The Regents of the University of California, Davis campus.
+        <p>Copyright &copy; 2021 - <span id="copyright-year"></span> The Regents of the University of California, Davis campus.
             All rights reserved.</p>
     </footer>
 
@@ -129,6 +129,11 @@
                 alert("Cookies are disabled in your browser. Please enable cookies to use Harvest.");
             }
         }; 
+    </script>
+
+    <script type="text/javascript">
+        //Set copyright year
+        document.getElementById("copyright-year").innerHTML = new Date().getFullYear();
     </script>
 </body>
 
