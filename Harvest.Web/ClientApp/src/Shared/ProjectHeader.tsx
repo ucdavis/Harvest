@@ -78,8 +78,14 @@ export const ProjectHeader = (props: Props) => {
             {project.accounts.map((acc: ProjectAccount) => (
               <div key={acc.id}>
                 <p className="word-wrap">
-                  {acc.number} | <b>{acc.percentage}%</b> <br />{" "}
-                  <small> {acc.name} </small>
+                  <a
+                    href={`https://finjector.ucdavis.edu/Details/${acc.number}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {acc.number}{" "}
+                  </a>
+                  | <b>{acc.percentage}%</b> <br /> <small> {acc.name} </small>
                 </p>
               </div>
             ))}
