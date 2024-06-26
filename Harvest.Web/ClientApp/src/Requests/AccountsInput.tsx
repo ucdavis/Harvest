@@ -185,16 +185,21 @@ export const AccountsInput = (props: Props) => {
         filterBy={() => true} // don't filter on top of our search
         renderMenuItemChildren={(option, propsData, index) => (
           <div>
-            <div>
-              <Highlighter key="name" search={propsData.text || ""}>
-                {option.name}
-              </Highlighter>
-            </div>
-            <div>
-              <Highlighter key="number" search={propsData.text || ""}>
-                {option.number}
-              </Highlighter>
-            </div>
+            {!option?.name && <div>Nothing Found or Invalid Chart String</div>}
+            {option?.name && (
+              <div>
+                <div>
+                  <Highlighter key="name" search={propsData.text || ""}>
+                    {option.name}
+                  </Highlighter>
+                </div>
+                <div>
+                  <Highlighter key="number" search={propsData.text || ""}>
+                    {option.number}
+                  </Highlighter>
+                </div>
+              </div>
+            )}
           </div>
         )}
         onSearch={onSearch}
