@@ -90,7 +90,7 @@ export const AccountsInput = (props: Props) => {
         setError(undefined);
       }
 
-      if (chosenAccount.number === undefined || chosenAccount.number === "") {
+      if (!chosenAccount.number) {
         setError("Account Selected is not valid");
         (typeaheadRef.current as any)?.clear();
         return;
