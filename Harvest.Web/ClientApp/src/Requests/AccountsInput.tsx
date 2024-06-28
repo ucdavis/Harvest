@@ -90,6 +90,12 @@ export const AccountsInput = (props: Props) => {
         setError(undefined);
       }
 
+      if (!chosenAccount.number) {
+        setError("Account Selected is not valid");
+        (typeaheadRef.current as any)?.clear();
+        return;
+      }
+
       if (accounts.length === 0) {
         // if it's our first account, default to 100%
         chosenAccount.percentage = 100.0;
