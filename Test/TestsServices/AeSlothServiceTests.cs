@@ -149,7 +149,7 @@ namespace Test.TestsServices
             var realAeService = new AggieEnterpriseService(MockAeSettings.Object);
 
             //Call the real Aggie Enterprise Service ReplaceNaturalAccount
-            MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na) => realAeService.ReplaceNaturalAccount(fss, na));
+            MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na, string xx) => realAeService.ReplaceNaturalAccount(fss, na, xx));
 
             MockAeService.Setup(a => a.ConvertKfsAccount("3-APSFB55")).ReturnsAsync("K30APSFB55-TASK01-APLS002-770006");
         }
