@@ -51,7 +51,8 @@ namespace Test.TestsServices
             UseCoA = true,
             GraphQlUrl = "http://fake.ucdavis.edu/graphql",
             NormalCoaNaturalAccount ="770006",
-            PassthroughCoaNaturalAccount = "770002"
+            PassthroughCoaNaturalAccount = "770002",
+            PpmSpecialNaturalAccounts = "52650R"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
         private SlothService SlothService { get; set; }
