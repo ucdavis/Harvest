@@ -187,9 +187,9 @@ namespace Harvest.Core.Services
                     {
                         transfer.Account = transferViewModel.FinancialSegmentString;
                         transfer.IsProjectAccount =
-                            invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.PassthroughCoaNaturalAccount))
+                            invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.PassthroughCoaNaturalAccount, _aeSettings.PpmSpecialNaturalAccounts))
                             ||
-                            invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.NormalCoaNaturalAccount));
+                            invoice.Project.Accounts.Select(a => a.Number).Contains(_aggieEnterpriseService.ReplaceNaturalAccount(transfer.Account, _aeSettings.NormalCoaNaturalAccount, _aeSettings.PpmSpecialNaturalAccounts));
                     }
                     else
                     {
@@ -269,7 +269,7 @@ namespace Harvest.Core.Services
                         //Replace the natural Account/Expenditure type with 
                         var tvm = new TransferViewModel
                         {
-                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount),
+                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(projectAccount.Number, debExpenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount, _aeSettings.PpmSpecialNaturalAccounts),
                             Amount = Math.Round(debExpenseGroup.total * (projectAccount.Percentage / 100), 2),
                             Description = $"Rev Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                             Direction = TransferViewModel.Directions.Credit,
@@ -446,7 +446,7 @@ namespace Harvest.Core.Services
                         var debit = projectAccount.Value;
                         var tvm = new TransferViewModel
                         {
-                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(debit.FinancialSegmentString, expenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount),
+                            FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(debit.FinancialSegmentString, expenseGroup.isPassthrough ? _aeSettings.PassthroughCoaNaturalAccount : _aeSettings.NormalCoaNaturalAccount, _aeSettings.PpmSpecialNaturalAccounts),
                             Amount = Math.Round(expenseGroup.total * (projectAccount.Key.Percentage / 100), 2),
                             Description = $"Proj: {invoice.Project.Name}".TruncateAndAppend($" Inv: {invoice.Id}", 40),
                             Direction = TransferViewModel.Directions.Debit,

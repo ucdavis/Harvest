@@ -52,7 +52,9 @@ namespace Harvest.Web.Controllers.Api
                 else if (segmentStringType == FinancialChartStringType.Ppm)
                 {
                     var ppmSegments = FinancialChartValidation.GetPpmSegments(account);
-                    if (ppmSegments.ExpenditureType != _aeSettings.NormalCoaNaturalAccount && ppmSegments.ExpenditureType != _aeSettings.PassthroughCoaNaturalAccount)
+                    if (ppmSegments.ExpenditureType != _aeSettings.NormalCoaNaturalAccount && 
+                        ppmSegments.ExpenditureType != _aeSettings.PassthroughCoaNaturalAccount && 
+                        !_aeSettings.PpmSpecialNaturalAccounts.Contains(ppmSegments.ExpenditureType))
                     {
                         ppmSegments.ExpenditureType = _aeSettings.NormalCoaNaturalAccount;
                         account = ppmSegments.ToSegmentString();

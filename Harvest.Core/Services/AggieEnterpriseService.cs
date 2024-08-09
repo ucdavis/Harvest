@@ -20,7 +20,7 @@ namespace Harvest.Core.Services
         Task<FinancialOfficerDetails> GetFinancialOfficer(string financialSegmentString);
 
         string GetNaturalAccount(string financialSegmentString);
-        string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount);
+        string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount, string ppmSpecialNaturalAccounts);
 
         Task<string> ConvertKfsAccount(string account);
     }
@@ -204,7 +204,7 @@ namespace Harvest.Core.Services
             return null;
         }
 
-        public string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount)
+        public string ReplaceNaturalAccount(string financialSegmentString, string naturalAccount, string ppmSpecialNaturalAccounts)
         {
             var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(financialSegmentString);
             if (segmentStringType == FinancialChartStringType.Gl)
@@ -214,8 +214,12 @@ namespace Harvest.Core.Services
                 return segments.ToSegmentString();
             }
             if (segmentStringType == FinancialChartStringType.Ppm)
-            {
+            {                
                 var segments = FinancialChartValidation.GetPpmSegments(financialSegmentString);
+                if(ppmSpecialNaturalAccounts.Contains(segments.ExpenditureType)) //Don't replace special accounts. This means a passthough will not change this. 
+                {
+                    return financialSegmentString;
+                }
                 segments.ExpenditureType = naturalAccount;
                 return segments.ToSegmentString();
             }

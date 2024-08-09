@@ -51,7 +51,8 @@ namespace Test.TestsServices
             UseCoA = true,
             GraphQlUrl = "http://fake.ucdavis.edu/graphql",
             NormalCoaNaturalAccount ="770006",
-            PassthroughCoaNaturalAccount = "770002"
+            PassthroughCoaNaturalAccount = "770002",
+            PpmSpecialNaturalAccounts = "52650R"
         };
         public JsonSerializerOptions JsonSerializerOptions { get; set; }
         private SlothService SlothService { get; set; }
@@ -149,7 +150,7 @@ namespace Test.TestsServices
             var realAeService = new AggieEnterpriseService(MockAeSettings.Object);
 
             //Call the real Aggie Enterprise Service ReplaceNaturalAccount
-            MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na) => realAeService.ReplaceNaturalAccount(fss, na));
+            MockAeService.Setup(a => a.ReplaceNaturalAccount(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns((string fss, string na, string xx) => realAeService.ReplaceNaturalAccount(fss, na, xx));
 
             MockAeService.Setup(a => a.ConvertKfsAccount("3-APSFB55")).ReturnsAsync("K30APSFB55-TASK01-APLS002-770006");
         }
