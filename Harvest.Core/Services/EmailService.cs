@@ -247,7 +247,8 @@ namespace Harvest.Core.Services
             {
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
-                await _notificationService.SendNotification(await FieldManagersEmails(project.TeamId), new []{project.PrincipalInvestigator.Email}, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                //INC2065591 Brain wants supervisors to be included in the email
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), new[] { project.PrincipalInvestigator.Email }, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
