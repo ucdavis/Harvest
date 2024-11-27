@@ -59,6 +59,16 @@ export const ProjectTable = (props: Props) => {
         filter: "progress",
       },
       {
+        id: "quote",
+        Header: "Quote",
+        accessor: (row) => `$${formatCurrency(row.quoteTotal)}`,
+      },
+      {
+        id: "charged",
+        Header: "Charged",
+        accessor: (row) => `$${formatCurrency(row.chargedTotal)}`,
+      },
+      {
         id: "remaining",
         Header: "Remaining",
         accessor: (row) =>
