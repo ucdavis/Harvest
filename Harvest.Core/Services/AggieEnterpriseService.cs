@@ -104,7 +104,15 @@ namespace Harvest.Core.Services
                 //TODO: Financial Officer for GL?
                 
                 
-                //TODO: Rate Validations
+
+                if(validateRate)
+                {
+                    if(!rtValue.GlSegments.Account.StartsWith("775"))
+                    {
+                        rtValue.IsValid = false;
+                        rtValue.Messages.Add("Harvest Rates must have Natural Accounts that start with 775");
+                    }
+                }
 
                 return rtValue;
             }
