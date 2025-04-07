@@ -14,6 +14,8 @@
         public string NormalCoaNaturalAccount { get; set; }
         public string PassthroughCoaNaturalAccount { get; set; }
         public string PpmSpecialNaturalAccounts { get; set; } //This MUST NOT contain the normal and passthrough natural accounts
+
+        public string RateCoaNaturalAccount { get; set; }
     }
 }
 
