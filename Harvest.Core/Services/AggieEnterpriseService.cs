@@ -107,10 +107,10 @@ namespace Harvest.Core.Services
 
                 if(validateRate)
                 {
-                    if(!rtValue.GlSegments.Account.StartsWith("775"))
+                    if(!string.IsNullOrWhiteSpace(Options.ValidRateNaturalAccountPrefix) && !rtValue.GlSegments.Account.StartsWith(Options.ValidRateNaturalAccountPrefix))
                     {
                         rtValue.IsValid = false;
-                        rtValue.Messages.Add("Harvest Rates must have Natural Accounts that start with 775");
+                        rtValue.Messages.Add($"Harvest Rates must have Natural Accounts that start with {Options.ValidRateNaturalAccountPrefix}");
                     }
                 }
 

@@ -599,7 +599,7 @@ namespace Harvest.Core.Services
                         //Maybe this should prevent it?
                         Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expenseGroup.Key.Account, credit.Message);
                     }
-                    if (!credit.GlSegments.Account.StartsWith("775"))
+                    if (!string.IsNullOrWhiteSpace(_aeSettings.ValidRateNaturalAccountPrefix) && !credit.GlSegments.Account.StartsWith(_aeSettings.ValidRateNaturalAccountPrefix))
                     {
                         credit.FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(credit.FinancialSegmentString, _aeSettings.RateCoaNaturalAccount, _aeSettings.RateCoaNaturalAccount);
 
