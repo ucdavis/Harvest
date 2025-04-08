@@ -104,7 +104,15 @@ namespace Harvest.Core.Services
                 //TODO: Financial Officer for GL?
                 
                 
-                //TODO: Rate Validations
+
+                if(validateRate)
+                {
+                    if(!string.IsNullOrWhiteSpace(Options.ValidRateNaturalAccountPrefix) && !rtValue.GlSegments.Account.StartsWith(Options.ValidRateNaturalAccountPrefix))
+                    {
+                        rtValue.IsValid = false;
+                        rtValue.Messages.Add($"Harvest Rates must have Natural Accounts that start with {Options.ValidRateNaturalAccountPrefix}");
+                    }
+                }
 
                 return rtValue;
             }

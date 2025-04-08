@@ -599,6 +599,11 @@ namespace Harvest.Core.Services
                         //Maybe this should prevent it?
                         Log.Warning("Unable to validate credit account {creditAccount}: {creditMessage}", expenseGroup.Key.Account, credit.Message);
                     }
+                    if (!string.IsNullOrWhiteSpace(_aeSettings.ValidRateNaturalAccountPrefix) && !credit.GlSegments.Account.StartsWith(_aeSettings.ValidRateNaturalAccountPrefix))
+                    {
+                        credit.FinancialSegmentString = _aggieEnterpriseService.ReplaceNaturalAccount(credit.FinancialSegmentString, _aeSettings.RateCoaNaturalAccount, _aeSettings.RateCoaNaturalAccount);
+
+                    }
                     var totalCost = Math.Round(expenseGroup.Sum(a => a.Total), 2); //Should already be to 2 decimals, but just in case...
                     if (totalCost >= 0.01m)
                     {
