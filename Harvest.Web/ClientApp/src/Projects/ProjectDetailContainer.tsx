@@ -29,7 +29,7 @@ import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
 
 export const ProjectDetailContainer = () => {
-  const { projectId, team } = useParams<CommonRouteParams>();
+  const { projectId, team, shareId } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({} as Project);
   const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -41,10 +41,10 @@ export const ProjectDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
-    const cb = async () => {
+      const cb = async () => {
       setIsLoading(true);
       const response = await authenticatedFetch(
-        `/api/${team}/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}/${shareId}`
       );
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -62,8 +62,8 @@ export const ProjectDetailContainer = () => {
 
     if (projectId) {
       cb();
-    }
-  }, [projectId, getIsMounted, team]);
+      }
+  }, [projectId, getIsMounted, team, shareId, setNotification]);
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(

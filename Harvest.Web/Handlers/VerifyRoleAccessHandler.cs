@@ -37,10 +37,22 @@ namespace Harvest.Web.Handlers
             var nonPiRequirements = requirement.RoleStrings.Where(r => r != Role.Codes.PI);
 
             var projectId = _httpContext.GetProjectId();
+            var shareId = _httpContext.GetProjectShareId();
 
             // if we have a project context, we need to check if the user is a PI on that project or has a valid team role, depending on the requirement
             if (projectId.HasValue)
             {
+                if(shareId.HasValue)
+                {
+                    throw new NotImplementedException("ShareId is not implemented yet.");
+                    //if(await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.ShareId == shareId))
+                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId))
+                    {
+                        //LOG that the share was accessed and who did it?
+                        context.Succeed(requirement);
+                        return;
+                    }
+                }
                 // check for a PI
                 if (requirement.RoleStrings.Contains(Role.Codes.PI))
                 {

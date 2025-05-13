@@ -136,8 +136,9 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Returns JSON info of the project
+        [HttpGet("/api/{team}/Project/Get/{projectId}/{shareId?}")]
         [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)        
-        public async Task<ActionResult> Get(int projectId)
+        public async Task<ActionResult> Get(int projectId, Guid? shareId = null)
         {
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects

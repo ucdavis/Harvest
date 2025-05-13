@@ -171,7 +171,7 @@ function App() {
               component={TicketDetailContainer}
             />
             <Route
-              path="/:team/project/details/:projectId"
+              path="/:team/project/details/:projectId/:shareId?"
               component={ProjectDetailContainer}
             />
             <ConditionalRoute
