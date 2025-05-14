@@ -17,7 +17,8 @@ export type RoleName =
   | "Supervisor"
   | "Worker"
   | "Finance"
-  | "PI";
+  | "PI"
+  | "Shared";
 
 export type ProjectStatus =
   | "Requested"
