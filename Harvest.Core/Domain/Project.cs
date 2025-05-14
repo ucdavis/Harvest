@@ -16,6 +16,7 @@ namespace Harvest.Core.Domain
             Attachments = new List<ProjectAttachment>();
             LastStatusUpdatedOn = DateTime.UtcNow;
             CreatedOn = DateTime.UtcNow;
+            ShareId = Guid.NewGuid();
         }
 
         [Key]
@@ -99,6 +100,8 @@ namespace Harvest.Core.Domain
         [Display(Name = "Created By")]
         public User CreatedBy { get; set; }
 
+        public Guid ShareId { get; set; } = Guid.NewGuid();
+
         public List<Account> Accounts { get; set; }
 
         [JsonIgnore]
@@ -137,6 +140,8 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Project>().HasIndex(a => a.IsActive);
 
             modelBuilder.Entity<Project>().Property(a => a.Requirements).HasDefaultValue("N/A");
+
+            modelBuilder.Entity<Project>().Property(a => a.ShareId);
 
             modelBuilder.Entity<Project>().Property(a => a.ChargedTotal).HasPrecision(18, 2);
             modelBuilder.Entity<Project>().Property(a => a.QuoteTotal).HasPrecision(18, 2);

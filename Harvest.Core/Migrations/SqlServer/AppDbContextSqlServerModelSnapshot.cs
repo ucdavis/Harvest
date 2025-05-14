@@ -406,6 +406,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("N/A");
 
+                    b.Property<Guid>("ShareId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 

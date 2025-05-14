@@ -383,6 +383,9 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasDefaultValue("N/A");
 
+                    b.Property<Guid>("ShareId")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("Start")
                         .HasColumnType("TEXT");
 
