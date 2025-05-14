@@ -71,7 +71,7 @@ function App() {
               component={AccountChangeContainer}
             />
             <Route
-              path="/:team/project/invoices/:projectId"
+              path="/:team/project/invoices/:projectId/:shareId?"
               component={InvoiceListContainer}
             />
             <ConditionalRoute

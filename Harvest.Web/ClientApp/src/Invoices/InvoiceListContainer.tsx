@@ -13,16 +13,17 @@ interface RouteParams {
 
 export const InvoiceListContainer = () => {
   const { projectId } = useParams<RouteParams>();
-  const { team } = useParams<CommonRouteParams>();
+  const { team, shareId } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
+    console.log("InvoiceListContainer: projectId", projectId);
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/${team}/Invoice/List/?projectId=${projectId}`
+        `/api/${team}/Invoice/List/?projectId=${projectId}&shareId=${shareId}`
       );
 
       if (response.ok) {
@@ -33,11 +34,11 @@ export const InvoiceListContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted, team]);
+  }, [projectId, getIsMounted, team, shareId]);
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/${team}/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}/${shareId}`
       );
 
       if (response.ok) {
@@ -47,7 +48,7 @@ export const InvoiceListContainer = () => {
     };
 
     cb();
-  }, [projectId, getIsMounted, team]);
+  }, [projectId, getIsMounted, team, shareId]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
