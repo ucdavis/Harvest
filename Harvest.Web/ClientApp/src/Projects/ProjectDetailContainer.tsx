@@ -40,8 +40,13 @@ export const ProjectDetailContainer = () => {
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
-    if (!userInfo.user.roles.includes("Shared")) {
+    if (
+      shareId &&
+      !userInfo.user.roles.includes("Shared") &&
+      !userInfo.user.roles.includes("PI")
+    ) {
       userInfo.user.roles.push("Shared");
+      console.log("User Roles: ", userInfo.user.roles);
     }
     // get rates so we can load up all expense types and info
     const cb = async () => {
