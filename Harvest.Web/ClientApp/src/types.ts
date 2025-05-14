@@ -57,6 +57,7 @@ export interface Project {
   acreageRate: Rate;
   acres: number;
   team: Team;
+  shareId: string;
 }
 
 export interface BlobFile {

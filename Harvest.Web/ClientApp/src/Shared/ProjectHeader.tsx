@@ -13,6 +13,7 @@ import { ReturnToProject } from "../Shared/ReturnToProject";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { ShowForPiOnly } from "./ShowForPiOnly";
 
 interface Props {
   project: Project;
@@ -73,6 +74,16 @@ export const ProjectHeader = (props: Props) => {
                 <FontAwesomeIcon icon={faEye} />
               </a>
             </p>
+            <ShowForPiOnly project={project}>
+              <p className="lede">Share Link:</p>
+              <p>
+                <a
+                  href={`${window.location.origin}/${project.team.slug}/Project/Details/${project.id}/${project.shareId}`}
+                >
+                  {`${window.location.origin}/${project.team.slug}/Project/Details/${project.id}/${project.shareId}`}
+                </a>
+              </p>
+            </ShowForPiOnly>
             {project.accounts.length > 0 && <p className="lede">Accounts</p>}
 
             {project.accounts.map((acc: ProjectAccount) => (

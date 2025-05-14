@@ -44,11 +44,9 @@ namespace Harvest.Web.Handlers
             {
                 if(shareId.HasValue)
                 {
-                    throw new NotImplementedException("ShareId is not implemented yet.");
-                    //if(await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.ShareId == shareId))
-                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId))
+                    //If using a share id, make sure it matches the project
+                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.ShareId == shareId))
                     {
-                        //LOG that the share was accessed and who did it?
                         context.Succeed(requirement);
                         return;
                     }

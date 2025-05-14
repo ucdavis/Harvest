@@ -41,7 +41,7 @@ export const ProjectDetailContainer = () => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
-      const cb = async () => {
+    const cb = async () => {
       setIsLoading(true);
       const response = await authenticatedFetch(
         `/api/${team}/Project/Get/${projectId}/${shareId}`
@@ -62,8 +62,8 @@ export const ProjectDetailContainer = () => {
 
     if (projectId) {
       cb();
-      }
-  }, [projectId, getIsMounted, team, shareId]);
+    }
+  }, [projectId, getIsMounted, team, shareId]); //Don't include the notification in here or it breaks it
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(
