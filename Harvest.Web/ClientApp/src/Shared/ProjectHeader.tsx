@@ -78,9 +78,9 @@ export const ProjectHeader = (props: Props) => {
               <p className="lede">Share Link:</p>
               <p>
                 <a
-                  href={`${window.location.origin}/${project.team.slug}/Project/Details/${project.id}/${project.shareId}`}
+                  href={`${window.location.origin}/${project.team.slug}/project/details/${project.id}/${project.shareId}`}
                 >
-                  {`${window.location.origin}/${project.team.slug}/Project/Details/${project.id}/${project.shareId}`}
+                  {`${window.location.origin}/${project.team.slug}/project/details/${project.id}/${project.shareId}`}
                 </a>
               </p>
             </ShowForPiOnly>
