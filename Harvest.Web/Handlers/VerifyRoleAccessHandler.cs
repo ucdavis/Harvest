@@ -50,6 +50,10 @@ namespace Harvest.Web.Handlers
                         context.Succeed(requirement);
                         return;
                     }
+                    else
+                    {
+                        return;
+                    }
                 }
                 // check for a PI
                 if (requirement.RoleStrings.Contains(Role.Codes.PI))
