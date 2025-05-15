@@ -56,6 +56,7 @@ export const RecentInvoicesContainer = (props: Props) => {
         <InvoiceTable
           compact={props.compact}
           invoices={invoices}
+          shareId={shareId}
         ></InvoiceTable>
       </div>
     </ShowFor>

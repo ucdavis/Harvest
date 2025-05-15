@@ -30,7 +30,7 @@ namespace Harvest.Web.Controllers.Api
 
         // Get info on the project as well as invoice
         [HttpGet]
-        public async Task<ActionResult> Get(int projectId, int invoiceId)
+        public async Task<ActionResult> Get(int projectId, int invoiceId, Guid? shareId)
         {
 
             var invoice = await _dbContext.Invoices

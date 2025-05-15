@@ -9,6 +9,7 @@ import { formatCurrency } from "../Util/NumberFormatting";
 interface Props {
   invoices: Invoice[];
   compact?: boolean;
+  shareId?: string;
 }
 
 export const InvoiceTable = (props: Props) => {
@@ -20,7 +21,11 @@ export const InvoiceTable = (props: Props) => {
         Cell: (data: Cell<Invoice>) => (
           <div>
             <Link
-              to={`/${team}/invoice/details/${data.row.original.projectId}/${data.row.original.id}`}
+              to={
+                props.shareId
+                  ? `/${team}/invoice/details/${data.row.original.projectId}/${data.row.original.id}/${props.shareId}`
+                  : `/${team}/invoice/details/${data.row.original.projectId}/${data.row.original.id}`
+              }
             >
               #{data.row.original.id}
             </Link>

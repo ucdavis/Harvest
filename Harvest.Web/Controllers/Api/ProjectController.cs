@@ -139,8 +139,7 @@ namespace Harvest.Web.Controllers.Api
         [Route("/api/{team}/Project/Get/{projectId}/{shareId?}")]
         [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)        
         public async Task<ActionResult> Get(int projectId, Guid? shareId = null)
-        {
-            //TODO: Check if shareId is used and it is not the PI. If so, log that.
+        {            
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(a => a.Team)
@@ -160,6 +159,12 @@ namespace Harvest.Web.Controllers.Api
             foreach (var file in project.Attachments)
             {
                 file.SasLink = _fileService.GetDownloadUrl(_storageSettings.ContainerName, file.Identifier).AbsoluteUri;
+            }
+
+            if(shareId != null && project.CreatedBy.Id != user.Id)
+            {
+                //Check if shareId is used and it is not the PI. If so, log that.
+                Log.Information("User {user} is trying to access project {projectId} with shareId {shareId}.", user.Id, projectId, shareId);
             }
 
             return Ok(project);

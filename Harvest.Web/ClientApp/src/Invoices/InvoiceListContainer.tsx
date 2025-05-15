@@ -75,7 +75,7 @@ export const InvoiceListContainer = () => {
       ></ProjectHeader>
       <div className="card-content">
         <h3>Invoices</h3>
-        <InvoiceTable invoices={invoices}></InvoiceTable>
+        <InvoiceTable invoices={invoices} shareId={shareId}></InvoiceTable>
       </div>
     </div>
   );
