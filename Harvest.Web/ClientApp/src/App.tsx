@@ -180,7 +180,7 @@ function App() {
               component={ExpenseEntryContainer}
             />
             <Route
-              path="/:team/expense/unbilled/:projectId"
+              path="/:team/expense/unbilled/:projectId/:shareId?"
               component={UnbilledExpensesContainer}
             />
             <ConditionalRoute

@@ -8,6 +8,7 @@ import { CommonRouteParams } from "../types";
 interface Props {
   projectId: number;
   remaining: number;
+  shareId?: string;
 }
 
 export const ProjectUnbilledButton = (props: Props) => {
@@ -40,7 +41,11 @@ export const ProjectUnbilledButton = (props: Props) => {
   if (total === undefined || (total !== 0 && total <= props.remaining)) {
     return (
       <Link
-        to={`/${team}/expense/unbilled/${props.projectId}`}
+        to={
+          props.shareId
+            ? `/${team}/expense/unbilled/${props.projectId}/${props.shareId}`
+            : `/${team}/expense/unbilled/${props.projectId}`
+        }
         className="btn btn-lg btn-outline"
       >
         View Unbilled Expenses - $
@@ -51,7 +56,11 @@ export const ProjectUnbilledButton = (props: Props) => {
 
   return (
     <Link
-      to={`/${team}/expense/unbilled/${props.projectId}`}
+      to={
+        props.shareId
+          ? `/${team}/expense/unbilled/${props.projectId}/${props.shareId}`
+          : `/${team}/expense/unbilled/${props.projectId}`
+      }
       className="btn btn-lg  btn-outline-danger"
     >
       View Unbilled Expenses - $

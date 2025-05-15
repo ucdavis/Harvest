@@ -8,6 +8,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
@@ -84,9 +85,23 @@ namespace Harvest.Web.Controllers.Api
         // Get all unbilled expenses for the given project
         [HttpGet]
         [Authorize(Policy = AccessCodes.InvoiceAccess)]
-        public async Task<ActionResult> GetUnbilled(int projectId)
+        //`/api/${team}/Expense/GetUnbilled/${projectId}/${shareId}`
+        [Route("/api/{team}/Expense/GetUnbilled/{projectId}/{shareId?}")]
+        public async Task<ActionResult> GetUnbilled(int projectId, Guid? shareId)
         {
-            return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).ToArrayAsync());
+            var query = _dbContext.Expenses
+                .Include(e => e.CreatedBy)
+                .Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug);
+
+            if (shareId.HasValue)
+            {
+                query = query.Where(e => e.Project.ShareId == shareId.Value);
+            }
+
+            return Ok( await query.ToArrayAsync());
+
+            //return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).ToArrayAsync());
+
         }
 
         // Get just the total of unbilled expenses for the current project

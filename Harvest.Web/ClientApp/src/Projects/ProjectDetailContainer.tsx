@@ -326,33 +326,65 @@ export const ProjectDetailContainer = () => {
           <div className="row">
             <div className="col-md-6">
               <h2>Project Attachments</h2>
-              <FileUpload
-                disabled={notification.pending}
-                files={newFiles}
-                setFiles={(f) => {
-                  let files = f.slice(newFiles.length);
-                  if (newFiles.length === 0) {
-                    files = f;
-                  }
 
-                  setNewFiles([...f]);
-                  updateFiles(files);
-                }}
-                updateFile={(f) => {
-                  setNewFiles((oldFiles) => {
-                    if (oldFiles) {
-                      oldFiles[
-                        oldFiles.findIndex(
-                          (file) => file.identifier === f.identifier
-                        )
-                      ] = { ...f };
-                      return [...oldFiles];
+              <ShowForPiOnly project={project}>
+                <FileUpload
+                  disabled={notification.pending}
+                  files={newFiles}
+                  setFiles={(f) => {
+                    let files = f.slice(newFiles.length);
+                    if (newFiles.length === 0) {
+                      files = f;
                     }
 
-                    return oldFiles;
-                  });
-                }}
-              />
+                    setNewFiles([...f]);
+                    updateFiles(files);
+                  }}
+                  updateFile={(f) => {
+                    setNewFiles((oldFiles) => {
+                      if (oldFiles) {
+                        oldFiles[
+                          oldFiles.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+                        return [...oldFiles];
+                      }
+
+                      return oldFiles;
+                    });
+                  }}
+                />
+              </ShowForPiOnly>
+              <ShowFor roles={["FieldManager", "Supervisor"]}>
+                <FileUpload
+                  disabled={notification.pending}
+                  files={newFiles}
+                  setFiles={(f) => {
+                    let files = f.slice(newFiles.length);
+                    if (newFiles.length === 0) {
+                      files = f;
+                    }
+
+                    setNewFiles([...f]);
+                    updateFiles(files);
+                  }}
+                  updateFile={(f) => {
+                    setNewFiles((oldFiles) => {
+                      if (oldFiles) {
+                        oldFiles[
+                          oldFiles.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+                        return [...oldFiles];
+                      }
+
+                      return oldFiles;
+                    });
+                  }}
+                />
+              </ShowFor>
               <ul className="no-list-style attached-files-list">
                 {project.attachments.map((attachment, i) => (
                   <li key={`attachment-${i}`}>
@@ -373,6 +405,7 @@ export const ProjectDetailContainer = () => {
               <ProjectUnbilledButton
                 projectId={project.id}
                 remaining={project.quoteTotal - project.chargedTotal}
+                shareId={shareId}
               />
             </div>
           </div>

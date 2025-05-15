@@ -27,7 +27,7 @@ interface Props {
 }
 
 export const UnbilledExpensesContainer = (props: Props) => {
-  const { projectId, team } = useParams<CommonRouteParams>();
+  const { projectId, team, shareId } = useParams<CommonRouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [project, setProject] = useState<Project>();
   const [total, setTotal] = useState(0);
@@ -42,10 +42,9 @@ export const UnbilledExpensesContainer = (props: Props) => {
   useEffect(() => {
     // get unbilled expenses for the project
     if (projectId === undefined) return;
-
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/${team}/Expense/GetUnbilled/${projectId}`
+        `/api/${team}/Expense/GetUnbilled/${projectId}/${shareId}`
       );
 
       if (response.ok) {
@@ -61,13 +60,20 @@ export const UnbilledExpensesContainer = (props: Props) => {
     };
 
     cb();
-  }, [projectId, newExpenseCount, getIsMounted, setTotalUnbilled, team]);
+  }, [
+    projectId,
+    newExpenseCount,
+    getIsMounted,
+    setTotalUnbilled,
+    team,
+    shareId,
+  ]);
 
   useEffect(() => {
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
-        `/api/${team}/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}/${shareId}`
       );
 
       if (response.ok) {
@@ -79,7 +85,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted, team]);
+  }, [projectId, getIsMounted, team, shareId]);
 
   if (project === undefined) {
     return <div>Loading...</div>;
