@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { Invoice, Project, CommonRouteParams } from "../types";
@@ -6,6 +6,7 @@ import { InvoiceTable } from "./InvoiceTable";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { authenticatedFetch } from "../Util/Api";
+import AppContext from "../Shared/AppContext";
 
 interface RouteParams {
   projectId?: string;
@@ -16,10 +17,18 @@ export const InvoiceListContainer = () => {
   const { team, shareId } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const userInfo = useContext(AppContext);
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
-    console.log("InvoiceListContainer: projectId", projectId);
+    if (
+      shareId &&
+      !userInfo.user.roles.includes("Shared") &&
+      !userInfo.user.roles.includes("PI")
+    ) {
+      userInfo.user.roles.push("Shared");
+      console.log("User Roles: ", userInfo.user.roles);
+    }
     // get rates so we can load up all expense types and info
     const cb = async () => {
       const response = await authenticatedFetch(
@@ -34,7 +43,7 @@ export const InvoiceListContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted, team, shareId]);
+  }, [projectId, getIsMounted, team, shareId, userInfo.user.roles]);
   useEffect(() => {
     const cb = async () => {
       const response = await authenticatedFetch(

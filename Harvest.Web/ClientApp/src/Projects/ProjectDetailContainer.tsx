@@ -71,7 +71,7 @@ export const ProjectDetailContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted, team, shareId]); //Don't include the notification in here or it breaks it
+  }, [projectId, getIsMounted, team, shareId, userInfo.user.roles]); //Don't include the notification in here or it breaks it
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(
