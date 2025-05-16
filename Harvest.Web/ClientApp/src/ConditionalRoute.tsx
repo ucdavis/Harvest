@@ -12,6 +12,13 @@ interface ConditionalRouteProps extends RouteProps {
 export const ConditionalRoute = (props: ConditionalRouteProps) => {
   const userRoles = useContext(AppContext).user.roles;
 
+  // if the user doesn't have the shared role, add it
+  if (!userRoles.includes("Shared")) {
+    //TODO: If i'm doing it here, I can probably remove it everywhere else. If I don't do it here, and the shared goes to the view quote from the project details, they can see it, but if they refresh the page it gives them a not authorized below.
+    // Maybe I should just remove the roles from the route in the App.tsx. If so, then I'd need to do it for the view invoice as well
+    userRoles.push("Shared");
+  }
+
   // if the user has System role they can see everything
   if (userRoles.includes("System")) {
     return <Route {...props} />;
