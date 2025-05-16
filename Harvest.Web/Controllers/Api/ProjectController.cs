@@ -161,7 +161,12 @@ namespace Harvest.Web.Controllers.Api
                 file.SasLink = _fileService.GetDownloadUrl(_storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
-            if(shareId != null && project.CreatedBy.Id != user.Id)
+            if(shareId != null && project.ShareId != shareId)
+            {
+                return BadRequest("share id invalid");
+            }
+
+            if (shareId != null && project.PrincipalInvestigator.Id != user.Id)
             {
                 //Check if shareId is used and it is not the PI. If so, log that.
                 Log.Information("User {user} is trying to access project {projectId} with shareId {shareId}.", user.Id, projectId, shareId);

@@ -32,7 +32,7 @@ export const InvoiceDetailContainer = () => {
       !userInfo.user.roles.includes("PI")
     ) {
       userInfo.user.roles.push("Shared");
-      console.log("User Roles: ", userInfo.user.roles);
+      //console.log("User Roles: ", userInfo.user.roles);
     }
 
     const cb = async () => {

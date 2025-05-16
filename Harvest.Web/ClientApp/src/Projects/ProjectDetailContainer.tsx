@@ -46,7 +46,7 @@ export const ProjectDetailContainer = () => {
       !userInfo.user.roles.includes("PI")
     ) {
       userInfo.user.roles.push("Shared");
-      console.log("User Roles: ", userInfo.user.roles);
+      //console.log("User Roles: ", userInfo.user.roles);
     }
     // get rates so we can load up all expense types and info
     const cb = async () => {
@@ -246,7 +246,7 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["PI", "FieldManager", "Finance", "System"],
+      roles: ["PI", "FieldManager", "Finance", "System", "Shared"],
       condition:
         // all statuses with approved quotes
         project.status === "Active" ||
@@ -257,7 +257,11 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/${team}/quote/details/${project.id}`}
+          to={
+            shareId
+              ? `/${team}/quote/details/${project.id}/${shareId}`
+              : `/${team}/quote/details/${project.id}`
+          }
         >
           View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
