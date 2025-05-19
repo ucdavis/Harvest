@@ -43,7 +43,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(11);
+            ControllerReflection.ControllerPublicMethods(12);
         }
         [Fact]
         public void TestControllerMethodAttributes()
@@ -132,6 +132,15 @@ namespace Test.TestsControllers.TestsApiControllers
             attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3, testMessage: "CreateAdHoc");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
+
+            //12
+            methodName = "ResetShareLink";
+            attribute = null;
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3, testMessage: "ResetShareLink");
+            attribute.ShouldNotBeNull();
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigatorOnly);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
         }
