@@ -55,7 +55,7 @@ namespace Harvest.Web.Controllers.Api
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId && p.Team.Slug == TeamSlug);
 
-            if(shareId != null && invoice.Project.ShareId != shareId)
+            if(shareId != null && project.ShareId != shareId)
             {
                 return BadRequest("share id invalid");
             }
