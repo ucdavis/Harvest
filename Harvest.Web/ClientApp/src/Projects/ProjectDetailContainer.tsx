@@ -360,7 +360,12 @@ export const ProjectDetailContainer = () => {
                   }}
                 />
               </ShowForPiOnly>
-              <ShowFor roles={["FieldManager", "Supervisor"]}>
+              <ShowFor
+                roles={["FieldManager", "Supervisor"]}
+                condition={
+                  project.principalInvestigator.iam !== userInfo.user.detail.iam
+                }
+              >
                 <FileUpload
                   disabled={notification.pending}
                   files={newFiles}
