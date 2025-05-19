@@ -66,8 +66,11 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Save", countAdjustment + 3);
 
             //3
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetApproved", countAdjustment + 2);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetApproved", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetApproved", countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetApproved", countAdjustment + 3);
+            var routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetApproved", countAdjustment + 3);
+            routeAttribute.ShouldNotBeNull();
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/Quote/GetApproved/{projectId}/{shareId?}");
         }
     }
 }
