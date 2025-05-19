@@ -9,6 +9,7 @@ import {
   faExchangeAlt,
   faEye,
   faTimes,
+  faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FileUpload } from "../Shared/FileUpload";
@@ -109,6 +110,27 @@ export const ProjectDetailContainer = () => {
     if (response.ok) {
       //redirect to home
       history.push("/");
+    }
+  };
+
+  //refresh the share link
+  const resetShareLink = async () => {
+    const request = authenticatedFetch(
+      `/api/${team}/Project/ResetShareLink/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
+    setNotification(request, "Refreshing", "Share Link Refreshed");
+    const response = await request;
+    if (response.ok) {
+      //This will return a new project.shareId (guid), update thge project.shareId with this
+      const shareId = await response.json();
+      getIsMounted() &&
+        setProject({
+          ...project,
+          shareId: shareId,
+        });
     }
   };
 
@@ -265,6 +287,28 @@ export const ProjectDetailContainer = () => {
         >
           View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
+      ),
+    }),
+    useForPiOnly({
+      project: project,
+      // all statuses
+      condition:
+        project.status === "Requested" ||
+        project.status === "Active" ||
+        project.status === "Completed" ||
+        project.status === "AwaitingCloseout" ||
+        project.status === "PendingCloseoutApproval" ||
+        project.status === "FinalInvoicePending" ||
+        project.status === "PendingApproval" ||
+        project.status === "ChangeRequested" ||
+        project.status === "QuoteRejected",
+      children: (
+        <button
+          className="btn btn-primary btn-sm float-right"
+          onClick={() => resetShareLink()}
+        >
+          Reset Share <FontAwesomeIcon icon={faUndo} />
+        </button>
       ),
     }),
   ].filter((a) => a !== null);

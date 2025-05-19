@@ -175,6 +175,27 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project);
         }
 
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        public async Task<ActionResult> ResetShareLink(int projectId)
+        {
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            if (project.PrincipalInvestigator.Id != user.Id)
+            {
+                return BadRequest("You are not the PI of this project.");
+            }
+            project.ShareId = Guid.NewGuid();
+            await _dbContext.SaveChangesAsync();
+            return Ok(project.ShareId);
+        }
+
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public async Task<ActionResult> GetFields()
