@@ -17,7 +17,8 @@ export type RoleName =
   | "Supervisor"
   | "Worker"
   | "Finance"
-  | "PI";
+  | "PI"
+  | "Shared";
 
 export type ProjectStatus =
   | "Requested"
@@ -57,6 +58,7 @@ export interface Project {
   acreageRate: Rate;
   acres: number;
   team: Team;
+  shareId: string;
 }
 
 export interface BlobFile {
@@ -390,4 +392,5 @@ export interface CommonRouteParams {
   team?: string;
   projectId?: string;
   ticketId?: string;
+  shareId?: string;
 }

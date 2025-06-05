@@ -7,6 +7,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Web.Controllers.Api
@@ -44,8 +45,12 @@ namespace Harvest.Web.Controllers.Api
 
         // Get info on the project as well as in-progess quote if it exists
         [HttpGet]
-        public async Task<ActionResult> GetApproved(int projectId)
+        [Route("/api/{team}/Quote/GetApproved/{projectId}/{shareId?}")]
+        public async Task<ActionResult> GetApproved(int projectId, Guid? shareId)
         {
+            //TODO: Check the has access here, because the shareId might open this up to other roles.
+            var hasAccess = await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.FinanceAccess }, TeamSlug);
+            var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(p => p.Team)
                 .Include(p => p.Quote).ThenInclude(a => a.ApprovedBy)
@@ -53,6 +58,25 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.Accounts)
                 .Include(p => p.CreatedBy)
                 .SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+
+            if (shareId != null)
+            {
+                if (project.ShareId != shareId)
+                {
+                    //return not authorized
+                    return Unauthorized();
+                }
+            }
+            else
+            {
+                if(!hasAccess && project.PrincipalInvestigator.Id != user.Id)
+                {
+                    //return not authorized
+                    return Unauthorized();
+                }
+            }
+
+            
 
             var model = new QuoteModel
             {

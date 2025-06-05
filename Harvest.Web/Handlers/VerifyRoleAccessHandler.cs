@@ -37,10 +37,24 @@ namespace Harvest.Web.Handlers
             var nonPiRequirements = requirement.RoleStrings.Where(r => r != Role.Codes.PI);
 
             var projectId = _httpContext.GetProjectId();
+            var shareId = _httpContext.GetProjectShareId();
 
             // if we have a project context, we need to check if the user is a PI on that project or has a valid team role, depending on the requirement
             if (projectId.HasValue)
             {
+                if(shareId.HasValue)
+                {
+                    //If using a share id, make sure it matches the project
+                    if (await _dbContext.Projects.AnyAsync(a => a.Id == projectId && a.ShareId == shareId))
+                    {
+                        context.Succeed(requirement);
+                        return;
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
                 // check for a PI
                 if (requirement.RoleStrings.Contains(Role.Codes.PI))
                 {

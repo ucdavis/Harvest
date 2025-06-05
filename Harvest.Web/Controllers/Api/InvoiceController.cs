@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Harvest.Core.Data;
@@ -29,7 +30,7 @@ namespace Harvest.Web.Controllers.Api
 
         // Get info on the project as well as invoice
         [HttpGet]
-        public async Task<ActionResult> Get(int projectId, int invoiceId)
+        public async Task<ActionResult> Get(int projectId, int invoiceId, Guid? shareId)
         {
 
             var invoice = await _dbContext.Invoices
@@ -54,10 +55,15 @@ namespace Harvest.Web.Controllers.Api
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId && p.Team.Slug == TeamSlug);
 
+            if(shareId != null && project.ShareId != shareId)
+            {
+                return BadRequest("share id invalid");
+            }
+
             return Json(new ProjectInvoiceModel { Project = project, Invoice = new InvoiceModel(invoice) });
         }
         [HttpGet]
-        public async Task<ActionResult> List(int projectId, int? maxRows)
+        public async Task<ActionResult> List(int projectId, int? maxRows, Guid? shareId)
         {
             var user = await _userService.GetCurrentUser();
             //var hasAccess = await _userService.HasAccess(AccessCodes.FieldManagerAccess) || await _userService.HasAccess(AccessCodes.FinanceAccess);
@@ -65,7 +71,7 @@ namespace Harvest.Web.Controllers.Api
 
             var invoiceQuery = _dbContext.Invoices.Where(a =>
                     a.ProjectId == projectId && a.Project.Team.Slug == TeamSlug
-                    && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id))
+                    && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id || (shareId != null && a.Project.ShareId == shareId)))
                     .OrderByDescending(a => a.CreatedOn);
 
             if (maxRows.HasValue)

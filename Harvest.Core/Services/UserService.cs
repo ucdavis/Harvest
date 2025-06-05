@@ -92,15 +92,17 @@ namespace Harvest.Core.Services
             var userRoles = await _dbContext.Permissions
                 .Where(p => p.User.Iam == iamId && (p.Role.Name == Role.Codes.System || p.Team.Slug == team))
                 .Select(p => new TeamRoles(p.Role.Name, p.Team.Slug))
-                .ToArrayAsync();
+                .ToListAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
             var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigator.Iam == iamId);
 
             if (isPrincipalInvestigator)
             {
-                return userRoles.Append(new TeamRoles(Role.Codes.PI, null));
+                userRoles.Add(new TeamRoles(Role.Codes.PI, null));
             }
+
+            userRoles.Add(new TeamRoles(Role.Codes.Shared, null)); //Everyone has shared access
 
             return userRoles;
         }

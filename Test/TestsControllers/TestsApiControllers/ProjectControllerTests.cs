@@ -43,7 +43,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(11);
+            ControllerReflection.ControllerPublicMethods(12);
         }
         [Fact]
         public void TestControllerMethodAttributes()
@@ -87,10 +87,12 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //6
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 2, testMessage: "Get");
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 3, testMessage: "Get");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 3);
+            routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("Get", countAdjustment + 3, testMessage: "Get");
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/Project/Get/{projectId}/{shareId?}");
 
             //7
             attribute = null;
@@ -130,6 +132,15 @@ namespace Test.TestsControllers.TestsApiControllers
             attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3, testMessage: "CreateAdHoc");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
+
+            //12
+            methodName = "ResetShareLink";
+            attribute = null;
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>(methodName, countAdjustment + 3, testMessage: "ResetShareLink");
+            attribute.ShouldNotBeNull();
+            attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigatorOnly);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
         }

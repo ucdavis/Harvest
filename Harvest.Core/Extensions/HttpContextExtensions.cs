@@ -26,7 +26,22 @@ namespace Harvest.Core.Extensions
 
             return null;
         }
-        
+
+        public static Guid? GetProjectShareId(this IHttpContextAccessor httpContextAccessor)
+        {
+            var httpContext = httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return null;
+            }
+            var projectShareGuidString = (string)httpContext.Request.Query["shareId"] ?? httpContext.GetRouteValue("shareId") as string;
+            if (Guid.TryParse(projectShareGuidString, out Guid projectShareGuid))
+            {
+                return projectShareGuid;
+            }
+            return null;
+        }
+
         public static string GetTeam(this IHttpContextAccessor httpContextAccessor)
         {
             var httpContext = httpContextAccessor.HttpContext;

@@ -9,6 +9,7 @@ import {
   faExchangeAlt,
   faEye,
   faTimes,
+  faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FileUpload } from "../Shared/FileUpload";
@@ -29,7 +30,7 @@ import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
 
 export const ProjectDetailContainer = () => {
-  const { projectId, team } = useParams<CommonRouteParams>();
+  const { projectId, team, shareId } = useParams<CommonRouteParams>();
   const [project, setProject] = useState<Project>({} as Project);
   const [isLoading, setIsLoading] = useState(true);
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
@@ -40,11 +41,19 @@ export const ProjectDetailContainer = () => {
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
+    if (
+      shareId &&
+      !userInfo.user.roles.includes("Shared") &&
+      !userInfo.user.roles.includes("PI")
+    ) {
+      userInfo.user.roles.push("Shared");
+      //console.log("User Roles: ", userInfo.user.roles);
+    }
     // get rates so we can load up all expense types and info
     const cb = async () => {
       setIsLoading(true);
       const response = await authenticatedFetch(
-        `/api/${team}/Project/Get/${projectId}`
+        `/api/${team}/Project/Get/${projectId}/${shareId}`
       );
       if (response.ok) {
         const project = (await response.json()) as Project;
@@ -63,7 +72,7 @@ export const ProjectDetailContainer = () => {
     if (projectId) {
       cb();
     }
-  }, [projectId, getIsMounted, team]);
+  }, [projectId, getIsMounted, team, shareId, userInfo.user.roles]); //Don't include the notification in here or it breaks it
 
   const updateFiles = async (attachments: BlobFile[]) => {
     const request = authenticatedFetch(
@@ -101,6 +110,27 @@ export const ProjectDetailContainer = () => {
     if (response.ok) {
       //redirect to home
       history.push("/");
+    }
+  };
+
+  //refresh the share link
+  const resetShareLink = async () => {
+    const request = authenticatedFetch(
+      `/api/${team}/Project/ResetShareLink/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
+    setNotification(request, "Refreshing", "Share Link Refreshed");
+    const response = await request;
+    if (response.ok) {
+      //This will return a new project.shareId (guid), update thge project.shareId with this
+      const shareId = await response.json();
+      getIsMounted() &&
+        setProject({
+          ...project,
+          shareId: shareId,
+        });
     }
   };
 
@@ -238,7 +268,7 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["PI", "FieldManager", "Finance", "System"],
+      roles: ["PI", "FieldManager", "Finance", "System", "Shared"],
       condition:
         // all statuses with approved quotes
         project.status === "Active" ||
@@ -249,10 +279,36 @@ export const ProjectDetailContainer = () => {
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
-          to={`/${team}/quote/details/${project.id}`}
+          to={
+            shareId
+              ? `/${team}/quote/details/${project.id}/${shareId}`
+              : `/${team}/quote/details/${project.id}`
+          }
         >
           View Quote <FontAwesomeIcon icon={faEye} />
         </Link>
+      ),
+    }),
+    useForPiOnly({
+      project: project,
+      // all statuses
+      condition:
+        project.status === "Requested" ||
+        project.status === "Active" ||
+        project.status === "Completed" ||
+        project.status === "AwaitingCloseout" ||
+        project.status === "PendingCloseoutApproval" ||
+        project.status === "FinalInvoicePending" ||
+        project.status === "PendingApproval" ||
+        project.status === "ChangeRequested" ||
+        project.status === "QuoteRejected",
+      children: (
+        <button
+          className="btn btn-primary btn-sm float-right"
+          onClick={() => resetShareLink()}
+        >
+          Reset Share <FontAwesomeIcon icon={faUndo} />
+        </button>
       ),
     }),
   ].filter((a) => a !== null);
@@ -318,33 +374,70 @@ export const ProjectDetailContainer = () => {
           <div className="row">
             <div className="col-md-6">
               <h2>Project Attachments</h2>
-              <FileUpload
-                disabled={notification.pending}
-                files={newFiles}
-                setFiles={(f) => {
-                  let files = f.slice(newFiles.length);
-                  if (newFiles.length === 0) {
-                    files = f;
-                  }
 
-                  setNewFiles([...f]);
-                  updateFiles(files);
-                }}
-                updateFile={(f) => {
-                  setNewFiles((oldFiles) => {
-                    if (oldFiles) {
-                      oldFiles[
-                        oldFiles.findIndex(
-                          (file) => file.identifier === f.identifier
-                        )
-                      ] = { ...f };
-                      return [...oldFiles];
+              <ShowForPiOnly project={project}>
+                <FileUpload
+                  disabled={notification.pending}
+                  files={newFiles}
+                  setFiles={(f) => {
+                    let files = f.slice(newFiles.length);
+                    if (newFiles.length === 0) {
+                      files = f;
                     }
 
-                    return oldFiles;
-                  });
-                }}
-              />
+                    setNewFiles([...f]);
+                    updateFiles(files);
+                  }}
+                  updateFile={(f) => {
+                    setNewFiles((oldFiles) => {
+                      if (oldFiles) {
+                        oldFiles[
+                          oldFiles.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+                        return [...oldFiles];
+                      }
+
+                      return oldFiles;
+                    });
+                  }}
+                />
+              </ShowForPiOnly>
+              <ShowFor
+                roles={["FieldManager", "Supervisor"]}
+                condition={
+                  project.principalInvestigator.iam !== userInfo.user.detail.iam
+                }
+              >
+                <FileUpload
+                  disabled={notification.pending}
+                  files={newFiles}
+                  setFiles={(f) => {
+                    let files = f.slice(newFiles.length);
+                    if (newFiles.length === 0) {
+                      files = f;
+                    }
+
+                    setNewFiles([...f]);
+                    updateFiles(files);
+                  }}
+                  updateFile={(f) => {
+                    setNewFiles((oldFiles) => {
+                      if (oldFiles) {
+                        oldFiles[
+                          oldFiles.findIndex(
+                            (file) => file.identifier === f.identifier
+                          )
+                        ] = { ...f };
+                        return [...oldFiles];
+                      }
+
+                      return oldFiles;
+                    });
+                  }}
+                />
+              </ShowFor>
               <ul className="no-list-style attached-files-list">
                 {project.attachments.map((attachment, i) => (
                   <li key={`attachment-${i}`}>
@@ -365,6 +458,7 @@ export const ProjectDetailContainer = () => {
               <ProjectUnbilledButton
                 projectId={project.id}
                 remaining={project.quoteTotal - project.chargedTotal}
+                shareId={shareId}
               />
             </div>
           </div>

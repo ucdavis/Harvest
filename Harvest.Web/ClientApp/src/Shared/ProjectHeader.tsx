@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Project, ProjectAccount } from "../types";
+import { CommonRouteParams, Project, ProjectAccount } from "../types";
 import {
   Button,
   Modal,
@@ -13,6 +13,8 @@ import { ReturnToProject } from "../Shared/ReturnToProject";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
+import { ShowForPiOnly } from "./ShowForPiOnly";
+import { useParams } from "react-router-dom";
 
 interface Props {
   project: Project;
@@ -24,6 +26,7 @@ export const ProjectHeader = (props: Props) => {
   const { project, title } = props;
   const [modal, setModal] = useState<boolean>(false);
   const toggleModal = () => setModal((modal) => !modal);
+  const { shareId } = useParams<CommonRouteParams>();
 
   // Function to show a truncated version of project.requirements if the
   // character count is above 256
@@ -73,6 +76,16 @@ export const ProjectHeader = (props: Props) => {
                 <FontAwesomeIcon icon={faEye} />
               </a>
             </p>
+            <ShowForPiOnly project={project}>
+              <p className="lede">Share Link:</p>
+              <p>
+                <a
+                  href={`${window.location.origin}/${project.team.slug}/project/details/${project.id}/${project.shareId}`}
+                >
+                  {`${window.location.origin}/${project.team.slug}/project/details/${project.id}/${project.shareId}`}
+                </a>
+              </p>
+            </ShowForPiOnly>
             {project.accounts.length > 0 && <p className="lede">Accounts</p>}
 
             {project.accounts.map((acc: ProjectAccount) => (
@@ -159,7 +172,11 @@ export const ProjectHeader = (props: Props) => {
         </div>
       </div>
       {!props.hideBack && (
-        <ReturnToProject projectId={project.id} team={project.team.slug} />
+        <ReturnToProject
+          projectId={project.id}
+          team={project.team.slug}
+          shareId={shareId}
+        />
       )}
     </div>
   );

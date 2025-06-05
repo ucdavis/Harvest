@@ -75,12 +75,14 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 3);
 
             //3 This should probably do PI auth... 
-            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilled", countAdjustment + 3);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilled", countAdjustment + 3);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetUnbilled", countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilled", countAdjustment + 4);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilled", countAdjustment + 4);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetUnbilled", countAdjustment +4);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
-
+            var routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetUnbilled", countAdjustment + 4);
+            routeAttribute.ShouldNotBeNull();
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/Expense/GetUnbilled/{projectId}/{shareId?}");
             //4
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetUnbilledTotal", countAdjustment + 2);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetUnbilledTotal", countAdjustment + 2);

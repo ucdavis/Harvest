@@ -71,12 +71,12 @@ function App() {
               component={AccountChangeContainer}
             />
             <Route
-              path="/:team/project/invoices/:projectId"
+              path="/:team/project/invoices/:projectId/:shareId?"
               component={InvoiceListContainer}
             />
             <ConditionalRoute
-              roles={["FieldManager", "PI", "Finance"]}
-              path="/:team/invoice/details/:projectId/:invoiceId"
+              roles={["FieldManager", "PI", "Finance", "Shared"]}
+              path="/:team/invoice/details/:projectId/:invoiceId/:shareId?"
               component={InvoiceDetailContainer}
             />
             <ConditionalRoute
@@ -85,8 +85,8 @@ function App() {
               component={QuoteContainer}
             />
             <ConditionalRoute
-              roles={["PI", "FieldManager", "Finance"]}
-              path="/:team/quote/details/:projectId"
+              roles={["PI", "FieldManager", "Finance", "Shared"]}
+              path="/:team/quote/details/:projectId/:shareId?"
               component={QuoteDisplayContainer}
             />
             <ConditionalRoute
@@ -171,7 +171,7 @@ function App() {
               component={TicketDetailContainer}
             />
             <Route
-              path="/:team/project/details/:projectId"
+              path="/:team/project/details/:projectId/:shareId?"
               component={ProjectDetailContainer}
             />
             <ConditionalRoute
@@ -180,7 +180,7 @@ function App() {
               component={ExpenseEntryContainer}
             />
             <Route
-              path="/:team/expense/unbilled/:projectId"
+              path="/:team/expense/unbilled/:projectId/:shareId?"
               component={UnbilledExpensesContainer}
             />
             <ConditionalRoute

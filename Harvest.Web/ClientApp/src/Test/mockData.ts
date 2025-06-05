@@ -100,6 +100,7 @@ export const fakeProject: Project = {
     slug: "team-1",
     description: "Team 1",
   },
+  shareId: "1234567890",
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -146,6 +147,7 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       slug: "team-1",
       description: "Team 1",
     },
+    shareId: "1234567890",
   },
   quote: null,
 };

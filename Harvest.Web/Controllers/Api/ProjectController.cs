@@ -136,9 +136,10 @@ namespace Harvest.Web.Controllers.Api
         }
 
         // Returns JSON info of the project
+        [Route("/api/{team}/Project/Get/{projectId}/{shareId?}")]
         [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)        
-        public async Task<ActionResult> Get(int projectId)
-        {
+        public async Task<ActionResult> Get(int projectId, Guid? shareId = null)
+        {            
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(a => a.Team)
@@ -160,7 +161,39 @@ namespace Harvest.Web.Controllers.Api
                 file.SasLink = _fileService.GetDownloadUrl(_storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
+            if(shareId != null && project.ShareId != shareId)
+            {
+                return BadRequest("share id invalid");
+            }
+
+            if (shareId != null && project.PrincipalInvestigator.Id != user.Id)
+            {
+                //Check if shareId is used and it is not the PI. If so, log that.
+                Log.Information("User {user} is trying to access project {projectId} with shareId {shareId}.", user.Id, projectId, shareId);
+            }
+
             return Ok(project);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        public async Task<ActionResult> ResetShareLink(int projectId)
+        {
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            if (project.PrincipalInvestigator.Id != user.Id)
+            {
+                return BadRequest("You are not the PI of this project.");
+            }
+            project.ShareId = Guid.NewGuid();
+            await _dbContext.SaveChangesAsync();
+            return Ok(project.ShareId);
         }
 
         [HttpGet]

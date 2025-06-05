@@ -14,14 +14,15 @@ interface Props {
 
 export const RecentInvoicesContainer = (props: Props) => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const { team } = useParams<CommonRouteParams>();
+  const { team, shareId } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
+      //alert("Shareid" + shareId);
       // TODO: only fetch first 5 instead of chopping off client-side
       const response = await authenticatedFetch(
-        `/api/${team}/Invoice/List/?projectId=${props.projectId}&maxRows=5`
+        `/api/${team}/Invoice/List/?projectId=${props.projectId}&maxRows=5&shareId=${shareId}`
       );
 
       if (response.ok) {
@@ -33,14 +34,20 @@ export const RecentInvoicesContainer = (props: Props) => {
   }, [props.projectId, getIsMounted, team]);
 
   return (
-    <ShowFor roles={["FieldManager", "Supervisor", "PI", "Finance"]}>
+    <ShowFor roles={["FieldManager", "Supervisor", "PI", "Finance", "Shared"]}>
       <div id="recentInvoiceContainer">
         <div className="row justify-content-between">
           <div className="col">
             <h3>Recent Invoices</h3>
           </div>
           <div className="col text-right">
-            <Link to={`/${team}/project/invoices/${props.projectId}`}>
+            <Link
+              to={
+                shareId
+                  ? `/${team}/project/invoices/${props.projectId}/${shareId}`
+                  : `/${team}/project/invoices/${props.projectId}`
+              }
+            >
               View All
             </Link>
           </div>
@@ -49,6 +56,7 @@ export const RecentInvoicesContainer = (props: Props) => {
         <InvoiceTable
           compact={props.compact}
           invoices={invoices}
+          shareId={shareId}
         ></InvoiceTable>
       </div>
     </ShowFor>
