@@ -257,7 +257,10 @@ export const ProjectDetailContainer = () => {
     }),
     useFor({
       roles: ["PI", "FieldManager"],
-      condition: project.status === "Active",
+      condition:
+        project.status === "Active" &&
+        (project.principalInvestigator.iam === userInfo.user.detail.iam ||
+          userInfo.user.roles.includes("FieldManager")),
       children: (
         <Link
           className="btn btn-primary btn-sm mr-4"
