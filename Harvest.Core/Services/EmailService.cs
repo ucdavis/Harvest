@@ -381,8 +381,10 @@ namespace Harvest.Core.Services
             try
             {
                 var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
+                string[] ccEmails = null;
                 if (ticketMessage.CreatedById != project.PrincipalInvestigatorId)
                 {
+                    ccEmails = emailTo;
                     emailTo = new[] {project.PrincipalInvestigator.Email};
                 }
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
@@ -399,7 +401,7 @@ namespace Harvest.Core.Services
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/TicketReply.cshtml", model);
                 var textVersion = $"A reply to the ticket in the project {model.ProjectName} by {model.From}";
-                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Ticket Reply");
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Ticket Reply");
             }
             catch (Exception e)
             {
@@ -419,9 +421,11 @@ namespace Harvest.Core.Services
             try
             {
                 var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
+                string[] ccEmails = null;
                 var firstAttachment = ticketAttachments.First();
                 if (firstAttachment.CreatedById != project.PrincipalInvestigatorId)
                 {
+                    ccEmails = emailTo;
                     emailTo = new[] {project.PrincipalInvestigator.Email};
                 }
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
@@ -438,7 +442,7 @@ namespace Harvest.Core.Services
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/TicketAttachment.cshtml", model);
                 var textVersion = $"An attachment was added to the ticket in the project {model.ProjectName} by {model.From}";
-                await _notificationService.SendNotification(emailTo, null, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
+                await _notificationService.SendNotification(emailTo, ccEmails, emailBody, textVersion, "Harvest Notification - Ticket Attachment Added");
             }
             catch (Exception e)
             {
