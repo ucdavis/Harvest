@@ -361,7 +361,7 @@ namespace Harvest.Core.Services
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
-                await _notificationService.SendNotification(await FieldManagersEmails(project.TeamId), null, emailBody, textVersion, "Harvest Notification - New Ticket");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), null, emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
@@ -380,7 +380,7 @@ namespace Harvest.Core.Services
             //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
             try
             {
-                var emailTo = await FieldManagersEmails(project.TeamId);
+                var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
                 if (ticketMessage.CreatedById != project.PrincipalInvestigatorId)
                 {
                     emailTo = new[] {project.PrincipalInvestigator.Email};
@@ -418,7 +418,7 @@ namespace Harvest.Core.Services
             //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
             try
             {
-                var emailTo = await FieldManagersEmails(project.TeamId);
+                var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
                 var firstAttachment = ticketAttachments.First();
                 if (firstAttachment.CreatedById != project.PrincipalInvestigatorId)
                 {
@@ -460,13 +460,13 @@ namespace Harvest.Core.Services
                 string[] ccEmails = null;
                 if (ticket.Project.PrincipalInvestigatorId == closedBy.Id)
                 {
-                    emailTo = await FieldManagersEmails(project.TeamId);
+                    emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
                     ccEmails = new[] {project.PrincipalInvestigator.Email};
                 }
                 else
                 {
                     emailTo = new[] {project.PrincipalInvestigator.Email};
-                    ccEmails = await FieldManagersEmails(project.TeamId);
+                    ccEmails = await FieldManagersAndSupervisorEmails(project.TeamId);
                 }
 
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
