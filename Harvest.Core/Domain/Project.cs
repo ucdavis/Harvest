@@ -121,6 +121,9 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Invoice> Invoices { get; set; }
 
+        [JsonIgnore]
+        public List<ProjectPermission> ProjectPermissions { get; set; }
+
         public void UpdateStatus(string newStatus)
         {
             Status = newStatus;
@@ -198,6 +201,12 @@ namespace Harvest.Core.Domain
                 .HasOne(f => f.Project)
                 .WithMany(f => f.Fields)
                 .HasForeignKey(f => f.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ProjectPermission>()
+                .HasOne(p => p.Project)
+                .WithMany(p => p.ProjectPermissions)
+                .HasForeignKey(p => p.ProjectId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
         public class Statuses
