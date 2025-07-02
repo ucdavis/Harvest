@@ -59,7 +59,7 @@ namespace Harvest.Core.Services
                     LastName = userClaims.Single(c => c.Type == ClaimTypes.Surname).Value,
                     Email = userClaims.Single(c => c.Type == ClaimTypes.Email).Value,
                     Iam = iamId,
-                    Kerberos = userClaims.Single(c=>c.Type == ClaimTypes.NameIdentifier).Value
+                    Kerberos = userClaims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value
                 };
 
                 _dbContext.Users.Add(newUser);
@@ -95,9 +95,12 @@ namespace Harvest.Core.Services
                 .ToListAsync();
 
             // if projectId is null, we just want to know if user is a PI of at least one project
-            var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigator.Iam == iamId);
+            //var isPrincipalInvestigator = await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigator.Iam == iamId);
 
-            if (isPrincipalInvestigator)
+
+
+            if (await _dbContext.Projects.AnyAsync(p => (projectId == null || p.Id == projectId) && p.PrincipalInvestigator.Iam == iamId) 
+                || await _dbContext.ProjectPermissions.Where(pp => pp.User.Iam == iamId).AnyAsync())
             {
                 userRoles.Add(new TeamRoles(Role.Codes.PI, null));
             }
@@ -147,7 +150,7 @@ namespace Harvest.Core.Services
             Role = role;
             TeamSlug = teamSlug;
         }
-        
+
         public string Role { get; set; }
         public string TeamSlug { get; set; }
     }
