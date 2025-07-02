@@ -485,6 +485,9 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<string>("Details")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("DisplayForPi")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("INTEGER");
 
@@ -492,9 +495,35 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasIndex("ActorId");
 
+                    b.HasIndex("DisplayForPi");
+
                     b.HasIndex("ProjectId");
 
                     b.ToTable("ProjectHistory");
+                });
+
+            modelBuilder.Entity("Harvest.Core.Domain.ProjectPermission", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Permission")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ProjectPermissions");
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Quote", b =>
@@ -1116,6 +1145,25 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Project");
                 });
 
+            modelBuilder.Entity("Harvest.Core.Domain.ProjectPermission", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Project", "Project")
+                        .WithMany("ProjectPermissions")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.User", "User")
+                        .WithMany("ProjectPermissions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Quote", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
@@ -1293,6 +1341,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.Navigation("Invoices");
 
+                    b.Navigation("ProjectPermissions");
+
                     b.Navigation("Quotes");
 
                     b.Navigation("Tickets");
@@ -1333,6 +1383,8 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Navigation("Permissions");
 
                     b.Navigation("PrincipalInvestigatorProjects");
+
+                    b.Navigation("ProjectPermissions");
 
                     b.Navigation("TicketAttachments");
 
