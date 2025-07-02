@@ -22,6 +22,8 @@ namespace Harvest.Core.Domain
 
         public User User { get; set; }
 
+        [Required]
+        [StringLength(20)]
         public string Permission { get; set; } = Role.Codes.ProjectViewer;
 
         internal static void OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder modelBuilder)
