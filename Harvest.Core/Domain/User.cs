@@ -53,6 +53,9 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<TicketMessage> TicketMessages { get; set; }
 
+        [JsonIgnore]
+        public List<ProjectPermission> ProjectPermissions { get; set; }
+
         [Display(Name = "Name")]
         public string Name => FirstName + " " + LastName;
 
@@ -104,6 +107,12 @@ namespace Harvest.Core.Domain
                 .WithMany(a => a.TicketMessages)
                 .HasForeignKey(a => a.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<ProjectPermission>()
+                .HasOne(a => a.User)
+                .WithMany(a => a.ProjectPermissions)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
