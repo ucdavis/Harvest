@@ -30,6 +30,7 @@ namespace Harvest.Web.Controllers
             _notificationService = notificationService;
             _emailService = emailService;
         }
+        // PlaceHolder for PR. TODO, remove this
         public async Task<IActionResult> TestBody()
         {
             var model = new ProjectClosedModel();
