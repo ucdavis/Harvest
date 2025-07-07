@@ -192,14 +192,15 @@ namespace Harvest.Web.Controllers.Api
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
                 .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             if (project == null)
             {
                 return NotFound();
             }
-            if (project.PrincipalInvestigator.Id != user.Id)
+            if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
             {
-                return BadRequest("You are not the PI of this project.");
+                return BadRequest("You are not the PI of this project or an editor of the project.");
             }
             project.ShareId = Guid.NewGuid();
             await _dbContext.SaveChangesAsync();
