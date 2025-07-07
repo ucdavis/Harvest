@@ -51,6 +51,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.CreatedBy)
                 .Include(p => p.Accounts)
                 .Include(p => p.Team)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
                 .AsNoTracking()
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(p => p.Id == invoice.ProjectId && p.Team.Slug == TeamSlug);
@@ -71,7 +72,7 @@ namespace Harvest.Web.Controllers.Api
 
             var invoiceQuery = _dbContext.Invoices.Where(a =>
                     a.ProjectId == projectId && a.Project.Team.Slug == TeamSlug
-                    && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id || (shareId != null && a.Project.ShareId == shareId)))
+                    && (hasAccess || a.Project.PrincipalInvestigatorId == user.Id || a.Project.ProjectPermissions.Any(pp => pp.UserId == user.Id) || (shareId != null && a.Project.ShareId == shareId)))
                     .OrderByDescending(a => a.CreatedOn);
 
             if (maxRows.HasValue)
