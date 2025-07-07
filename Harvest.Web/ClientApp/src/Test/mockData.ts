@@ -101,6 +101,20 @@ export const fakeProject: Project = {
     description: "Team 1",
   },
   shareId: "1234567890",
+  projectPermissions: [
+    {
+      id: 1,
+      user: fakeUser,
+      permission: "View",
+      projectId: 3,
+    },
+    {
+      id: 2,
+      user: fakeUser,
+      permission: "Edit",
+      projectId: 3,
+    },
+  ],
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -148,6 +162,20 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       description: "Team 1",
     },
     shareId: "1234567890",
+    projectPermissions: [
+      {
+        id: 1,
+        user: fakeUser,
+        permission: "View",
+        projectId: 3,
+      },
+      {
+        id: 2,
+        user: fakeUser,
+        permission: "Edit",
+        projectId: 3,
+      },
+    ],
   },
   quote: null,
 };

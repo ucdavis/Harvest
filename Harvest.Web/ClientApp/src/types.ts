@@ -59,6 +59,14 @@ export interface Project {
   acres: number;
   team: Team;
   shareId: string;
+  projectPermissions: ProjectPermission[];
+}
+
+export interface ProjectPermission {
+  id: number;
+  projectId: number;
+  user: User;
+  permission: string;
 }
 
 export interface BlobFile {
