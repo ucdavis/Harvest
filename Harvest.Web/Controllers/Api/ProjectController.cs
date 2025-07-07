@@ -157,6 +157,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.AcreageRate)
+                .Include(p => p.ProjectPermissions).ThenInclude(a => a.User)
                 .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
             if (project == null)
