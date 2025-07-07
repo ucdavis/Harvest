@@ -57,6 +57,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Accounts)
                 .Include(p => p.CreatedBy)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
                 .SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
             if (shareId != null)
@@ -69,7 +70,7 @@ namespace Harvest.Web.Controllers.Api
             }
             else
             {
-                if(!hasAccess && project.PrincipalInvestigator.Id != user.Id)
+                if(!hasAccess && project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id))
                 {
                     //return not authorized
                     return Unauthorized();
