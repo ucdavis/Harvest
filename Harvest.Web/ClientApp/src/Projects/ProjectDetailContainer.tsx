@@ -481,7 +481,13 @@ export const ProjectDetailContainer = () => {
             <ShowFor
               roles={["PI"]}
               condition={
-                project.principalInvestigator.iam === userInfo.user.detail.iam
+                project.principalInvestigator.iam ===
+                  userInfo.user.detail.iam ||
+                project.projectPermissions?.some(
+                  (pp) =>
+                    pp.user.iam === userInfo.user.detail.iam &&
+                    pp.permission === "ProjectEditor"
+                )
               }
             >
               <RecentTicketsContainer compact={true} projectId={projectId} />
