@@ -81,6 +81,8 @@ namespace Harvest.Web.Controllers.Api
 
             if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
+                //TODO! Deal with change requests and Project Editors.
+
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
                 var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
@@ -153,10 +155,10 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 // not a change request, so just get the project
-                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
                 
-                if(project.PrincipalInvestigator.Iam != currentUser.Iam)
+                if(project.PrincipalInvestigator.Iam != currentUser.Iam && !project.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
                 {
                     var staleDays = (int)((DateTime.UtcNow - project.LastStatusUpdatedOn).TotalDays);
                     if(staleDays <= MinimumStaleDays)
@@ -226,6 +228,8 @@ namespace Harvest.Web.Controllers.Api
             }
 
             await _historyService.QuoteApproved(project.Id, model.Accounts);
+
+            await _historyService.AdhocHistory(project.Id, "QuoteApproved", $"Quote Approved: {quoteDetail.GrandTotal:C}", null, true);
 
             await _dbContext.SaveChangesAsync();
 
