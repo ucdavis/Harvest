@@ -288,8 +288,18 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorandFinance)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var currentUser = await _userService.GetCurrentUser();
+
+            var hasAccess = await _userService.HasAccess(new[] { AccessCodes.FinanceAccess }, TeamSlug);
+
+            if (currentUser == null) {
+                return Unauthorized("User not found");
+            }
+            if (!hasAccess && project.PrincipalInvestigator.Iam != currentUser.Iam && !project.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
+            {
+                return BadRequest("You are not authorized to change accounts for this project.");
+            }
 
             var percentage = 0.0m;
             foreach (var account in model.Accounts)
