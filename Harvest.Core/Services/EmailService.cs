@@ -91,7 +91,7 @@ namespace Harvest.Core.Services
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(project.TeamId), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(GetPiAndProjectEditorEmails(project),await FieldManagersEmails(project.TeamId), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -161,6 +161,26 @@ namespace Harvest.Core.Services
 
             emails.AddRange(project.ProjectPermissions
                 .Where(a => a.Permission == Role.Codes.ProjectEditor)
+                .Select(a => a.User.Email));
+
+            // Filter out duplicates
+            return emails.Distinct().ToArray();
+        }
+
+        private string[] GetAllProjectEmails(Project project)
+        {
+            var emails = new List<string>
+            {
+                project.PrincipalInvestigator.Email
+            };
+
+            emails.AddRange(project.ProjectPermissions
+                .Where(a => a.Permission == Role.Codes.ProjectEditor)
+                .Select(a => a.User.Email));
+
+            //Just to order them by "importance"
+            emails.AddRange(project.ProjectPermissions
+                .Where(a => a.Permission == Role.Codes.ProjectViewer)
                 .Select(a => a.User.Email));
 
             // Filter out duplicates
@@ -393,14 +413,19 @@ namespace Harvest.Core.Services
             project = await CheckForMissingDataForProject(project);
 
             //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
+            //Above, not anymore because we want to allow Project Editors to reply to tickets and they are not PI.
+            //Possibly someone can be both a field manager and the PI/Project Editor... But don't care about that edge case.
+            var piAndProjectEditorsEmails = GetPiAndProjectEditorEmails(project);
+
+
             try
             {
                 var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
-                string[] ccEmails = null;
-                if (ticketMessage.CreatedById != project.PrincipalInvestigatorId)
+                string[] ccEmails = piAndProjectEditorsEmails;
+                if (!piAndProjectEditorsEmails.Contains(ticketMessage.CreatedBy.Email))
                 {
                     ccEmails = emailTo;
-                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    emailTo = piAndProjectEditorsEmails;
                 }
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
@@ -431,17 +456,18 @@ namespace Harvest.Core.Services
         public async Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
         {
             project = await CheckForMissingDataForProject(project);
+            var piAndProjectEditorsEmails = GetPiAndProjectEditorEmails(project);
 
             //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
             try
             {
                 var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
-                string[] ccEmails = null;
+                string[] ccEmails = piAndProjectEditorsEmails;
                 var firstAttachment = ticketAttachments.First();
-                if (firstAttachment.CreatedById != project.PrincipalInvestigatorId)
+                if (!piAndProjectEditorsEmails.Contains(firstAttachment.CreatedBy.Email))
                 {
                     ccEmails = emailTo;
-                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    emailTo = piAndProjectEditorsEmails;
                 }
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
@@ -472,19 +498,20 @@ namespace Harvest.Core.Services
         public async Task<bool> TicketClosed(Project project, Ticket ticket, User closedBy)
         {
             project = await CheckForMissingDataForProject(project);
+            var piAndProjectEditorsEmails = GetPiAndProjectEditorEmails(project);
 
             try
             {
                 string[] emailTo = null;
                 string[] ccEmails = null;
-                if (ticket.Project.PrincipalInvestigatorId == closedBy.Id)
+                if (piAndProjectEditorsEmails.Contains(closedBy.Email))
                 {
                     emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
-                    ccEmails = new[] {project.PrincipalInvestigator.Email};
+                    ccEmails = piAndProjectEditorsEmails;
                 }
                 else
                 {
-                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    emailTo = piAndProjectEditorsEmails;
                     ccEmails = await FieldManagersAndSupervisorEmails(project.TeamId);
                 }
 
@@ -556,12 +583,12 @@ namespace Harvest.Core.Services
             
             try
             {
-                var project = await CheckForMissingDataForInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice); //Might need to include ProjectPermissions here.
 
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
                 
-                var emailTo = new string[] {project.PrincipalInvestigator.Email};
+                var emailTo = GetAllProjectEmails(project);
                 //CC field managers? I'd say no....
 
                 var model = new InvoiceEmailModel()
@@ -599,7 +626,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
                 
-                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var emailTo = GetAllProjectEmails(project);
                 //CC field managers? I'd say no....
 
                 var model = new InvoiceEmailModel()
@@ -637,7 +664,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Request/ChangeAccount/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
                 
-                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var emailTo = GetAllProjectEmails(project);
                 var ccEmails = await FieldManagersEmails(project.TeamId);
 
 
@@ -687,7 +714,7 @@ namespace Harvest.Core.Services
 
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var closeoutUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/CloseoutConfirmation/";
-                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var emailTo = GetPiAndProjectEditorEmails(project);
                 var ccEmails = ccFieldManagers ? await FieldManagersEmails(project.TeamId) : null;
 
                 var model = new CloseoutConfirmationModel()
@@ -742,7 +769,7 @@ namespace Harvest.Core.Services
 
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var emailTo = await FieldManagersEmails(project.TeamId);
-                var ccEmails = new string[] { project.PrincipalInvestigator.Email };
+                var ccEmails = GetPiAndProjectEditorEmails(project);
 
                 var model = new ProjectClosedModel()
                 {
@@ -785,6 +812,12 @@ namespace Harvest.Core.Services
             if (project.Team == null)
             {
                 project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
+            }
+
+            if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
+            {
+                project.ProjectPermissions = await _dbContext.ProjectPermissions.AsNoTracking()
+                    .Where(a => a.ProjectId == project.Id).ToListAsync();
             }
 
             return project;
