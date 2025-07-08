@@ -44,6 +44,8 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> TicketFilesAttached(int projectId, IEnumerable<TicketAttachment> attachments);
         Task<ProjectHistory> TicketNotesUpdated(int projectId, Ticket ticket);
         Task<ProjectHistory> TicketReplyCreated(int projectId, TicketMessage message);
+
+        Task<ProjectHistory> ShareResetByOther(int projectId, string description, object detailsModel);
     }
 
     public class ProjectHistoryService : IProjectHistoryService
@@ -100,9 +102,9 @@ namespace Harvest.Core.Services
         public Task<ProjectHistory> AdhocProjectCreated(Project project) =>
             MakeHistory(project, nameof(AdhocProjectCreated), new ProjectHistoryModel(project));
         public Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts) =>
-            MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)));
+            MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)), true);
         public Task<ProjectHistory> QuoteRejected(int projectId, string reason) =>
-            MakeHistory(projectId, nameof(QuoteRejected), reason);
+            MakeHistory(projectId, $"{nameof(QuoteRejected)}: {reason}", reason, displayForPi: true);
         public Task<ProjectHistory> TicketCreated(int projectId, Ticket ticket) =>
             MakeHistory(projectId, nameof(TicketCreated), new TicketHistoryModel(ticket));
         public Task<ProjectHistory> TicketFilesAttached(int projectId, IEnumerable<TicketAttachment> attachments) =>
@@ -112,14 +114,17 @@ namespace Harvest.Core.Services
         public Task<ProjectHistory> TicketReplyCreated(int projectId, TicketMessage message) =>
             MakeHistory(projectId, nameof(TicketReplyCreated), new TicketMessageHistoryModel(message));
 
+        public Task<ProjectHistory> ShareResetByOther(int projectId, string description, object detailsModel) =>
+            MakeDisplayHistory(projectId, "Share ID Reset", description, JsonSerializer.Serialize(detailsModel, _jsonOptions));
 
-        private Task<ProjectHistory> MakeHistory(int projectId, string action, object detailsModel) =>
+
+        private Task<ProjectHistory> MakeHistory(int projectId, string action, object detailsModel, bool displayForPi = false) =>
             MakeHistory(projectId, action, JsonSerializer.Serialize(detailsModel, _jsonOptions));
 
-        private Task<ProjectHistory> MakeHistory(Project project, string action, object detailsModel) =>
+        private Task<ProjectHistory> MakeHistory(Project project, string action, object detailsModel, bool displayForPi = false) =>
             MakeHistory(project, action, JsonSerializer.Serialize(detailsModel, _jsonOptions));
 
-        private async Task<ProjectHistory> MakeHistory(int projectId, string action, string detailsSerialized)
+        private async Task<ProjectHistory> MakeHistory(int projectId, string action, string detailsSerialized, bool displayForPi = false)
         {
 
             var projectHistory = new ProjectHistory
@@ -130,12 +135,30 @@ namespace Harvest.Core.Services
                 ProjectId = projectId,
                 ActionDate = DateTime.UtcNow,
                 ActorId = (await _userService.GetCurrentUser())?.Id,
+                DisplayForPi = displayForPi,
             };
             _dbContext.Add(projectHistory);
             return projectHistory;
         }
 
-        private async Task<ProjectHistory> MakeHistory(Project project, string action, string detailsSerialized)
+        private async Task<ProjectHistory> MakeDisplayHistory(int projectId, string action, string description, string detailsSerialized)
+        {
+
+            var projectHistory = new ProjectHistory
+            {
+                Action = action,
+                Description = description,
+                Details = detailsSerialized,
+                ProjectId = projectId,
+                ActionDate = DateTime.UtcNow,
+                ActorId = (await _userService.GetCurrentUser())?.Id,            
+                DisplayForPi = true,
+            };
+            _dbContext.Add(projectHistory);
+            return projectHistory;
+        }
+
+        private async Task<ProjectHistory> MakeHistory(Project project, string action, string detailsSerialized, bool displayForPi = false)
         {
 
             var projectHistory = new ProjectHistory
@@ -146,9 +169,12 @@ namespace Harvest.Core.Services
                 Project = project,
                 ActionDate = DateTime.UtcNow,
                 ActorId = (await _userService.GetCurrentUser())?.Id,
+                DisplayForPi = displayForPi,
             };
             _dbContext.Add(projectHistory);
             return projectHistory;
         }
+
+
     }
 }

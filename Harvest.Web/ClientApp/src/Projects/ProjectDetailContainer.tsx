@@ -124,7 +124,7 @@ export const ProjectDetailContainer = () => {
     setNotification(request, "Refreshing", "Share Link Refreshed");
     const response = await request;
     if (response.ok) {
-      //This will return a new project.shareId (guid), update thge project.shareId with this
+      //This will return a new project.shareId (guid), update the project.shareId with this
       const shareId = await response.json();
       getIsMounted() &&
         setProject({
