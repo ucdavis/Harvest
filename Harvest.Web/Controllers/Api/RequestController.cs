@@ -319,6 +319,8 @@ namespace Harvest.Web.Controllers.Api
 
             await _historyService.AccountChanged(project.Id, model.Accounts);
 
+            await _historyService.AdhocHistory(project.Id, "AccountsChanged", $"Accounts Changed: {string.Join(", ", model.Accounts.Select(a => $"{a.Number} ({a.Percentage}%)"))}", null, true);
+
             await _dbContext.SaveChangesAsync();
 
             return Ok(project);
