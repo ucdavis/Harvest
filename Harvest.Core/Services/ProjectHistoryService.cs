@@ -104,9 +104,9 @@ namespace Harvest.Core.Services
         public Task<ProjectHistory> AdhocProjectCreated(Project project) =>
             MakeHistory(project, nameof(AdhocProjectCreated), new ProjectHistoryModel(project));
         public Task<ProjectHistory> QuoteApproved(int projectId, IEnumerable<Account> accounts) =>
-            MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)), true);
+            MakeHistory(projectId, nameof(QuoteApproved), accounts.Select(a => new AccountHistoryModel(a)));
         public Task<ProjectHistory> QuoteRejected(int projectId, string reason) =>
-            MakeHistory(projectId, $"{nameof(QuoteRejected)}: {reason}", reason, displayForPi: true);
+            MakeHistory(projectId, nameof(QuoteRejected), reason);
         public Task<ProjectHistory> TicketCreated(int projectId, Ticket ticket) =>
             MakeHistory(projectId, nameof(TicketCreated), new TicketHistoryModel(ticket));
         public Task<ProjectHistory> TicketFilesAttached(int projectId, IEnumerable<TicketAttachment> attachments) =>

@@ -242,12 +242,12 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest();
             }
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var quote = await _dbContext.Quotes.SingleAsync(a => a.ProjectId == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
 
-            if (project.PrincipalInvestigator.Iam != currentUser.Iam)
+            if (project.PrincipalInvestigator.Iam != currentUser.Iam && !project.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
             {
                 var staleDays = (int)((DateTime.UtcNow - project.LastStatusUpdatedOn).TotalDays);
                 if (staleDays <= MinimumStaleDays)
@@ -271,6 +271,7 @@ namespace Harvest.Web.Controllers.Api
             quote.Status = Quote.Statuses.Rejected;
 
             await _historyService.QuoteRejected(project.Id, model.Reason);
+            await _historyService.AdhocHistory(project.Id, "QuoteRejected", $"Quote Rejected: {model.Reason}", null, true);
 
             await _dbContext.SaveChangesAsync();
 

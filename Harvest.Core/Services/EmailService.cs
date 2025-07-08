@@ -227,6 +227,15 @@ namespace Harvest.Core.Services
         {
             project = await CheckForMissingDataForProject(project);
 
+            var piAndProjectEditors = new List<string>
+            {
+                project.PrincipalInvestigator.Email
+            };
+
+            piAndProjectEditors.AddRange(project.ProjectPermissions.Where(a => a.Permission == Role.Codes.ProjectEditor).Select(a => a.User.Email).ToList());
+            //Filter out duplicates
+            piAndProjectEditors = piAndProjectEditors.Distinct().ToList();
+
             var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
 
             var model = new QuoteDecisionModel()
@@ -248,7 +257,7 @@ namespace Harvest.Core.Services
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
                 //INC2065591 Brain wants supervisors to be included in the email
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), new[] { project.PrincipalInvestigator.Email }, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), piAndProjectEditors.ToArray(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
@@ -791,6 +800,13 @@ namespace Harvest.Core.Services
             if(project.Team == null)
             {
                 project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
+            }
+
+            //I don't know if the null check would find it, so populate this.
+            if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
+            {
+                project.ProjectPermissions = await _dbContext.ProjectPermissions.AsNoTracking()
+                    .Where(a => a.ProjectId == project.Id).ToListAsync();
             }
 
             return project;
