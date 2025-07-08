@@ -152,6 +152,20 @@ namespace Harvest.Core.Services
             return await _dbContext.Permissions.Where(a => a.TeamId == teamId && (a.Role.Name == Role.Codes.FieldManager || a.Role.Name == Role.Codes.Supervisor)).Select(a => a.User.Email).Distinct().ToArrayAsync();
         }
 
+        private string[] GetPiAndProjectEditorEmails(Project project)
+        {
+            var emails = new List<string>
+            {
+                project.PrincipalInvestigator.Email
+            };
+
+            emails.AddRange(project.ProjectPermissions
+                .Where(a => a.Permission == Role.Codes.ProjectEditor)
+                .Select(a => a.User.Email));
+
+            // Filter out duplicates
+            return emails.Distinct().ToArray();
+        }
 
         public async Task<bool> NewFieldRequest(Project project)
         {
@@ -227,14 +241,6 @@ namespace Harvest.Core.Services
         {
             project = await CheckForMissingDataForProject(project);
 
-            var piAndProjectEditors = new List<string>
-            {
-                project.PrincipalInvestigator.Email
-            };
-
-            piAndProjectEditors.AddRange(project.ProjectPermissions.Where(a => a.Permission == Role.Codes.ProjectEditor).Select(a => a.User.Email).ToList());
-            //Filter out duplicates
-            piAndProjectEditors = piAndProjectEditors.Distinct().ToList();
 
             var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
 
@@ -257,7 +263,7 @@ namespace Harvest.Core.Services
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
                 //INC2065591 Brain wants supervisors to be included in the email
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), piAndProjectEditors.ToArray(), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), GetPiAndProjectEditorEmails(project), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
@@ -370,7 +376,7 @@ namespace Harvest.Core.Services
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), null, emailBody, textVersion, "Harvest Notification - New Ticket");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), GetPiAndProjectEditorEmails(project), emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
