@@ -185,6 +185,19 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project);
         }
 
+        [Authorize(Policy = AccessCodes.InvoiceAccess)]
+        public async Task<ActionResult> ListHistory(int projectId, int? maxRows = 5)
+        {
+            var query = _dbContext.ProjectHistory.Include(a => a.Actor)
+                .Where(a => a.Project.Id == projectId && a.Project.Team.Slug == TeamSlug && a.DisplayForPi)
+                .OrderByDescending(a => a.ActionDate);
+            if (maxRows.HasValue)
+            {
+                query = (IOrderedQueryable<ProjectHistory>)query.Take(maxRows.Value);
+            }
+            return Ok(await query.ToListAsync());
+        }
+
         [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> ResetShareLink(int projectId)
