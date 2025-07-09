@@ -816,7 +816,7 @@ namespace Harvest.Core.Services
 
             if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
             {
-                project.ProjectPermissions = await _dbContext.ProjectPermissions.AsNoTracking()
+                project.ProjectPermissions = await _dbContext.ProjectPermissions.Include(a => a.User).AsNoTracking()
                     .Where(a => a.ProjectId == project.Id).ToListAsync();
             }
 
@@ -844,7 +844,7 @@ namespace Harvest.Core.Services
             //I don't know if the null check would find it, so populate this.
             if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
             {
-                project.ProjectPermissions = await _dbContext.ProjectPermissions.AsNoTracking()
+                project.ProjectPermissions = await _dbContext.ProjectPermissions.Include(a => a.User).AsNoTracking()
                     .Where(a => a.ProjectId == project.Id).ToListAsync();
             }
 
