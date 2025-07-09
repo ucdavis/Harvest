@@ -307,6 +307,13 @@ export interface ProjectAccount {
   percentage: number;
 }
 
+export interface History {
+  id: number;
+  description: string;
+  actionDate: Date;
+  actor: User;
+}
+
 //Rename to TicketCreate? (Attachments is a BlobFile[] which doesn't work when I'm pulling the attachments from the DB see TicketDetails)
 export interface Ticket {
   id: number;
