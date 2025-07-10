@@ -32,9 +32,11 @@ namespace Harvest.Core.Domain
             public const string FieldManager = "FieldManager";
             public const string Supervisor = "Supervisor";
             public const string Worker = "Worker";
-            public const string PI = "PI";
+            public const string PI = "PI"; // Not in the Db
             public const string Finance = "Finance";
-            public const string Shared = "Shared";
+            public const string Shared = "Shared"; // Not in the Db
+            public const string ProjectEditor = "ProjectEditor"; // Not in the Db
+            public const string ProjectViewer = "ProjectViewer"; // Not in the Db
         }
     }
 }

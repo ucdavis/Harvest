@@ -127,11 +127,20 @@ namespace Harvest.Web.Controllers.Api
         {
             var user = await _userService.GetCurrentUser();
 
+            //Look for any projects where I have a project permission
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            //Just for testing, remove this later as the call below will do the same thing
+            //var projectsWithPermissions = await _dbContext.ProjectPermissions.Where(a => a.UserId == user.Id).Select(a => a.ProjectId).ToArrayAsync();
+
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Team)
-                .Where(p => p.IsActive && p.PrincipalInvestigatorId == user.Id)
+                .Where(p => p.IsActive && (p.PrincipalInvestigatorId == user.Id || p.ProjectPermissions.Any(a => a.UserId == user.Id)))
                 .ToArrayAsync());
         }
 
@@ -148,6 +157,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.AcreageRate)
+                .Include(p => p.ProjectPermissions).ThenInclude(a => a.User)
                 .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
             if (project == null)
@@ -175,6 +185,20 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project);
         }
 
+        [Authorize(Policy = AccessCodes.InvoiceAccess)]
+        [HttpGet]
+        public async Task<ActionResult> ListHistory(int projectId, int? maxRows = 5)
+        {
+            var query = _dbContext.ProjectHistory.Include(a => a.Actor)
+                .Where(a => a.Project.Id == projectId && a.Project.Team.Slug == TeamSlug && a.DisplayForPi)
+                .OrderByDescending(a => a.ActionDate);
+            if (maxRows.HasValue)
+            {
+                query = (IOrderedQueryable<ProjectHistory>)query.Take(maxRows.Value);
+            }
+            return Ok(await query.ToListAsync());
+        }
+
         [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> ResetShareLink(int projectId)
@@ -182,17 +206,24 @@ namespace Harvest.Web.Controllers.Api
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
                 .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             if (project == null)
             {
                 return NotFound();
             }
+            if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
+            {
+                return BadRequest("You are not the PI of this project or an editor of the project.");
+            }
             if (project.PrincipalInvestigator.Id != user.Id)
             {
-                return BadRequest("You are not the PI of this project.");
+                await _historyService.ShareResetByOther(projectId, "Share Id Reset by Project Editor", project);
             }
             project.ShareId = Guid.NewGuid();
             await _dbContext.SaveChangesAsync();
+
+
             return Ok(project.ShareId);
         }
 

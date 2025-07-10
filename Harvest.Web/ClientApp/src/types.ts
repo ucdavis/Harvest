@@ -59,6 +59,14 @@ export interface Project {
   acres: number;
   team: Team;
   shareId: string;
+  projectPermissions: ProjectPermission[];
+}
+
+export interface ProjectPermission {
+  id: number;
+  projectId: number;
+  user: User;
+  permission: string;
 }
 
 export interface BlobFile {
@@ -297,6 +305,13 @@ export interface ProjectAccount {
   accountManagerName: string;
   accountManagerEmail: string;
   percentage: number;
+}
+
+export interface History {
+  id: number;
+  description: string;
+  actionDate: Date;
+  actor: User;
 }
 
 //Rename to TicketCreate? (Attachments is a BlobFile[] which doesn't work when I'm pulling the attachments from the DB see TicketDetails)

@@ -39,7 +39,7 @@ namespace Harvest.Web.Extensions
                 //When there is no team, we want to get all roles so we can show them the team picker. (PI's never need to pick teams until they create a project)
                 roles = await dbContext.Permissions.Where(p => p.User.Iam == user.Iam).Select(p => p.Role.Name).ToArrayAsync();
             }
-            if (await dbContext.Projects.AnyAsync(p => p.PrincipalInvestigator.Iam == user.Iam))
+            if (await dbContext.Projects.AnyAsync(p => p.PrincipalInvestigator.Iam == user.Iam) || await dbContext.ProjectPermissions.AnyAsync(a => a.User.Iam == user.Iam))
             {
                 roles = roles.Append(Role.Codes.PI);
             }
