@@ -323,13 +323,15 @@ namespace Harvest.Web.Controllers.Api
             //Ignore accounts that don't have a percentage
             project.Accounts = new List<Account>(model.Accounts.Where(a => a.Percentage > 0).ToArray());
 
+            var oldAccounts = await _dbContext.Accounts.Where(a => a.ProjectId == projectId).Select(a => $"{a.Number} ({a.Percentage})").ToListAsync();
+
             // TODO: Maybe inactivate instead?
             // remove any existing accounts that we no longer need
             _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
 
             await _historyService.AccountChanged(project.Id, model.Accounts);
 
-            await _historyService.AdhocHistory(project.Id, "AccountsChanged", $"Accounts Changed: {string.Join(", ", model.Accounts.Select(a => $"{a.Number} ({a.Percentage}%)"))}", null, true);
+            await _historyService.AdhocHistory(project.Id, "AccountsChanged", $"Accounts Changed. \nOld: {string.Join(", ", oldAccounts)} \nNew: {string.Join(", ", model.Accounts.Select(a => $"{a.Number} ({a.Percentage}%)"))}", null, true);
 
             await _dbContext.SaveChangesAsync();
 

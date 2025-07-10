@@ -12,12 +12,26 @@ interface Props {
 
 export const HistoryTable = (props: Props) => {
   const historyData = useMemo(() => props.histories, [props.histories]);
-  const { team } = useParams<CommonRouteParams>();
+
   const columns: Column<History>[] = useMemo(
     () => [
       {
         Header: "Description",
         accessor: (row) => row.description,
+        Cell: (data: Cell<History>) => {
+          const description = data.row.original.description;
+          if (!description) return "";
+
+          // Split by line breaks and render each line
+          const lines = description.split(/\r?\n/);
+          return (
+            <div style={{ whiteSpace: "pre-wrap" }}>
+              {lines.map((line, index) => (
+                <div key={index}>{line}</div>
+              ))}
+            </div>
+          );
+        },
       },
       {
         id: "actionDate",
@@ -32,7 +46,7 @@ export const HistoryTable = (props: Props) => {
         accessor: (row) => row.actor.name,
       },
     ],
-    [team]
+    []
   );
 
   const initialState: Partial<TableState<any>> = {
