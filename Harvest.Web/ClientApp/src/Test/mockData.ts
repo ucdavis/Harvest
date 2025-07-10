@@ -8,6 +8,7 @@ import {
   Rate,
   Team,
   Ticket,
+  History,
 } from "../types";
 
 const fakeUser = {
@@ -179,6 +180,21 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
   },
   quote: null,
 };
+
+export const fakeHistories: History[] = [
+  {
+    id: 1,
+    description: "Project created",
+    actionDate: new Date("2021-03-15T00:00:00"),
+    actor: fakeUser,
+  },
+  {
+    id: 2,
+    description: "Project updated",
+    actionDate: new Date("2021-03-16T00:00:00"),
+    actor: fakeUser,
+  },
+];
 
 export const fakeInvoices: Invoice[] = [
   {

@@ -493,9 +493,7 @@ export const ProjectDetailContainer = () => {
             >
               <RecentTicketsContainer compact={true} projectId={projectId} />
             </ShowFor>
-
             <RecentInvoicesContainer compact={true} projectId={projectId} />
-
             <ShowFor
               roles={["FieldManager", "Supervisor", "System"]}
               condition={
