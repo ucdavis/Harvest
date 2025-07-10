@@ -186,6 +186,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [Authorize(Policy = AccessCodes.InvoiceAccess)]
+        [HttpGet]
         public async Task<ActionResult> ListHistory(int projectId, int? maxRows = 5)
         {
             var query = _dbContext.ProjectHistory.Include(a => a.Actor)
