@@ -16,6 +16,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
+import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, CommonRouteParams, Project } from "../types";
 import { ShowFor, useFor } from "../Shared/ShowFor";
@@ -494,6 +495,7 @@ export const ProjectDetailContainer = () => {
             </ShowFor>
 
             <RecentInvoicesContainer compact={true} projectId={projectId} />
+            <RecentHistoriesContainer compact={true} projectId={projectId} />
           </div>
         )}
       </div>
