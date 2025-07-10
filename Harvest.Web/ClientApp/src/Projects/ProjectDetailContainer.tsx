@@ -495,7 +495,29 @@ export const ProjectDetailContainer = () => {
             </ShowFor>
 
             <RecentInvoicesContainer compact={true} projectId={projectId} />
-            <RecentHistoriesContainer compact={true} projectId={projectId} />
+
+            <ShowFor
+              roles={["FieldManager", "Supervisor", "System"]}
+              condition={
+                project.principalInvestigator.iam !== userInfo.user.detail.iam
+              }
+            >
+              <RecentHistoriesContainer compact={true} projectId={projectId} />
+            </ShowFor>
+            <ShowFor
+              roles={["PI"]}
+              condition={
+                project.principalInvestigator.iam ===
+                  userInfo.user.detail.iam ||
+                project.projectPermissions?.some(
+                  (pp) =>
+                    pp.user.iam === userInfo.user.detail.iam &&
+                    pp.permission === "ProjectEditor"
+                )
+              }
+            >
+              <RecentHistoriesContainer compact={true} projectId={projectId} />
+            </ShowFor>
           </div>
         )}
       </div>
