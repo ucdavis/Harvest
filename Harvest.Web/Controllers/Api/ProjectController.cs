@@ -187,7 +187,7 @@ namespace Harvest.Web.Controllers.Api
 
         [Authorize(Policy = AccessCodes.InvoiceAccess)]
         [HttpGet]
-        public async Task<ActionResult> ListHistory(int projectId, int? maxRows = 5)
+        public async Task<ActionResult> ListHistory(int projectId, int? maxRows)
         {
             var query = _dbContext.ProjectHistory.Include(a => a.Actor)
                 .Where(a => a.Project.Id == projectId && a.Project.Team.Slug == TeamSlug && a.DisplayForPi)

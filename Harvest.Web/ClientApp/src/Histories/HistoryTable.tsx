@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { useParams } from "react-router-dom";
 import { Cell, Column, TableState } from "react-table";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
-import { History, CommonRouteParams } from "../types";
+import { History } from "../types";
 
 interface Props {
   histories: History[];

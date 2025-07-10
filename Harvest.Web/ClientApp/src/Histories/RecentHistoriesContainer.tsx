@@ -7,6 +7,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
 
+// If we need to work with the share ID, look into the invoices container. There are a few places else that would need to change as well.
 interface Props {
   projectId?: string;
   compact: boolean;
@@ -14,7 +15,7 @@ interface Props {
 
 export const RecentHistoriesContainer = (props: Props) => {
   const [histories, setHistories] = useState<History[]>([]);
-  const { team, shareId } = useParams<CommonRouteParams>();
+  const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -39,13 +40,7 @@ export const RecentHistoriesContainer = (props: Props) => {
             <h3>Recent Histories</h3>
           </div>
           <div className="col text-right">
-            <Link
-              to={
-                shareId
-                  ? `/${team}/project/invoices/${props.projectId}/${shareId}`
-                  : `/${team}/project/invoices/${props.projectId}`
-              }
-            >
+            <Link to={`/${team}/project/history/${props.projectId}`}>
               View All
             </Link>
           </div>
