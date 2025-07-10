@@ -59,7 +59,7 @@ namespace Harvest.Web.Handlers
                 if (requirement.RoleStrings.Contains(Role.Codes.PI))
                 {
                     if (await _dbContext.Projects.AnyAsync(a =>
-                            a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId))
+                            a.Id == projectId && a.PrincipalInvestigator.Iam == userIamId) || await _dbContext.ProjectPermissions.AnyAsync(a => a.ProjectId == projectId && a.User.Iam == userIamId))
                     {
                         context.Succeed(requirement);
                         return;

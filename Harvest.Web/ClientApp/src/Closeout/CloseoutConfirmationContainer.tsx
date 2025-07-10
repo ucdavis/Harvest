@@ -94,7 +94,10 @@ export const CloseoutConfirmationContainer = () => {
 
   const canCloseout =
     project.status === "PendingCloseoutApproval" &&
-    project.principalInvestigator.iam === userDetail.iam;
+    (project.principalInvestigator.iam === userDetail.iam ||
+      project.projectPermissions.some(
+        (p) => p.user.iam === userDetail.iam && p.permission === "ProjectEditor"
+      ));
 
   return (
     <div className="card-wrapper">
@@ -118,7 +121,8 @@ export const CloseoutConfirmationContainer = () => {
             <ShowFor condition={!canCloseout}>
               {/* Not sure if there's a better way to handle indicators as to why something is disabled */}
               <UncontrolledTooltip target="CloseoutButton">
-                Closeout approval can only be performed by project's PI.
+                Closeout approval can only be performed by project's PI or a
+                Project Editor.
               </UncontrolledTooltip>
             </ShowFor>
           </div>

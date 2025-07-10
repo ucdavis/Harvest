@@ -24,7 +24,14 @@ export const ShowForPiOnly = (props: Props) => {
     return (
       <ShowFor
         roles={["PI"]}
-        condition={props.project.principalInvestigator.iam === user.detail.iam}
+        condition={
+          props.project.principalInvestigator.iam === user.detail.iam ||
+          props.project.projectPermissions?.some(
+            (pp) =>
+              pp.user.iam === user.detail.iam &&
+              pp.permission === "ProjectEditor"
+          )
+        }
       >
         {props.children}
       </ShowFor>

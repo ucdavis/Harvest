@@ -33,9 +33,13 @@ namespace Harvest.Core.Domain
 
         public Project Project { get; set; }
 
+        public bool DisplayForPi { get; set; } = false;
+        
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ProjectHistory>().HasIndex(a => a.ProjectId);
+            modelBuilder.Entity<ProjectHistory>().HasIndex(a => a.DisplayForPi);
         }
     }
 }
