@@ -21,7 +21,7 @@ namespace Harvest.Core.Domain
 
         [Key]
         public int Id { get; set; }
-        
+
         [Required] public int TeamId { get; set; } = 1;
 
         public Team Team { get; set; }
@@ -121,7 +121,6 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Invoice> Invoices { get; set; }
 
-        [JsonIgnore]
         public List<ProjectPermission> ProjectPermissions { get; set; }
 
         public void UpdateStatus(string newStatus)
@@ -135,7 +134,7 @@ namespace Harvest.Core.Domain
             // TODO: temporary for migrations
             modelBuilder.Entity<Project>().Property(a => a.TeamId).HasDefaultValue(1);
             modelBuilder.Entity<Project>().HasIndex(a => a.TeamId);
-            
+
             modelBuilder.Entity<Project>().HasIndex(a => a.Name);
             modelBuilder.Entity<Project>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Project>().HasIndex(a => a.PrincipalInvestigatorId);

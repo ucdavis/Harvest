@@ -81,6 +81,8 @@ namespace Harvest.Web.Controllers.Api
 
             if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
+                //TODO! Deal with change requests and Project Editors.
+
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
                 var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
@@ -153,10 +155,10 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 // not a change request, so just get the project
-                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+                project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
                 
-                if(project.PrincipalInvestigator.Iam != currentUser.Iam)
+                if(project.PrincipalInvestigator.Iam != currentUser.Iam && !project.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
                 {
                     var staleDays = (int)((DateTime.UtcNow - project.LastStatusUpdatedOn).TotalDays);
                     if(staleDays <= MinimumStaleDays)
@@ -227,6 +229,8 @@ namespace Harvest.Web.Controllers.Api
 
             await _historyService.QuoteApproved(project.Id, model.Accounts);
 
+            await _historyService.AdhocHistory(project.Id, "QuoteApproved", $"Quote Approved: {quoteDetail.GrandTotal:C}", null, true);
+
             await _dbContext.SaveChangesAsync();
 
             await _emailService.QuoteApproved(project);
@@ -242,12 +246,12 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest();
             }
-            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Team).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var quote = await _dbContext.Quotes.SingleAsync(a => a.ProjectId == projectId);
 
             var currentUser = await _userService.GetCurrentUser();
 
-            if (project.PrincipalInvestigator.Iam != currentUser.Iam)
+            if (project.PrincipalInvestigator.Iam != currentUser.Iam && !project.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
             {
                 var staleDays = (int)((DateTime.UtcNow - project.LastStatusUpdatedOn).TotalDays);
                 if (staleDays <= MinimumStaleDays)
@@ -271,6 +275,7 @@ namespace Harvest.Web.Controllers.Api
             quote.Status = Quote.Statuses.Rejected;
 
             await _historyService.QuoteRejected(project.Id, model.Reason);
+            await _historyService.AdhocHistory(project.Id, "QuoteRejected", $"Quote Rejected: {model.Reason}", null, true);
 
             await _dbContext.SaveChangesAsync();
 
@@ -283,8 +288,18 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorandFinance)]
         public async Task<ActionResult> ChangeAccount(int projectId, [FromBody] RequestApprovalModel model)
         {
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             var currentUser = await _userService.GetCurrentUser();
+
+            var hasAccess = await _userService.HasAccess(new[] { AccessCodes.FinanceAccess }, TeamSlug);
+
+            if (currentUser == null) {
+                return Unauthorized("User not found");
+            }
+            if (!hasAccess && project.PrincipalInvestigator.Iam != currentUser.Iam && !project.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
+            {
+                return BadRequest("You are not authorized to change accounts for this project.");
+            }
 
             var percentage = 0.0m;
             foreach (var account in model.Accounts)
@@ -313,6 +328,8 @@ namespace Harvest.Web.Controllers.Api
             _dbContext.RemoveRange(_dbContext.Accounts.Where(x => x.ProjectId == projectId));
 
             await _historyService.AccountChanged(project.Id, model.Accounts);
+
+            await _historyService.AdhocHistory(project.Id, "AccountsChanged", $"Accounts Changed: {string.Join(", ", model.Accounts.Select(a => $"{a.Number} ({a.Percentage}%)"))}", null, true);
 
             await _dbContext.SaveChangesAsync();
 

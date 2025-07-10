@@ -124,7 +124,7 @@ export const ProjectDetailContainer = () => {
     setNotification(request, "Refreshing", "Share Link Refreshed");
     const response = await request;
     if (response.ok) {
-      //This will return a new project.shareId (guid), update thge project.shareId with this
+      //This will return a new project.shareId (guid), update the project.shareId with this
       const shareId = await response.json();
       getIsMounted() &&
         setProject({
@@ -481,7 +481,13 @@ export const ProjectDetailContainer = () => {
             <ShowFor
               roles={["PI"]}
               condition={
-                project.principalInvestigator.iam === userInfo.user.detail.iam
+                project.principalInvestigator.iam ===
+                  userInfo.user.detail.iam ||
+                project.projectPermissions?.some(
+                  (pp) =>
+                    pp.user.iam === userInfo.user.detail.iam &&
+                    pp.permission === "ProjectEditor"
+                )
               }
             >
               <RecentTicketsContainer compact={true} projectId={projectId} />
