@@ -22,6 +22,7 @@ import { ProjectFields } from "./Projects/ProjectFields";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
+import { HistoryListContainer } from "./Histories/HistoryListContainer";
 import { TicketListContainer } from "./Tickets/TicketListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
@@ -73,6 +74,10 @@ function App() {
             <Route
               path="/:team/project/invoices/:projectId/:shareId?"
               component={InvoiceListContainer}
+            />
+            <Route
+              path="/:team/project/history/:projectId"
+              component={HistoryListContainer}
             />
             <ConditionalRoute
               roles={["FieldManager", "PI", "Finance", "Shared"]}

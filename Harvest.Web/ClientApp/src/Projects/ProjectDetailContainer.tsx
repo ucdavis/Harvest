@@ -16,6 +16,7 @@ import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
+import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
 import { BlobFile, CommonRouteParams, Project } from "../types";
 import { ShowFor, useFor } from "../Shared/ShowFor";
@@ -492,8 +493,29 @@ export const ProjectDetailContainer = () => {
             >
               <RecentTicketsContainer compact={true} projectId={projectId} />
             </ShowFor>
-
             <RecentInvoicesContainer compact={true} projectId={projectId} />
+            <ShowFor
+              roles={["FieldManager", "Supervisor", "System"]}
+              condition={
+                project.principalInvestigator.iam !== userInfo.user.detail.iam
+              }
+            >
+              <RecentHistoriesContainer compact={true} projectId={projectId} />
+            </ShowFor>
+            <ShowFor
+              roles={["PI"]}
+              condition={
+                project.principalInvestigator.iam ===
+                  userInfo.user.detail.iam ||
+                project.projectPermissions?.some(
+                  (pp) =>
+                    pp.user.iam === userInfo.user.detail.iam &&
+                    pp.permission === "ProjectEditor"
+                )
+              }
+            >
+              <RecentHistoriesContainer compact={true} projectId={projectId} />
+            </ShowFor>
           </div>
         )}
       </div>

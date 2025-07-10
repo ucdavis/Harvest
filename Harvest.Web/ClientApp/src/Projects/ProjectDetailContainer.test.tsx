@@ -10,6 +10,7 @@ import {
   fakeInvoices,
   fakeProject,
   fakeTickets,
+  fakeHistories,
 } from "../Test/mockData";
 import { responseMap } from "../Test/testHelpers";
 
@@ -40,6 +41,12 @@ beforeEach(() => {
     json: () => Promise.resolve(fakeInvoices),
   });
 
+  const historyResponse = Promise.resolve({
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeHistories),
+  });
+
   const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
@@ -58,6 +65,7 @@ beforeEach(() => {
       "/api/team1/Ticket/GetList": ticketResponses,
       "/api/team1/expense/getunbilledtotal/": unbilledResponse,
       "/api/File/GetUploadDetails": fileResponse,
+      "/api/team1/Project/ListHistory/": historyResponse,
     })
   );
 });
