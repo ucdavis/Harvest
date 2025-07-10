@@ -42,7 +42,7 @@ export const HistoryTable = (props: Props) => {
       },
       {
         Header: "Actor",
-        accessor: (row) => row.actor.name,
+        accessor: (row) => row.actor?.name,
       },
     ],
     []
