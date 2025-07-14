@@ -1,13 +1,6 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import {
-  BlobFile,
-  User,
-  TicketInput,
-  WorkItem,
-  Activity,
-  ProjectPermissionInput,
-} from "./types";
+import { BlobFile, User, TicketInput, WorkItem, Activity } from "./types";
 import { ErrorMessages } from "./errorMessages";
 import { addDays } from "./Util/Calculations";
 import { roundToTwo } from "./Util/Calculations";
@@ -73,13 +66,16 @@ export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
   dueDate: yup.date().optional(),
 });
 
-export const projectPermissionSchema: SchemaOf<ProjectPermissionInput> = yup
-  .object()
-  .shape({
-    projectId: yup.number().required(),
-    permission: yup.string().required(),
-    user: investigatorSchema.required(),
-  });
+export const projectPermissionSchema = yup.object().shape({
+  projectId: yup.number().required(),
+  permission: yup.string().required(),
+  user: yup.lazy((value) =>
+    // investigatorSchema.required() didn't work, but this seems to do the trick
+    value
+      ? investigatorSchema
+      : yup.object().required(ErrorMessages.UserRequired)
+  ),
+});
 
 export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   id: yup.number().required().default(0),

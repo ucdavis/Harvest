@@ -19,4 +19,5 @@ export const ErrorMessages = {
   YearsNegative: "Years cannot be negative.",
   EndDateAfterStartDate: "End date must come after start date.",
   PIRequired: "Prinipal investigator is required",
+  UserRequired: "User is required.",
 };

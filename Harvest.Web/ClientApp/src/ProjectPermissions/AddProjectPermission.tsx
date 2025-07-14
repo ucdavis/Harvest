@@ -97,8 +97,6 @@ export const AddProjectPermission = () => {
       const data = await response.json();
       console.log("Project Permission Added: ", data);
       history.push(`/${team}/Project/Details/${project.id}`);
-    } else {
-      history.push(`/${team}/Project/Details/${project.id}`);
     }
   };
 
@@ -167,9 +165,7 @@ export const AddProjectPermission = () => {
                   className="btn-lg mb-2"
                   color="primary"
                   onClick={create}
-                  disabled={
-                    notification.pending || formErrorCount > 0 || !formIsTouched
-                  }
+                  disabled={notification.pending}
                 >
                   Add Project Permission
                 </Button>
