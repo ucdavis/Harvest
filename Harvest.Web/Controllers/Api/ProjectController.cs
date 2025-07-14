@@ -280,7 +280,8 @@ namespace Harvest.Web.Controllers.Api
 
             //Need to add to the history
             //Might need to reget the project?
-            await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added:/n{newPermission.User.Name}({newPermission.User.Email}) with permission {newPermission.Permission}", project, true);
+            await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added:\n{newPermission.User.Name}({newPermission.User.Email}) with permission: {newPermission.Permission.SplitCamelCase()}", project, true);
+            await _dbContext.SaveChangesAsync();
 
             return Ok(newPermission);
         }

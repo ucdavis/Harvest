@@ -22,7 +22,7 @@ export const ProjectPermissionTable = (props: Props) => {
       //   accessor: (row) => row.id,
       // },
       {
-        Header: "Access",
+        Header: "Permission",
         accessor: (row) => convertCamelCase(row.permission),
       },
       {
