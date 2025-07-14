@@ -80,7 +80,15 @@ export const AddProjectPermission = () => {
     setNotification(
       request,
       "Adding Project Permission",
-      "Project Permission Added"
+      "Project Permission Added",
+      async (error) => {
+        // error is the response object when the request fails
+        if (error.status === 400) {
+          const data = await error.json();
+          return data || "Invalid request. Please check your input.";
+        }
+        return "Failed to add project permission";
+      }
     );
 
     const response = await request;
@@ -89,14 +97,6 @@ export const AddProjectPermission = () => {
       const data = await response.json();
       console.log("Project Permission Added: ", data);
       history.push(`/${team}/Project/Details/${project.id}`);
-    }
-    if (response.status === 400) {
-      const data = await response.json();
-      console.error("Error adding project permission: ", data);
-      setProjectPermissions((prev) => ({
-        ...prev,
-        permission: "",
-      }));
     }
   };
 
