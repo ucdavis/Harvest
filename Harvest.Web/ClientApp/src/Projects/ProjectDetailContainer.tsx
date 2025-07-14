@@ -309,7 +309,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-primary btn-sm float-right"
+          className="btn btn-primary btn-sm"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />
