@@ -97,6 +97,8 @@ export const AddProjectPermission = () => {
       const data = await response.json();
       console.log("Project Permission Added: ", data);
       history.push(`/${team}/Project/Details/${project.id}`);
+    } else {
+      history.push(`/${team}/Project/Details/${project.id}`);
     }
   };
 
@@ -113,12 +115,12 @@ export const AddProjectPermission = () => {
             <FormGroup>
               <Label>User to Add</Label>
               <SearchPerson
-                onChange={onChangeValue("user", (u) =>
+                onChange={onChangeValue("user", (u) => {
                   setProjectPermissions({
                     ...projectPermission,
                     user: u,
-                  })
-                )}
+                  });
+                })}
                 onBlur={() => onBlurValue("user")}
               />
               <InputErrorMessage name="user" />
@@ -139,13 +141,13 @@ export const AddProjectPermission = () => {
                 id="permission"
                 className="form-control"
                 value={projectPermission.permission}
-                onChange={(e) => {
+                onChange={onChange("permission", (e) => {
                   const value = e.target.value;
                   setProjectPermissions({
                     ...projectPermission,
                     permission: value,
                   });
-                }}
+                })}
                 onBlur={() => onBlurValue("permission")}
               >
                 <option value="">Select Permission</option>
