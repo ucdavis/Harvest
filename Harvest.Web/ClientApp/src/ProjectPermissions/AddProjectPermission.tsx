@@ -137,6 +137,7 @@ export const AddProjectPermission = () => {
                 type="select"
                 name="permission"
                 id="permission"
+                className="form-control"
                 value={projectPermission.permission}
                 onChange={(e) => {
                   const value = e.target.value;

@@ -253,7 +253,7 @@ namespace Harvest.Web.Controllers.Api
 
             if(postModel.Permission != Role.Codes.ProjectEditor && postModel.Permission != Role.Codes.ProjectViewer)
             {
-                return BadRequest("Invalid permission type. Only ProjectEditor and ProjectViewer are allowed.");
+                return BadRequest("Invalid permission type. Only Project Editor and Project Viewer are allowed.");
             }
 
             var newPermission = new ProjectPermission
@@ -280,7 +280,7 @@ namespace Harvest.Web.Controllers.Api
 
             //Need to add to the history
             //Might need to reget the project?
-            await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added: {newPermission.User.Name}({newPermission.User.Email}) with permission {newPermission.Permission}", project);
+            await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added:/n{newPermission.User.Name}({newPermission.User.Email}) with permission {newPermission.Permission}", project, true);
 
             return Ok(newPermission);
         }
