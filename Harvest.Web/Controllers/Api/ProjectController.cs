@@ -227,6 +227,97 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project.ShareId);
         }
 
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        public async Task<ActionResult> AddProjectPermission(int projectId, [FromBody] ProjectPermission postModel)
+        {
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
+                .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
+            {
+                return BadRequest("You are not the PI of this project or an editor of the project.");
+            }
+            
+            if (project.ProjectPermissions.Any(a => a.User?.Iam == postModel.User.Iam) || project.PrincipalInvestigator.Iam == postModel.User.Iam)
+            {
+                return BadRequest("User already has a permission for this project.");
+            }
+
+            if(postModel.Permission != Role.Codes.ProjectEditor && postModel.Permission != Role.Codes.ProjectViewer)
+            {
+                return BadRequest("Invalid permission type. Only ProjectEditor and ProjectViewer are allowed.");
+            }
+
+            var newPermission = new ProjectPermission
+            {
+                ProjectId = projectId,
+                Permission = postModel.Permission,
+            };
+            
+
+            //// create PI if needed and assign to project
+            var permissionUser = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.User.Iam);
+            if (permissionUser != null)
+            {
+                newPermission.UserId = permissionUser.Id;
+            }
+            else
+            {
+                // TODO: if PI doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
+                newPermission.User = postModel.User; // This will be used to create a new user if needed
+            }
+
+            await _dbContext.ProjectPermissions.AddAsync(newPermission);
+            await _dbContext.SaveChangesAsync();
+
+            //Need to add to the history
+            //Might need to reget the project?
+            await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added: {newPermission.User.Name}({newPermission.User.Email}) with permission {newPermission.Permission}", project);
+
+            return Ok(newPermission);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        public async Task<ActionResult> RemoveProjectPermission(int projectId, [FromBody] ProjectPermission postModel)
+        {
+            return BadRequest("This endpoint is not implemented yet.");
+
+            //var user = await _userService.GetCurrentUser();
+            //var project = await _dbContext.Projects
+            //    .Include(p => p.PrincipalInvestigator)
+            //    .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
+            //    .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            //if (project == null)
+            //{
+            //    return NotFound();
+            //}
+            //if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
+            //{
+            //    return BadRequest("You are not the PI of this project or an editor of the project.");
+            //}
+            //var permissionToRemove = await _dbContext.ProjectPermissions
+            //    .SingleOrDefaultAsync(pp => pp.ProjectId == projectId && pp.User.Iam == postModel.User.Iam);
+            //if (permissionToRemove == null)
+            //{
+            //    return NotFound("Permission not found.");
+            //}
+            //_dbContext.ProjectPermissions.Remove(permissionToRemove);
+            //await _dbContext.SaveChangesAsync();
+            ////Need to add to the history
+            ////Might need to reget the project?
+            //await _historyService.AdhocHistory(projectId, "ProjectPermissionRemoved", $"Project Permission Removed: {permissionToRemove.User.Name}({permissionToRemove.User.Email}) with permission {permissionToRemove.Permission}", project);
+            //return Ok();
+        }
+
         [HttpGet]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
         public async Task<ActionResult> GetFields()

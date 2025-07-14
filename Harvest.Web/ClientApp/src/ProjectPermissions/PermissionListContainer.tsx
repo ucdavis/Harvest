@@ -3,6 +3,7 @@ import React from "react";
 import { CommonRouteParams, Project } from "../types";
 import { ProjectPermissionTable } from "./ProjectPermissionTable";
 import { Link, useParams } from "react-router-dom";
+import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 
 interface Props {
   project: Project;
@@ -22,11 +23,15 @@ export const PermissionListContainer = (props: Props) => {
         <div className="col">
           <h3>Project Permissions</h3>
         </div>
-        <div className="col text-right">
-          <Link to={`/${team}/ticket/create/${props.project.id}`}>
-            Add Permission
-          </Link>
-        </div>
+        <ShowForPiOnly project={project}>
+          <div className="col text-right">
+            <Link
+              to={`/${team}/project/AddProjectPermission/${props.project.id}`}
+            >
+              Add Permission
+            </Link>
+          </div>
+        </ShowForPiOnly>
       </div>
 
       <ProjectPermissionTable projectPermissions={project.projectPermissions} />
