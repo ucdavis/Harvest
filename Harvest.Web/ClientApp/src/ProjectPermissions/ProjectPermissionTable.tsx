@@ -46,8 +46,7 @@ export const ProjectPermissionTable = (props: Props) => {
   );
 
   const initialState: Partial<TableState<any>> = {
-    sortBy: [{ id: "actionDate", desc: true }],
-    pageSize: ReactTableUtil.getPageSize(),
+    sortBy: [{ id: "id", desc: true }],
   };
 
   return (
@@ -55,8 +54,8 @@ export const ProjectPermissionTable = (props: Props) => {
       columns={columns}
       data={permissionData}
       initialState={initialState}
-      hideFilters={false}
-      hidePagination={false}
+      hideFilters={true}
+      hidePagination={true}
     />
   );
 };
