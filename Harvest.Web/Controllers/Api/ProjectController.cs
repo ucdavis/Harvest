@@ -287,7 +287,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
-        public async Task<ActionResult> RemoveProjectPermission(int projectId, [FromBody] ProjectPermission postModel)
+        public async Task<ActionResult> RemoveProjectPermission(int projectId, int permissionId)
         {
             return BadRequest("This endpoint is not implemented yet.");
 
