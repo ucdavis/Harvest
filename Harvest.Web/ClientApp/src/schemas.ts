@@ -1,6 +1,13 @@
 import * as yup from "yup";
 import { SchemaOf } from "yup";
-import { BlobFile, User, TicketInput, WorkItem, Activity } from "./types";
+import {
+  BlobFile,
+  User,
+  TicketInput,
+  WorkItem,
+  Activity,
+  ProjectPermissionInput,
+} from "./types";
 import { ErrorMessages } from "./errorMessages";
 import { addDays } from "./Util/Calculations";
 import { roundToTwo } from "./Util/Calculations";
@@ -65,6 +72,14 @@ export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
   attachments: yup.array().of(fileSchema),
   dueDate: yup.date().optional(),
 });
+
+export const projectPermissionSchema: SchemaOf<ProjectPermissionInput> = yup
+  .object()
+  .shape({
+    projectId: yup.number().required(),
+    permission: yup.string().required(),
+    user: investigatorSchema.required(),
+  });
 
 export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   id: yup.number().required().default(0),
