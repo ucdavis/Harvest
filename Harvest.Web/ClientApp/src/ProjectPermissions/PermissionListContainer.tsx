@@ -6,6 +6,8 @@ import { Link, useParams } from "react-router-dom";
 import { ShowForPiOnly } from "../Shared/ShowForPiOnly";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import AppContext from "../Shared/AppContext";
+import { authenticatedFetch } from "../Util/Api";
+import { usePromiseNotification } from "../Util/Notifications";
 
 interface Props {
   project: Project;
@@ -17,6 +19,7 @@ export const PermissionListContainer = (props: Props) => {
   const userInfo = useContext(AppContext);
   const [permissionToDelete, setPermissionToDelete] =
     useState<ProjectPermission | null>(null);
+  const [notification, setNotification] = usePromiseNotification();
 
   const [confirmRemovePermission] = useConfirmationDialog(
     {
@@ -39,6 +42,23 @@ export const PermissionListContainer = (props: Props) => {
       setPermissionToDelete(null);
       return;
     }
+
+    const request = authenticatedFetch(
+      `/api/${team}/Project/RemoveProjectPermission?projectId=${project.id}&permissionId=${permission.id}`,
+      {
+        method: "POST",
+      }
+    );
+
+    setNotification(request, "Removing Permission", () => {
+      const index = project.projectPermissions.findIndex(
+        (p) => p.id === permission.id
+      );
+      if (index !== -1) {
+        project.projectPermissions.splice(index, 1);
+      }
+      return "Permission removed successfully.";
+    });
 
     // Implement delete logic here
     console.log("Delete permission:", permission);
