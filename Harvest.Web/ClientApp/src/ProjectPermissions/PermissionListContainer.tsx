@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { CommonRouteParams, Project, ProjectPermission } from "../types";
 import { ProjectPermissionTable } from "./ProjectPermissionTable";
@@ -14,22 +14,35 @@ interface Props {
 export const PermissionListContainer = (props: Props) => {
   const { project } = props;
   const { team } = useParams<CommonRouteParams>();
-  const [confirmRemovePermission] = useConfirmationDialog({
-    title: "Remove Permission",
-    message: "Are you sure you want to remove this permission?",
-  });
   const userInfo = useContext(AppContext);
+  const [permissionToDelete, setPermissionToDelete] =
+    useState<ProjectPermission | null>(null);
+
+  const [confirmRemovePermission] = useConfirmationDialog(
+    {
+      title: "Remove Permission",
+      message: permissionToDelete
+        ? `Are you sure you want to remove permission for ${permissionToDelete.user.name}?`
+        : "Are you sure you want to remove this permission?",
+    },
+    [permissionToDelete]
+  );
 
   if (project === undefined) {
     return <div>Loading...</div>;
   }
 
   const deletePermission = async (permission: ProjectPermission) => {
+    setPermissionToDelete(permission);
     const confirmed = await confirmRemovePermission();
-    if (!confirmed) return;
+    if (!confirmed) {
+      setPermissionToDelete(null);
+      return;
+    }
 
     // Implement delete logic here
     console.log("Delete permission:", permission);
+    setPermissionToDelete(null);
   };
 
   return (
