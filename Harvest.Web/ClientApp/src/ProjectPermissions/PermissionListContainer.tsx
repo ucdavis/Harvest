@@ -60,8 +60,7 @@ export const PermissionListContainer = (props: Props) => {
       return "Permission removed successfully.";
     });
 
-    // Implement delete logic here
-    console.log("Delete permission:", permission);
+    // Reset the permission to delete after the operation
     setPermissionToDelete(null);
   };
 
