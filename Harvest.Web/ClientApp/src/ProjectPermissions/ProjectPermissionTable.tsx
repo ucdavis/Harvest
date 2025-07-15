@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import { Column, TableState } from "react-table";
 import { ReactTable } from "../Shared/ReactTable";
-import { ReactTableUtil } from "../Shared/TableUtil";
 import { ProjectPermission } from "../types";
 import { convertCamelCase } from "../Util/StringFormatting";
+import { Button } from "reactstrap";
 
 interface Props {
   projectPermissions: ProjectPermission[];
+  deletePermission: (permission: ProjectPermission) => void;
+  canDeletePermission: boolean;
 }
 
 export const ProjectPermissionTable = (props: Props) => {
@@ -15,12 +17,10 @@ export const ProjectPermissionTable = (props: Props) => {
     [props.projectPermissions]
   );
 
+  const { deletePermission, canDeletePermission } = props;
+
   const columns: Column<ProjectPermission>[] = useMemo(
     () => [
-      // {
-      //   Header: "Id",
-      //   accessor: (row) => row.id,
-      // },
       {
         Header: "Permission",
         accessor: (row) => convertCamelCase(row.permission),
@@ -29,20 +29,23 @@ export const ProjectPermissionTable = (props: Props) => {
         Header: "User",
         accessor: (row) => `${row.user.name} (${row.user.email})`,
       },
-      //Need to add a column to delete permissions
-      // {
-      //   Header: "Actions",
-      //   Cell: (row) => (
-      //     <button
-      //       className="btn btn-danger"
-      //       onClick={() => deletePermission(row.row.original.id)}
-      //     >
-      //       Delete
-      //     </button>
-      //   ),
-      // },
+      ...(canDeletePermission
+        ? [
+            {
+              Header: "Action",
+              Cell: (data: any) => (
+                <Button
+                  color="link"
+                  onClick={() => deletePermission(data.row.original)}
+                >
+                  Delete
+                </Button>
+              ),
+            },
+          ]
+        : []),
     ],
-    []
+    [deletePermission, canDeletePermission]
   );
 
   const initialState: Partial<TableState<any>> = {
