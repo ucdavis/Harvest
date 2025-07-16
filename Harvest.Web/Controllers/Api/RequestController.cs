@@ -79,19 +79,19 @@ namespace Harvest.Web.Controllers.Api
 
             var currentUser = await _userService.GetCurrentUser();
 
-            if (await _dbContext.Projects.Include(a => a.ProjectPermissions).ThenInclude(a => a.User).AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
+            if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
                 //TODO! Deal with change requests and Project Editors.
 
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
-                var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+                var changeRequestProject = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
                 if (changeRequestProject.PrincipalInvestigator.Iam != currentUser.Iam && !changeRequestProject.ProjectPermissions.Any(a => a.Permission == Role.Codes.ProjectEditor && a.User.Iam == currentUser.Iam))
                 {
                     var staleDays = (int)((DateTime.UtcNow - changeRequestProject.LastStatusUpdatedOn).TotalDays);
                     if (staleDays <= MinimumStaleDays)
                     {
-                        return BadRequest("You are not the principal investigator for this project and it isn't stale enough.");
+                        return BadRequest("You are not the principal investigator or project editor for this project and it isn't stale enough.");
                     }
                 }
 
