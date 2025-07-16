@@ -434,7 +434,7 @@ namespace Harvest.Web.Controllers.Api
 
                 await _dbContext.AddAsync(quoteCopy);
 
-                // copy over project permissions from original project
+                // copy over project permissions from original project. This lets Editors make changes. If any or added to this change request, currently they are not being updated when the change request is approved.
                 if(existingProject.ProjectPermissions != null && existingProject.ProjectPermissions.Any())
                 {
                     newProject.ProjectPermissions = new List<ProjectPermission>();
@@ -448,7 +448,6 @@ namespace Harvest.Web.Controllers.Api
                     }
                 }
 
-                // copy the PI visible history?
             }
 
             // create PI if needed and assign to project
