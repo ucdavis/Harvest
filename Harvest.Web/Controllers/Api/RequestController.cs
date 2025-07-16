@@ -79,14 +79,14 @@ namespace Harvest.Web.Controllers.Api
 
             var currentUser = await _userService.GetCurrentUser();
 
-            if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
+            if (await _dbContext.Projects.Include(a => a.ProjectPermissions).ThenInclude(a => a.User).AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
                 //TODO! Deal with change requests and Project Editors.
 
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
                 var changeRequestProject = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
-                if (changeRequestProject.PrincipalInvestigator.Iam != currentUser.Iam)
+                if (changeRequestProject.PrincipalInvestigator.Iam != currentUser.Iam && !changeRequestProject.ProjectPermissions.Any(a => a.Permission == Role.Codes.ProjectEditor && a.User.Iam == currentUser.Iam))
                 {
                     var staleDays = (int)((DateTime.UtcNow - changeRequestProject.LastStatusUpdatedOn).TotalDays);
                     if (staleDays <= MinimumStaleDays)
@@ -399,8 +399,13 @@ namespace Harvest.Web.Controllers.Api
             if (project.Id > 0)
             {
                 // this project already exists, so we are requesting a change
-                //Make sure the project exists and the user is the PI
-                if (!await _dbContext.Projects.AnyAsync(p => p.Id == project.Id && p.PrincipalInvestigator.Iam == currentUser.Iam))
+                //Make sure the project exists and the user is the PI or an editor
+                var existingProject = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleOrDefaultAsync(p => p.Id == project.Id);
+                if(existingProject == null)
+                {
+                    return BadRequest("Project not found");
+                }
+                if(existingProject.PrincipalInvestigator.Iam != currentUser.Iam && !existingProject.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))                
                 {
                     //OK, PI is not initiating this change, so we need to check if they are a member of the team in the Field Manager role.
                     if(!await _userService.HasAnyTeamRoles(team.Slug, new[] { Role.Codes.FieldManager }))
@@ -428,6 +433,22 @@ namespace Harvest.Web.Controllers.Api
                 };
 
                 await _dbContext.AddAsync(quoteCopy);
+
+                // copy over project permissions from original project
+                if(existingProject.ProjectPermissions != null && existingProject.ProjectPermissions.Any())
+                {
+                    newProject.ProjectPermissions = new List<ProjectPermission>();
+                    foreach (var permission in existingProject.ProjectPermissions)
+                    {
+                        newProject.ProjectPermissions.Add(new ProjectPermission
+                        {
+                            User = permission.User,
+                            Permission = permission.Permission,
+                        });
+                    }
+                }
+
+                // copy the PI visible history?
             }
 
             // create PI if needed and assign to project

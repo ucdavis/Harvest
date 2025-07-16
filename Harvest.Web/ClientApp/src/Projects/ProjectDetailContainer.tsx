@@ -262,6 +262,11 @@ export const ProjectDetailContainer = () => {
       condition:
         project.status === "Active" &&
         (project.principalInvestigator.iam === userInfo.user.detail.iam ||
+          project.projectPermissions.some(
+            (p) =>
+              p.permission === "ProjectEditor" &&
+              p.user.iam === userInfo.user.detail.iam
+          ) ||
           userInfo.user.roles.includes("FieldManager")),
       children: (
         <Link
