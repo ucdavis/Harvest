@@ -66,7 +66,7 @@ export const HistoryListContainer = () => {
         title={"Field Request #" + (project.id || "")}
       ></ProjectHeader>
       <div className="card-content">
-        <h3>Invoices</h3>
+        <h3>History</h3>
         <HistoryTable histories={histories}></HistoryTable>
       </div>
     </div>

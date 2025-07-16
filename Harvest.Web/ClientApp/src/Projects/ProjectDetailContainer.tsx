@@ -29,6 +29,7 @@ import { authenticatedFetch } from "../Util/Api";
 import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
+import { PermissionListContainer } from "../ProjectPermissions/PermissionListContainer";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -308,7 +309,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-primary btn-sm float-right"
+          className="btn btn-primary btn-sm"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />
@@ -494,6 +495,7 @@ export const ProjectDetailContainer = () => {
               <RecentTicketsContainer compact={true} projectId={projectId} />
             </ShowFor>
             <RecentInvoicesContainer compact={true} projectId={projectId} />
+            <PermissionListContainer project={project} />
             <ShowFor
               roles={["FieldManager", "Supervisor", "System"]}
               condition={

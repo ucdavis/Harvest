@@ -66,6 +66,17 @@ export const ticketSchema: SchemaOf<TicketInput> = yup.object().shape({
   dueDate: yup.date().optional(),
 });
 
+export const projectPermissionSchema = yup.object().shape({
+  projectId: yup.number().required(),
+  permission: yup.string().required(),
+  user: yup.lazy((value) =>
+    // investigatorSchema.required() didn't work, but this seems to do the trick
+    value
+      ? investigatorSchema
+      : yup.object().required(ErrorMessages.UserRequired)
+  ),
+});
+
 export const workItemSchema: SchemaOf<WorkItem> = yup.object().shape({
   id: yup.number().required().default(0),
   activityId: yup.number().required().integer(),

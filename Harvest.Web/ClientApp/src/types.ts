@@ -1,3 +1,5 @@
+import exp from "constants";
+
 export type CropType = "Row" | "Tree" | "Other";
 export interface Crop {
   id: number;
@@ -67,6 +69,12 @@ export interface ProjectPermission {
   projectId: number;
   user: User;
   permission: string;
+}
+
+export interface ProjectPermissionInput {
+  projectId: number;
+  permission: string;
+  user: User;
 }
 
 export interface BlobFile {
