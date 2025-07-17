@@ -87,7 +87,7 @@ export const PermissionListContainer = (props: Props) => {
           project.principalInvestigator.iam === userInfo.user.detail.iam ||
           project.projectPermissions.some(
             (p) =>
-              p.user.id === userInfo.user.detail.id &&
+              p.user.iam === userInfo.user.detail.iam &&
               p.permission === "ProjectEditor"
           )
         }
