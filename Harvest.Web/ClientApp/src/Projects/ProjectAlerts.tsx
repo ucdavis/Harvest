@@ -9,6 +9,7 @@ interface Props {
   extraText?: string;
   linkId?: number; // Optional link ID for specific actions
   linkText?: string; // Optional text for the link
+  skipStatusCheck?: boolean; // Optional flag to skip status check
 }
 
 export const ProjectAlerts = (props: Props) => {
@@ -16,10 +17,11 @@ export const ProjectAlerts = (props: Props) => {
   const { extraText } = props;
   const { linkId, linkText } = props;
   const { team } = useParams<CommonRouteParams>();
+  const { skipStatusCheck } = props;
 
   const statusDetail = useMemo(() => {
-    return getStatusDetail(project);
-  }, [project]);
+    return getStatusDetail(project, skipStatusCheck);
+  }, [project, skipStatusCheck]);
 
   if (!statusDetail.showAlert && !extraText) {
     return null;
@@ -66,8 +68,17 @@ interface StatusDetail {
   actionText: string;
 }
 
-const getStatusDetail = (project: Project): StatusDetail => {
+const getStatusDetail = (
+  project: Project,
+  skipStatusCheck?: boolean
+): StatusDetail => {
   const team = project.team.slug;
+
+  if (skipStatusCheck) {
+    return {
+      showAlert: false,
+    } as StatusDetail;
+  }
 
   // switch return different classname based on status
   switch (project.status) {

@@ -355,6 +355,7 @@ export const ProjectDetailContainer = () => {
       />
       {project.originalProjectId && (
         <ProjectAlerts
+          skipStatusCheck={true}
           project={project}
           linkId={project.originalProjectId}
           linkText={`Go To Original Project ${project.originalProjectId}`}
@@ -366,6 +367,7 @@ export const ProjectDetailContainer = () => {
         <>
           {pendingChangeRequests.map((request) => (
             <ProjectAlerts
+              skipStatusCheck={true}
               key={request.id}
               project={project}
               linkId={request.id}
@@ -398,15 +400,19 @@ export const ProjectDetailContainer = () => {
         roles={["System", "Finance"]}
         condition={project.status === "PendingApproval"}
       >
-        <ProjectAlerts
-          project={project}
-          extraText={`Project has not been acted on since ${new Date(
-            project.lastStatusUpdatedOn
-          ).toLocaleDateString()}. ${getDaysDiff(
-            new Date(),
-            new Date(project.lastStatusUpdatedOn)
-          ).toFixed(0)} days.`}
-        />
+        {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
+          5 && (
+          <ProjectAlerts
+            skipStatusCheck={true}
+            project={project}
+            extraText={`Project has not been acted on since ${new Date(
+              project.lastStatusUpdatedOn
+            ).toLocaleDateString()}. ${getDaysDiff(
+              new Date(),
+              new Date(project.lastStatusUpdatedOn)
+            ).toFixed(0)} days.`}
+          />
+        )}
       </ShowFor>
 
       {projectActions.length > 0 && (
