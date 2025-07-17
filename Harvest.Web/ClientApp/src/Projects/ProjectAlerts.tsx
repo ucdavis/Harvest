@@ -1,16 +1,20 @@
 import { useMemo } from "react";
 
-import { Project } from "../types";
+import { CommonRouteParams, Project } from "../types";
 import { convertCamelCase } from "../Util/StringFormatting";
+import { Link, useParams } from "react-router-dom";
 
 interface Props {
   project: Project;
   extraText?: string;
+  linkId?: number; // Optional link ID for specific actions
 }
 
 export const ProjectAlerts = (props: Props) => {
   const { project } = props;
   const { extraText } = props;
+  const { linkId } = props;
+  const { team } = useParams<CommonRouteParams>();
 
   const statusDetail = useMemo(() => {
     return getStatusDetail(project);
@@ -22,6 +26,18 @@ export const ProjectAlerts = (props: Props) => {
 
   return (
     <div>
+      {extraText && (
+        <div className={`card-project-status merlot-bg`}>
+          <div className="card-content">
+            <p>{extraText} </p>
+            {linkId && (
+              <Link to={`/${team}/project/details/${linkId}`}>
+                Go To Project {linkId}
+              </Link>
+            )}
+          </div>
+        </div>
+      )}
       <div className={`card-project-status ${statusDetail.cardClass}`}>
         <div className="card-content">
           <h4>Current Status: {convertCamelCase(project.status)}</h4>
@@ -34,13 +50,6 @@ export const ProjectAlerts = (props: Props) => {
         </Link> */}
         </div>
       </div>
-      {extraText && (
-        <div className={`card-project-status merlot-bg`}>
-          <div className="card-content">
-            <p>{extraText} </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

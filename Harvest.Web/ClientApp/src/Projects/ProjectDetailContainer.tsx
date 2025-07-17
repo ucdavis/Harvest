@@ -334,6 +334,13 @@ export const ProjectDetailContainer = () => {
         title={"Field Request #" + (project?.id || "")}
         hideBack={true}
       />
+      {project.originalProjectId && (
+        <ProjectAlerts
+          project={project}
+          linkId={project.originalProjectId}
+          extraText={`This is a Change Request of an existing project.`}
+        />
+      )}
       <ShowFor
         roles={["FieldManager", "Supervisor"]}
         condition={
@@ -364,12 +371,7 @@ export const ProjectDetailContainer = () => {
           ).toFixed(0)} days.`}
         />
       </ShowFor>
-      {project.originalProjectId && (
-        <ProjectAlerts
-          project={project}
-          extraText={`This project is a Change Request of original project ID ${project.originalProjectId}.`}
-        />
-      )}
+
       {projectActions.length > 0 && (
         <div className="card-green-bg">
           <div className="card-content">
