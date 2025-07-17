@@ -18,7 +18,12 @@ import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
-import { BlobFile, CommonRouteParams, Project } from "../types";
+import {
+  BlobFile,
+  CommonRouteParams,
+  PendingChangeRequest,
+  Project,
+} from "../types";
 import { ShowFor, useFor } from "../Shared/ShowFor";
 import { ShowForPiOnly, useForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -30,6 +35,7 @@ import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
 import { PermissionListContainer } from "../ProjectPermissions/PermissionListContainer";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -38,6 +44,9 @@ export const ProjectDetailContainer = () => {
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
   const history = useHistory();
   const userInfo = useContext(AppContext);
+  const [pendingChangeRequests, setPendingChangeRequests] = useState<
+    PendingChangeRequest[]
+  >([]);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -61,12 +70,22 @@ export const ProjectDetailContainer = () => {
         const project = (await response.json()) as Project;
 
         getIsMounted() && setProject(project);
+
+        // Fetch pending change requests after project loads
+        const pendingResponse = await authenticatedFetch(
+          `/api/${team}/Project/GetPendingChangeRequests/${projectId}`
+        );
+        if (pendingResponse.ok) {
+          const pendingRequests = await pendingResponse.json();
+          getIsMounted() && setPendingChangeRequests(pendingRequests);
+        }
         setIsLoading(false);
       } else {
         setNotification(response, "Loading", "Error Loading Project");
         if (response.status === 403) {
           window.location.replace("/Account/AccessDenied");
         }
+
         //history.push("/"); //If we redirect to the home page, we will have to fix the tests
       }
     };
@@ -342,6 +361,23 @@ export const ProjectDetailContainer = () => {
           extraText={`This is a Change Request of an existing project.`}
         />
       )}
+
+      {pendingChangeRequests.length > 0 && (
+        <>
+          {pendingChangeRequests.map((request) => (
+            <ProjectAlerts
+              key={request.id}
+              project={project}
+              linkId={request.id}
+              linkText={`Go To Change Request: ${request.name} (${request.id})`}
+              extraText={`This project has a pending change request: ${convertCamelCase(
+                request.status
+              )}.`}
+            />
+          ))}
+        </>
+      )}
+
       <ShowFor
         roles={["FieldManager", "Supervisor"]}
         condition={

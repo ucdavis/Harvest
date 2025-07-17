@@ -21,7 +21,7 @@ export const ProjectAlerts = (props: Props) => {
     return getStatusDetail(project);
   }, [project]);
 
-  if (!statusDetail.showAlert) {
+  if (!statusDetail.showAlert && !extraText) {
     return null;
   }
 
@@ -39,18 +39,20 @@ export const ProjectAlerts = (props: Props) => {
           </div>
         </div>
       )}
-      <div className={`card-project-status ${statusDetail.cardClass}`}>
-        <div className="card-content">
-          <h4>Current Status: {convertCamelCase(project.status)}</h4>
-          <p>{statusDetail.statusText} </p>
-          {/* <Link
+      {statusDetail.showAlert && (
+        <div className={`card-project-status ${statusDetail.cardClass}`}>
+          <div className="card-content">
+            <h4>Current Status: {convertCamelCase(project.status)}</h4>
+            <p>{statusDetail.statusText} </p>
+            {/* <Link
           to={statusDetail.linkTo}
           className={`btn ${statusDetail.linkClass} btn-sm`}
         >
           {statusDetail.actionText}
         </Link> */}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

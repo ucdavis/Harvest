@@ -78,6 +78,12 @@ export interface ProjectPermissionInput {
   user: User;
 }
 
+export interface PendingChangeRequest {
+  id: number; //ProjectId
+  status: string;
+  name: string; //Name of the project
+}
+
 export interface BlobFile {
   identifier: string;
   fileName: string;
