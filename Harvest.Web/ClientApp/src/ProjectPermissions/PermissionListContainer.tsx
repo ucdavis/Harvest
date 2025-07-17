@@ -70,7 +70,14 @@ export const PermissionListContainer = (props: Props) => {
         <div className="col">
           <h3>Project Permissions</h3>
         </div>
-        <ShowForPiOnly project={project}>
+
+        <ShowForPiOnly
+          project={project}
+          condition={
+            project.originalProjectId === null ||
+            project.originalProjectId === undefined
+          }
+        >
           <div className="col text-right">
             <Link
               to={`/${team}/project/AddProjectPermission/${props.project.id}`}
