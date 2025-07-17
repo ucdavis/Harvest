@@ -62,6 +62,7 @@ export interface Project {
   team: Team;
   shareId: string;
   projectPermissions: ProjectPermission[];
+  originalProjectId?: number;
 }
 
 export interface ProjectPermission {

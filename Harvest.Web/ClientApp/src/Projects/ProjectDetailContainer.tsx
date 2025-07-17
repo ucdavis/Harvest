@@ -364,6 +364,12 @@ export const ProjectDetailContainer = () => {
           ).toFixed(0)} days.`}
         />
       </ShowFor>
+      {project.originalProjectId && (
+        <ProjectAlerts
+          project={project}
+          extraText={`This project is a Change Request of original project ID ${project.originalProjectId}.`}
+        />
+      )}
       {projectActions.length > 0 && (
         <div className="card-green-bg">
           <div className="card-content">
