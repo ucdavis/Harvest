@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Web.Models;
@@ -14,6 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
 {
@@ -183,6 +184,14 @@ namespace Harvest.Web.Controllers.Api
             }
 
             return Ok(project);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GetPendingChangeRequests(int projectId)
+        {
+
+            var projects = await _dbContext.Projects.Where(a => a.Team.Slug == TeamSlug && a.OriginalProjectId == projectId && a.IsActive && (a.Status == Project.Statuses.PendingApproval || a.Status == Project.Statuses.ChangeRequested || a.Status == Project.Statuses.QuoteRejected)).Select(ProjectChangeRequestModel.Projection()).ToListAsync();
+            return Ok(projects);
         }
 
         [Authorize(Policy = AccessCodes.InvoiceAccess)]

@@ -54,6 +54,12 @@ beforeEach(() => {
     json: () => Promise.resolve(fakeTickets),
   });
 
+  const relatedProjectsResponse = Promise.resolve({
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve([]), // Assuming no related projects for this test
+  });
+
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
@@ -67,6 +73,7 @@ beforeEach(() => {
       "/api/team1/expense/getunbilledtotal/": unbilledResponse,
       "/api/File/GetUploadDetails": fileResponse,
       "/api/team1/Project/ListHistory/": historyResponse,
+      "/api/team1/Project/GetPendingChangeRequests/": relatedProjectsResponse,
     })
   );
 });

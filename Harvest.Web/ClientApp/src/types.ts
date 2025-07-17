@@ -62,6 +62,7 @@ export interface Project {
   team: Team;
   shareId: string;
   projectPermissions: ProjectPermission[];
+  originalProjectId?: number;
 }
 
 export interface ProjectPermission {
@@ -75,6 +76,12 @@ export interface ProjectPermissionInput {
   projectId: number;
   permission: string;
   user: User;
+}
+
+export interface PendingChangeRequest {
+  id: number; //ProjectId
+  status: string;
+  name: string; //Name of the project
 }
 
 export interface BlobFile {

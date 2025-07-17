@@ -70,7 +70,11 @@ export const PermissionListContainer = (props: Props) => {
         <div className="col">
           <h3>Project Permissions</h3>
         </div>
-        <ShowForPiOnly project={project}>
+
+        <ShowForPiOnly
+          project={project}
+          condition={project.originalProjectId === null}
+        >
           <div className="col text-right">
             <Link
               to={`/${team}/project/AddProjectPermission/${props.project.id}`}
@@ -84,12 +88,13 @@ export const PermissionListContainer = (props: Props) => {
       <ProjectPermissionTable
         projectPermissions={project.projectPermissions}
         canDeletePermission={
-          project.principalInvestigator.iam === userInfo.user.detail.iam ||
-          project.projectPermissions.some(
-            (p) =>
-              p.user.id === userInfo.user.detail.id &&
-              p.permission === "ProjectEditor"
-          )
+          project.originalProjectId === null &&
+          (project.principalInvestigator.iam === userInfo.user.detail.iam ||
+            project.projectPermissions.some(
+              (p) =>
+                p.user.iam === userInfo.user.detail.iam &&
+                p.permission === "ProjectEditor"
+            ))
         }
         deletePermission={deletePermission}
       />

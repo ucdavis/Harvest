@@ -43,7 +43,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(15);
+            ControllerReflection.ControllerPublicMethods(16);
         }
         [Fact]
         public void TestControllerMethodAttributes()
@@ -170,6 +170,11 @@ namespace Test.TestsControllers.TestsApiControllers
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.PrincipalInvestigatorOnly);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3);
+
+            //16
+            methodName = "GetPendingChangeRequests";
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>(methodName, countAdjustment + 2);
         }
     }
 

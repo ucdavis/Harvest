@@ -437,7 +437,7 @@ input[type="radio" i] {
     color: $merlot;
 
     &:hover {
-      color: transparentize($merlot, 0.9);
+      color: darken($merlot, 10);
     }
   }
 }

@@ -18,7 +18,12 @@ import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
-import { BlobFile, CommonRouteParams, Project } from "../types";
+import {
+  BlobFile,
+  CommonRouteParams,
+  PendingChangeRequest,
+  Project,
+} from "../types";
 import { ShowFor, useFor } from "../Shared/ShowFor";
 import { ShowForPiOnly, useForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -30,6 +35,7 @@ import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
 import { PermissionListContainer } from "../ProjectPermissions/PermissionListContainer";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -38,6 +44,9 @@ export const ProjectDetailContainer = () => {
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
   const history = useHistory();
   const userInfo = useContext(AppContext);
+  const [pendingChangeRequests, setPendingChangeRequests] = useState<
+    PendingChangeRequest[]
+  >([]);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -61,12 +70,22 @@ export const ProjectDetailContainer = () => {
         const project = (await response.json()) as Project;
 
         getIsMounted() && setProject(project);
+
+        // Fetch pending change requests after project loads
+        const pendingResponse = await authenticatedFetch(
+          `/api/${team}/Project/GetPendingChangeRequests/${projectId}`
+        );
+        if (pendingResponse.ok) {
+          const pendingRequests = await pendingResponse.json();
+          getIsMounted() && setPendingChangeRequests(pendingRequests);
+        }
         setIsLoading(false);
       } else {
         setNotification(response, "Loading", "Error Loading Project");
         if (response.status === 403) {
           window.location.replace("/Account/AccessDenied");
         }
+
         //history.push("/"); //If we redirect to the home page, we will have to fix the tests
       }
     };
@@ -262,6 +281,11 @@ export const ProjectDetailContainer = () => {
       condition:
         project.status === "Active" &&
         (project.principalInvestigator.iam === userInfo.user.detail.iam ||
+          project.projectPermissions.some(
+            (p) =>
+              p.permission === "ProjectEditor" &&
+              p.user.iam === userInfo.user.detail.iam
+          ) ||
           userInfo.user.roles.includes("FieldManager")),
       children: (
         <Link
@@ -329,6 +353,33 @@ export const ProjectDetailContainer = () => {
         title={"Field Request #" + (project?.id || "")}
         hideBack={true}
       />
+      {project.originalProjectId && (
+        <ProjectAlerts
+          skipStatusCheck={true}
+          project={project}
+          linkId={project.originalProjectId}
+          linkText={`Go To Original Project ${project.originalProjectId}`}
+          extraText={`This is a Change Request of an existing project.`}
+        />
+      )}
+
+      {pendingChangeRequests.length > 0 && (
+        <>
+          {pendingChangeRequests.map((request) => (
+            <ProjectAlerts
+              skipStatusCheck={true}
+              key={request.id}
+              project={project}
+              linkId={request.id}
+              linkText={`Go To Change Request: ${request.name} (${request.id})`}
+              extraText={`This project has a pending change request: ${convertCamelCase(
+                request.status
+              )}.`}
+            />
+          ))}
+        </>
+      )}
+
       <ShowFor
         roles={["FieldManager", "Supervisor"]}
         condition={
@@ -349,16 +400,21 @@ export const ProjectDetailContainer = () => {
         roles={["System", "Finance"]}
         condition={project.status === "PendingApproval"}
       >
-        <ProjectAlerts
-          project={project}
-          extraText={`Project has not been acted on since ${new Date(
-            project.lastStatusUpdatedOn
-          ).toLocaleDateString()}. ${getDaysDiff(
-            new Date(),
-            new Date(project.lastStatusUpdatedOn)
-          ).toFixed(0)} days.`}
-        />
+        {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
+          5 && (
+          <ProjectAlerts
+            skipStatusCheck={true}
+            project={project}
+            extraText={`Project has not been acted on since ${new Date(
+              project.lastStatusUpdatedOn
+            ).toLocaleDateString()}. ${getDaysDiff(
+              new Date(),
+              new Date(project.lastStatusUpdatedOn)
+            ).toFixed(0)} days.`}
+          />
+        )}
       </ShowFor>
+
       {projectActions.length > 0 && (
         <div className="card-green-bg">
           <div className="card-content">
