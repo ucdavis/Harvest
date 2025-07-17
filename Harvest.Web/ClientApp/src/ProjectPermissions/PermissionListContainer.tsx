@@ -73,10 +73,7 @@ export const PermissionListContainer = (props: Props) => {
 
         <ShowForPiOnly
           project={project}
-          condition={
-            project.originalProjectId === null ||
-            project.originalProjectId === undefined
-          }
+          condition={project.originalProjectId === null}
         >
           <div className="col text-right">
             <Link
@@ -91,12 +88,13 @@ export const PermissionListContainer = (props: Props) => {
       <ProjectPermissionTable
         projectPermissions={project.projectPermissions}
         canDeletePermission={
-          project.principalInvestigator.iam === userInfo.user.detail.iam ||
-          project.projectPermissions.some(
-            (p) =>
-              p.user.iam === userInfo.user.detail.iam &&
-              p.permission === "ProjectEditor"
-          )
+          project.originalProjectId === null &&
+          (project.principalInvestigator.iam === userInfo.user.detail.iam ||
+            project.projectPermissions.some(
+              (p) =>
+                p.user.iam === userInfo.user.detail.iam &&
+                p.permission === "ProjectEditor"
+            ))
         }
         deletePermission={deletePermission}
       />
