@@ -338,6 +338,7 @@ export const ProjectDetailContainer = () => {
         <ProjectAlerts
           project={project}
           linkId={project.originalProjectId}
+          linkText={`Go To Original Project ${project.originalProjectId}`}
           extraText={`This is a Change Request of an existing project.`}
         />
       )}

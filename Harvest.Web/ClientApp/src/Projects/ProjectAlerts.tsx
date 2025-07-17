@@ -8,12 +8,13 @@ interface Props {
   project: Project;
   extraText?: string;
   linkId?: number; // Optional link ID for specific actions
+  linkText?: string; // Optional text for the link
 }
 
 export const ProjectAlerts = (props: Props) => {
   const { project } = props;
   const { extraText } = props;
-  const { linkId } = props;
+  const { linkId, linkText } = props;
   const { team } = useParams<CommonRouteParams>();
 
   const statusDetail = useMemo(() => {
@@ -32,7 +33,7 @@ export const ProjectAlerts = (props: Props) => {
             <p>{extraText} </p>
             {linkId && (
               <Link to={`/${team}/project/details/${linkId}`}>
-                Go To Project {linkId}
+                {linkText || `Go To Project ${linkId}`}
               </Link>
             )}
           </div>
