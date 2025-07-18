@@ -779,7 +779,7 @@ namespace Harvest.Core.Services
                     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                     ButtonUrl1 = $"{projectUrl}{project.Id}",
                     ButtonText1 = "View Project",
-                    NotificationText = isAutoCloseout ? "your project as been closed-out automatically." : "has approved the closeout of the project.",
+                    NotificationText = isAutoCloseout ? "your project as been closed-out automatically." : "or a Project Editor has approved the closeout of the project.",
                 };
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProjectClosed.cshtml", model);

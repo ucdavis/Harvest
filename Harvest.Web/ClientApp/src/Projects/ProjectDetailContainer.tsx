@@ -79,6 +79,23 @@ export const ProjectDetailContainer = () => {
           const pendingRequests = await pendingResponse.json();
           getIsMounted() && setPendingChangeRequests(pendingRequests);
         }
+        if (
+          !userInfo.user.roles.includes("Shared") ||
+          !userInfo.user.roles.includes("PI")
+        ) {
+          //If the user permissions has this user, push the shared role
+          if (
+            project.projectPermissions.some(
+              (p) => p.user.iam === userInfo.user.detail.iam
+            )
+          ) {
+            console.log("Adding Shared role to user");
+            //If the user has a project permission, add the shared
+            userInfo.user.roles.push("Shared");
+            userInfo.user.roles.push("PI");
+          }
+        }
+
         setIsLoading(false);
       } else {
         setNotification(response, "Loading", "Error Loading Project");
