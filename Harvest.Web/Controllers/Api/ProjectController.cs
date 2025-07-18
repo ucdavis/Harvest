@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Web.Models;
@@ -14,6 +11,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
 {
@@ -127,11 +128,17 @@ namespace Harvest.Web.Controllers.Api
         {
             var user = await _userService.GetCurrentUser();
 
+            //Look for any projects where I have a project permission
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.Team)
-                .Where(p => p.IsActive && p.PrincipalInvestigatorId == user.Id)
+                .Where(p => p.IsActive && (p.PrincipalInvestigatorId == user.Id || p.ProjectPermissions.Any(a => a.UserId == user.Id)))
                 .ToArrayAsync());
         }
 
@@ -148,6 +155,7 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Include(p => p.CreatedBy)
                 .Include(p => p.AcreageRate)
+                .Include(p => p.ProjectPermissions).ThenInclude(a => a.User)
                 .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
             if (project == null)
@@ -175,6 +183,28 @@ namespace Harvest.Web.Controllers.Api
             return Ok(project);
         }
 
+        [HttpGet]
+        public async Task<ActionResult> GetPendingChangeRequests(int projectId)
+        {
+
+            var projects = await _dbContext.Projects.Where(a => a.Team.Slug == TeamSlug && a.OriginalProjectId == projectId && a.IsActive && (a.Status == Project.Statuses.PendingApproval || a.Status == Project.Statuses.ChangeRequested || a.Status == Project.Statuses.QuoteRejected)).Select(ProjectChangeRequestModel.Projection()).ToListAsync();
+            return Ok(projects);
+        }
+
+        [Authorize(Policy = AccessCodes.InvoiceAccess)]
+        [HttpGet]
+        public async Task<ActionResult> ListHistory(int projectId, int? maxRows)
+        {
+            var query = _dbContext.ProjectHistory.Include(a => a.Actor)
+                .Where(a => a.Project.Id == projectId && a.Project.Team.Slug == TeamSlug && a.DisplayForPi)
+                .OrderByDescending(a => a.ActionDate);
+            if (maxRows.HasValue)
+            {
+                query = (IOrderedQueryable<ProjectHistory>)query.Take(maxRows.Value);
+            }
+            return Ok(await query.ToListAsync());
+        }
+
         [HttpPost]
         [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
         public async Task<ActionResult> ResetShareLink(int projectId)
@@ -182,18 +212,121 @@ namespace Harvest.Web.Controllers.Api
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
                 .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             if (project == null)
             {
                 return NotFound();
             }
-            if (project.PrincipalInvestigator.Id != user.Id)
+            if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
             {
-                return BadRequest("You are not the PI of this project.");
+                return BadRequest("You are not the PI of this project or an editor of the project.");
             }
+
+            await _historyService.ShareResetByOther(projectId, "Share Id Reset", project);
+
             project.ShareId = Guid.NewGuid();
             await _dbContext.SaveChangesAsync();
+
+
             return Ok(project.ShareId);
+        }
+
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        public async Task<ActionResult> AddProjectPermission(int projectId, [FromBody] ProjectPermission postModel)
+        {
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
+                .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
+            {
+                return BadRequest("You are not the PI of this project or an editor of the project.");
+            }
+            
+            if (project.ProjectPermissions.Any(a => a.User?.Iam == postModel.User.Iam) || project.PrincipalInvestigator.Iam == postModel.User.Iam)
+            {
+                return BadRequest("User already has a permission for this project.");
+            }
+
+            if(postModel.Permission != Role.Codes.ProjectEditor && postModel.Permission != Role.Codes.ProjectViewer)
+            {
+                return BadRequest("Invalid permission type. Only Project Editor and Project Viewer are allowed.");
+            }
+
+            var newPermission = new ProjectPermission
+            {
+                ProjectId = projectId,
+                Permission = postModel.Permission,
+            };
+            
+
+            //// create user if needed and assign to project
+            var permissionUser = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.User.Iam);
+            if (permissionUser != null)
+            {
+                newPermission.UserId = permissionUser.Id;
+            }
+            else
+            {
+                // TODO: if User doesn't exist we'll just use what our client sent.  We may instead want to re-query to ensure the most up to date info?
+                newPermission.User = postModel.User; // This will be used to create a new user if needed
+            }
+
+            await _dbContext.ProjectPermissions.AddAsync(newPermission);
+
+            await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added:\n{newPermission.User.Name}({newPermission.User.Email}) with permission: {newPermission.Permission.SplitCamelCase()}", project, true);
+            await _dbContext.SaveChangesAsync(); // Might be able to remove the extra save if the history call is moved up.
+
+            return Ok(newPermission);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.PrincipalInvestigatorOnly)]
+        public async Task<ActionResult> RemoveProjectPermission(int projectId, int permissionId)
+        {
+
+            var user = await _userService.GetCurrentUser();
+            var project = await _dbContext.Projects
+                .Include(p => p.PrincipalInvestigator)
+                .Include(p => p.ProjectPermissions).ThenInclude(pp => pp.User)
+                .SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            //Might not need this check, but doesn't hurt.
+            if (project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id && a.Permission == Role.Codes.ProjectEditor))
+            {
+                return BadRequest("You are not the PI of this project or an editor of the project.");
+            }
+            var permissionToRemove = project.ProjectPermissions
+                .Where(pp => pp.ProjectId == projectId && pp.Id == permissionId).SingleOrDefault();
+            if (permissionToRemove == null)
+            {
+                return NotFound("Permission not found.");
+            }
+            if(permissionToRemove.User.Iam == user.Iam)
+            {
+                return BadRequest("You cannot remove your own permission from the project. Please contact the PI or another" +
+                    " project editor to do this.");
+            }
+
+            await _historyService.AdhocHistory(projectId, "ProjectPermissionRemoved", $"Project Permission Removed:\n{permissionToRemove.User.Name}({permissionToRemove.User.Email}) with permission: {permissionToRemove.Permission.SplitCamelCase()}", project, true);
+            _dbContext.ProjectPermissions.Remove(permissionToRemove);
+
+            
+
+            await _dbContext.SaveChangesAsync();
+            
+            return Ok();
         }
 
         [HttpGet]

@@ -91,7 +91,7 @@ namespace Harvest.Core.Services
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProfessorQuoteNotification.cshtml", model);
 
-                await _notificationService.SendNotification(new []{project.PrincipalInvestigator.Email},await FieldManagersEmails(project.TeamId), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
+                await _notificationService.SendNotification(GetPiAndProjectEditorEmails(project),await FieldManagersEmails(project.TeamId), emailBody, "A quote is ready for your review/approval for your harvest project.", "Harvest Notification - Quote Ready");
             }
             catch (Exception e)
             {
@@ -152,6 +152,40 @@ namespace Harvest.Core.Services
             return await _dbContext.Permissions.Where(a => a.TeamId == teamId && (a.Role.Name == Role.Codes.FieldManager || a.Role.Name == Role.Codes.Supervisor)).Select(a => a.User.Email).Distinct().ToArrayAsync();
         }
 
+        private string[] GetPiAndProjectEditorEmails(Project project)
+        {
+            var emails = new List<string>
+            {
+                project.PrincipalInvestigator.Email
+            };
+
+            emails.AddRange(project.ProjectPermissions
+                .Where(a => a.Permission == Role.Codes.ProjectEditor)
+                .Select(a => a.User.Email));
+
+            // Filter out duplicates
+            return emails.Distinct().ToArray();
+        }
+
+        private string[] GetAllProjectEmails(Project project)
+        {
+            var emails = new List<string>
+            {
+                project.PrincipalInvestigator.Email
+            };
+
+            emails.AddRange(project.ProjectPermissions
+                .Where(a => a.Permission == Role.Codes.ProjectEditor)
+                .Select(a => a.User.Email));
+
+            //Just to order them by "importance"
+            emails.AddRange(project.ProjectPermissions
+                .Where(a => a.Permission == Role.Codes.ProjectViewer)
+                .Select(a => a.User.Email));
+
+            // Filter out duplicates
+            return emails.Distinct().ToArray();
+        }
 
         public async Task<bool> NewFieldRequest(Project project)
         {
@@ -227,6 +261,7 @@ namespace Harvest.Core.Services
         {
             project = await CheckForMissingDataForProject(project);
 
+
             var url = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
 
             var model = new QuoteDecisionModel()
@@ -248,7 +283,7 @@ namespace Harvest.Core.Services
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/QuoteDecisionEmail.cshtml", model);
 
                 //INC2065591 Brain wants supervisors to be included in the email
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), new[] { project.PrincipalInvestigator.Email }, emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), GetPiAndProjectEditorEmails(project), emailBody, textVersion, $"Harvest Notification - Quote {model.Decision}");
             }
             catch (Exception e)
             {
@@ -361,7 +396,7 @@ namespace Harvest.Core.Services
                 };
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/Ticket/NewTicket.cshtml", model);
                 var textVersion = $"A new ticket has been created for project {model.ProjectName} by {model.PI}";
-                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), null, emailBody, textVersion, "Harvest Notification - New Ticket");
+                await _notificationService.SendNotification(await FieldManagersAndSupervisorEmails(project.TeamId), GetPiAndProjectEditorEmails(project), emailBody, textVersion, "Harvest Notification - New Ticket");
             }
             catch (Exception e)
             {
@@ -378,14 +413,19 @@ namespace Harvest.Core.Services
             project = await CheckForMissingDataForProject(project);
 
             //if ticketMessage.createdby == project.pi, email fieldManages emails, otherwise email PI
+            //Above, not anymore because we want to allow Project Editors to reply to tickets and they are not PI.
+            //Possibly someone can be both a field manager and the PI/Project Editor... But don't care about that edge case.
+            var piAndProjectEditorsEmails = GetPiAndProjectEditorEmails(project);
+
+
             try
             {
                 var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
-                string[] ccEmails = null;
-                if (ticketMessage.CreatedById != project.PrincipalInvestigatorId)
+                string[] ccEmails = piAndProjectEditorsEmails;
+                if (!piAndProjectEditorsEmails.Contains(ticketMessage.CreatedBy.Email))
                 {
                     ccEmails = emailTo;
-                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    emailTo = piAndProjectEditorsEmails;
                 }
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
@@ -416,17 +456,18 @@ namespace Harvest.Core.Services
         public async Task<bool> TicketAttachmentAdded(Project project, Ticket ticket, TicketAttachment[] ticketAttachments)
         {
             project = await CheckForMissingDataForProject(project);
+            var piAndProjectEditorsEmails = GetPiAndProjectEditorEmails(project);
 
             //if ticketattachments[0].createdby == project.pi, email fieldManages emails, otherwise email PI
             try
             {
                 var emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
-                string[] ccEmails = null;
+                string[] ccEmails = piAndProjectEditorsEmails;
                 var firstAttachment = ticketAttachments.First();
-                if (firstAttachment.CreatedById != project.PrincipalInvestigatorId)
+                if (!piAndProjectEditorsEmails.Contains(firstAttachment.CreatedBy.Email))
                 {
                     ccEmails = emailTo;
-                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    emailTo = piAndProjectEditorsEmails;
                 }
                 var ticketUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Ticket/Details/";
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
@@ -457,19 +498,20 @@ namespace Harvest.Core.Services
         public async Task<bool> TicketClosed(Project project, Ticket ticket, User closedBy)
         {
             project = await CheckForMissingDataForProject(project);
+            var piAndProjectEditorsEmails = GetPiAndProjectEditorEmails(project);
 
             try
             {
                 string[] emailTo = null;
                 string[] ccEmails = null;
-                if (ticket.Project.PrincipalInvestigatorId == closedBy.Id)
+                if (piAndProjectEditorsEmails.Contains(closedBy.Email))
                 {
                     emailTo = await FieldManagersAndSupervisorEmails(project.TeamId);
-                    ccEmails = new[] {project.PrincipalInvestigator.Email};
+                    ccEmails = piAndProjectEditorsEmails;
                 }
                 else
                 {
-                    emailTo = new[] {project.PrincipalInvestigator.Email};
+                    emailTo = piAndProjectEditorsEmails;
                     ccEmails = await FieldManagersAndSupervisorEmails(project.TeamId);
                 }
 
@@ -541,12 +583,12 @@ namespace Harvest.Core.Services
             
             try
             {
-                var project = await CheckForMissingDataForInvoice(invoice);
+                var project = await CheckForMissingDataForInvoice(invoice); //Might need to include ProjectPermissions here.
 
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
                 
-                var emailTo = new string[] {project.PrincipalInvestigator.Email};
+                var emailTo = GetAllProjectEmails(project);
                 //CC field managers? I'd say no....
 
                 var model = new InvoiceEmailModel()
@@ -584,7 +626,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
                 
-                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var emailTo = GetAllProjectEmails(project);
                 //CC field managers? I'd say no....
 
                 var model = new InvoiceEmailModel()
@@ -622,7 +664,7 @@ namespace Harvest.Core.Services
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Request/ChangeAccount/";
                 var invoiceUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Invoice/Details/";
                 
-                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var emailTo = GetAllProjectEmails(project);
                 var ccEmails = await FieldManagersEmails(project.TeamId);
 
 
@@ -672,7 +714,7 @@ namespace Harvest.Core.Services
 
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var closeoutUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/CloseoutConfirmation/";
-                var emailTo = new string[] { project.PrincipalInvestigator.Email };
+                var emailTo = GetPiAndProjectEditorEmails(project);
                 var ccEmails = ccFieldManagers ? await FieldManagersEmails(project.TeamId) : null;
 
                 var model = new CloseoutConfirmationModel()
@@ -727,7 +769,7 @@ namespace Harvest.Core.Services
 
                 var projectUrl = $"{_emailSettings.BaseUrl}/{project.Team.Slug}/Project/Details/";
                 var emailTo = await FieldManagersEmails(project.TeamId);
-                var ccEmails = new string[] { project.PrincipalInvestigator.Email };
+                var ccEmails = GetPiAndProjectEditorEmails(project);
 
                 var model = new ProjectClosedModel()
                 {
@@ -737,7 +779,7 @@ namespace Harvest.Core.Services
                     ProjectEnd = project.End.ToPacificTime().Date.Format("d"),
                     ButtonUrl1 = $"{projectUrl}{project.Id}",
                     ButtonText1 = "View Project",
-                    NotificationText = isAutoCloseout ? "your project as been closed-out automatically." : "has approved the closeout of the project.",
+                    NotificationText = isAutoCloseout ? "your project as been closed-out automatically." : "or a Project Editor has approved the closeout of the project.",
                 };
 
                 var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProjectClosed.cshtml", model);
@@ -772,6 +814,12 @@ namespace Harvest.Core.Services
                 project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
             }
 
+            if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
+            {
+                project.ProjectPermissions = await _dbContext.ProjectPermissions.Include(a => a.User).AsNoTracking()
+                    .Where(a => a.ProjectId == project.Id).ToListAsync();
+            }
+
             return project;
         }
 
@@ -791,6 +839,13 @@ namespace Harvest.Core.Services
             if(project.Team == null)
             {
                 project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
+            }
+
+            //I don't know if the null check would find it, so populate this.
+            if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
+            {
+                project.ProjectPermissions = await _dbContext.ProjectPermissions.Include(a => a.User).AsNoTracking()
+                    .Where(a => a.ProjectId == project.Id).ToListAsync();
             }
 
             return project;

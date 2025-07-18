@@ -53,6 +53,8 @@ namespace Harvest.Core.Data
         public virtual DbSet<TicketAttachment> TicketAttachments { get; set; }
         public virtual DbSet<Crop> Crops { get; set; }
 
+        public virtual DbSet<ProjectPermission> ProjectPermissions { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,6 +79,7 @@ namespace Harvest.Core.Data
             TicketMessage.OnModelCreating(modelBuilder);
             TicketAttachment.OnModelCreating(modelBuilder);
             Crop.OnModelCreating(modelBuilder);
+            ProjectPermission.OnModelCreating(modelBuilder);
         }
     }
 }

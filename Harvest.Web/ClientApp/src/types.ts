@@ -1,3 +1,4 @@
+
 export type CropType = "Row" | "Tree" | "Other";
 export interface Crop {
   id: number;
@@ -59,6 +60,27 @@ export interface Project {
   acres: number;
   team: Team;
   shareId: string;
+  projectPermissions: ProjectPermission[];
+  originalProjectId?: number;
+}
+
+export interface ProjectPermission {
+  id: number;
+  projectId: number;
+  user: User;
+  permission: string;
+}
+
+export interface ProjectPermissionInput {
+  projectId: number;
+  permission: string;
+  user: User;
+}
+
+export interface PendingChangeRequest {
+  id: number; //ProjectId
+  status: string;
+  name: string; //Name of the project
 }
 
 export interface BlobFile {
@@ -297,6 +319,13 @@ export interface ProjectAccount {
   accountManagerName: string;
   accountManagerEmail: string;
   percentage: number;
+}
+
+export interface History {
+  id: number;
+  description: string;
+  actionDate: Date;
+  actor: User;
 }
 
 //Rename to TicketCreate? (Attachments is a BlobFile[] which doesn't work when I'm pulling the attachments from the DB see TicketDetails)

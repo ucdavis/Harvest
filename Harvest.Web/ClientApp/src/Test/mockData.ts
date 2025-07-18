@@ -8,6 +8,7 @@ import {
   Rate,
   Team,
   Ticket,
+  History,
 } from "../types";
 
 const fakeUser = {
@@ -101,6 +102,20 @@ export const fakeProject: Project = {
     description: "Team 1",
   },
   shareId: "1234567890",
+  projectPermissions: [
+    {
+      id: 1,
+      user: fakeUser,
+      permission: "View",
+      projectId: 3,
+    },
+    {
+      id: 2,
+      user: fakeUser,
+      permission: "Edit",
+      projectId: 3,
+    },
+  ],
 };
 
 export const fakeProjectWithQuote: ProjectWithQuote = {
@@ -148,9 +163,38 @@ export const fakeProjectWithQuote: ProjectWithQuote = {
       description: "Team 1",
     },
     shareId: "1234567890",
+    projectPermissions: [
+      {
+        id: 1,
+        user: fakeUser,
+        permission: "View",
+        projectId: 3,
+      },
+      {
+        id: 2,
+        user: fakeUser,
+        permission: "Edit",
+        projectId: 3,
+      },
+    ],
   },
   quote: null,
 };
+
+export const fakeHistories: History[] = [
+  {
+    id: 1,
+    description: "Project created",
+    actionDate: new Date("2021-03-15T00:00:00"),
+    actor: fakeUser,
+  },
+  {
+    id: 2,
+    description: "Project updated",
+    actionDate: new Date("2021-03-16T00:00:00"),
+    actor: fakeUser,
+  },
+];
 
 export const fakeInvoices: Invoice[] = [
   {

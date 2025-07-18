@@ -78,6 +78,8 @@ namespace Harvest.Core.Services
 
             await _historyService.ProjectCloseoutInitiated(project.Id, project);
 
+            await _historyService.AdhocHistory(projectId, "ProjectCloseoutInitiated", "Project Closeout Initiated", null, true);
+
             await _dbContext.SaveChangesAsync();
 
             return Result.Value(true, "Closeout initiated. An approval request has been sent to project's PI.");

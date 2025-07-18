@@ -16,8 +16,14 @@ import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
+import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
 import { ProjectUnbilledButton } from "./ProjectUnbilledButton";
-import { BlobFile, CommonRouteParams, Project } from "../types";
+import {
+  BlobFile,
+  CommonRouteParams,
+  PendingChangeRequest,
+  Project,
+} from "../types";
 import { ShowFor, useFor } from "../Shared/ShowFor";
 import { ShowForPiOnly, useForPiOnly } from "../Shared/ShowForPiOnly";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -28,6 +34,8 @@ import { authenticatedFetch } from "../Util/Api";
 import { addDays } from "../Util/Calculations";
 import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
+import { PermissionListContainer } from "../ProjectPermissions/PermissionListContainer";
+import { convertCamelCase } from "../Util/StringFormatting";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -36,6 +44,9 @@ export const ProjectDetailContainer = () => {
   const [newFiles, setNewFiles] = useState<BlobFile[]>([]);
   const history = useHistory();
   const userInfo = useContext(AppContext);
+  const [pendingChangeRequests, setPendingChangeRequests] = useState<
+    PendingChangeRequest[]
+  >([]);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -59,12 +70,37 @@ export const ProjectDetailContainer = () => {
         const project = (await response.json()) as Project;
 
         getIsMounted() && setProject(project);
+
+        // Fetch pending change requests after project loads
+        const pendingResponse = await authenticatedFetch(
+          `/api/${team}/Project/GetPendingChangeRequests/${projectId}`
+        );
+        if (pendingResponse.ok) {
+          const pendingRequests = await pendingResponse.json();
+          getIsMounted() && setPendingChangeRequests(pendingRequests);
+        }
+        if (
+          !userInfo.user.roles.includes("Shared") ||
+          !userInfo.user.roles.includes("PI")
+        ) {
+          //If the user permissions has this user, push the shared role
+          if (
+            project.projectPermissions.some(
+              (p) => p.user.iam === userInfo.user.detail.iam
+            )
+          ) {
+            //If the user has a project permission, add the shared
+            userInfo.user.roles.push("Shared");
+          }
+        }
+
         setIsLoading(false);
       } else {
         setNotification(response, "Loading", "Error Loading Project");
         if (response.status === 403) {
           window.location.replace("/Account/AccessDenied");
         }
+
         //history.push("/"); //If we redirect to the home page, we will have to fix the tests
       }
     };
@@ -124,7 +160,7 @@ export const ProjectDetailContainer = () => {
     setNotification(request, "Refreshing", "Share Link Refreshed");
     const response = await request;
     if (response.ok) {
-      //This will return a new project.shareId (guid), update thge project.shareId with this
+      //This will return a new project.shareId (guid), update the project.shareId with this
       const shareId = await response.json();
       getIsMounted() &&
         setProject({
@@ -260,6 +296,11 @@ export const ProjectDetailContainer = () => {
       condition:
         project.status === "Active" &&
         (project.principalInvestigator.iam === userInfo.user.detail.iam ||
+          project.projectPermissions.some(
+            (p) =>
+              p.permission === "ProjectEditor" &&
+              p.user.iam === userInfo.user.detail.iam
+          ) ||
           userInfo.user.roles.includes("FieldManager")),
       children: (
         <Link
@@ -307,7 +348,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-primary btn-sm float-right"
+          className="btn btn-primary btn-sm"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />
@@ -327,6 +368,33 @@ export const ProjectDetailContainer = () => {
         title={"Field Request #" + (project?.id || "")}
         hideBack={true}
       />
+      {project.originalProjectId && (
+        <ProjectAlerts
+          skipStatusCheck={true}
+          project={project}
+          linkId={project.originalProjectId}
+          linkText={`Go To Original Project ${project.originalProjectId}`}
+          extraText={`This is a Change Request of an existing project.`}
+        />
+      )}
+
+      {pendingChangeRequests.length > 0 && (
+        <>
+          {pendingChangeRequests.map((request) => (
+            <ProjectAlerts
+              skipStatusCheck={true}
+              key={request.id}
+              project={project}
+              linkId={request.id}
+              linkText={`Go To Change Request: ${request.name} (${request.id})`}
+              extraText={`This project has a pending change request: ${convertCamelCase(
+                request.status
+              )}.`}
+            />
+          ))}
+        </>
+      )}
+
       <ShowFor
         roles={["FieldManager", "Supervisor"]}
         condition={
@@ -347,16 +415,21 @@ export const ProjectDetailContainer = () => {
         roles={["System", "Finance"]}
         condition={project.status === "PendingApproval"}
       >
-        <ProjectAlerts
-          project={project}
-          extraText={`Project has not been acted on since ${new Date(
-            project.lastStatusUpdatedOn
-          ).toLocaleDateString()}. ${getDaysDiff(
-            new Date(),
-            new Date(project.lastStatusUpdatedOn)
-          ).toFixed(0)} days.`}
-        />
+        {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
+          5 && (
+          <ProjectAlerts
+            skipStatusCheck={true}
+            project={project}
+            extraText={`Project has not been acted on since ${new Date(
+              project.lastStatusUpdatedOn
+            ).toLocaleDateString()}. ${getDaysDiff(
+              new Date(),
+              new Date(project.lastStatusUpdatedOn)
+            ).toFixed(0)} days.`}
+          />
+        )}
       </ShowFor>
+
       {projectActions.length > 0 && (
         <div className="card-green-bg">
           <div className="card-content">
@@ -481,13 +554,41 @@ export const ProjectDetailContainer = () => {
             <ShowFor
               roles={["PI"]}
               condition={
-                project.principalInvestigator.iam === userInfo.user.detail.iam
+                project.principalInvestigator.iam ===
+                  userInfo.user.detail.iam ||
+                project.projectPermissions?.some(
+                  (pp) =>
+                    pp.user.iam === userInfo.user.detail.iam &&
+                    pp.permission === "ProjectEditor"
+                )
               }
             >
               <RecentTicketsContainer compact={true} projectId={projectId} />
             </ShowFor>
-
             <RecentInvoicesContainer compact={true} projectId={projectId} />
+            <PermissionListContainer project={project} />
+            <ShowFor
+              roles={["FieldManager", "Supervisor", "System"]}
+              condition={
+                project.principalInvestigator.iam !== userInfo.user.detail.iam
+              }
+            >
+              <RecentHistoriesContainer compact={true} projectId={projectId} />
+            </ShowFor>
+            <ShowFor
+              roles={["PI"]}
+              condition={
+                project.principalInvestigator.iam ===
+                  userInfo.user.detail.iam ||
+                project.projectPermissions?.some(
+                  (pp) =>
+                    pp.user.iam === userInfo.user.detail.iam &&
+                    pp.permission === "ProjectEditor"
+                )
+              }
+            >
+              <RecentHistoriesContainer compact={true} projectId={projectId} />
+            </ShowFor>
           </div>
         )}
       </div>

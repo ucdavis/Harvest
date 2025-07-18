@@ -22,8 +22,10 @@ import { ProjectFields } from "./Projects/ProjectFields";
 import { ProjectListContainer } from "./Projects/ProjectListContainer";
 import { InvoiceDetailContainer } from "./Invoices/InvoiceDetailContainer";
 import { InvoiceListContainer } from "./Invoices/InvoiceListContainer";
+import { HistoryListContainer } from "./Histories/HistoryListContainer";
 import { TicketListContainer } from "./Tickets/TicketListContainer";
 import { TicketCreate } from "./Tickets/TicketCreate";
+import { AddProjectPermission } from "./ProjectPermissions/AddProjectPermission";
 import { TicketsContainer } from "./Tickets/TicketsContainer";
 import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { CloseoutContainer } from "./Closeout/CloseoutContainer";
@@ -74,6 +76,10 @@ function App() {
               path="/:team/project/invoices/:projectId/:shareId?"
               component={InvoiceListContainer}
             />
+            <Route
+              path="/:team/project/history/:projectId"
+              component={HistoryListContainer}
+            />
             <ConditionalRoute
               roles={["FieldManager", "PI", "Finance", "Shared"]}
               path="/:team/invoice/details/:projectId/:invoiceId/:shareId?"
@@ -114,6 +120,11 @@ function App() {
               roles={["FieldManager", "Supervisor", "PI"]}
               path="/:team/ticket/create/:projectId"
               component={TicketCreate}
+            />
+            <ConditionalRoute
+              roles={["PI"]}
+              path="/:team/project/AddProjectPermission/:projectId"
+              component={AddProjectPermission}
             />
             {/* admin routes requiring team context */}
             <ConditionalRoute

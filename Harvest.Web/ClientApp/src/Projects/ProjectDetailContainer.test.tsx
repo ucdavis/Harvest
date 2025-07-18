@@ -2,6 +2,7 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
 import { act } from "react-dom/test-utils";
+import { ModalProvider } from "react-modal-hook";
 import AppContext from "../Shared/AppContext";
 
 import { ProjectDetailContainer } from "./ProjectDetailContainer";
@@ -10,6 +11,7 @@ import {
   fakeInvoices,
   fakeProject,
   fakeTickets,
+  fakeHistories,
 } from "../Test/mockData";
 import { responseMap } from "../Test/testHelpers";
 
@@ -40,10 +42,22 @@ beforeEach(() => {
     json: () => Promise.resolve(fakeInvoices),
   });
 
+  const historyResponse = Promise.resolve({
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve(fakeHistories),
+  });
+
   const ticketResponses = Promise.resolve({
     status: 200,
     ok: true,
     json: () => Promise.resolve(fakeTickets),
+  });
+
+  const relatedProjectsResponse = Promise.resolve({
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve([]), // Assuming no related projects for this test
   });
 
   (global as any).Harvest = fakeAppContext;
@@ -58,6 +72,8 @@ beforeEach(() => {
       "/api/team1/Ticket/GetList": ticketResponses,
       "/api/team1/expense/getunbilledtotal/": unbilledResponse,
       "/api/File/GetUploadDetails": fileResponse,
+      "/api/team1/Project/ListHistory/": historyResponse,
+      "/api/team1/Project/GetPendingChangeRequests/": relatedProjectsResponse,
     })
   );
 });
@@ -90,11 +106,13 @@ describe("Project Detail Container", () => {
 
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -108,11 +126,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -126,11 +146,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -146,11 +168,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -168,11 +192,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -188,11 +214,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -208,11 +236,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
@@ -230,11 +260,13 @@ describe("Project Detail Container", () => {
     await act(async () => {
       render(
         <AppContext.Provider value={(global as any).Harvest}>
-          <MemoryRouter initialEntries={["team1/project/details/3"]}>
-            <Route path=":team/project/details/:projectId">
-              <ProjectDetailContainer />
-            </Route>
-          </MemoryRouter>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
         </AppContext.Provider>,
         container
       );
