@@ -69,7 +69,7 @@ namespace Harvest.Web.Controllers.Api
 
             await _dbContext.SaveChangesAsync();
 
-            if(originalProjectId != null)
+            if (originalProjectId != null)
             {
                 //Copy histories
                 var histories = await _dbContext.ProjectHistory.Where(h => h.ProjectId == project.Id && h.DisplayForPi == true).ToListAsync();
