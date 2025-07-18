@@ -134,9 +134,6 @@ namespace Harvest.Web.Controllers.Api
                 return Unauthorized();
             }
 
-            //Just for testing, remove this later as the call below will do the same thing
-            //var projectsWithPermissions = await _dbContext.ProjectPermissions.Where(a => a.UserId == user.Id).Select(a => a.ProjectId).ToArrayAsync();
-
             // TODO: only show projects where between start and end?
             return Ok(await _dbContext.Projects
                 .Include(p => p.PrincipalInvestigator)
