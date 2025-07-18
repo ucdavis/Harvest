@@ -281,10 +281,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             await _dbContext.ProjectPermissions.AddAsync(newPermission);
-            await _dbContext.SaveChangesAsync();
 
-            //Need to add to the history
-            //Might need to reget the project?
             await _historyService.AdhocHistory(projectId, "ProjectPermissionAdded", $"Project Permission Added:\n{newPermission.User.Name}({newPermission.User.Email}) with permission: {newPermission.Permission.SplitCamelCase()}", project, true);
             await _dbContext.SaveChangesAsync(); // Might be able to remove the extra save if the history call is moved up.
 
