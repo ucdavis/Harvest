@@ -111,8 +111,6 @@ namespace Harvest.Web.Controllers.Api
 
             if (await _dbContext.Projects.AnyAsync(p => p.Id == projectId && p.OriginalProject != null))
             {
-                //TODO! Deal with change requests and Project Editors.
-
                 // this was a change request that has been approved, so copy everything over to original and inActiveate change request
                 var changeRequestProject = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
