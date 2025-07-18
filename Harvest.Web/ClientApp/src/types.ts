@@ -1,4 +1,3 @@
-import exp from "constants";
 
 export type CropType = "Row" | "Tree" | "Other";
 export interface Crop {
