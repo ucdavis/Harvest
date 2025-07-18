@@ -48,6 +48,7 @@ namespace Harvest.Core.Services
         Task<ProjectHistory> ShareResetByOther(int projectId, string description, object detailsModel);
 
         Task<ProjectHistory> AdhocHistory(int projectId, string action, string description, object detailsModel, bool displayForPi = false);
+        Task<ProjectHistory> AdhocHistory(Project project, string action, string description, object detailsModel, bool displayForPi = false);
     }
 
     public class ProjectHistoryService : IProjectHistoryService
@@ -122,6 +123,8 @@ namespace Harvest.Core.Services
         public Task<ProjectHistory> AdhocHistory(int projectId, string action, string description, object detailsModel, bool displayForPi = false) =>
             MakeAdhocHistory(projectId, action, description, JsonSerializer.Serialize(detailsModel, _jsonOptions), displayForPi);
 
+        public Task<ProjectHistory> AdhocHistory(Project project, string action, string description, object detailsModel, bool displayForPi = false) =>
+            MakeAdhocHistory(project, action, description, JsonSerializer.Serialize(detailsModel, _jsonOptions), displayForPi);
 
         private Task<ProjectHistory> MakeHistory(int projectId, string action, object detailsModel, bool displayForPi = false) =>
             MakeHistory(projectId, action, JsonSerializer.Serialize(detailsModel, _jsonOptions));
@@ -138,6 +141,21 @@ namespace Harvest.Core.Services
                 Description = description,
                 Details = detailsSerialized,
                 ProjectId = projectId,
+                ActionDate = DateTime.UtcNow,
+                ActorId = (await _userService.GetCurrentUser())?.Id,
+                DisplayForPi = displayForPi,
+            };
+            _dbContext.Add(projectHistory);
+            return projectHistory;
+        }
+        private async Task<ProjectHistory> MakeAdhocHistory(Project project, string action, string description, string detailsSerialized, bool displayForPi = false)
+        {
+            var projectHistory = new ProjectHistory
+            {
+                Action = action,
+                Description = description,
+                Details = detailsSerialized,
+                Project = project,
                 ActionDate = DateTime.UtcNow,
                 ActorId = (await _userService.GetCurrentUser())?.Id,
                 DisplayForPi = displayForPi,

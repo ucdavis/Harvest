@@ -64,7 +64,37 @@ namespace Harvest.Web.Controllers.Api
 
             await _historyService.ProjectRequestCanceled(projectId, project);
 
+            await _historyService.AdhocHistory(project.Id, "ProjectCanceled", $"Project Canceled", null, true);
+            var originalProjectId = project.OriginalProjectId;
+
             await _dbContext.SaveChangesAsync();
+
+            if(originalProjectId != null)
+            {
+                //Copy histories
+                var histories = await _dbContext.ProjectHistory.Where(h => h.ProjectId == project.Id && h.DisplayForPi == true).ToListAsync();
+                var newHistories = new List<ProjectHistory>();
+                foreach (var history in histories)
+                {
+                    newHistories.Add(new ProjectHistory
+                    {
+                        ProjectId = originalProjectId.Value,
+                        Actor = history.Actor,
+                        Action = history.Action,
+                        Details = history.Details,
+                        ActionDate = history.ActionDate,
+                        DisplayForPi = history.DisplayForPi,
+                        ActorId = history.ActorId,
+                        Description = $"From Change Request {project.Id}: {history.Description}",
+                    });
+                }
+                if(newHistories.Any())
+                {
+                    await _dbContext.ProjectHistory.AddRangeAsync(newHistories);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+            }
 
             return Ok(project);
         }
@@ -470,6 +500,8 @@ namespace Harvest.Web.Controllers.Api
                         });
                     }
                 }
+
+                await _historyService.AdhocHistory(newProject, "ChangeRequestCreated", $"Change Request Created for Project {existingProject.Id}", null, true);
 
             }
 
