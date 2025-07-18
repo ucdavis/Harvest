@@ -225,10 +225,9 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest("You are not the PI of this project or an editor of the project.");
             }
-            if (project.PrincipalInvestigator.Id != user.Id)
-            {
-                await _historyService.ShareResetByOther(projectId, "Share Id Reset by Project Editor", project);
-            }
+
+            await _historyService.ShareResetByOther(projectId, "Share Id Reset", project);
+
             project.ShareId = Guid.NewGuid();
             await _dbContext.SaveChangesAsync();
 
