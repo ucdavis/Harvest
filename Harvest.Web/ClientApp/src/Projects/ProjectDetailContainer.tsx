@@ -89,10 +89,8 @@ export const ProjectDetailContainer = () => {
               (p) => p.user.iam === userInfo.user.detail.iam
             )
           ) {
-            console.log("Adding Shared role to user");
             //If the user has a project permission, add the shared
             userInfo.user.roles.push("Shared");
-            userInfo.user.roles.push("PI");
           }
         }
 
