@@ -707,14 +707,14 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeFalse();
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
 
-            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
-            addedInvoice.ShouldNotBeNull();
-            addedInvoice.Expenses.ShouldNotBeNull();
-            addedInvoice.Expenses.Any().ShouldBe(false);
-            addedInvoice.CreatedOn.Date.ShouldBe(new DateTime(2021,01,01).Date);
-            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
-            addedInvoice.Status.ShouldBe(Invoice.Statuses.Completed);
-            addedInvoice.Total.ShouldBe(0);
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Never);
+            //addedInvoice.ShouldNotBeNull();
+            //addedInvoice.Expenses.ShouldNotBeNull();
+            //addedInvoice.Expenses.Any().ShouldBe(false);
+            //addedInvoice.CreatedOn.Date.ShouldBe(new DateTime(2021,01,01).Date);
+            //addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            //addedInvoice.Status.ShouldBe(Invoice.Statuses.Completed);
+            //addedInvoice.Total.ShouldBe(0);
 
             Projects[0].Status.ShouldBe(Project.Statuses.Completed);
         }
@@ -1156,14 +1156,14 @@ namespace Test.TestsServices
             rtValue.IsError.ShouldBeFalse();
             MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once);
 
-            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Once);
-            addedInvoice.ShouldNotBeNull();
-            addedInvoice.Expenses.ShouldNotBeNull();
-            addedInvoice.Expenses.Any().ShouldBe(false);
-            addedInvoice.CreatedOn.ShouldBe(date);
-            addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
-            addedInvoice.Status.ShouldBe(Invoice.Statuses.Completed);
-            addedInvoice.Total.ShouldBe(0);
+            MockDbContext.Verify(a => a.Invoices.Add(It.IsAny<Invoice>()), times: Times.Never); //We no longer create an invoice if there are no unbilled expenses
+            //addedInvoice.ShouldNotBeNull();
+            //addedInvoice.Expenses.ShouldNotBeNull();
+            //addedInvoice.Expenses.Any().ShouldBe(false);
+            //addedInvoice.CreatedOn.ShouldBe(date);
+            //addedInvoice.ProjectId.ShouldBe(Projects[0].Id);
+            //addedInvoice.Status.ShouldBe(Invoice.Statuses.Completed);
+            //addedInvoice.Total.ShouldBe(0);
 
             Projects[0].Status.ShouldBe(Project.Statuses.Completed);
         }
