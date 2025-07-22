@@ -177,19 +177,26 @@ namespace Harvest.Core.Services
                 return Result.Error("No unbilled expenses found for project: {projectId}", projectId);
             }
 
-            var newInvoice = new Invoice
+            Invoice newInvoice = null;
+
+            if (unbilledExpenses.Any())
             {
-                CreatedOn = now,
-                ProjectId = projectId,
-                // empty invoice won't be processed by SlothService
-                Status = unbilledExpenses.Any() ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
-                Total = unbilledExpenses.Sum(x => x.Total)
-            };
-            newInvoice.Expenses = new List<Expense>(unbilledExpenses);
-            _dbContext.Invoices.Add(newInvoice);
-
-            await _historyService.InvoiceCreated(project.Id, newInvoice);
-
+                newInvoice = new Invoice
+                {
+                    CreatedOn = now,
+                    ProjectId = projectId,
+                    // empty invoice won't be processed by SlothService
+                    Status = unbilledExpenses.Any() ? Invoice.Statuses.Created : Invoice.Statuses.Completed,
+                    Total = unbilledExpenses.Sum(x => x.Total)
+                };
+                newInvoice.Expenses = new List<Expense>(unbilledExpenses);
+                _dbContext.Invoices.Add(newInvoice);
+                await _historyService.InvoiceCreated(project.Id, newInvoice);
+            }
+            else 
+            {
+                await _historyService.AdhocHistory(project.Id, "InvoiceNotCreated", "No unbilled expenses found for project. No Invoice Created", null, true);
+            }
             var resultMessage = "Invoice Created";
 
             if (isCloseout)
@@ -213,9 +220,13 @@ namespace Harvest.Core.Services
 
             await _dbContext.SaveChangesAsync();
 
-            await _emailService.InvoiceCreated(newInvoice);
+            if (newInvoice != null)
+            {
+                await _emailService.InvoiceCreated(newInvoice);
+                return Result.Value(newInvoice.Id, resultMessage);
+            }            
 
-            return Result.Value(newInvoice.Id, resultMessage);
+            return Result.Value(0, resultMessage); //This should be OK returning a 0. It is more using the result message. And counters.
         }
 
         public async Task<int> CreateInvoices(bool manualOverride = false)
