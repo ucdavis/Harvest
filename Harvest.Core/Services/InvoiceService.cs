@@ -177,8 +177,6 @@ namespace Harvest.Core.Services
                 return Result.Error("No unbilled expenses found for project: {projectId}", projectId);
             }
 
-            var wasInvoiceCreated = false;
-
             Invoice newInvoice = null;
 
             if (unbilledExpenses.Any())
@@ -193,13 +191,9 @@ namespace Harvest.Core.Services
                 };
                 newInvoice.Expenses = new List<Expense>(unbilledExpenses);
                 _dbContext.Invoices.Add(newInvoice);
-                wasInvoiceCreated = true;
-            }
-            if (wasInvoiceCreated)
-            {
                 await _historyService.InvoiceCreated(project.Id, newInvoice);
             }
-            else
+            else 
             {
                 await _historyService.AdhocHistory(project.Id, "InvoiceNotCreated", "No unbilled expenses found for project. No Invoice Created", null, true);
             }
@@ -226,7 +220,7 @@ namespace Harvest.Core.Services
 
             await _dbContext.SaveChangesAsync();
 
-            if (wasInvoiceCreated)
+            if (newInvoice != null)
             {
                 await _emailService.InvoiceCreated(newInvoice);
                 return Result.Value(newInvoice.Id, resultMessage);
