@@ -89,13 +89,14 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            IQueryable<Role> rolesQuery = _dbContext.Roles;
+            IQueryable<Role> rolesQuery = _dbContext.Roles.Where(a => a.Name != Role.Codes.Worker);
 
             //If you have System, show system.
             if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 rolesQuery = rolesQuery.Where(a => a.Name != Role.Codes.System);
             }
+            
             var viewModel = new AddUserRolesModel
             {
                 Roles = await rolesQuery.ToListAsync(),
@@ -348,7 +349,14 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            return View(supervisorPermission);
+            var model = new AddUserRolesModel
+            {
+                PermissionId = supervisorPermission.Id,
+                SupervisorName = supervisorPermission.User.NameAndEmail,
+                TeamName = team.Name,
+            };
+
+            return View(model);
         }
 
         /// <summary>
