@@ -187,6 +187,9 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
+                    b.Property<Guid?>("WorkerMobileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
@@ -196,6 +199,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("ProjectId");
 
                     b.HasIndex("RateId");
+
+                    b.HasIndex("WorkerMobileId");
 
                     b.ToTable("Expenses");
                 });
