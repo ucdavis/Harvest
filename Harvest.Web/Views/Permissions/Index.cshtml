@@ -41,7 +41,17 @@
                         @item.RolesList
                     </td>
                     <td>
-                        @Html.ActionLink("Remove Role(s)", "Delete", new { id = item.User.Id})
+                        @Html.ActionLink("Remove Role(s)", "Delete", new { id = item.User.Id })
+                        @if (item.SupervisorPermissionId != null)
+                        {
+                            @: |
+                            @Html.ActionLink("Details", "Details", new { id = item.SupervisorPermissionId })
+                        }
+                        @if (item.WorkerPermissionId != null)
+                        {
+                            @: |
+                            @Html.ActionLink("Details", "Details", new { id = item.WorkerPermissionId })
+                        }
                     </td>
 
                 </tr>

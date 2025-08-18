@@ -59,11 +59,20 @@ namespace Harvest.Web.Controllers
                 if (viewModel.UserRoles.Any(a => a.User.Id == permission.User.Id))
                 {
                     viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).Roles.Add(permission.Role);
+                    if(permission.Role.Name == Role.Codes.Supervisor)
+                    {
+                        viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).SupervisorPermissionId = permission.Id;
+                    }
+                    if (permission.Role.Name == Role.Codes.Worker)
+                    {
+                        viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).WorkerPermissionId = permission.Id;
+                    }
                 }
                 else
                 {
                     viewModel.UserRoles.Add(new UserRole(permission));
                 }
+
             }
             viewModel.UserRoles = viewModel.UserRoles.OrderBy(u => u.User.LastName).ThenBy(u => u.User.FirstName).ToList();
 
@@ -301,6 +310,57 @@ namespace Harvest.Web.Controllers
             await _dbContext.SaveChangesAsync();
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = await _dbContext.Permissions.Where(a => a.Id == id).Include(a => a.User).Include(a => a.Role).Include(a => a.Parents).ThenInclude(a => a.User).Include(a => a.Children).ThenInclude(a => a.User).SingleOrDefaultAsync();
+            //We don't really need the roles for parents and children, just the users because it is implied. Children are workers of the supervisor. Parents are supervisors of the worker.
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddWorkerToSupervisor(int id)
+        {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+            var supervisorPermission = await _dbContext.Permissions
+                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && (a.TeamId == null || a.TeamId == team.Id))
+                .Include(a => a.User)
+                //.Include(a => a.Children).ThenInclude(c => c.User)
+                .SingleOrDefaultAsync();
+            if (supervisorPermission == null)
+            {
+                ErrorMessage = "Supervisor not found.";
+                return RedirectToAction("Index");
+            }
+
+            return View(supervisorPermission);
+        }
+
+        /// <summary>
+        /// Id is permission id of the supervisor
+        /// </summary>
+        /// <param name="id">Supervisor's Permission</param>
+        /// <param name="UserEmail">Email or Kerb of worker to add to supervisor's permissions</param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> AddWorkerToSupervisor(int id, string UserEmail)
+        {
+            throw new NotImplementedException("Not implemented yet");
         }
     }
 }
