@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Harvest.Core.Domain
@@ -29,9 +30,11 @@ namespace Harvest.Core.Domain
         public Team Team { get; set; }
 
         // Self-referencing many-to-many for parent permissions
+        [JsonIgnore]
         public List<Permission> Parents { get; set; } = new();
 
         // Optional: Children navigation for easier traversal
+        [JsonIgnore]
         public List<Permission> Children { get; set; } = new();
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)
