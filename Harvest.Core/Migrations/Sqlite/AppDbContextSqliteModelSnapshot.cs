@@ -953,6 +953,21 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("PermissionParent", b =>
+                {
+                    b.Property<int>("ChildId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ChildId", "ParentId");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("PermissionParent");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Account", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
@@ -1320,6 +1335,21 @@ namespace Harvest.Core.Migrations.Sqlite
                         .IsRequired();
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("PermissionParent", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>
