@@ -412,7 +412,7 @@ namespace Harvest.Web.Controllers
                 .SingleOrDefaultAsync(a => a.User.Email.ToLower() == UserEmail.Trim().ToLower());
             if(existingWorkerPermission != null)
             {
-                Message = "Warning, that user is already assigned to another supervisor"; 
+                Message = "Warning, that user is already assigned to another supervisor. "; 
             }
 
             //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
@@ -477,7 +477,7 @@ namespace Harvest.Web.Controllers
                 }
                 await _dbContext.SaveChangesAsync();
 
-                Message = "User Permission added";
+                Message = $"{Message}User Permission added";
                 return RedirectToAction("Index");
             }
             else
