@@ -21,7 +21,7 @@ namespace Harvest.Web.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly IIdentityService _identityService;
-        private readonly IUserService _userService;        
+        private readonly IUserService _userService;
 
         public PermissionsController(AppDbContext dbContext, IIdentityService identityService, IUserService userService)
         {
@@ -33,23 +33,23 @@ namespace Harvest.Web.Controllers
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
 
-            if(team == null)
+            if (team == null)
             {
                 ErrorMessage = $"Team not found! Team: {TeamSlug}";
                 return RedirectToAction("Index", "Home");
-            }   
+            }
 
             IQueryable<Permission> permissionsQuery = _dbContext.Permissions
                 .Include(a => a.User)
                 .Include(a => a.Role)
                 .Where(a => a.TeamId == null || a.TeamId == team.Id);
-            
+
             //If you have System, show system.
             if (!await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
                 permissionsQuery = permissionsQuery.Where(a => a.Role.Name != Role.Codes.System && a.TeamId == team.Id);
             }
-            
+
             var permissions = await permissionsQuery.ToListAsync();
 
             var viewModel = new UserPermissionsListModel();
@@ -59,18 +59,18 @@ namespace Harvest.Web.Controllers
                 if (viewModel.UserRoles.Any(a => a.User.Id == permission.User.Id))
                 {
                     viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).Roles.Add(permission.Role);
-                    if(permission.Role.Name == Role.Codes.Supervisor)
-                    {
-                        viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).SupervisorPermissionId = permission.Id;
-                    }
-                    if (permission.Role.Name == Role.Codes.Worker)
-                    {
-                        viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).WorkerPermissionId = permission.Id;
-                    }
                 }
                 else
                 {
                     viewModel.UserRoles.Add(new UserRole(permission));
+                }
+                if (permission.Role.Name == Role.Codes.Supervisor)
+                {
+                    viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).SupervisorPermissionId = permission.Id;
+                }
+                if (permission.Role.Name == Role.Codes.Worker)
+                {
+                    viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).WorkerPermissionId = permission.Id;
                 }
 
             }
@@ -96,7 +96,7 @@ namespace Harvest.Web.Controllers
             {
                 rolesQuery = rolesQuery.Where(a => a.Name != Role.Codes.System);
             }
-            
+
             var viewModel = new AddUserRolesModel
             {
                 Roles = await rolesQuery.ToListAsync(),
@@ -145,7 +145,7 @@ namespace Harvest.Web.Controllers
             //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
             User user = null;
             var users = await _dbContext.Users.Where(a => a.Email == model.UserEmail || a.Kerberos == model.UserEmail).ToArrayAsync();
-            if(users.Length == 1)
+            if (users.Length == 1)
             {
                 user = users.First();
             }
@@ -188,7 +188,7 @@ namespace Harvest.Web.Controllers
                 return View(viewModel);
             }
 
-            if(addUser && await _dbContext.Users.AnyAsync(a => a.Iam == user.Iam))
+            if (addUser && await _dbContext.Users.AnyAsync(a => a.Iam == user.Iam))
             {
                 addUser = false;
                 user = await _dbContext.Users.SingleAsync(a => a.Iam == user.Iam);
@@ -234,7 +234,7 @@ namespace Harvest.Web.Controllers
                 var permission = new Permission();
                 permission.User = user;
                 permission.Role = role;
-                if(role.Name != Role.Codes.System)
+                if (role.Name != Role.Codes.System)
                 {
                     permission.TeamId = team.Id;
                 }
@@ -267,14 +267,15 @@ namespace Harvest.Web.Controllers
             else
             {
                 var viewModel = (await _dbContext.Users.Select(
-                    a => new {
+                    a => new
+                    {
                         User = a,
                         Permissions = a.Permissions.Where(b => b.Role.Name != Role.Codes.System && b.TeamId == team.Id),
                         Roles = a.Permissions.Select(b => b.Role)
                     }).SingleAsync(a => a.User.Id == id)).User;
                 return View(viewModel);
             }
-                            
+
         }
 
         [HttpPost]
@@ -298,15 +299,17 @@ namespace Harvest.Web.Controllers
                 }
             }
 
-            if(roles.Length <= 0)
+            if (roles.Length <= 0)
             {
                 ErrorMessage = "No Roles Selected to remove.";
                 return RedirectToAction("Delete", new { id = userId });
             }
 
-            foreach(var role in roles)
+            //TODO: Need special handling if it is a worker role? Test this. Maybe do it by removing from supervisor only? And the
+
+            foreach (var role in roles)
             {
-               _dbContext.Permissions.Remove(user.Permissions.Where(a => a.Role.Id == role && (a.TeamId == null || a.TeamId == team.Id)).Single());
+                _dbContext.Permissions.Remove(user.Permissions.Where(a => a.Role.Id == role && (a.TeamId == null || a.TeamId == team.Id)).Single());
             }
             await _dbContext.SaveChangesAsync();
 
@@ -339,7 +342,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             var supervisorPermission = await _dbContext.Permissions
-                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && (a.TeamId == null || a.TeamId == team.Id))
+                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
                 .Include(a => a.User)
                 //.Include(a => a.Children).ThenInclude(c => c.User)
                 .SingleOrDefaultAsync();
@@ -367,6 +370,158 @@ namespace Harvest.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> AddWorkerToSupervisor(int id, string UserEmail)
+        {
+            UserEmail = UserEmail?.Trim().ToLower();
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+            var supervisorPermission = await _dbContext.Permissions
+                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Include(a => a.User)
+                .Include(a => a.Children).ThenInclude(c => c.User)
+                .SingleOrDefaultAsync();
+            if (supervisorPermission == null)
+                {
+                ErrorMessage = "Supervisor not found.";
+                return RedirectToAction("Index");
+            }
+            if(supervisorPermission.Children.Any(a => a.User.Email.ToLower() == UserEmail.Trim().ToLower()))
+            {
+                ErrorMessage = "That user is already a worker for that supervisor.";
+                return RedirectToAction("Details", new { id = supervisorPermission.Id });
+            }
+            var viewModel = new AddUserRolesModel
+            {
+                PermissionId = supervisorPermission.Id,
+                SupervisorName = supervisorPermission.User.NameAndEmail,
+                TeamName = team.Name,
+            };
+            if (string.IsNullOrWhiteSpace(UserEmail))
+            {
+                ModelState.AddModelError("UserEmail", "Must Enter User email");
+                return View(viewModel);
+            }
+            //Check if user is assigned to another supervisor in the team
+            var existingWorkerPermission = await _dbContext.Permissions
+                .Where(a => a.Role.Name == Role.Codes.Worker && a.TeamId == team.Id)
+                .Include(a => a.Parents).ThenInclude(p => p.User)
+                .Include(a => a.User)
+                .SingleOrDefaultAsync(a => a.User.Email.ToLower() == UserEmail.Trim().ToLower());
+            if(existingWorkerPermission != null)
+            {
+                Message = "Warning, that user is already assigned to another supervisor"; 
+            }
+
+            //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
+            User user = null;
+            var users = await _dbContext.Users.Where(a => a.Email == UserEmail || a.Kerberos == UserEmail).ToArrayAsync();
+            if (users.Length == 1)
+            {
+                user = users.First();
+            }
+
+            var role = await _dbContext.Roles.SingleOrDefaultAsync(r => r.Name == Role.Codes.Worker);
+
+            var addUser = false;
+            if (user == null)
+            {
+                addUser = true;
+                if (UserEmail.Contains("@"))
+                {
+                    user = await _identityService.GetByEmail(UserEmail);
+                }
+                else
+                {
+                    user = await _identityService.GetByKerberos(UserEmail);
+                }
+            }
+            if (user == null)
+            {
+                ModelState.AddModelError("UserEmail", "User Not found.");
+                return View(viewModel);
+            }
+
+            if (addUser && await _dbContext.Users.AnyAsync(a => a.Iam == user.Iam))
+            {
+                addUser = false;
+                user = await _dbContext.Users.SingleAsync(a => a.Iam == user.Iam);
+            }
+
+            if (addUser)
+            {
+                await _dbContext.AddAsync(user);
+            }
+            
+
+            if (ModelState.IsValid)
+            {
+                if (existingWorkerPermission == null)
+                {
+
+                    var permission = new Permission();
+                    permission.User = user;
+                    permission.Role = role;
+                    if (role.Name != Role.Codes.System)
+                    {
+                        permission.TeamId = team.Id;
+                    }
+                    permission.Parents.Add(supervisorPermission);
+                    await _dbContext.Permissions.AddAsync(permission);
+                }
+                else
+                {
+                    existingWorkerPermission.Parents.Add(supervisorPermission);
+                }
+                await _dbContext.SaveChangesAsync();
+
+                Message = "User Permission added";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Error adding worker to supervisor.");
+                return View(viewModel);
+            }
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RemoveWorkerFromSupervisor(int id, int workerId)
+        {
+            throw new NotImplementedException("Not implemented yet");
+            //var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            //if (team == null)
+            //{
+            //    ErrorMessage = $"Team not found! Team: {TeamSlug}";
+            //    return RedirectToAction("Index", "Home");
+            //}
+            //var supervisorPermission = await _dbContext.Permissions
+            //    .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && (a.TeamId == null || a.TeamId == team.Id))
+            //    .Include(a => a.User)
+            //    .Include(a => a.Children).ThenInclude(c => c.User)
+            //    .SingleOrDefaultAsync();
+            //if (supervisorPermission == null)
+            //{
+            //    ErrorMessage = "Supervisor not found.";
+            //    return RedirectToAction("Index");
+            //}
+            //var workerPermission = supervisorPermission.Children.SingleOrDefault(a => a.UserId == workerId);
+            //if (workerPermission == null)
+            //{
+            //    ErrorMessage = "Worker not found for that supervisor.";
+            //    return RedirectToAction("Details", new { id = supervisorPermission.Id });
+            //}
+            //_dbContext.Permissions.Remove(workerPermission);
+            //await _dbContext.SaveChangesAsync();
+            //Message = "Worker removed from Supervisor";
+            //return RedirectToAction("Details", new { id = supervisorPermission.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveWorkerFromSupervisor(int id, int workerId, bool remove)
         {
             throw new NotImplementedException("Not implemented yet");
         }

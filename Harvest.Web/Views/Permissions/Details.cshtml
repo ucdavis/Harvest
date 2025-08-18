@@ -45,11 +45,11 @@
                     {
                         <tr>
                             <td>
-                                @item.User.Name (@item.Id)
+                                @item.User.Name
                             </td>
                             <td>@Html.DisplayFor(a => item.User.Email)</td>
                             <td>
-                                @Html.ActionLink("Remove", "Details", "Remove", new { id = item.Id }, null)
+                                @Html.ActionLink("Remove", "RemoveWorkerFromSupervisor", "Permissions", new {id = Model.Id, workerId = item.Id }, null)
                             </td>
                         </tr>
                     }
@@ -75,7 +75,7 @@
                     {
                         <tr>
                             <td>
-                                @item.User.Name (@item.Id)
+                                @item.User.Name
                             </td>
                             <td>@Html.DisplayFor(a => item.User.Email)</td>
                             <td>
