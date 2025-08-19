@@ -6,80 +6,99 @@
 
 <div class="row justify-content-between mb-3">
     <div class="col">
-<h1>Users with roles in team @Model.Team.Name</h1>
+        <h1>Users with roles in team @Model.Team.Name</h1>
     </div>
     <div class="col text-right">
         <a class="btn btn-sm btn-primary" asp-action="Create">Add new User/Role <i class="fas fa-plus fa-xs"></i></a>
-    </div> 
     </div>
+</div>
 
-        <table  id="permissions" class="table harvest-table table-striped table-bordered" >
-            <thead>
+<table id="permissions" class="table harvest-table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Name
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Roles
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.UserRoles)
+        {
+            var showSeparator = false;
             <tr>
-                <th>
-                    Name
-                </th>
-                <th>
-                    Email
-                </th>
-                <th>
-                    Roles
-                </th>
-                <th>
-
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var item in Model.UserRoles) {
-                <tr>
-                    <td>
-                        @item.User.Name
-                    </td>
-                    <td>@Html.DisplayFor(a => item.User.Email)</td>
-                    <td>
-                        @item.RolesList
-                    </td>
-                    <td>
+                <td>
+                    @item.User.Name
+                </td>
+                <td>@Html.DisplayFor(a => item.User.Email)</td>
+                <td>
+                    @item.RolesList
+                </td>
+                <td>
+                    @if (item.RolesList != "Worker")
+                    {
                         @Html.ActionLink("Remove Role(s)", "Delete", new { id = item.User.Id })
-                        @if (item.SupervisorPermissionId != null)
+                        showSeparator = true;
+                    }
+                    @if (item.SupervisorPermissionId != null)
+                    {
+                        @if(showSeparator)
                         {
                             @: |
-                            @Html.ActionLink("Details", "Details", new { id = item.SupervisorPermissionId })
                         }
-                        @if (item.WorkerPermissionId != null)
+                        showSeparator = true;
+                        @Html.ActionLink("Details", "Details", new { id = item.SupervisorPermissionId })
+                    }
+                    @if (item.WorkerPermissionId != null)
+                    {
+                        @if (showSeparator)
                         {
                             @: |
-                            @Html.ActionLink("Details", "Details", new { id = item.WorkerPermissionId })
                         }
-                    </td>
+                        @Html.ActionLink("Details", "Details", new { id = item.WorkerPermissionId })
+                    }
+                </td>
 
-                </tr>
-            }
-            </tbody>
-        </table>
+            </tr>
+        }
+    </tbody>
+</table>
 
 
 
 @section Styles
 {
-    @{ await Html.RenderPartialAsync("_ReportStylesPartial");}
-    @{ await Html.RenderPartialAsync("_FaStylesPartial");}
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
 }
 
 @section Scripts
 {
-  @{ await Html.RenderPartialAsync("_ReportScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
 
-  <script type="text/javascript">
-    var table = $('#permissions').DataTable({
-      responsive: true,
-      columnDefs: [
-        { responsivePriority: 1, targets: 0 },
-        { responsivePriority: 2, targets: 1 },
-        { responsivePriority: 3, targets: 2 },
-        { responsivePriority: 4, targets: 3 }
-      ]
-    });
-  </script>
+    <script type="text/javascript">
+        var table = $('#permissions').DataTable({
+          responsive: true,
+          columnDefs: [
+            { responsivePriority: 1, targets: 0 },
+            { responsivePriority: 2, targets: 1 },
+            { responsivePriority: 3, targets: 2 },
+            { responsivePriority: 4, targets: 3 }
+          ]
+        });
+    </script>
 }
