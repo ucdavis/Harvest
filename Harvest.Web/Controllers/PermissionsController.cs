@@ -488,42 +488,97 @@ namespace Harvest.Web.Controllers
 
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">Supervisor Permission id</param>
+        /// <param name="workerId">Worker Permission id</param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> RemoveWorkerFromSupervisor(int id, int workerId)
         {
-            throw new NotImplementedException("Not implemented yet");
-            //var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
-            //if (team == null)
-            //{
-            //    ErrorMessage = $"Team not found! Team: {TeamSlug}";
-            //    return RedirectToAction("Index", "Home");
-            //}
-            //var supervisorPermission = await _dbContext.Permissions
-            //    .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && (a.TeamId == null || a.TeamId == team.Id))
-            //    .Include(a => a.User)
-            //    .Include(a => a.Children).ThenInclude(c => c.User)
-            //    .SingleOrDefaultAsync();
-            //if (supervisorPermission == null)
-            //{
-            //    ErrorMessage = "Supervisor not found.";
-            //    return RedirectToAction("Index");
-            //}
-            //var workerPermission = supervisorPermission.Children.SingleOrDefault(a => a.UserId == workerId);
-            //if (workerPermission == null)
-            //{
-            //    ErrorMessage = "Worker not found for that supervisor.";
-            //    return RedirectToAction("Details", new { id = supervisorPermission.Id });
-            //}
-            //_dbContext.Permissions.Remove(workerPermission);
-            //await _dbContext.SaveChangesAsync();
-            //Message = "Worker removed from Supervisor";
-            //return RedirectToAction("Details", new { id = supervisorPermission.Id });
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+            var supervisorPermission = await _dbContext.Permissions
+                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Include(a => a.User)
+                .Include(a => a.Children).ThenInclude(c => c.User)
+                .SingleOrDefaultAsync();
+            if (supervisorPermission == null)
+            {
+                ErrorMessage = "Supervisor not found.";
+                return RedirectToAction("Index");
+            }
+            var workerPermission = supervisorPermission.Children.SingleOrDefault(a => a.Id == workerId);
+            if (workerPermission == null)
+            {
+                ErrorMessage = "Worker not found for that supervisor.";
+                return RedirectToAction("Details", new { id = supervisorPermission.Id });
+            }
+
+            var model = new RemoveWorkerModel
+            {
+                SupervisorId = supervisorPermission.Id,
+                WorkerId = workerPermission.Id,
+                WorkerName = workerPermission.User.NameAndEmail,
+                SupervisorName = supervisorPermission.User.NameAndEmail
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveWorkerFromSupervisor(int id, int workerId, bool remove)
+        public async Task<IActionResult> RemoveWorkerFromSupervisor(RemoveWorkerModel model)
         {
-            throw new NotImplementedException("Not implemented yet");
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+            var supervisorPermission = await _dbContext.Permissions
+                .Where(a => a.Id == model.SupervisorId && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Include(a => a.User)
+                .Include(a => a.Children).ThenInclude(c => c.User)
+                .SingleOrDefaultAsync();
+            if (supervisorPermission == null)
+            {
+                ErrorMessage = "Supervisor not found.";
+                return RedirectToAction("Index");
+            }
+            var workerPermission = supervisorPermission.Children.SingleOrDefault(a => a.Id == model.WorkerId);
+            if (workerPermission == null)
+            {
+                ErrorMessage = "Worker not found for that supervisor.";
+                return RedirectToAction("Details", new { id = supervisorPermission.Id });
+            }
+            supervisorPermission.Children.Remove(workerPermission);
+            //_dbContext.Permissions.Remove(workerPermission);
+            await _dbContext.SaveChangesAsync();
+            //Check if the worker has no parents left, if so, remove the worker permission
+            
+            workerPermission = await _dbContext.Permissions
+                .Where(a => a.Id == model.WorkerId && a.Role.Name == Role.Codes.Worker && a.TeamId == team.Id)
+                .Include(a => a.Parents)
+                .SingleOrDefaultAsync();
+            if(workerPermission != null && !workerPermission.Parents.Any())
+            {
+                _dbContext.Permissions.Remove(workerPermission);
+                await _dbContext.SaveChangesAsync();
+                Message = "Worker removed from Supervisor and Worker role.";
+            }
+            else
+            {
+                Message = "Worker removed from Supervisor";
+            }
+
+
+
+                return RedirectToAction("Details", new { id = supervisorPermission.Id });
         }
     }
 }
