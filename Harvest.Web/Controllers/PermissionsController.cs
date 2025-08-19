@@ -260,7 +260,7 @@ namespace Harvest.Web.Controllers
 
             if (await _userService.HasAccess(AccessCodes.SystemAccess, TeamSlug))
             {
-                var viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions.Where(w => w.TeamId == null || w.TeamId == team.Id))
+                var viewModel = await _dbContext.Users.Where(a => a.Id == id).Include(a => a.Permissions.Where(w => w.Role.Name != Role.Codes.Worker && ( w.TeamId == null || w.TeamId == team.Id)))
                     .ThenInclude(a => a.Role).SingleAsync();
                 return View(viewModel);
             }
@@ -270,7 +270,7 @@ namespace Harvest.Web.Controllers
                     a => new
                     {
                         User = a,
-                        Permissions = a.Permissions.Where(b => b.Role.Name != Role.Codes.System && b.TeamId == team.Id),
+                        Permissions = a.Permissions.Where(b => b.Role.Name != Role.Codes.System && b.Role.Name != Role.Codes.Worker && b.TeamId == team.Id),
                         Roles = a.Permissions.Select(b => b.Role)
                     }).SingleAsync(a => a.User.Id == id)).User;
                 return View(viewModel);
