@@ -142,6 +142,12 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<bool>("Approved")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
@@ -191,6 +197,10 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Approved");
+
+                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CreatedById");
 
@@ -1047,6 +1057,10 @@ namespace Harvest.Core.Migrations.SqlServer
 
             modelBuilder.Entity("Harvest.Core.Domain.Expense", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
+
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
@@ -1067,6 +1081,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasForeignKey("RateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApprovedBy");
 
                     b.Navigation("CreatedBy");
 
