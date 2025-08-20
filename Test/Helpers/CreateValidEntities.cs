@@ -182,6 +182,7 @@ namespace Test.Helpers
             rtValue.CreatedById = 1;
             rtValue.CreatedBy = CreateValidEntities.User(1);
             rtValue.Account = rtValue.Rate.Account;
+            rtValue.Approved = true;
 
             return rtValue;       
 
