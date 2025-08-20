@@ -47,24 +47,6 @@ export const ExpenseDetailsModal = ({ expense, isOpen, toggle }: Props) => {
             </tr>
             <tr>
               <th>Rate</th>
-              <td>
-                {expense.rate
-                  ? `$${formatCurrency(expense.rate.price)} per ${
-                      expense.rate.unit
-                    }`
-                  : "N/A"}
-              </td>
-            </tr>
-            <tr>
-              <th>Rate Description</th>
-              <td>{expense.rate?.description || "N/A"}</td>
-            </tr>
-            <tr>
-              <th>Rate ID</th>
-              <td>{expense.rateId}</td>
-            </tr>
-            <tr>
-              <th>Price</th>
               <td>${formatCurrency(expense.price)}</td>
             </tr>
             <tr>
