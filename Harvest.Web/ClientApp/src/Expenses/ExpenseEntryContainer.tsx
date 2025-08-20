@@ -175,6 +175,7 @@ export const ExpenseEntryContainer = () => {
             total: workItem.total,
             rateId: workItem.rateId,
             rate: null,
+            approved: false,
           })
         )
     );

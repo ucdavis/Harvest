@@ -91,6 +91,7 @@ namespace Harvest.Web.Controllers.Api
         {
             var query = _dbContext.Expenses
                 .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
                 .Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug);
 
             if (shareId.HasValue)

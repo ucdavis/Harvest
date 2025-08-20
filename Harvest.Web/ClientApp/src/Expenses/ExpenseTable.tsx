@@ -21,21 +21,12 @@ export const ExpenseTable = (props: Props) => {
   const columns: Column<Expense>[] = useMemo(
     () => [
       {
-        Header: "Activity",
-        accessor: (row) => row.activity,
-      },
-      {
         Header: "Type",
         accessor: (row) => row.type,
       },
       {
         Header: "Description",
         accessor: (row) => row.description,
-      },
-      {
-        Header: "Markup",
-        accessor: (row) =>
-          row.type === "Other" ? (row.markup ? "Yes" : "No") : "N/A",
       },
       {
         Header: "Quantity",
@@ -62,6 +53,21 @@ export const ExpenseTable = (props: Props) => {
         Cell: (data: Cell<Expense>) =>
           data.row.original.createdOn
             ? new Date(data.row.original.createdOn).toLocaleDateString()
+            : "N/A",
+      },
+      {
+        Header: "Approved",
+        accessor: (row) => (row.approved ? "Yes" : "No"),
+      },
+      {
+        Header: "Approved by",
+        accessor: (row) => row.approvedBy?.name,
+      },
+      {
+        Header: "Approved on",
+        accessor: (row) =>
+          row.approvedOn
+            ? new Date(row.approvedOn).toLocaleDateString()
             : "N/A",
       },
 

@@ -129,6 +129,7 @@ export const AdhocProject = () => {
             total: workItem.total,
             rateId: workItem.rateId,
             rate: null,
+            approved: false,
           })
         )
     );

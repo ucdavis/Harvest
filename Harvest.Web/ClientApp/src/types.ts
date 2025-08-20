@@ -1,4 +1,3 @@
-
 export type CropType = "Row" | "Tree" | "Other";
 export interface Crop {
   id: number;
@@ -143,6 +142,9 @@ export interface Expense {
   total: number;
   createdOn?: Date;
   createdBy?: User;
+  approvedBy?: User;
+  approvedOn?: Date;
+  approved: boolean;
 }
 
 export interface AdhocProjectModel {
