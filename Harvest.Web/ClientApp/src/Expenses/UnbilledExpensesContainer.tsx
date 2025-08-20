@@ -134,16 +134,19 @@ export const UnbilledExpensesContainer = (props: Props) => {
         <div className="row justify-content-between mb-3">
           <div className="col">
             {expenses.length ? (
-              <h3>
-                Unbilled Expenses
-                <small> (${formatCurrency(total)} total)</small>
-                {total - project.quoteTotal > 0 && (
-                  <p style={{ color: "red" }}>
-                    <strong> Warning!</strong> Expenses exceed amount remaining
-                    by ${formatCurrency(total - project.quoteTotal)}
-                  </p>
-                )}
-              </h3>
+              <>
+                <h3>
+                  Unbilled Expenses
+                  <small> (${formatCurrency(total)} total)</small>
+                  {total - project.quoteTotal > 0 && (
+                    <p style={{ color: "red" }}>
+                      <strong> Warning!</strong> Expenses exceed amount
+                      remaining by ${formatCurrency(total - project.quoteTotal)}
+                    </p>
+                  )}
+                </h3>
+                <small>You may click on the expense row for more details</small>
+              </>
             ) : (
               <h3>No Unbilled Expenses</h3>
             )}
