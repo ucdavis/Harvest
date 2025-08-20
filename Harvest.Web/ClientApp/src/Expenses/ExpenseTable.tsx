@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Cell, Column, TableState } from "react-table";
 import { Button } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
@@ -6,6 +6,7 @@ import { ReactTableUtil } from "../Shared/TableUtil";
 import { Expense } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
+import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
 
 interface Props {
   expenses: Expense[];
@@ -15,8 +16,22 @@ interface Props {
 
 export const ExpenseTable = (props: Props) => {
   const expenseData = useMemo(() => props.expenses, [props.expenses]);
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { deleteExpense, canDeleteExpense } = props;
+
+  const handleRowClick = (expense: Expense) => {
+    setSelectedExpense(expense);
+    setIsModalOpen(true);
+  };
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+    if (isModalOpen) {
+      setSelectedExpense(null);
+    }
+  };
 
   const columns: Column<Expense>[] = useMemo(
     () => [
@@ -98,10 +113,18 @@ export const ExpenseTable = (props: Props) => {
   };
 
   return (
-    <ReactTable
-      columns={columns}
-      data={expenseData}
-      initialState={initialState}
-    />
+    <>
+      <ReactTable
+        columns={columns}
+        data={expenseData}
+        initialState={initialState}
+        onRowClick={handleRowClick}
+      />
+      <ExpenseDetailsModal
+        expense={selectedExpense}
+        isOpen={isModalOpen}
+        toggle={toggleModal}
+      />
+    </>
   );
 };
