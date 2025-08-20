@@ -44,7 +44,7 @@ namespace Test.TestsControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(5);
+            ControllerReflection.ControllerPublicMethods(10);
         }
 
         [Fact]
@@ -72,7 +72,26 @@ namespace Test.TestsControllers
             //3-2
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Delete", countAdjustment + 2, isSecondMethod: true);
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Delete", countAdjustment + 2, isSecondMethod: true);
-            
+
+            //4
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Details", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Details", countAdjustment + 2);
+
+            //5-1
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("AddWorkerToSupervisor", countAdjustment + 2, isSecondMethod: false);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("AddWorkerToSupervisor", countAdjustment + 2, isSecondMethod: false);
+
+            //5-2
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("AddWorkerToSupervisor", countAdjustment + 2, isSecondMethod: true);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("AddWorkerToSupervisor", countAdjustment + 2, isSecondMethod: true);
+
+            //6-1
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RemoveWorkerFromSupervisor", countAdjustment +2, isSecondMethod: false);
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("RemoveWorkerFromSupervisor", countAdjustment + 2, isSecondMethod: false);
+
+            //6-2
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RemoveWorkerFromSupervisor", countAdjustment + 2, isSecondMethod: true);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("RemoveWorkerFromSupervisor", countAdjustment + 2, isSecondMethod: true);
         }
     }
 }

@@ -1,0 +1,125 @@
+﻿@model Harvest.Core.Domain.Permission
+
+@{
+    ViewData["Title"] = "Permission Details";
+}
+
+<div class="row justify-content-between mb-3">
+    <div class="col">
+
+        <h1>Permission Details</h1>
+        <div>
+            <h2>Permission</h2>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-2">
+                    @Html.DisplayNameFor(model => model.User.Name)
+                </dt>
+                <dd class="col-sm-10">
+                    @Html.DisplayFor(model => model.User.Name)
+                </dd>
+
+            </dl>
+
+
+        </div>
+        @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiple permissions
+        {
+            <h2>Workers assigned to supervisor</h2>
+            <div class="col text-right">
+                <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to Supervisor<i class="fas fa-plus fa-xs"></i></a>
+            </div>
+            <table id="workers" class="table harvest-table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th></th>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Children)
+                    {
+                        <tr>
+                            <td>
+                                @item.User.Name
+                            </td>
+                            <td>@Html.DisplayFor(a => item.User.Email)</td>
+                            <td>
+                                @Html.ActionLink("Remove", "RemoveWorkerFromSupervisor", "Permissions", new {id = Model.Id, workerId = item.Id }, null)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        @if (Model.Role.Name == Role.Codes.Worker) //This model is a permission, not a user with multiple permissions
+        {
+            <h2>Supervisor(s) assigned to worker</h2>
+            <table id="supervisors" class="table harvest-table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th></th>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Parents)
+                    {
+                        <tr>
+                            <td>
+                                @item.User.Name
+                            </td>
+                            <td>@Html.DisplayFor(a => item.User.Email)</td>
+                            <td>
+                                @Html.ActionLink("Details", "Details", "Permissions", new { id = item.Id, workerId = Model.Id }, null)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+
+@section Styles
+{
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+}
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('#workers').DataTable({
+          responsive: true,
+          columnDefs: [
+            { responsivePriority: 1, targets: 0 },
+            { responsivePriority: 2, targets: 1 },
+          ]
+        });
+        var table2 = $('#supervisors').DataTable({
+          responsive: true,
+          columnDefs: [
+            { responsivePriority: 1, targets: 0 },
+            { responsivePriority: 2, targets: 1 },
+          ]
+         });
+    </script>
+}

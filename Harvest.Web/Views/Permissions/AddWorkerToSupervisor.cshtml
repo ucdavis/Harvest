@@ -1,0 +1,33 @@
+﻿@model Harvest.Web.Models.AddUserRolesModel
+@{
+    ViewData["Title"] = "Add Worker to Supervisor";
+}
+
+<div class="card-wrapper col-md-6">
+    <div class="card-content">
+        <h2>Add Worker to Supervisor</h2>
+        <h3>Supervisor: @Model.SupervisorName</h3>
+        <form asp-action="AddWorkerToSupervisor">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" name="id" value="@Model.PermissionId" />
+
+            <div class="form-group">
+                <label class="control-label">Worker Email</label>
+                <input asp-for="UserEmail" class="form-control" placeholder="Email or Kerb"/>
+                <span asp-validation-for="UserEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add Worker" class="btn btn-primary" />
+                <small class="form-text text-muted">This will assign the worker to the supervisor above. And add them to the worker permission if required.</small>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

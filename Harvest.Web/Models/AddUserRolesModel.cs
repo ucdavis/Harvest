@@ -19,5 +19,8 @@ namespace Harvest.Web.Models
         public List<Role> Roles { get; set; }
 
         public string TeamName { get; set; }
-    }
+
+        public int PermissionId { get; set; } //Used for adding workers to supervisors
+        public string SupervisorName { get; set; } = string.Empty;
+        }
 }
