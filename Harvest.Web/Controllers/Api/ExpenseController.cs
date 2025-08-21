@@ -43,6 +43,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             var user = await _userService.GetCurrentUser();
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
@@ -52,6 +53,12 @@ namespace Harvest.Web.Controllers.Api
                 expense.InvoiceId = null;
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                 expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                if(autoApprove)
+                {
+                    expense.Approved = true;
+                    expense.ApprovedBy = user;
+                    expense.ApprovedOn = DateTime.UtcNow;
+                }
             }
 
             _dbContext.Expenses.AddRange(expenses);
