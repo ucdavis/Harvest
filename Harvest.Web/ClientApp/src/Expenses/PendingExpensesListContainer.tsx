@@ -87,14 +87,11 @@ export const PendingExpensesListContainer = (props: Props) => {
 
   return (
     <div className="card">
-      <span>TESTING</span>
-      {expenses.length > 0 && (
-        <ExpenseTable
-          expenses={expenses}
-          deleteExpense={deleteExpense}
-          canDeleteExpense={!notification.pending}
-        ></ExpenseTable>
-      )}
+      <ExpenseTable
+        expenses={expenses}
+        deleteExpense={deleteExpense}
+        canDeleteExpense={!notification.pending}
+      ></ExpenseTable>
     </div>
   );
 };
