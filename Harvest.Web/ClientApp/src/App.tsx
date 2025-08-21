@@ -11,6 +11,7 @@ import { ConditionalRoute } from "./ConditionalRoute";
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
+import { PendingExpensesListContainer } from "./Expenses/PendingExpensesListContainer";
 import { HomeContainer } from "./Home/HomeContainer";
 import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
@@ -156,6 +157,13 @@ function App() {
                 projectSource="Project/GetCompleted"
                 hasTeamRoute={true}
               />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor"]}
+              exact
+              path="/:team/expense/GetMyPendingExpenses"
+            >
+              <PendingExpensesListContainer />
             </ConditionalRoute>
             <ConditionalRoute
               exact
