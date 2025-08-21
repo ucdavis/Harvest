@@ -23,13 +23,14 @@ interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
   hideProjectHeader?: boolean;
   disableEdits?: boolean;
+  showAll: boolean;
 }
 
 export const PendingExpensesListContainer = (props: Props) => {
   const { team } = useParams<CommonRouteParams>();
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [showAll] = useState(props.showAll);
 
-  const [total, setTotal] = useState(0);
   const [notification, setNotification] = usePromiseNotification();
   const [confirmRemoveExpense] = useConfirmationDialog({
     title: "Remove Expense",
@@ -39,9 +40,12 @@ export const PendingExpensesListContainer = (props: Props) => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      const response = await authenticatedFetch(
-        `/api/${team}/Expense/GetMyPendingExpenses/`
-      );
+      let url = `/api/${team}/Expense/GetPendingExpenses`;
+      if (showAll) {
+        url = `/api/${team}/Expense/GetAllPendingExpenses`;
+      }
+
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         const expenses: Expense[] = await response.json();
@@ -53,7 +57,7 @@ export const PendingExpensesListContainer = (props: Props) => {
     };
 
     cb();
-  }, [getIsMounted, team]);
+  }, [getIsMounted, team, showAll]);
 
   const deleteExpense = async (expense: Expense) => {
     const [confirmed] = await confirmRemoveExpense();

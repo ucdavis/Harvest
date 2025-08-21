@@ -159,11 +159,18 @@ function App() {
               />
             </ConditionalRoute>
             <ConditionalRoute
-              roles={["FieldManager", "Supervisor"]}
+              roles={["Supervisor"]}
               exact
               path="/:team/expense/GetMyPendingExpenses"
             >
-              <PendingExpensesListContainer />
+              <PendingExpensesListContainer showAll={false} />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["FieldManager"]}
+              exact
+              path="/:team/expense/GetAllPendingExpenses"
+            >
+              <PendingExpensesListContainer showAll={true} />
             </ConditionalRoute>
             <ConditionalRoute
               exact
