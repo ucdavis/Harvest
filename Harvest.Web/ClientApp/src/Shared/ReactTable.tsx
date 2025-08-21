@@ -22,6 +22,7 @@ export const ReactTable = ({
   filterTypes,
   hideFilters = false,
   hidePagination = false,
+  onRowClick,
 }: any) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -110,7 +111,49 @@ export const ReactTable = ({
             rows.map((row) => {
               prepareRow(row);
               return (
-                <tr className="rt-tr-group" {...row.getRowProps()}>
+                <tr
+                  className="rt-tr-group"
+                  {...row.getRowProps()}
+                  onClick={
+                    onRowClick
+                      ? (e) => {
+                          // Don't trigger row click if clicking on a button or link
+                          const target = e.target as HTMLElement;
+                          if (
+                            target.tagName === "BUTTON" ||
+                            target.tagName === "A" ||
+                            target.closest("button") ||
+                            target.closest("a")
+                          ) {
+                            return;
+                          }
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                  style={
+                    onRowClick
+                      ? {
+                          cursor: "pointer",
+                          transition: "background-color 0.2s",
+                        }
+                      : undefined
+                  }
+                  onMouseEnter={
+                    onRowClick
+                      ? (e) => {
+                          e.currentTarget.style.backgroundColor = "#f8f9fa";
+                        }
+                      : undefined
+                  }
+                  onMouseLeave={
+                    onRowClick
+                      ? (e) => {
+                          e.currentTarget.style.backgroundColor = "";
+                        }
+                      : undefined
+                  }
+                >
                   {row.cells.map((cell) => {
                     return (
                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
@@ -124,7 +167,49 @@ export const ReactTable = ({
             page.map((row) => {
               prepareRow(row);
               return (
-                <tr className="rt-tr-group" {...row.getRowProps()}>
+                <tr
+                  className="rt-tr-group"
+                  {...row.getRowProps()}
+                  onClick={
+                    onRowClick
+                      ? (e) => {
+                          // Don't trigger row click if clicking on a button or link
+                          const target = e.target as HTMLElement;
+                          if (
+                            target.tagName === "BUTTON" ||
+                            target.tagName === "A" ||
+                            target.closest("button") ||
+                            target.closest("a")
+                          ) {
+                            return;
+                          }
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                  style={
+                    onRowClick
+                      ? {
+                          cursor: "pointer",
+                          transition: "background-color 0.2s",
+                        }
+                      : undefined
+                  }
+                  onMouseEnter={
+                    onRowClick
+                      ? (e) => {
+                          e.currentTarget.style.backgroundColor = "#f8f9fa";
+                        }
+                      : undefined
+                  }
+                  onMouseLeave={
+                    onRowClick
+                      ? (e) => {
+                          e.currentTarget.style.backgroundColor = "";
+                        }
+                      : undefined
+                  }
+                >
                   {row.cells.map((cell) => {
                     return (
                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>

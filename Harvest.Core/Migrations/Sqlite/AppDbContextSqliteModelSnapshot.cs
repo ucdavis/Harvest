@@ -129,6 +129,12 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<bool>("Approved")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("CreatedById")
                         .HasColumnType("INTEGER");
 
@@ -178,6 +184,10 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Approved");
+
+                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CreatedById");
 
@@ -996,6 +1006,10 @@ namespace Harvest.Core.Migrations.Sqlite
 
             modelBuilder.Entity("Harvest.Core.Domain.Expense", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
+
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
@@ -1016,6 +1030,8 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasForeignKey("RateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApprovedBy");
 
                     b.Navigation("CreatedBy");
 
