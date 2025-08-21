@@ -51,6 +51,9 @@ export const SupervisorHome = () => {
         <li className="list-group-item">
           <Link to={`/${team}/expense/entry`}>Enter Project Expenses</Link>
         </li>
+        <li className="list-group-item">
+            <Link to={`/${team}/expense/getmypendingexpenses`}>My Worker's Pending Expenses</Link>
+        </li>
         {projects.slice(0, 3).map((project) => (
           <li key={project.id} className="list-group-item">
             <Link to={`/${project.team.slug}/project/details/${project.id}`}>
