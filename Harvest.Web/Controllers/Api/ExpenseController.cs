@@ -46,11 +46,11 @@ namespace Harvest.Web.Controllers.Api
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
-                expense.CreatedBy     = user;
-                expense.CreatedOn     = DateTime.UtcNow;
-                expense.ProjectId     = projectId;
-                expense.InvoiceId     = null;
-                expense.Account       = allRates.Single(a => a.Id == expense.RateId).Account;
+                expense.CreatedBy = user;
+                expense.CreatedOn = DateTime.UtcNow;
+                expense.ProjectId = projectId;
+                expense.InvoiceId = null;
+                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                 expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
             }
 
@@ -99,7 +99,7 @@ namespace Harvest.Web.Controllers.Api
                 query = query.Where(e => e.Project.ShareId == shareId.Value);
             }
 
-            return Ok( await query.ToArrayAsync());
+            return Ok(await query.ToArrayAsync());
 
             //return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).ToArrayAsync());
 
@@ -128,6 +128,40 @@ namespace Harvest.Web.Controllers.Api
                 .ToArrayAsync();
 
             return Ok(projects);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> GetMyPendingExpenses()
+        {
+            var user = await _userService.GetCurrentUser();
+            var myWorkers = await _dbContext.Permissions.Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug).Include(a => a.Children).ThenInclude(a => a.User)
+                .SelectMany(a => a.Children).Select(a => a.User).Select(a => a.Id).ToListAsync();
+
+            //TODO: Use a projection? 
+            var pendingExpenses = await _dbContext.Expenses
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
+                .Include(a => a.Project)
+                .Where(a => !a.Approved && a.CreatedBy != null && myWorkers.Contains(a.CreatedById.Value)) //Created by can be null for auto generated expenses
+                .ToArrayAsync();
+
+            return Ok(pendingExpenses);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> GetAllPendingExpenses()
+        {
+            var pendingExpenses = await _dbContext.Expenses
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
+                .Include(a => a.Project)
+                .Where(a => !a.Approved && a.CreatedBy != null) //Created by can be null for auto generated expenses
+                .ToArrayAsync();
+
+            return Ok(pendingExpenses);
+
         }
     }
 }
