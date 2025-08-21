@@ -145,6 +145,7 @@ export interface Expense {
   approvedBy?: User;
   approvedOn?: Date;
   approved: boolean;
+  project?: Project;
 }
 
 export interface AdhocProjectModel {
