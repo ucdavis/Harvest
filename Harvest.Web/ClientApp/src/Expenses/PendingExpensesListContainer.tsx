@@ -1,20 +1,12 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import {
-  CommonRouteParams,
-  Expense,
-  ExpenseQueryParams,
-  Project,
-} from "../types";
+import { CommonRouteParams, Expense } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
-import { ShowFor } from "../Shared/ShowFor";
-import { formatCurrency } from "../Util/NumberFormatting";
 import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { ProjectHeader } from "../Shared/ProjectHeader";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -87,6 +79,11 @@ export const PendingExpensesListContainer = (props: Props) => {
 
   return (
     <div className="card">
+      <div className="card-header">
+        <h5 className="mb-0">
+          {showAll ? "All Pending Expenses" : "My Worker's Pending Expenses"}
+        </h5>
+      </div>
       <ExpenseTable
         expenses={expenses}
         deleteExpense={deleteExpense}
