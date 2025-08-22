@@ -33,7 +33,7 @@ export const PendingExpensesListContainer = (props: Props) => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      let url = `/api/${team}/Expense/GetPendingExpenses`;
+      let url = `/api/${team}/Expense/GetMyPendingExpenses`;
       if (showAll) {
         url = `/api/${team}/Expense/GetAllPendingExpenses`;
       }
@@ -105,7 +105,7 @@ export const PendingExpensesListContainer = (props: Props) => {
     setNotification(request, "Approving All Expenses", async (response) => {
       if (getIsMounted()) {
         // Refresh the page data
-        let url = `/api/${team}/Expense/GetPendingExpenses`;
+        let url = `/api/${team}/Expense/GetMyPendingExpenses`;
         if (showAll) {
           url = `/api/${team}/Expense/GetAllPendingExpenses`;
         }
