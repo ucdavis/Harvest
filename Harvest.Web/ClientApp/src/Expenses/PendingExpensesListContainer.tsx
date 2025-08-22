@@ -103,6 +103,7 @@ export const PendingExpensesListContainer = (props: Props) => {
     });
 
     setNotification(request, "Approving All Expenses", async (response) => {
+      let approvedCount = 0;
       if (getIsMounted()) {
         // Refresh the page data
         let url = `/api/${team}/Expense/GetMyPendingExpenses`;
@@ -113,10 +114,14 @@ export const PendingExpensesListContainer = (props: Props) => {
         const refreshResponse = await authenticatedFetch(url);
         if (refreshResponse.ok) {
           const refreshedExpenses: Expense[] = await refreshResponse.json();
+          // Calculate how many were actually approved by comparing the counts
+          approvedCount = expenseCount - refreshedExpenses.length;
           setExpenses(refreshedExpenses);
         }
       }
-      return `${expenseCount} Expense${expenseCount === 1 ? "" : "s"} Approved`;
+      return `${approvedCount} Expense${
+        approvedCount === 1 ? "" : "s"
+      } Approved`;
     });
   };
 
