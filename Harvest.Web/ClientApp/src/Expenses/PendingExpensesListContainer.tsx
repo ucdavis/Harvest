@@ -85,6 +85,7 @@ export const PendingExpensesListContainer = (props: Props) => {
 
     // Get all expense IDs
     const expenseIds = expenses.map((expense) => expense.id);
+    const expenseCount = expenseIds.length;
 
     //console.log(expenseIds);
 
@@ -115,7 +116,7 @@ export const PendingExpensesListContainer = (props: Props) => {
           setExpenses(refreshedExpenses);
         }
       }
-      return "All Expenses Approved";
+      return `${expenseCount} Expense${expenseCount === 1 ? "" : "s"} Approved`;
     });
   };
 
