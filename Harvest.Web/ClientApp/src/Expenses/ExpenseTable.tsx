@@ -3,21 +3,25 @@ import { Cell, Column, TableState } from "react-table";
 import { Button } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
-import { Expense } from "../types";
+import { CommonRouteParams, Expense } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
+import { useParams } from "react-router-dom";
 
 interface Props {
   expenses: Expense[];
   deleteExpense: (expense: Expense) => void;
   canDeleteExpense: boolean;
+  showProject: boolean;
 }
 
 export const ExpenseTable = (props: Props) => {
   const expenseData = useMemo(() => props.expenses, [props.expenses]);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showProject] = useState(props.showProject);
+  const { team } = useParams<CommonRouteParams>();
 
   const { deleteExpense, canDeleteExpense } = props;
 
@@ -35,6 +39,24 @@ export const ExpenseTable = (props: Props) => {
 
   const columns: Column<Expense>[] = useMemo(
     () => [
+      ...(showProject
+        ? [
+            {
+              Header: "Project",
+              accessor: (row: Expense) => row.project?.name,
+              Cell: (data: Cell<Expense>) =>
+                data.row.original.project ? (
+                  <a
+                    href={`/${team}/Project/Details/${data.row.original.project.id}`}
+                  >
+                    {data.row.original.project.name}
+                  </a>
+                ) : (
+                  "N/A"
+                ),
+            },
+          ]
+        : []),
       {
         Header: "Type",
         accessor: (row) => row.type,

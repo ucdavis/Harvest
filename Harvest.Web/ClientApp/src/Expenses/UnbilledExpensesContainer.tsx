@@ -174,6 +174,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
               !notification.pending &&
               project?.status !== "PendingCloseoutApproval"
             }
+            showProject={false}
           ></ExpenseTable>
         )}
       </div>
