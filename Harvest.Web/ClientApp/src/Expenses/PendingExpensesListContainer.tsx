@@ -9,7 +9,8 @@ import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Button } from "reactstrap";
 
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
@@ -78,12 +79,29 @@ export const PendingExpensesListContainer = (props: Props) => {
   };
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <h5 className="mb-0">
-          {showAll ? "All Pending Expenses" : "My Worker's Pending Expenses"}
-        </h5>
+    <div className="projectlisttable-wrapper">
+      <div className="row justify-content-between mb-3">
+        <div className="col">
+          <h1>
+            {showAll ? "All Pending Expenses" : "My Worker's Pending Expenses"}
+          </h1>
+        </div>
+        {/* <div className="col text-right">
+          <Link to={requestUrl} className="btn btn-sm btn-primary ">
+            Create New <FontAwesomeIcon icon={faPlus} />
+          </Link>
+        </div> */}
+        <div className="col text-right">
+          <Button
+            id="ApproveAllButton"
+            color="primary"
+            onClick={() => alert("TODO")}
+          >
+            Approve All <FontAwesomeIcon icon={faCheck} />
+          </Button>
+        </div>
       </div>
+
       <ExpenseTable
         expenses={expenses}
         deleteExpense={deleteExpense}
