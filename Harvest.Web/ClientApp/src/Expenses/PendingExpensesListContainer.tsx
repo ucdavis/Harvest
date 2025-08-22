@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import { CommonRouteParams, Expense } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
@@ -9,7 +9,7 @@ import { usePromiseNotification } from "../Util/Notifications";
 import { useIsMounted } from "../Shared/UseIsMounted";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "reactstrap";
 
 interface Props {
@@ -27,7 +27,7 @@ export const PendingExpensesListContainer = (props: Props) => {
   const [notification, setNotification] = usePromiseNotification();
   const [confirmRemoveExpense] = useConfirmationDialog({
     title: "Remove Expense",
-    message: "Are you sure you want to remove this unbilled expense?",
+    message: "Are you sure you want to remove this un-billed expense?",
   });
 
   const getIsMounted = useIsMounted();
@@ -78,6 +78,47 @@ export const PendingExpensesListContainer = (props: Props) => {
     });
   };
 
+  const approveAllExpenses = async () => {
+    if (expenses.length === 0) {
+      return;
+    }
+
+    // Get all expense IDs
+    const expenseIds = expenses.map((expense) => expense.id);
+
+    //console.log(expenseIds);
+
+    // Determine which API endpoint to use based on showAll
+    const endpoint = showAll
+      ? `/api/${team}/Expense/ApproveExpenses`
+      : `/api/${team}/Expense/ApproveMyWorkerExpenses`;
+
+    const request = authenticatedFetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(expenseIds),
+    });
+
+    setNotification(request, "Approving All Expenses", async (response) => {
+      if (getIsMounted()) {
+        // Refresh the page data
+        let url = `/api/${team}/Expense/GetPendingExpenses`;
+        if (showAll) {
+          url = `/api/${team}/Expense/GetAllPendingExpenses`;
+        }
+
+        const refreshResponse = await authenticatedFetch(url);
+        if (refreshResponse.ok) {
+          const refreshedExpenses: Expense[] = await refreshResponse.json();
+          setExpenses(refreshedExpenses);
+        }
+      }
+      return "All Expenses Approved";
+    });
+  };
+
   return (
     <div className="projectlisttable-wrapper">
       <div className="row justify-content-between mb-3">
@@ -86,16 +127,12 @@ export const PendingExpensesListContainer = (props: Props) => {
             {showAll ? "All Pending Expenses" : "My Worker's Pending Expenses"}
           </h1>
         </div>
-        {/* <div className="col text-right">
-          <Link to={requestUrl} className="btn btn-sm btn-primary ">
-            Create New <FontAwesomeIcon icon={faPlus} />
-          </Link>
-        </div> */}
         <div className="col text-right">
           <Button
             id="ApproveAllButton"
             color="primary"
-            onClick={() => alert("TODO")}
+            onClick={approveAllExpenses}
+            disabled={notification.pending || expenses.length === 0}
           >
             Approve All <FontAwesomeIcon icon={faCheck} />
           </Button>
