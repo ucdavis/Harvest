@@ -198,7 +198,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> ApproveMyWorkerExpenses(int[] expenseIds)
+        public async Task<ActionResult> ApproveMyWorkerExpenses([FromBody] int[] expenseIds)
         {
             var user = await _userService.GetCurrentUser();
             var myWorkers = await _dbContext.Permissions.Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug).Include(a => a.Children).ThenInclude(a => a.User)
@@ -247,7 +247,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> ApproveExpenses(int[] expenseIds)
+        public async Task<ActionResult> ApproveExpenses([FromBody] int[] expenseIds)
         {
             var expenses = await _dbContext.Expenses
                 .Where(a => expenseIds.Contains(a.Id) && a.Project.Team.Slug == TeamSlug && !a.Approved)
