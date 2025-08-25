@@ -150,7 +150,12 @@ export const ExpenseTable = (props: Props) => {
                           </Button>
                           <Button
                             color="link"
-                            onClick={() => approveExpense(data.row.original)}
+                            onClick={() =>
+                              alert(
+                                "TODO: Implement edit functionality" +
+                                  JSON.stringify(data.row.original)
+                              )
+                            }
                             title="Edit Expense"
                             style={{
                               padding: "0.25rem 0.1rem",
