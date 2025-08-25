@@ -16,6 +16,8 @@ interface Props {
   deleteExpense: (expense: Expense) => void;
   showActions: boolean;
   showProject: boolean;
+  showApprove: boolean;
+  approveExpense?: (expense: Expense) => void;
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -25,7 +27,7 @@ export const ExpenseTable = (props: Props) => {
   const [showProject] = useState(props.showProject);
   const { team } = useParams<CommonRouteParams>();
 
-  const { deleteExpense, showActions } = props;
+  const { deleteExpense, showActions, approveExpense, showApprove } = props;
 
   const handleRowClick = (expense: Expense) => {
     setSelectedExpense(expense);
@@ -123,6 +125,17 @@ export const ExpenseTable = (props: Props) => {
                   >
                     <FontAwesomeIcon icon={faTrash} />
                   </Button>
+                  {showApprove &&
+                    !data.row.original.approved &&
+                    approveExpense && (
+                      <Button
+                        color="link"
+                        onClick={() => approveExpense(data.row.original)}
+                        title="Approve Expense"
+                      >
+                        <FontAwesomeIcon icon={faCheck} />
+                      </Button>
+                    )}
                 </ShowFor>
               ),
             },
