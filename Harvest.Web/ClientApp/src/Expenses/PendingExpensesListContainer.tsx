@@ -105,6 +105,9 @@ export const PendingExpensesListContainer = (props: Props) => {
     setNotification(request, "Approving All Expenses", async (response) => {
       let approvedCount = 0;
       if (getIsMounted()) {
+        const result = (await response.json()) as Expense[];
+        //Possibly we could show these and disable the approve buttons
+
         // Refresh the page data
         let url = `/api/${team}/Expense/GetMyPendingExpenses`;
         if (showAll) {
@@ -115,7 +118,7 @@ export const PendingExpensesListContainer = (props: Props) => {
         if (refreshResponse.ok) {
           const refreshedExpenses: Expense[] = await refreshResponse.json();
           // Calculate how many were actually approved by comparing the counts
-          approvedCount = expenseCount - refreshedExpenses.length;
+          approvedCount = result.length;
           setExpenses(refreshedExpenses);
         }
       }
