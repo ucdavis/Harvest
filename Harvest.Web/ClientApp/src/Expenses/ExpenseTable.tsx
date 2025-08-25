@@ -18,6 +18,7 @@ interface Props {
   showProject: boolean;
   showApprove: boolean;
   approveExpense?: (expense: Expense) => void;
+  showExport?: boolean;
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -207,6 +208,7 @@ export const ExpenseTable = (props: Props) => {
         data={expenseData}
         initialState={initialState}
         onRowClick={handleRowClick}
+        enableExport={props.showExport ?? false}
       />
       <ExpenseDetailsModal
         expense={selectedExpense}
