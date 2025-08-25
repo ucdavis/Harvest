@@ -8,11 +8,13 @@ import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
 import { useParams } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   expenses: Expense[];
   deleteExpense: (expense: Expense) => void;
-  canDeleteExpense: boolean;
+  showActions: boolean;
   showProject: boolean;
 }
 
@@ -23,7 +25,7 @@ export const ExpenseTable = (props: Props) => {
   const [showProject] = useState(props.showProject);
   const { team } = useParams<CommonRouteParams>();
 
-  const { deleteExpense, canDeleteExpense } = props;
+  const { deleteExpense, showActions } = props;
 
   const handleRowClick = (expense: Expense) => {
     setSelectedExpense(expense);
@@ -108,17 +110,18 @@ export const ExpenseTable = (props: Props) => {
             : "N/A",
       },
 
-      ...(canDeleteExpense
+      ...(showActions
         ? [
             {
-              Header: "Delete",
+              Header: "Actions",
               Cell: (data: any) => (
                 <ShowFor roles={["FieldManager", "Supervisor"]}>
                   <Button
                     color="link"
                     onClick={() => deleteExpense(data.row.original)}
+                    title="Delete Expense"
                   >
-                    Delete
+                    <FontAwesomeIcon icon={faTrash} />
                   </Button>
                 </ShowFor>
               ),
@@ -126,7 +129,7 @@ export const ExpenseTable = (props: Props) => {
           ]
         : []),
     ],
-    [deleteExpense, canDeleteExpense]
+    [deleteExpense, showActions]
   );
 
   const initialState: Partial<TableState<any>> = {

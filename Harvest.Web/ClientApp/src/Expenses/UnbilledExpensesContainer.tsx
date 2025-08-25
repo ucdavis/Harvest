@@ -170,7 +170,7 @@ export const UnbilledExpensesContainer = (props: Props) => {
           <ExpenseTable
             expenses={expenses}
             deleteExpense={deleteExpense}
-            canDeleteExpense={
+            showActions={
               !notification.pending &&
               project?.status !== "PendingCloseoutApproval"
             }

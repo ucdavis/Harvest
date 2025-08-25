@@ -151,7 +151,7 @@ export const PendingExpensesListContainer = (props: Props) => {
       <ExpenseTable
         expenses={expenses}
         deleteExpense={deleteExpense}
-        canDeleteExpense={!notification.pending}
+        showActions={!notification.pending}
         showProject={true}
       ></ExpenseTable>
     </div>
