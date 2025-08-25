@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Cell, Column, TableState } from "react-table";
-import { Button } from "reactstrap";
+import { Button, UncontrolledTooltip } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
 import { ReactTableUtil } from "../Shared/TableUtil";
 import { CommonRouteParams, Expense } from "../types";
@@ -126,11 +126,17 @@ export const ExpenseTable = (props: Props) => {
                   >
                     <Button
                       color="link"
+                      id={`deleteExpense-${data.row.original.id}`}
                       onClick={() => deleteExpense(data.row.original)}
-                      title="Delete Expense"
                       style={{ padding: "0.25rem 0.1rem", margin: "0" }}
                     >
                       <FontAwesomeIcon icon={faTrash} />
+                      <UncontrolledTooltip
+                        placement="top"
+                        target={`deleteExpense-${data.row.original.id}`}
+                      >
+                        Delete Expense
+                      </UncontrolledTooltip>
                     </Button>
                     {showApprove &&
                       !data.row.original.approved &&
@@ -138,8 +144,8 @@ export const ExpenseTable = (props: Props) => {
                         <>
                           <Button
                             color="link"
+                            id={`approveExpense-${data.row.original.id}`}
                             onClick={() => approveExpense(data.row.original)}
-                            title="Approve Expense"
                             style={{
                               padding: "0.25rem 0.1rem",
                               margin: "0",
@@ -147,16 +153,22 @@ export const ExpenseTable = (props: Props) => {
                             }}
                           >
                             <FontAwesomeIcon icon={faCheck} />
+                            <UncontrolledTooltip
+                              placement="top"
+                              target={`approveExpense-${data.row.original.id}`}
+                            >
+                              Approve Expense
+                            </UncontrolledTooltip>
                           </Button>
                           <Button
                             color="link"
+                            id={`editExpense-${data.row.original.id}`}
                             onClick={() =>
                               alert(
                                 "TODO: Implement edit functionality" +
                                   JSON.stringify(data.row.original)
                               )
                             }
-                            title="Edit Expense"
                             style={{
                               padding: "0.25rem 0.1rem",
                               margin: "0",
@@ -164,6 +176,12 @@ export const ExpenseTable = (props: Props) => {
                             }}
                           >
                             <FontAwesomeIcon icon={faEdit} />
+                            <UncontrolledTooltip
+                              placement="top"
+                              target={`editExpense-${data.row.original.id}`}
+                            >
+                              Edit Expense
+                            </UncontrolledTooltip>
                           </Button>
                         </>
                       )}
