@@ -207,6 +207,7 @@ export const ExpenseTable = (props: Props) => {
         data={expenseData}
         initialState={initialState}
         onRowClick={handleRowClick}
+        enableExport={true}
       />
       <ExpenseDetailsModal
         expense={selectedExpense}
