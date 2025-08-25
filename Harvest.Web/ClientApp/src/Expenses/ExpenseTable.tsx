@@ -9,7 +9,7 @@ import { ShowFor } from "../Shared/ShowFor";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
 import { useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   expenses: Expense[];
@@ -118,31 +118,58 @@ export const ExpenseTable = (props: Props) => {
               Header: "Actions",
               Cell: (data: any) => (
                 <ShowFor roles={["FieldManager", "Supervisor"]}>
-                  <Button
-                    color="link"
-                    onClick={() => deleteExpense(data.row.original)}
-                    title="Delete Expense"
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
                   >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </Button>
-                  {showApprove &&
-                    !data.row.original.approved &&
-                    approveExpense && (
-                      <Button
-                        color="link"
-                        onClick={() => approveExpense(data.row.original)}
-                        title="Approve Expense"
-                      >
-                        <FontAwesomeIcon icon={faCheck} />
-                      </Button>
-                    )}
+                    <Button
+                      color="link"
+                      onClick={() => deleteExpense(data.row.original)}
+                      title="Delete Expense"
+                      style={{ padding: "0.25rem 0.1rem", margin: "0" }}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </Button>
+                    {showApprove &&
+                      !data.row.original.approved &&
+                      approveExpense && (
+                        <>
+                          <Button
+                            color="link"
+                            onClick={() => approveExpense(data.row.original)}
+                            title="Approve Expense"
+                            style={{
+                              padding: "0.25rem 0.1rem",
+                              margin: "0",
+                              marginLeft: "0.25rem",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faCheck} />
+                          </Button>
+                          <Button
+                            color="link"
+                            onClick={() => approveExpense(data.row.original)}
+                            title="Edit Expense"
+                            style={{
+                              padding: "0.25rem 0.1rem",
+                              margin: "0",
+                              marginLeft: "0.25rem",
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faEdit} />
+                          </Button>
+                        </>
+                      )}
+                  </div>
                 </ShowFor>
               ),
             },
           ]
         : []),
     ],
-    [deleteExpense, showActions]
+    [deleteExpense, showActions, approveExpense, showApprove, showProject, team]
   );
 
   const initialState: Partial<TableState<any>> = {
