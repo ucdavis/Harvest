@@ -7,7 +7,7 @@ import {
   usePagination,
 } from "react-table";
 import { ColumnFilterHeaders, DefaultColumnFilter } from "./Filtering";
-import { PaginationItem, PaginationLink, Button } from "reactstrap";
+import { PaginationItem, PaginationLink } from "reactstrap";
 import { ReactTableUtil } from "./TableUtil";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -126,16 +126,16 @@ export const ReactTable = ({
   return (
     <>
       {enableExport && (
-        <div className="mb-3 d-flex justify-content-end">
-          <Button
-            color="primary"
-            size="sm"
+        <div className="mb-2">
+          <button
+            type="button"
             onClick={exportToCSV}
             title="Export all data to CSV"
+            className="btn btn-link p-0 text-primary"
+            style={{ textDecoration: "none" }}
           >
-            <FontAwesomeIcon icon={faDownload} className="me-1" />
-            Export CSV
-          </Button>
+            <FontAwesomeIcon icon={faDownload} className="me-1" /> Export CSV
+          </button>
         </div>
       )}
       <table
