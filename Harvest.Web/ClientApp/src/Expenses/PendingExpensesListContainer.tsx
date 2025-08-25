@@ -78,6 +78,46 @@ export const PendingExpensesListContainer = (props: Props) => {
     });
   };
 
+  const approveExpense = async (expense: Expense) => {
+    // Determine which API endpoint to use based on showAll
+    const endpoint = showAll
+      ? `/api/${team}/Expense/ApproveExpense`
+      : `/api/${team}/Expense/ApproveMyWorkerExpense`;
+
+    const request = authenticatedFetch(`${endpoint}?expenseId=${expense.id}`, {
+      method: "POST",
+    });
+
+    setNotification(request, "Approving Expense", async (response) => {
+      if (getIsMounted()) {
+        if (response.ok) {
+          // Remove the approved expense from the list
+          let expensesCopy = [...expenses];
+          const index = expensesCopy.findIndex(
+            (element) => element.id === expense.id
+          );
+          if (index !== -1) {
+            expensesCopy.splice(index, 1);
+            setExpenses(expensesCopy);
+          }
+
+          return "Expense Approved";
+        } else {
+          // Handle error cases
+          if (response.status === 404) {
+            throw new Error("Expense not found");
+          } else if (response.status === 400) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Bad request");
+          } else {
+            throw new Error("Failed to approve expense");
+          }
+        }
+      }
+      return "Expense Approved";
+    });
+  };
+
   const approveAllExpenses = async () => {
     if (expenses.length === 0) {
       return;
@@ -85,7 +125,6 @@ export const PendingExpensesListContainer = (props: Props) => {
 
     // Get all expense IDs
     const expenseIds = expenses.map((expense) => expense.id);
-    const expenseCount = expenseIds.length;
 
     //console.log(expenseIds);
 
@@ -154,9 +193,7 @@ export const PendingExpensesListContainer = (props: Props) => {
         showActions={!notification.pending}
         showProject={true}
         showApprove={true}
-        approveExpense={() => {
-          alert("Approve Expense");
-        }}
+        approveExpense={approveExpense}
       ></ExpenseTable>
     </div>
   );
