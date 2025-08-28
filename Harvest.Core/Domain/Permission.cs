@@ -37,11 +37,17 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Permission> Children { get; set; } = new();
 
+        #nullable enable
+        public byte[]? Hash { get; set; }
+        public byte[]? Salt { get; set; }
+        public byte[]? Lookup { get; set; }
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Permission>().HasIndex(a => a.RoleId);
             modelBuilder.Entity<Permission>().HasIndex(a => a.UserId);
             modelBuilder.Entity<Permission>().HasIndex(a => a.TeamId);
+            modelBuilder.Entity<Permission>().HasIndex(a => a.Lookup);
 
             // Self-referencing many-to-many relationship
             modelBuilder.Entity<Permission>()
