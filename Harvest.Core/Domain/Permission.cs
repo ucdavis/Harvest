@@ -37,9 +37,12 @@ namespace Harvest.Core.Domain
         [JsonIgnore]
         public List<Permission> Children { get; set; } = new();
 
-        #nullable enable
+#nullable enable
+        [MaxLength(32)]
         public byte[]? Hash { get; set; }
+        [MaxLength(16)]
         public byte[]? Salt { get; set; }
+        [MaxLength(32)]
         public byte[]? Lookup { get; set; }
 
         internal static void OnModelCreating(ModelBuilder modelBuilder)

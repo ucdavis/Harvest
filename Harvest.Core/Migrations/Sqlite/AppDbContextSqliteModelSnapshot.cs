@@ -309,15 +309,18 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("Hash")
+                        .HasMaxLength(32)
                         .HasColumnType("BLOB");
 
                     b.Property<byte[]>("Lookup")
+                        .HasMaxLength(32)
                         .HasColumnType("BLOB");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("Salt")
+                        .HasMaxLength(16)
                         .HasColumnType("BLOB");
 
                     b.Property<int?>("TeamId")
