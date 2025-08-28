@@ -425,4 +425,5 @@ export interface CommonRouteParams {
   projectId?: string;
   ticketId?: string;
   shareId?: string;
+  expenseId?: string;
 }

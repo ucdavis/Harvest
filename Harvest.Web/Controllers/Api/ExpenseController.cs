@@ -53,7 +53,7 @@ namespace Harvest.Web.Controllers.Api
                 expense.InvoiceId = null;
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                 expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
-                if(autoApprove)
+                if (autoApprove)
                 {
                     expense.Approved = true;
                     expense.ApprovedBy = user;
@@ -68,6 +68,47 @@ namespace Harvest.Web.Controllers.Api
             await _dbContext.SaveChangesAsync();
 
             return Ok(expenses);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Route("/api/{team}/Expense/Get/{expenseId}")]
+        public async Task<ActionResult> Get(int expenseId)
+        {
+            var user = await _userService.GetCurrentUser();
+            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager });
+
+            var expense = await _dbContext.Expenses
+                .Include(e => e.Project)
+                .Include(e => e.Rate)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
+                .SingleOrDefaultAsync(e => e.Id == expenseId && e.Project.Team.Slug == TeamSlug);
+
+            if (expense == null)
+            {
+                return NotFound();
+            }
+
+            if (!isFieldManager)
+            {
+                // Check if the worker belongs to the supervisor
+                var myWorkers = await _dbContext.Permissions
+                    .Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug)
+                    .Include(a => a.Children)
+                    .ThenInclude(a => a.User)
+                    .SelectMany(a => a.Children)
+                    .Select(a => a.User)
+                    .Select(a => a.Id)
+                    .ToListAsync();
+
+                if (expense.CreatedById == null || !myWorkers.Contains(expense.CreatedById.Value))
+                {
+                    return Forbid("You can only view expenses created by your workers.");
+                }
+            }
+
+            return Ok(expense);
         }
 
         [HttpPost]
@@ -88,12 +129,13 @@ namespace Harvest.Web.Controllers.Api
 
             //Only unbilled and unapproved expenses can be edited
             var expenseIds = expenses.Where(e => e.Id != 0).Select(e => e.Id).Distinct().ToArray();
-            if(expenseIds.Length == 0)
+            if (expenseIds.Length == 0)
             {
                 return BadRequest("At least one expense must already exist to do an edit.");
             }
 
-            if(expenseIds.Length > 1) {
+            if (expenseIds.Length > 1)
+            {
                 return BadRequest("Only one expense can be edited at a time.");
             }
 
@@ -127,17 +169,17 @@ namespace Harvest.Web.Controllers.Api
             var expense = expenses.Single(e => e.Id == existingExpense.Id); //Get the one we are editing            
             existingExpense.Activity = expense.Activity;
             existingExpense.Description = expense.Description;
-            existingExpense.Type = expense.Type;            
+            existingExpense.Type = expense.Type;
             existingExpense.Quantity = expense.Quantity;
             existingExpense.Markup = expense.Markup;
-            existingExpense.Rate = expense.Rate;
+            //existingExpense.Rate = expense.Rate;
             existingExpense.RateId = expense.RateId;
             existingExpense.Price = expense.Price;
             existingExpense.Total = expense.Total;
             existingExpense.CreatedOn = DateTime.UtcNow;
             existingExpense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
             existingExpense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
-            if(existingExpense.Total <= 0)
+            if (existingExpense.Total <= 0)
             {
                 return BadRequest("Maybe the expense was removed. Can't do that.");
             }
@@ -162,8 +204,9 @@ namespace Harvest.Web.Controllers.Api
             if (newExpenses.Count > 0)
             {
                 _dbContext.Expenses.AddRange(newExpenses);
+                await _historyService.ExpensesCreated(projectId, newExpenses); //TODO: Change to edited?
             }
-            await _historyService.ExpensesCreated(projectId, expenses); //TODO: Change to edited?
+            
 
             await _dbContext.SaveChangesAsync();
 

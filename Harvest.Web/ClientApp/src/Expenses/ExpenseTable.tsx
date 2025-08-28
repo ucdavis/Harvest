@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { Cell, Column, TableState } from "react-table";
 import { Button, UncontrolledTooltip } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
@@ -7,7 +7,7 @@ import { CommonRouteParams, Expense } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 
@@ -26,7 +26,8 @@ export const ExpenseTable = (props: Props) => {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showProject] = useState(props.showProject);
-  const { team } = useParams<CommonRouteParams>();
+  const { team, projectId } = useParams<CommonRouteParams>();
+  const history = useHistory();
 
   const { deleteExpense, showActions, approveExpense, showApprove } = props;
 
@@ -41,6 +42,17 @@ export const ExpenseTable = (props: Props) => {
       setSelectedExpense(null);
     }
   };
+
+  const handleEditExpense = useCallback(
+    (expense: Expense) => {
+      // Try to get project ID from the current route params first, then from expense
+      const targetProjectId = projectId || expense.project?.id;
+      if (targetProjectId) {
+        history.push(`/${team}/expense/edit/${targetProjectId}/${expense.id}`);
+      }
+    },
+    [history, team, projectId]
+  );
 
   const columns: Column<Expense>[] = useMemo(
     () => [
@@ -164,12 +176,7 @@ export const ExpenseTable = (props: Props) => {
                           <Button
                             color="link"
                             id={`editExpense-${data.row.original.id}`}
-                            onClick={() =>
-                              alert(
-                                "TODO: Implement edit functionality" +
-                                  JSON.stringify(data.row.original)
-                              )
-                            }
+                            onClick={() => handleEditExpense(data.row.original)}
                             style={{
                               padding: "0.25rem 0.1rem",
                               margin: "0",
@@ -193,7 +200,15 @@ export const ExpenseTable = (props: Props) => {
           ]
         : []),
     ],
-    [deleteExpense, showActions, approveExpense, showApprove, showProject, team]
+    [
+      deleteExpense,
+      showActions,
+      approveExpense,
+      showApprove,
+      showProject,
+      team,
+      handleEditExpense,
+    ]
   );
 
   const initialState: Partial<TableState<any>> = {
