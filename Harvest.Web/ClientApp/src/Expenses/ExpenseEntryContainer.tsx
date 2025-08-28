@@ -136,15 +136,29 @@ export const ExpenseEntryContainer = () => {
   }, [isEditMode, activities.length]);
 
   const leavePage = useCallback(() => {
+    if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
+      // Check if we should return to the pending expenses list
+      const returnToShowAll = query.get(ExpenseQueryParams.ReturnToShowAll);
+      if (returnToShowAll !== null) {
+        // Navigate to the appropriate pending expenses page
+        if (returnToShowAll === "true") {
+          history.push(`/${team}/expense/GetAllPendingExpenses`);
+        } else {
+          history.push(`/${team}/expense/GetMyPendingExpenses`);
+        }
+        return;
+      }
+      // Default fallback to history.goBack()
+      history.goBack();
+      return;
+    }
+
+    // Original logic for non-return cases
     // go to the project page unless you are a worker -- worker can't see the project page
     if (roles.includes("Worker")) {
       history.push(`/${team}/team`);
     } else {
-      if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
-        history.goBack();
-      } else {
-        history.push(`/${team}/project/details/${projectId}`);
-      }
+      history.push(`/${team}/project/details/${projectId}`);
     }
   }, [projectId, history, query, roles, team]);
 

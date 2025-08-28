@@ -157,6 +157,7 @@ export interface AdhocProjectModel {
 
 export enum ExpenseQueryParams {
   ReturnOnSubmit = "returnOnSubmit",
+  ReturnToShowAll = "returnToShowAll",
 }
 
 export interface Transfer {

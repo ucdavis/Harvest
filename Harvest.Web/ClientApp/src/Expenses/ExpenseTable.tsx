@@ -19,6 +19,7 @@ interface Props {
   showApprove: boolean;
   approveExpense?: (expense: Expense) => void;
   showExport?: boolean;
+  showAll?: boolean; // indicates if we're showing all expenses or just user's workers
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -48,10 +49,21 @@ export const ExpenseTable = (props: Props) => {
       // Try to get project ID from the current route params first, then from expense
       const targetProjectId = projectId || expense.project?.id;
       if (targetProjectId) {
-        history.push(`/${team}/expense/edit/${targetProjectId}/${expense.id}`);
+        // Add query parameters to indicate return path
+        const searchParams = new URLSearchParams();
+        searchParams.set("returnOnSubmit", "true");
+        if (props.showAll !== undefined) {
+          searchParams.set("returnToShowAll", props.showAll.toString());
+        }
+
+        history.push(
+          `/${team}/expense/edit/${targetProjectId}/${
+            expense.id
+          }?${searchParams.toString()}`
+        );
       }
     },
-    [history, team, projectId]
+    [history, team, projectId, props.showAll]
   );
 
   const columns: Column<Expense>[] = useMemo(

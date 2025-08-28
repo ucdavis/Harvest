@@ -195,6 +195,7 @@ export const PendingExpensesListContainer = (props: Props) => {
         showApprove={true}
         approveExpense={approveExpense}
         showExport={true}
+        showAll={showAll}
       ></ExpenseTable>
     </div>
   );
