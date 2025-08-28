@@ -308,8 +308,17 @@ namespace Harvest.Core.Migrations.Sqlite
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("Hash")
+                        .HasColumnType("BLOB");
+
+                    b.Property<byte[]>("Lookup")
+                        .HasColumnType("BLOB");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Salt")
+                        .HasColumnType("BLOB");
 
                     b.Property<int?>("TeamId")
                         .HasColumnType("INTEGER");
@@ -318,6 +327,8 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Lookup");
 
                     b.HasIndex("RoleId");
 
