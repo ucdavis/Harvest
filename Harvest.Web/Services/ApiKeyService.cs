@@ -49,13 +49,12 @@ namespace Harvest.Web.Services
             _dbContext = dbContext;
             _authSettings = authSettings.Value;
             // Get the server HMAC key from configuration
-            var serverSecret = _authSettings.ApiSecret;
-            if (string.IsNullOrEmpty(serverSecret))
+            if (string.IsNullOrEmpty(_authSettings.ApiSecret) || _authSettings.ApiSecret == "[External]")
             {
                 throw new InvalidOperationException("ApiSecret configuration is required");
             }
             
-            _lookupHmacKey = Encoding.UTF8.GetBytes(serverSecret);
+            _lookupHmacKey = Encoding.UTF8.GetBytes(_authSettings.ApiSecret);
         }
 
 
