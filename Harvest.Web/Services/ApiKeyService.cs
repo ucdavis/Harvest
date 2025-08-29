@@ -1,33 +1,58 @@
+using Harvest.Core.Data;
+using Harvest.Core.Domain;
+using Harvest.Web.Models.Settings;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Harvest.Core.Data;
-using Harvest.Core.Domain;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 
-namespace Harvest.Core.Services
+namespace Harvest.Web.Services
 {
+    public interface IApiKeyService
+    {
+        /// <summary>
+        /// Generates a new API key for the specified permission, revoking any existing key
+        /// </summary>
+        /// <param name="permissionId">The permission ID to generate a key for</param>
+        /// <returns>The generated API key (base64url encoded)</returns>
+        Task<string> GenerateApiKeyAsync(int permissionId);
+
+        /// <summary>
+        /// Validates an API key against stored hashes
+        /// </summary>
+        /// <param name="apiKey">The API key to validate</param>
+        /// <returns>The permission if valid, null otherwise</returns>
+        Task<Permission> ValidateApiKeyAsync(string apiKey);
+
+        /// <summary>
+        /// Revokes an API key for the specified permission
+        /// </summary>
+        /// <param name="permissionId">The permission ID to revoke the key for</param>
+        Task RevokeApiKeyAsync(int permissionId);
+    }
+
     public class ApiKeyService : IApiKeyService
     {
         private readonly AppDbContext _dbContext;
         private readonly byte[] _lookupHmacKey;
+        private readonly AuthSettings _authSettings;
         const int HashIterations = 100000;
         const int OutputLength = 32; // 256 bits
 
 
-        public ApiKeyService(AppDbContext dbContext, IConfiguration configuration)
+        public ApiKeyService(AppDbContext dbContext, IOptions<AuthSettings> authSettings)
         {
             _dbContext = dbContext;
-            
+            _authSettings = authSettings.Value;
             // Get the server HMAC key from configuration
-            var serverSecret = configuration["ApiKeys:ServerSecret"];
+            var serverSecret = _authSettings.ApiSecret;
             if (string.IsNullOrEmpty(serverSecret))
             {
-                throw new InvalidOperationException("ApiKeys:ServerSecret configuration is required");
+                throw new InvalidOperationException("ApiSecret configuration is required");
             }
             
             _lookupHmacKey = Encoding.UTF8.GetBytes(serverSecret);
