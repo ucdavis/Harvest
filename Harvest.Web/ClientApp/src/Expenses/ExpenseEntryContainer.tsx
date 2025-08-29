@@ -283,7 +283,19 @@ export const ExpenseEntryContainer = () => {
       body: JSON.stringify(expensesBody),
     });
 
-    setNotification(request, pendingMessage, successMessage);
+    setNotification(request, pendingMessage, successMessage, async (error) => {
+      // Handle error cases
+      if (error.status === 404) {
+        return isEditMode ? "Expense not found" : "Project not found";
+      } else if (error.status === 400) {
+        const errorText = await error.text();
+        return errorText || "Bad request";
+      } else {
+        return isEditMode
+          ? "Failed to update expense"
+          : "Failed to save expenses";
+      }
+    });
 
     const response = await request;
 

@@ -131,7 +131,7 @@ namespace Harvest.Web.Controllers.Api
             var expenseIds = expenses.Where(e => e.Id != 0).Select(e => e.Id).Distinct().ToArray();
             if (expenseIds.Length == 0)
             {
-                return BadRequest("At least one expense must already exist to do an edit.");
+                return BadRequest("At least one expense must already exist to do an edit. (You can't completely remove the type (Labor, Expense, Other) without replacing that.)");
             }
 
             if (expenseIds.Length > 1)
