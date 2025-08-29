@@ -130,6 +130,7 @@ namespace Harvest.Web.Services
 
                 var permission = await _dbContext.Permissions
                     .Where(p => p.Lookup != null && p.Lookup.SequenceEqual(lookupHmac))
+                    .AsNoTracking()
                     .SingleOrDefaultAsync();
 
                 if (permission == null)
