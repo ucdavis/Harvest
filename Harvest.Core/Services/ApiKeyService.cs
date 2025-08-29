@@ -15,6 +15,9 @@ namespace Harvest.Core.Services
     {
         private readonly AppDbContext _dbContext;
         private readonly byte[] _lookupHmacKey;
+        const int HashIterations = 100000;
+        const int OutputLength = 32; // 256 bits
+
 
         public ApiKeyService(AppDbContext dbContext, IConfiguration configuration)
         {
@@ -30,12 +33,19 @@ namespace Harvest.Core.Services
             _lookupHmacKey = Encoding.UTF8.GetBytes(serverSecret);
         }
 
+
+        /// <summary>
+        /// The returned APIKey is not saved. It will be stored or saved in the mobile app.
+        /// </summary>
+        /// <param name="permissionId"></param>
+        /// <returns>A string API Key that is used in ValidateApiKeyAsync to lookup and validate the user</returns>
+        /// <exception cref="ArgumentException"></exception>
         public async Task<string> GenerateApiKeyAsync(int permissionId)
         {
             var permission = await _dbContext.Permissions.FindAsync(permissionId);
             if (permission == null)
             {
-                throw new ArgumentException("Permission not found", nameof(permissionId));
+                throw new ArgumentException("Permission not found", nameof(permissionId)); 
             }
 
             // Generate a random 32-byte secret
@@ -50,7 +60,7 @@ namespace Harvest.Core.Services
             RandomNumberGenerator.Fill(salt);
 
             // Create hash using PBKDF2
-            var hash = Rfc2898DeriveBytes.Pbkdf2(secret, salt, 100000, HashAlgorithmName.SHA256, 32);
+            var hash = Rfc2898DeriveBytes.Pbkdf2(secret, salt, HashIterations, HashAlgorithmName.SHA256, OutputLength);
 
             // Create lookup HMAC
             byte[] lookupHmac;
@@ -69,6 +79,11 @@ namespace Harvest.Core.Services
             return apiKey;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="apiKey">The value that was returned by GenerateApiKeyAsync</param>
+        /// <returns>The Permission if found and validated</returns>
         public async Task<Permission> ValidateApiKeyAsync(string apiKey)
         {
             if (string.IsNullOrEmpty(apiKey))
@@ -88,15 +103,18 @@ namespace Harvest.Core.Services
                     lookupHmac = hmac.ComputeHash(secret);
                 }
 
-                // Find permission by lookup - get all permissions with lookups and compare in memory
-                var permissions = await _dbContext.Permissions
+
+                var permission = await _dbContext.Permissions
                     .Include(p => p.User)
                     .Include(p => p.Role)
                     .Include(p => p.Team)
-                    .Where(p => p.Lookup != null)
-                    .ToListAsync();
+                    .Where(p => p.Lookup != null && p.Lookup.SequenceEqual(lookupHmac))
+                    .SingleOrDefaultAsync();
 
-                var permission = permissions.FirstOrDefault(p => p.Lookup.SequenceEqual(lookupHmac));
+                if (permission == null)
+                {
+                    return null;
+                }
 
                 if (permission?.Salt == null || permission.Hash == null)
                 {
@@ -104,7 +122,7 @@ namespace Harvest.Core.Services
                 }
 
                 // Verify the hash
-                var computedHash = Rfc2898DeriveBytes.Pbkdf2(secret, permission.Salt, 100000, HashAlgorithmName.SHA256, 32);
+                var computedHash = Rfc2898DeriveBytes.Pbkdf2(secret, permission.Salt, HashIterations, HashAlgorithmName.SHA256, OutputLength);
                 
                 if (computedHash.SequenceEqual(permission.Hash))
                 {
