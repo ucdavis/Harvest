@@ -21,7 +21,7 @@ interface Props {
 
 export const PendingExpensesListContainer = (props: Props) => {
   const { team } = useParams<CommonRouteParams>();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<Expense[] | undefined>(undefined);
   const [showAll] = useState(props.showAll);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -46,6 +46,10 @@ export const PendingExpensesListContainer = (props: Props) => {
         if (getIsMounted()) {
           setExpenses(expenses);
         }
+      } else {
+        if (getIsMounted()) {
+          setExpenses([]);
+        }
       }
     };
 
@@ -65,7 +69,7 @@ export const PendingExpensesListContainer = (props: Props) => {
       }
     );
     setNotification(request, "Removing Expense", () => {
-      if (getIsMounted()) {
+      if (getIsMounted() && expenses) {
         let expensesCopy = [...expenses];
         const index = expensesCopy.findIndex(
           (element) => element.id === expense.id
@@ -92,13 +96,15 @@ export const PendingExpensesListContainer = (props: Props) => {
       if (getIsMounted()) {
         if (response.ok) {
           // Remove the approved expense from the list
-          let expensesCopy = [...expenses];
-          const index = expensesCopy.findIndex(
-            (element) => element.id === expense.id
-          );
-          if (index !== -1) {
-            expensesCopy.splice(index, 1);
-            setExpenses(expensesCopy);
+          if (expenses) {
+            let expensesCopy = [...expenses];
+            const index = expensesCopy.findIndex(
+              (element) => element.id === expense.id
+            );
+            if (index !== -1) {
+              expensesCopy.splice(index, 1);
+              setExpenses(expensesCopy);
+            }
           }
 
           return "Expense Approved";
@@ -119,7 +125,7 @@ export const PendingExpensesListContainer = (props: Props) => {
   };
 
   const approveAllExpenses = async () => {
-    if (expenses.length === 0) {
+    if (!expenses || expenses.length === 0) {
       return;
     }
 
@@ -180,23 +186,31 @@ export const PendingExpensesListContainer = (props: Props) => {
             id="ApproveAllButton"
             color="primary"
             onClick={approveAllExpenses}
-            disabled={notification.pending || expenses.length === 0}
+            disabled={
+              notification.pending || !expenses || expenses.length === 0
+            }
           >
             Approve All <FontAwesomeIcon icon={faCheck} />
           </Button>
         </div>
       </div>
 
-      <ExpenseTable
-        expenses={expenses}
-        deleteExpense={deleteExpense}
-        showActions={!notification.pending}
-        showProject={true}
-        showApprove={true}
-        approveExpense={approveExpense}
-        showExport={true}
-        showAll={showAll}
-      ></ExpenseTable>
+      {expenses === undefined ? (
+        <div className="text-center">
+          <p>Loading expenses...</p>
+        </div>
+      ) : (
+        <ExpenseTable
+          expenses={expenses}
+          deleteExpense={deleteExpense}
+          showActions={!notification.pending}
+          showProject={true}
+          showApprove={true}
+          approveExpense={approveExpense}
+          showExport={true}
+          showAll={showAll}
+        ></ExpenseTable>
+      )}
     </div>
   );
 };
