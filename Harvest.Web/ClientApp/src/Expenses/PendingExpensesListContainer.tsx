@@ -147,30 +147,45 @@ export const PendingExpensesListContainer = (props: Props) => {
       body: JSON.stringify(expenseIds),
     });
 
-    setNotification(request, "Approving All Expenses", async (response) => {
-      let approvedCount = 0;
-      if (getIsMounted()) {
-        const result = (await response.json()) as Expense[];
-        //Possibly we could show these and disable the approve buttons
+    setNotification(
+      request,
+      "Approving All Expenses",
+      async (response) => {
+        if (getIsMounted()) {
+          const result = (await response.json()) as Expense[];
+          //Possibly we could show these and disable the approve buttons
 
-        // Refresh the page data
-        let url = `/api/${team}/Expense/GetMyPendingExpenses`;
-        if (showAll) {
-          url = `/api/${team}/Expense/GetAllPendingExpenses`;
+          // Refresh the page data
+          let url = `/api/${team}/Expense/GetMyPendingExpenses`;
+          if (showAll) {
+            url = `/api/${team}/Expense/GetAllPendingExpenses`;
+          }
+
+          const refreshResponse = await authenticatedFetch(url);
+          if (refreshResponse.ok) {
+            const refreshedExpenses: Expense[] = await refreshResponse.json();
+            // Calculate how many were actually approved by comparing the counts
+            const approvedCount = result.length;
+            setExpenses(refreshedExpenses);
+            return `${approvedCount} Expense${
+              approvedCount === 1 ? "" : "s"
+            } Approved`;
+          }
         }
-
-        const refreshResponse = await authenticatedFetch(url);
-        if (refreshResponse.ok) {
-          const refreshedExpenses: Expense[] = await refreshResponse.json();
-          // Calculate how many were actually approved by comparing the counts
-          approvedCount = result.length;
-          setExpenses(refreshedExpenses);
+        return "Expenses processed";
+      },
+      async (error) => {
+        // Handle error cases
+        if (error.status === 404) {
+          return "Expenses not found";
+        } else if (error.status === 400) {
+          const errorText = await error.text();
+          return errorText || "Bad request";
+        } else {
+          return "Failed to approve expenses";
         }
       }
-      return `${approvedCount} Expense${
-        approvedCount === 1 ? "" : "s"
-      } Approved`;
-    });
+    );
   };
 
   return (
