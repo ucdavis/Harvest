@@ -129,9 +129,6 @@ namespace Harvest.Web.Services
 
 
                 var permission = await _dbContext.Permissions
-                    .Include(p => p.User)
-                    .Include(p => p.Role)
-                    .Include(p => p.Team)
                     .Where(p => p.Lookup != null && p.Lookup.SequenceEqual(lookupHmac))
                     .SingleOrDefaultAsync();
 
