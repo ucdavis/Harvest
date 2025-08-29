@@ -172,7 +172,7 @@ namespace Harvest.Web.Controllers.Api
             existingExpense.Type = expense.Type;
             existingExpense.Quantity = expense.Quantity;
             existingExpense.Markup = expense.Markup;
-            //existingExpense.Rate = expense.Rate;
+            //existingExpense.Rate = expense.Rate; Do not set this as it is a null value in the posted object, ends up deleting the expense.
             existingExpense.RateId = expense.RateId;
             existingExpense.Price = expense.Price;
             existingExpense.Total = expense.Total;
