@@ -326,6 +326,12 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.Property<int?>("TeamId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid?>("Token")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("TokenExpires")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("UserId")
                         .HasColumnType("INTEGER");
 

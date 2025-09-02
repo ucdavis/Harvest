@@ -38,7 +38,7 @@
                         <th>
                             Email
                         </th>
-                        <th></th>
+                        <th>Actions</th>
                 </thead>
                 <tbody>
                     @foreach (var item in Model.Children)
@@ -49,7 +49,8 @@
                             </td>
                             <td>@Html.DisplayFor(a => item.User.Email)</td>
                             <td>
-                                @Html.ActionLink("Remove", "RemoveWorkerFromSupervisor", "Permissions", new {id = Model.Id, workerId = item.Id }, null)
+
+                                <a asp-action="RemoveWorkerFromSupervisor" asp-route-id="@Model.Id" asp-route-workerId="@item.Id"><i class="fas fa-trash-alt"></i> Remove</a>
                             </td>
                         </tr>
                     }
@@ -68,7 +69,7 @@
                         <th>
                             Email
                         </th>
-                        <th></th>
+                        <th>Actions</th>
                 </thead>
                 <tbody>
                     @foreach (var item in Model.Parents)
@@ -79,7 +80,7 @@
                             </td>
                             <td>@Html.DisplayFor(a => item.User.Email)</td>
                             <td>
-                                @Html.ActionLink("Details", "Details", "Permissions", new { id = item.Id, workerId = Model.Id }, null)
+                                <a asp-action="Details" asp-route-id="@item.Id" asp-route-workerId="@Model.Id"><i class="fas fa-edit"></i> Manage</a>
                             </td>
                         </tr>
                     }

@@ -347,6 +347,12 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("Token")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("TokenExpires")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
