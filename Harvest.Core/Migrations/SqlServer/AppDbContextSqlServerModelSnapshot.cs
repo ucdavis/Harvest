@@ -329,8 +329,20 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<byte[]>("Hash")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<byte[]>("Lookup")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
+
+                    b.Property<byte[]>("Salt")
+                        .HasMaxLength(16)
+                        .HasColumnType("varbinary(16)");
 
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
@@ -339,6 +351,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Lookup");
 
                     b.HasIndex("RoleId");
 

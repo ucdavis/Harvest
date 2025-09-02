@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 import { Cell, Column, TableState } from "react-table";
 import { Button, UncontrolledTooltip } from "reactstrap";
 import { ReactTable } from "../Shared/ReactTable";
@@ -7,7 +7,7 @@ import { CommonRouteParams, Expense } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
 import { ShowFor } from "../Shared/ShowFor";
 import { ExpenseDetailsModal } from "./ExpenseDetailsModal";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTrash, faEdit } from "@fortawesome/free-solid-svg-icons";
 
@@ -19,6 +19,7 @@ interface Props {
   showApprove: boolean;
   approveExpense?: (expense: Expense) => void;
   showExport?: boolean;
+  showAll?: boolean; // indicates if we're showing all expenses or just user's workers
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -26,7 +27,8 @@ export const ExpenseTable = (props: Props) => {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showProject] = useState(props.showProject);
-  const { team } = useParams<CommonRouteParams>();
+  const { team, projectId } = useParams<CommonRouteParams>();
+  const history = useHistory();
 
   const { deleteExpense, showActions, approveExpense, showApprove } = props;
 
@@ -41,6 +43,28 @@ export const ExpenseTable = (props: Props) => {
       setSelectedExpense(null);
     }
   };
+
+  const handleEditExpense = useCallback(
+    (expense: Expense) => {
+      // Try to get project ID from the current route params first, then from expense
+      const targetProjectId = projectId || expense.project?.id;
+      if (targetProjectId) {
+        // Add query parameters to indicate return path
+        const searchParams = new URLSearchParams();
+        searchParams.set("returnOnSubmit", "true");
+        if (props.showAll !== undefined) {
+          searchParams.set("returnToShowAll", props.showAll.toString());
+        }
+
+        history.push(
+          `/${team}/expense/edit/${targetProjectId}/${
+            expense.id
+          }?${searchParams.toString()}`
+        );
+      }
+    },
+    [history, team, projectId, props.showAll]
+  );
 
   const columns: Column<Expense>[] = useMemo(
     () => [
@@ -62,6 +86,10 @@ export const ExpenseTable = (props: Props) => {
             },
           ]
         : []),
+      {
+        Header: "Activity",
+        accessor: (row) => row.activity || "N/A",
+      },
       {
         Header: "Type",
         accessor: (row) => row.type,
@@ -164,12 +192,7 @@ export const ExpenseTable = (props: Props) => {
                           <Button
                             color="link"
                             id={`editExpense-${data.row.original.id}`}
-                            onClick={() =>
-                              alert(
-                                "TODO: Implement edit functionality" +
-                                  JSON.stringify(data.row.original)
-                              )
-                            }
+                            onClick={() => handleEditExpense(data.row.original)}
                             style={{
                               padding: "0.25rem 0.1rem",
                               margin: "0",
@@ -193,7 +216,15 @@ export const ExpenseTable = (props: Props) => {
           ]
         : []),
     ],
-    [deleteExpense, showActions, approveExpense, showApprove, showProject, team]
+    [
+      deleteExpense,
+      showActions,
+      approveExpense,
+      showApprove,
+      showProject,
+      team,
+      handleEditExpense,
+    ]
   );
 
   const initialState: Partial<TableState<any>> = {

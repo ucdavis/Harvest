@@ -44,7 +44,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(11);
+            ControllerReflection.ControllerPublicMethods(13);
         }
 
         [Fact]
@@ -135,6 +135,23 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ApproveExpenses", countAdjustment + 3);
+
+            //12
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Edit", countAdjustment + 3);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Edit", countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Edit", countAdjustment + 3);
+
+            //13
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Get", countAdjustment + 4, showListOfAttributes: true);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 4);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Get", countAdjustment + 4);
+            routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("Get", countAdjustment + 4);
+            routeAttribute.ShouldNotBeNull();
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/Expense/Get/{expenseId}");
         }
 
     }
