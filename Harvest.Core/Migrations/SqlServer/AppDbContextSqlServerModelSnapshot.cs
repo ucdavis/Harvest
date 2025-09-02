@@ -329,9 +329,6 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime?>("Expires")
-                        .HasColumnType("datetime2");
-
                     b.Property<byte[]>("Hash")
                         .HasMaxLength(32)
                         .HasColumnType("varbinary(32)");
@@ -352,6 +349,9 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.Property<Guid?>("Token")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("TokenExpires")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

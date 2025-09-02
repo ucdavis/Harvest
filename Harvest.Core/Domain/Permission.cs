@@ -47,7 +47,7 @@ namespace Harvest.Core.Domain
 
         public Guid? Token { get; set; }
 
-        public DateTime? Expires { get; set; }
+        public DateTime? TokenExpires { get; set; }
 
 #nullable disable
 
