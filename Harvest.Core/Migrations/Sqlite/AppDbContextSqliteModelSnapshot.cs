@@ -308,9 +308,6 @@ namespace Harvest.Core.Migrations.Sqlite
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("Expires")
-                        .HasColumnType("TEXT");
-
                     b.Property<byte[]>("Hash")
                         .HasMaxLength(32)
                         .HasColumnType("BLOB");
@@ -330,6 +327,9 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasColumnType("INTEGER");
 
                     b.Property<Guid?>("Token")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("TokenExpires")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("UserId")
