@@ -145,6 +145,7 @@ export interface Expense {
   approvedBy?: User;
   approvedOn?: Date;
   approved: boolean;
+  project?: Project;
 }
 
 export interface AdhocProjectModel {
@@ -156,6 +157,7 @@ export interface AdhocProjectModel {
 
 export enum ExpenseQueryParams {
   ReturnOnSubmit = "returnOnSubmit",
+  ReturnToShowAll = "returnToShowAll",
 }
 
 export interface Transfer {
@@ -424,4 +426,5 @@ export interface CommonRouteParams {
   projectId?: string;
   ticketId?: string;
   shareId?: string;
+  expenseId?: string;
 }

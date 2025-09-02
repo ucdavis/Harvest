@@ -170,10 +170,12 @@ export const UnbilledExpensesContainer = (props: Props) => {
           <ExpenseTable
             expenses={expenses}
             deleteExpense={deleteExpense}
-            canDeleteExpense={
+            showActions={
               !notification.pending &&
               project?.status !== "PendingCloseoutApproval"
             }
+            showProject={false}
+            showApprove={false} //If we want to be able to do this here, we have to query more info to see if the worker belongs to the supervisor. We could always show for the Field Manager.
           ></ExpenseTable>
         )}
       </div>

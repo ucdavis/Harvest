@@ -81,6 +81,14 @@ export const ExpenseDetailsModal = ({ expense, isOpen, toggle }: Props) => {
                   : "N/A"}
               </td>
             </tr>
+            {expense.project && (
+              <tr>
+                <th>Project</th>
+                <td>
+                  {expense.project.name} ({expense.project.id})
+                </td>
+              </tr>
+            )}
           </tbody>
         </Table>
       </ModalBody>
