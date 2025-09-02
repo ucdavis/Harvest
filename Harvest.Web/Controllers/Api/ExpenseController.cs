@@ -43,6 +43,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             var user = await _userService.GetCurrentUser();
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
@@ -52,11 +53,160 @@ namespace Harvest.Web.Controllers.Api
                 expense.InvoiceId = null;
                 expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                 expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                if (autoApprove)
+                {
+                    expense.Approved = true;
+                    expense.ApprovedBy = user;
+                    expense.ApprovedOn = DateTime.UtcNow;
+                }
             }
 
             _dbContext.Expenses.AddRange(expenses);
 
             await _historyService.ExpensesCreated(projectId, expenses);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(expenses);
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        [Route("/api/{team}/Expense/Get/{expenseId}")]
+        public async Task<ActionResult> Get(int expenseId)
+        {
+            var user = await _userService.GetCurrentUser();
+            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.System });
+
+            var expense = await _dbContext.Expenses
+                .Include(e => e.Project)
+                .Include(e => e.Rate)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
+                .SingleOrDefaultAsync(e => e.Id == expenseId && e.Project.Team.Slug == TeamSlug);
+
+            if (expense == null)
+            {
+                return NotFound();
+            }
+
+            if (!isFieldManager)
+            {
+                // Check if the worker belongs to the supervisor
+                var myWorkers = await _dbContext.Permissions
+                    .Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug)
+                    .Include(a => a.Children)
+                    .ThenInclude(a => a.User)
+                    .SelectMany(a => a.Children)
+                    .Select(a => a.User)
+                    .Select(a => a.Id)
+                    .ToListAsync();
+
+                if (expense.CreatedById == null || !myWorkers.Contains(expense.CreatedById.Value))
+                {
+                    return Forbid("You can only view expenses created by your workers.");
+                }
+            }
+
+            return Ok(expense);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<ActionResult> Edit(int projectId, [FromBody] Expense[] expenses)
+        {
+            //When editing, new expenses can be added, but at least one must already exist.
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project.Status != Project.Statuses.Active
+                && project.Status != Project.Statuses.AwaitingCloseout
+                && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
+            }
+
+            var user = await _userService.GetCurrentUser();
+            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.System });
+
+            //Only unbilled and unapproved expenses can be edited
+            var expenseIds = expenses.Where(e => e.Id != 0).Select(e => e.Id).Distinct().ToArray();
+            if (expenseIds.Length == 0)
+            {
+                return BadRequest("At least one expense must already exist to do an edit. (You can't completely remove the type (Labor, Expense, Other) without replacing that.)");
+            }
+
+            if (expenseIds.Length > 1)
+            {
+                return BadRequest("Only one expense can be edited at a time.");
+            }
+
+            var existingExpense = await _dbContext.Expenses.Include(e => e.Project).SingleOrDefaultAsync(e => e.Id == expenseIds[0] && e.Project.Team.Slug == TeamSlug);
+            if (existingExpense == null)
+            {
+                return NotFound();
+            }
+            if (existingExpense.ProjectId != projectId)
+            {
+                return BadRequest("Project ID cannot be changed");
+            }
+            if (existingExpense.InvoiceId != null)
+            {
+                return BadRequest("Cannot edit an expense that has been billed.");
+            }
+
+            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+
+            if (!isFieldManager)
+            {
+                //Check if the worker belongs to the supervisor
+                var myWorkers = await _dbContext.Permissions.Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug).Include(a => a.Children).ThenInclude(a => a.User)
+                    .SelectMany(a => a.Children).Select(a => a.User).Select(a => a.Id).ToListAsync();
+                if (existingExpense.CreatedById == null || !myWorkers.Contains(existingExpense.CreatedById.Value))
+                {
+                    return BadRequest("You can only edit expenses created by your workers.");
+                }
+            }
+
+            var expense = expenses.Single(e => e.Id == existingExpense.Id); //Get the one we are editing            
+            existingExpense.Activity = expense.Activity;
+            existingExpense.Description = expense.Description;
+            existingExpense.Type = expense.Type;
+            existingExpense.Quantity = expense.Quantity;
+            existingExpense.Markup = expense.Markup;
+            //existingExpense.Rate = expense.Rate; Do not set this as it is a null value in the posted object, ends up deleting the expense.
+            existingExpense.RateId = expense.RateId;
+            existingExpense.Price = expense.Price;
+            existingExpense.Total = expense.Total;
+            existingExpense.CreatedOn = DateTime.UtcNow;
+            existingExpense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+            existingExpense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+            if (existingExpense.Total <= 0)
+            {
+                return BadRequest("Maybe the expense was removed. Can't do that.");
+            }
+
+            //Get any other expenses that were added
+            var newExpenses = expenses.Where(e => e.Id == 0).ToList();
+            foreach (var newExpense in newExpenses)
+            {
+                newExpense.CreatedBy = user; //Possibly we could get the worker that created the original expense and use them here
+                newExpense.CreatedOn = DateTime.UtcNow;
+                newExpense.ProjectId = projectId;
+                newExpense.InvoiceId = null;
+                newExpense.Account = allRates.Single(a => a.Id == newExpense.RateId).Account;
+                newExpense.IsPassthrough = allRates.Single(a => a.Id == newExpense.RateId).IsPassthrough;
+
+                newExpense.Approved = true;
+                newExpense.ApprovedBy = user;
+                newExpense.ApprovedOn = DateTime.UtcNow;
+
+            }
+
+            if (newExpenses.Count > 0)
+            {
+                _dbContext.Expenses.AddRange(newExpenses);
+                await _historyService.ExpensesCreated(projectId, newExpenses); //TODO: Change to edited?
+            }
+            
 
             await _dbContext.SaveChangesAsync();
 
@@ -74,6 +224,9 @@ namespace Harvest.Web.Controllers.Api
             {
                 return NotFound();
             }
+
+            //TODO: Do we want to prevent supervisors from deleting expenses if they don't manage the worker wo entered them? (Still allow field managers)
+            //TODO: Have an extra check to make sure only unbilled expenses can be deleted
 
             _dbContext.Expenses.Remove(expense);
             await _historyService.ExpenseDeleted(expense.ProjectId, expense);
@@ -191,7 +344,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> ApproveMyWorkerExpenses(int[] expenseIds)
+        public async Task<ActionResult> ApproveMyWorkerExpenses([FromBody] int[] expenseIds)
         {
             var user = await _userService.GetCurrentUser();
             var myWorkers = await _dbContext.Permissions.Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug).Include(a => a.Children).ThenInclude(a => a.User)
@@ -240,7 +393,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> ApproveExpenses(int[] expenseIds)
+        public async Task<ActionResult> ApproveExpenses([FromBody] int[] expenseIds)
         {
             var expenses = await _dbContext.Expenses
                 .Where(a => expenseIds.Contains(a.Id) && a.Project.Team.Slug == TeamSlug && !a.Approved)

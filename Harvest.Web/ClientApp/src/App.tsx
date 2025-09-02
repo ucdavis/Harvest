@@ -11,6 +11,7 @@ import { ConditionalRoute } from "./ConditionalRoute";
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
+import { PendingExpensesListContainer } from "./Expenses/PendingExpensesListContainer";
 import { HomeContainer } from "./Home/HomeContainer";
 import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
@@ -158,6 +159,20 @@ function App() {
               />
             </ConditionalRoute>
             <ConditionalRoute
+              roles={["Supervisor"]}
+              exact
+              path="/:team/expense/GetMyPendingExpenses"
+            >
+              <PendingExpensesListContainer showAll={false} />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["FieldManager"]}
+              exact
+              path="/:team/expense/GetAllPendingExpenses"
+            >
+              <PendingExpensesListContainer showAll={true} />
+            </ConditionalRoute>
+            <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
               path="/:team/ticket/needsAttention"
@@ -188,6 +203,11 @@ function App() {
             <ConditionalRoute
               roles={["FieldManager", "Supervisor", "Worker"]}
               path="/:team/expense/entry/:projectId?"
+              component={ExpenseEntryContainer}
+            />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor"]}
+              path="/:team/expense/edit/:projectId/:expenseId"
               component={ExpenseEntryContainer}
             />
             <Route

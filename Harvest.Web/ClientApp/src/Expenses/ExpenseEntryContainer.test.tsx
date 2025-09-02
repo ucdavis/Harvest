@@ -21,6 +21,23 @@ beforeEach(() => {
     ok: true,
     json: () => Promise.resolve(sampleRates),
   });
+  const expenseResponse = Promise.resolve({
+    status: 200,
+    ok: true,
+    json: () =>
+      Promise.resolve({
+        id: 1,
+        activity: "Test Activity",
+        description: "Test Description",
+        type: "Labor",
+        quantity: 2,
+        markup: false,
+        price: 50,
+        total: 100,
+        rateId: 3,
+        approved: false,
+      }),
+  });
 
   (global as any).Harvest = fakeAppContext;
 
@@ -32,6 +49,7 @@ beforeEach(() => {
     responseMap(x, {
       "/api/team1/Project": projectResponse,
       "/api/team1/Rate/Active": rateResponse,
+      "/api/team1/Expense/Get/1": expenseResponse,
     })
   );
 });
@@ -119,5 +137,22 @@ describe("Expense Entry Container", () => {
     const total = container.querySelector(".total-3");
 
     expect(total?.textContent).toContain("$180.00");
+  });
+
+  it("Edit Mode Title", async () => {
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={["/team1/expense/edit/3/1"]}>
+          <Route path="/:team/expense/edit/:projectId/:expenseId">
+            <ExpenseEntryContainer />
+          </Route>
+        </MemoryRouter>,
+        container
+      );
+    });
+
+    // Check that the title shows "Edit Expense" instead of "Add Expenses"
+    const title = container.querySelector("h1");
+    expect(title?.textContent).toContain("Edit Expense for");
   });
 });
