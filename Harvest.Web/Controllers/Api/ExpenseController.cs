@@ -76,7 +76,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> Get(int expenseId)
         {
             var user = await _userService.GetCurrentUser();
-            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager });
+            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.System });
 
             var expense = await _dbContext.Expenses
                 .Include(e => e.Project)
@@ -125,7 +125,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             var user = await _userService.GetCurrentUser();
-            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager });
+            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.System });
 
             //Only unbilled and unapproved expenses can be edited
             var expenseIds = expenses.Where(e => e.Id != 0).Select(e => e.Id).Distinct().ToArray();
