@@ -44,7 +44,7 @@
                 <td>
                     @if (item.RolesList != "Worker")
                     {
-                        <a asp-action="Delete" asp-route-id="@item.User.Id"><i class="fas fa-trash-alt"></i> Remove Role(s)</a>
+                        <a class="mr-4" asp-action="Delete" asp-route-id="@item.User.Id"><i class="fas fa-trash-alt"></i> Remove Role(s)</a>
                     }
                     @if (item.SupervisorPermissionId != null)
                     {
