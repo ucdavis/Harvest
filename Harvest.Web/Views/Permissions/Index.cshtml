@@ -26,14 +26,13 @@
                 Roles
             </th>
             <th>
-
+                Actions
             </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.UserRoles)
         {
-            var showSeparator = false;
             <tr>
                 <td>
                     @item.User.Name
@@ -45,25 +44,15 @@
                 <td>
                     @if (item.RolesList != "Worker")
                     {
-                        @Html.ActionLink("Remove Role(s)", "Delete", new { id = item.User.Id })
-                        showSeparator = true;
+                        <a asp-action="Delete" asp-route-id="@item.User.Id"><i class="fas fa-trash-alt"></i> Remove Role(s)</a>
                     }
                     @if (item.SupervisorPermissionId != null)
                     {
-                        @if(showSeparator)
-                        {
-                            @: |
-                        }
-                        showSeparator = true;
-                        @Html.ActionLink("Details", "Details", new { id = item.SupervisorPermissionId })
+                        <a asp-action="Details" asp-route-id="@item.SupervisorPermissionId"><i class="fas fa-edit"></i> Manage</a>
                     }
                     @if (item.WorkerPermissionId != null)
                     {
-                        @if (showSeparator)
-                        {
-                            @: |
-                        }
-                        @Html.ActionLink("Details", "Details", new { id = item.WorkerPermissionId })
+                        <a asp-action="Details" asp-route-id="@item.WorkerPermissionId"><i class="fas fa-edit"></i> Manage</a>
                     }
                 </td>
 
