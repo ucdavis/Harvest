@@ -228,6 +228,7 @@ namespace Harvest.Web
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
+            services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
             services.AddTransient<IDateTimeService, DateTimeService>();
             services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();

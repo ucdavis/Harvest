@@ -205,6 +205,11 @@ function App() {
               path="/:team/expense/entry/:projectId?"
               component={ExpenseEntryContainer}
             />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor"]}
+              path="/:team/expense/edit/:projectId/:expenseId"
+              component={ExpenseEntryContainer}
+            />
             <Route
               path="/:team/expense/unbilled/:projectId/:shareId?"
               component={UnbilledExpensesContainer}

@@ -21,7 +21,7 @@ interface Props {
 
 export const PendingExpensesListContainer = (props: Props) => {
   const { team } = useParams<CommonRouteParams>();
-  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [expenses, setExpenses] = useState<Expense[] | undefined>(undefined);
   const [showAll] = useState(props.showAll);
 
   const [notification, setNotification] = usePromiseNotification();
@@ -46,6 +46,10 @@ export const PendingExpensesListContainer = (props: Props) => {
         if (getIsMounted()) {
           setExpenses(expenses);
         }
+      } else {
+        if (getIsMounted()) {
+          setExpenses([]);
+        }
       }
     };
 
@@ -65,7 +69,7 @@ export const PendingExpensesListContainer = (props: Props) => {
       }
     );
     setNotification(request, "Removing Expense", () => {
-      if (getIsMounted()) {
+      if (getIsMounted() && expenses) {
         let expensesCopy = [...expenses];
         const index = expensesCopy.findIndex(
           (element) => element.id === expense.id
@@ -78,14 +82,55 @@ export const PendingExpensesListContainer = (props: Props) => {
     });
   };
 
+  const approveExpense = async (expense: Expense) => {
+    // Determine which API endpoint to use based on showAll
+    const endpoint = showAll
+      ? `/api/${team}/Expense/ApproveExpense`
+      : `/api/${team}/Expense/ApproveMyWorkerExpense`;
+
+    const request = authenticatedFetch(`${endpoint}?expenseId=${expense.id}`, {
+      method: "POST",
+    });
+
+    setNotification(request, "Approving Expense", async (response) => {
+      if (getIsMounted()) {
+        if (response.ok) {
+          // Remove the approved expense from the list
+          if (expenses) {
+            let expensesCopy = [...expenses];
+            const index = expensesCopy.findIndex(
+              (element) => element.id === expense.id
+            );
+            if (index !== -1) {
+              expensesCopy.splice(index, 1);
+              setExpenses(expensesCopy);
+            }
+          }
+
+          return "Expense Approved";
+        } else {
+          // Handle error cases
+          if (response.status === 404) {
+            throw new Error("Expense not found");
+          } else if (response.status === 400) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Bad request");
+          } else {
+            throw new Error("Failed to approve expense");
+          }
+        }
+      }
+      return "Expense Approved";
+    });
+  };
+
   const approveAllExpenses = async () => {
-    if (expenses.length === 0) {
+    if (!expenses || expenses.length === 0) {
       return;
     }
 
     // Get all expense IDs
     const expenseIds = expenses.map((expense) => expense.id);
-    const expenseCount = expenseIds.length;
 
     //console.log(expenseIds);
 
@@ -102,30 +147,45 @@ export const PendingExpensesListContainer = (props: Props) => {
       body: JSON.stringify(expenseIds),
     });
 
-    setNotification(request, "Approving All Expenses", async (response) => {
-      let approvedCount = 0;
-      if (getIsMounted()) {
-        const result = (await response.json()) as Expense[];
-        //Possibly we could show these and disable the approve buttons
+    setNotification(
+      request,
+      "Approving All Expenses",
+      async (response) => {
+        if (getIsMounted()) {
+          const result = (await response.json()) as Expense[];
+          //Possibly we could show these and disable the approve buttons
 
-        // Refresh the page data
-        let url = `/api/${team}/Expense/GetMyPendingExpenses`;
-        if (showAll) {
-          url = `/api/${team}/Expense/GetAllPendingExpenses`;
+          // Refresh the page data
+          let url = `/api/${team}/Expense/GetMyPendingExpenses`;
+          if (showAll) {
+            url = `/api/${team}/Expense/GetAllPendingExpenses`;
+          }
+
+          const refreshResponse = await authenticatedFetch(url);
+          if (refreshResponse.ok) {
+            const refreshedExpenses: Expense[] = await refreshResponse.json();
+            // Calculate how many were actually approved by comparing the counts
+            const approvedCount = result.length;
+            setExpenses(refreshedExpenses);
+            return `${approvedCount} Expense${
+              approvedCount === 1 ? "" : "s"
+            } Approved`;
+          }
         }
-
-        const refreshResponse = await authenticatedFetch(url);
-        if (refreshResponse.ok) {
-          const refreshedExpenses: Expense[] = await refreshResponse.json();
-          // Calculate how many were actually approved by comparing the counts
-          approvedCount = result.length;
-          setExpenses(refreshedExpenses);
+        return "Expenses processed";
+      },
+      async (error) => {
+        // Handle error cases
+        if (error.status === 404) {
+          return "Expenses not found";
+        } else if (error.status === 400) {
+          const errorText = await error.text();
+          return errorText || "Bad request";
+        } else {
+          return "Failed to approve expenses";
         }
       }
-      return `${approvedCount} Expense${
-        approvedCount === 1 ? "" : "s"
-      } Approved`;
-    });
+    );
   };
 
   return (
@@ -141,19 +201,31 @@ export const PendingExpensesListContainer = (props: Props) => {
             id="ApproveAllButton"
             color="primary"
             onClick={approveAllExpenses}
-            disabled={notification.pending || expenses.length === 0}
+            disabled={
+              notification.pending || !expenses || expenses.length === 0
+            }
           >
             Approve All <FontAwesomeIcon icon={faCheck} />
           </Button>
         </div>
       </div>
 
-      <ExpenseTable
-        expenses={expenses}
-        deleteExpense={deleteExpense}
-        canDeleteExpense={!notification.pending}
-        showProject={true}
-      ></ExpenseTable>
+      {expenses === undefined ? (
+        <div className="text-center">
+          <p>Loading expenses...</p>
+        </div>
+      ) : (
+        <ExpenseTable
+          expenses={expenses}
+          deleteExpense={deleteExpense}
+          showActions={!notification.pending}
+          showProject={true}
+          showApprove={true}
+          approveExpense={approveExpense}
+          showExport={true}
+          showAll={showAll}
+        ></ExpenseTable>
+      )}
     </div>
   );
 };
