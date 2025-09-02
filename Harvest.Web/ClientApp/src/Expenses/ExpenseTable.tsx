@@ -87,6 +87,10 @@ export const ExpenseTable = (props: Props) => {
           ]
         : []),
       {
+        Header: "Activity",
+        accessor: (row) => row.activity || "N/A",
+      },
+      {
         Header: "Type",
         accessor: (row) => row.type,
       },
