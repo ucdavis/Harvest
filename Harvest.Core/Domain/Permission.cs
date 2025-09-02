@@ -45,6 +45,12 @@ namespace Harvest.Core.Domain
         [MaxLength(32)]
         public byte[]? Lookup { get; set; }
 
+        public Guid? Token { get; set; }
+
+        public DateTime? Expires { get; set; }
+
+#nullable disable
+
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Permission>().HasIndex(a => a.RoleId);
