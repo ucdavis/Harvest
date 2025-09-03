@@ -17,12 +17,12 @@ namespace Harvest.Web.Controllers.Api
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
-        //private readonly IApiKeyService _apiKeyService;
+        private readonly IApiKeyService _apiKeyService;
         public LinkController(AppDbContext dbContext, IUserService userService, IApiKeyService apiKeyService)
         {
             _dbContext = dbContext;
             _userService = userService;
-            //_apiKeyService = apiKeyService;
+            _apiKeyService = apiKeyService;
         }
 
         [HttpGet]
@@ -47,5 +47,40 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(permission.Token);
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("api/getapi/{id}")]
+        public async Task<IActionResult> GetApi(Guid id)
+        {
+            var permission = await _dbContext.Permissions
+                .Include(p => p.Team)
+                .Where(p => p.Token == id && p.TokenExpires > DateTime.UtcNow)
+                .SingleOrDefaultAsync();
+            if (permission == null)
+                {
+                return NotFound();
+            }
+            var apiKey = await _apiKeyService.GenerateApiKeyAsync(permission.Id);
+            permission.Token = null;
+            permission.TokenExpires = null;
+            await _dbContext.SaveChangesAsync();
+            return Ok(new { apiKey, team = permission.Team.Slug });
+        }
+
+        //Can use this for testing
+        //[HttpGet]
+        //[AllowAnonymous]
+        //[Route("api/validate/{id}")]
+        //public async Task<IActionResult> Validate(string id)
+        //{
+        //    var permission = await _apiKeyService.ValidateApiKeyAsync(id);
+        //    if (permission == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return Ok(new { valid = true });
+        //}
+
     }
 }
