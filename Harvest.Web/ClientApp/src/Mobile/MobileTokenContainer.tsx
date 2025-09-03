@@ -64,8 +64,7 @@ export const MobileTokenContainer = () => {
             </CardHeader>
             <CardBody>
               <p className="text-muted mb-4">
-                Generate a mobile token for API access. This token can be used
-                to authenticate mobile applications.
+                Generate a mobile token to authenticate our app.
               </p>
 
               <div className="mb-4">
@@ -111,8 +110,9 @@ export const MobileTokenContainer = () => {
                     </Button>
                   </div>
                   <small className="text-muted mt-2 d-block">
-                    Keep this token secure. It provides API access for your
-                    mobile applications.
+                    Keep this token secure and use it within 5 minutes to
+                    authenticate our mobile app. Otherwise you will need to
+                    regenerate this.
                   </small>
                 </div>
               )}
