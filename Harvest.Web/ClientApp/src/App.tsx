@@ -33,6 +33,7 @@ import { CloseoutContainer } from "./Closeout/CloseoutContainer";
 import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationContainer";
 import { AdhocProject } from "./Projects/AdhocProject";
 import { TeamPicker } from "./Teams/TeamPicker";
+import { MobileTokenContainer } from "./Mobile/MobileTokenContainer";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -204,6 +205,12 @@ function App() {
               roles={["FieldManager", "Supervisor", "Worker"]}
               path="/:team/expense/entry/:projectId?"
               component={ExpenseEntryContainer}
+            />
+            <ConditionalRoute
+              roles={["Worker"]}
+              exact
+              path="/:team/mobile/token"
+              component={MobileTokenContainer}
             />
             <ConditionalRoute
               roles={["FieldManager", "Supervisor"]}
