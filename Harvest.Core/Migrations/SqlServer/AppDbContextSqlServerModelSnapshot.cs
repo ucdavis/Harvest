@@ -364,6 +364,8 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     b.HasIndex("TeamId");
 
+                    b.HasIndex("Token");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Permissions");
