@@ -22,7 +22,7 @@ export const MobileTokenContainer = () => {
       const response = await authenticatedFetch(`/api/${team}/Link`);
 
       if (response.ok) {
-        const token = await response.text();
+        const token = await response.json();
         setMobileToken(token);
         toast.success("Mobile token generated successfully!");
       } else {
