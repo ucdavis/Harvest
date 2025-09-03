@@ -343,6 +343,8 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasIndex("TeamId");
 
+                    b.HasIndex("Token");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Permissions");

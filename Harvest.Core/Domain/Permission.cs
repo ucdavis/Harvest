@@ -57,6 +57,7 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Permission>().HasIndex(a => a.UserId);
             modelBuilder.Entity<Permission>().HasIndex(a => a.TeamId);
             modelBuilder.Entity<Permission>().HasIndex(a => a.Lookup);
+            modelBuilder.Entity<Permission>().HasIndex(a => a.Token);
 
             // Self-referencing many-to-many relationship
             modelBuilder.Entity<Permission>()
