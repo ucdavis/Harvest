@@ -346,6 +346,17 @@ export const ExpenseEntryContainer = () => {
               Project {projectId}
             </Link>
           </h1>
+
+          {isEditMode && (
+            <>
+              <small>
+                You are in edit mode. If you add any expenses, they will show as
+                added and approved by yourself. Changes to the existing expense
+                will still need to be approved.
+              </small>
+              <br />
+            </>
+          )}
           <br />
           <div>
             {activities.map((activity) => (
