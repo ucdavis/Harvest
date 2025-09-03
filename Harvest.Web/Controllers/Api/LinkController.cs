@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
 {
-    //[Authorize]
+    [Authorize]
     public class LinkController : SuperController
     {
         private readonly AppDbContext _dbContext;
@@ -26,7 +26,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
-        //[Authorize(Policy = AccessCodes.WorkerAccess)]
+        [Authorize(Policy = AccessCodes.WorkerAccess)]
         [Route("api/{team}/link")]
         public async Task<IActionResult> Get()
         {
