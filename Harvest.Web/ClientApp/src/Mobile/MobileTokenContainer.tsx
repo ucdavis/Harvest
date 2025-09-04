@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Card, CardBody, CardHeader, Alert } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMobile, faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faMobile, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
@@ -12,6 +12,7 @@ export const MobileTokenContainer = () => {
   const [mobileToken, setMobileToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [isMobileAppOpened, setIsMobileAppOpened] = useState<boolean>(false);
 
   const generateMobileToken = async () => {
     setIsLoading(true);
@@ -40,14 +41,15 @@ export const MobileTokenContainer = () => {
     }
   };
 
-  const copyToClipboard = async () => {
+  const openMobileApp = () => {
     if (mobileToken) {
-      try {
-        await navigator.clipboard.writeText(mobileToken);
-        toast.success("Mobile token copied to clipboard!");
-      } catch (err) {
-        toast.error("Failed to copy to clipboard");
-      }
+      const baseUrl = window.location.origin;
+      const appLink = `harvestmobile://applink?code=${mobileToken}&baseUrl=${encodeURIComponent(
+        baseUrl
+      )}`;
+      window.location.href = appLink;
+      toast.success("Opening mobile app...");
+      setIsMobileAppOpened(true);
     }
   };
 
@@ -58,7 +60,7 @@ export const MobileTokenContainer = () => {
           <Card>
             <CardHeader>
               <h4>
-                <FontAwesomeIcon icon={faMobile} className="me-2" />
+                <FontAwesomeIcon icon={faMobile} className="mr-2" />
                 Mobile Token Generator
               </h4>
             </CardHeader>
@@ -71,7 +73,7 @@ export const MobileTokenContainer = () => {
                 <Button
                   color="primary"
                   onClick={generateMobileToken}
-                  disabled={isLoading}
+                  disabled={isLoading || isMobileAppOpened}
                   size="lg"
                 >
                   {isLoading ? "Generating..." : "Generate Mobile Token"}
@@ -102,11 +104,16 @@ export const MobileTokenContainer = () => {
                       {mobileToken}
                     </div>
                     <Button
-                      color="secondary"
-                      onClick={copyToClipboard}
-                      title="Copy to clipboard"
+                      color="primary"
+                      onClick={openMobileApp}
+                      title="Authorize Mobile App"
+                      size="sm"
                     >
-                      <FontAwesomeIcon icon={faCopy} />
+                      <FontAwesomeIcon
+                        icon={faExternalLinkAlt}
+                        className="mr-2"
+                      />
+                      Authorize Mobile App
                     </Button>
                   </div>
                   <small className="text-muted mt-2 d-block">
