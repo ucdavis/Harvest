@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
 {
-    [Authorize(AuthenticationSchemes = "ApiKey", Policy = "ApiKey")]
+    [Authorize(AuthenticationSchemes = AccessCodes.ApiKey, Policy = AccessCodes.ApiKey)]
     public class MobileController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -22,6 +22,8 @@ namespace Harvest.Web.Controllers.Api
             _userService = userService;
         }
 
+        [HttpGet]
+        [Route("api/mobile/projects")]
         public async Task<IActionResult> Projects()
         {
             // Get team ID from claims set by authentication handler

@@ -97,7 +97,7 @@ namespace Harvest.Web
                     return Task.CompletedTask;
                 };
             })
-            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey", options => { })
+            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(AccessCodes.ApiKey, options => { })
             .AddOpenIdConnect(oidc =>
             {
                 oidc.ClientId = Configuration["Authentication:ClientId"];
@@ -145,7 +145,7 @@ namespace Harvest.Web
             services.AddAuthorization(options =>
             {
                 // Add API Key policy
-                options.AddPolicy("ApiKey", policy => policy.Requirements.Add(new ApiKeyRequirement()));
+                options.AddPolicy(AccessCodes.ApiKey, policy => policy.Requirements.Add(new ApiKeyRequirement()));
                 
                 // no need to specify additional roles for system admin, as an exception is made for it in VerifyRoleAccessHandler
                 options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(
