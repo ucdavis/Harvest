@@ -107,7 +107,7 @@ export const MobileTokenContainer = () => {
                     >
                       <FontAwesomeIcon
                         icon={faExternalLinkAlt}
-                        className="me-2"
+                        className="mr-2"
                       />
                       Authorize Mobile App
                     </Button>
