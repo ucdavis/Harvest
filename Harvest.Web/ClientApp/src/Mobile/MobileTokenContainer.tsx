@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Card, CardBody, CardHeader, Alert } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMobile, faCopy } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMobile,
+  faCopy,
+  faExternalLinkAlt,
+} from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
@@ -48,6 +52,14 @@ export const MobileTokenContainer = () => {
       } catch (err) {
         toast.error("Failed to copy to clipboard");
       }
+    }
+  };
+
+  const openMobileApp = () => {
+    if (mobileToken) {
+      const appLink = `harvestmobile://applink?code=${mobileToken}`;
+      window.location.href = appLink;
+      toast.success("Opening mobile app...");
     }
   };
 
@@ -101,13 +113,24 @@ export const MobileTokenContainer = () => {
                     >
                       {mobileToken}
                     </div>
-                    <Button
-                      color="secondary"
-                      onClick={copyToClipboard}
-                      title="Copy to clipboard"
-                    >
-                      <FontAwesomeIcon icon={faCopy} />
-                    </Button>
+                    <div className="d-flex flex-column gap-2">
+                      <Button
+                        color="secondary"
+                        onClick={copyToClipboard}
+                        title="Copy to clipboard"
+                        size="sm"
+                      >
+                        <FontAwesomeIcon icon={faCopy} />
+                      </Button>
+                      <Button
+                        color="success"
+                        onClick={openMobileApp}
+                        title="Open in mobile app"
+                        size="sm"
+                      >
+                        <FontAwesomeIcon icon={faExternalLinkAlt} />
+                      </Button>
+                    </div>
                   </div>
                   <small className="text-muted mt-2 d-block">
                     Keep this token secure and use it within 5 minutes to
