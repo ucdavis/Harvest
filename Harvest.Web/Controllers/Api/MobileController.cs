@@ -1,7 +1,8 @@
 ﻿using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
-using Harvest.Web.Services;
+using Harvest.Core.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -9,70 +10,69 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
 {
+    [Authorize(AuthenticationSchemes = "ApiKey", Policy = "ApiKey")]
     public class MobileController : Controller
     {
         private readonly AppDbContext _dbContext;
-        private readonly IApiKeyService _apiKeyService;
-        public MobileController(AppDbContext appDbContext, IApiKeyService apiKeyService)
+        private readonly IUserService _userService;
+
+        public MobileController(AppDbContext appDbContext, IUserService userService)
         {
-            _apiKeyService = apiKeyService;
             _dbContext = appDbContext;
+            _userService = userService;
         }
+
         public async Task<IActionResult> Projects()
         {
-            var permission = await ValidateApiKeyFromHeader();
-            if (permission == null)
+            // Get team ID from claims set by authentication handler
+            var teamIdClaim = User.Claims.FirstOrDefault(c => c.Type == "TeamId");
+            if (teamIdClaim == null || !int.TryParse(teamIdClaim.Value, out var teamId))
             {
-                return Unauthorized();
-            }
-
-            permission = await _dbContext.Permissions.Include(a => a.Team).Include(a => a.User).Where(a => a.Id == permission.Id).SingleOrDefaultAsync();
-
-            if (permission.Team == null)
-            {
-                return Unauthorized();
+                return Unauthorized("Team information not found");
             }
 
             var projects = await _dbContext.Projects
-                .Where(p => p.TeamId == permission.TeamId && p.IsActive && p.Status == Project.Statuses.Active)
+                .Where(p => p.TeamId == teamId && p.IsActive && p.Status == Project.Statuses.Active)
                 .Select(p => new
                 {
                     p.Id,
                     p.Name,                    
                 })
                 .ToListAsync();
+            
             return Ok(projects);
         }
 
-
-        private async Task<Permission> ValidateApiKeyFromHeader()
+        /// <summary>
+        /// Example endpoint to show how user information is now available through UserService
+        /// </summary>
+        [HttpGet]
+        [Route("api/mobile/userinfo")]
+        public async Task<IActionResult> UserInfo()
         {
-            var apiKey = GetApiKeyFromHeader();
-
-            if (string.IsNullOrEmpty(apiKey))
+            // The UserService.GetCurrentUser() will now work because we set the proper claims
+            var user = await _userService.GetCurrentUser();
+            
+            // Get additional information from claims
+            var permissionIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PermissionId");
+            var teamSlugClaim = User.Claims.FirstOrDefault(c => c.Type == "TeamSlug");
+            
+            return Ok(new
             {
-                return null;
-            }
-
-            return await _apiKeyService.ValidateApiKeyAsync(apiKey);
-        }
-
-        private string GetApiKeyFromHeader()
-        {
-            if (!Request.Headers.TryGetValue("Authorization", out var authHeader))
-            {
-                return null;
-            }
-
-            var authValue = authHeader.ToString();
-
-            // Support both "Bearer {key}" and just "{key}" formats
-            if (authValue.StartsWith("Bearer ", System.StringComparison.OrdinalIgnoreCase))
-            {
-                return authValue.Substring(7); // Remove "Bearer " prefix
-            }
-
-            return authValue;
+                User = new
+                {
+                    user?.Id,
+                    user?.Iam,
+                    user?.FirstName,
+                    user?.LastName,
+                    user?.Email
+                },
+                PermissionId = permissionIdClaim?.Value,
+                TeamSlug = teamSlugClaim?.Value,
+                AuthenticationType = User.Identity?.AuthenticationType,
+                IsAuthenticated = User.Identity?.IsAuthenticated,
+                Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList()
+            });
         }
     }
 }
