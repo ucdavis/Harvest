@@ -12,6 +12,7 @@ export const MobileTokenContainer = () => {
   const [mobileToken, setMobileToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [isMobileAppOpened, setIsMobileAppOpened] = useState<boolean>(false);
 
   const generateMobileToken = async () => {
     setIsLoading(true);
@@ -46,6 +47,7 @@ export const MobileTokenContainer = () => {
       const appLink = `harvestmobile://applink?code=${mobileToken}&baseUrl=${baseUrl}`;
       window.location.href = appLink;
       toast.success("Opening mobile app...");
+      setIsMobileAppOpened(true);
     }
   };
 
@@ -69,7 +71,7 @@ export const MobileTokenContainer = () => {
                 <Button
                   color="primary"
                   onClick={generateMobileToken}
-                  disabled={isLoading}
+                  disabled={isLoading || isMobileAppOpened}
                   size="lg"
                 >
                   {isLoading ? "Generating..." : "Generate Mobile Token"}
