@@ -44,7 +44,9 @@ export const MobileTokenContainer = () => {
   const openMobileApp = () => {
     if (mobileToken) {
       const baseUrl = window.location.origin;
-      const appLink = `harvestmobile://applink?code=${mobileToken}&baseUrl=${baseUrl}`;
+      const appLink = `harvestmobile://applink?code=${mobileToken}&baseUrl=${encodeURIComponent(
+        baseUrl
+      )}`;
       window.location.href = appLink;
       toast.success("Opening mobile app...");
       setIsMobileAppOpened(true);
