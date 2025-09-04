@@ -8,7 +8,6 @@ using Harvest.Core.Data;
 using Harvest.Core.Services;
 using Harvest.Web.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -38,29 +37,21 @@ namespace Harvest.Web.Authentication
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
-        {
-            Logger.LogInformation("ApiKeyAuthenticationHandler.HandleAuthenticateAsync called for scheme: {Scheme}", Scheme.Name);
-            
+        {           
             var apiKey = GetApiKeyFromHeader();
 
             if (string.IsNullOrEmpty(apiKey))
             {
-                Logger.LogInformation("No API key found in Authorization header");
                 return AuthenticateResult.NoResult();
             }
-
-            Logger.LogInformation("API key found in header, validating...");
 
             try
             {
                 var permission = await _apiKeyService.ValidateApiKeyAsync(apiKey);
                 if (permission == null)
                 {
-                    Logger.LogWarning("Invalid API key provided");
                     return AuthenticateResult.Fail("Invalid API key");
                 }
-
-                Logger.LogInformation("API key validated successfully for PermissionId: {PermissionId}", permission.Id);
 
                 // Load full permission with related data
                 permission = await _dbContext.Permissions
@@ -71,7 +62,6 @@ namespace Harvest.Web.Authentication
 
                 if (permission?.User == null)
                 {
-                    Logger.LogError("Permission not found or user not associated for PermissionId: {PermissionId}", permission?.Id);
                     return AuthenticateResult.Fail("Permission not found or user not associated");
                 }
 
@@ -98,14 +88,11 @@ namespace Harvest.Web.Authentication
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-                Logger.LogInformation("Authentication successful for user: {UserIam}, AuthenticationType: {AuthType}", 
-                    permission.User.Iam, identity.AuthenticationType);
 
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error authenticating API key");
                 return AuthenticateResult.Fail("Authentication error");
             }
         }
