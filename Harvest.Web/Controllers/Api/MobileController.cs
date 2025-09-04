@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Harvest.Web.Controllers.Api
 {
     [Authorize(AuthenticationSchemes = AccessCodes.ApiKey, Policy = AccessCodes.ApiKey)]
-    public class MobileController : Controller
+    public class MobileController : ApiController
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
@@ -27,8 +27,8 @@ namespace Harvest.Web.Controllers.Api
         public async Task<IActionResult> Projects()
         {
             // Get team ID from claims set by authentication handler
-            var teamIdClaim = User.Claims.FirstOrDefault(c => c.Type == "TeamId");
-            if (teamIdClaim == null || !int.TryParse(teamIdClaim.Value, out var teamId))
+            var teamId = TeamId;
+            if (teamId == null)
             {
                 return Unauthorized("Team information not found");
             }
@@ -54,10 +54,10 @@ namespace Harvest.Web.Controllers.Api
         {
             // The UserService.GetCurrentUser() will now work because we set the proper claims
             var user = await _userService.GetCurrentUser();
-            
-            // Get additional information from claims
-            var permissionIdClaim = User.Claims.FirstOrDefault(c => c.Type == "PermissionId");
-            var teamSlugClaim = User.Claims.FirstOrDefault(c => c.Type == "TeamSlug");
+
+            var teamId = TeamId;
+            var teamSlug = TeamSlug;
+            var permissionId = PermissionId;
             
             return Ok(new
             {
@@ -69,8 +69,8 @@ namespace Harvest.Web.Controllers.Api
                     user?.LastName,
                     user?.Email
                 },
-                PermissionId = permissionIdClaim?.Value,
-                TeamSlug = teamSlugClaim?.Value,
+                PermissionId = permissionId,
+                TeamSlug = teamSlug,
                 AuthenticationType = User.Identity?.AuthenticationType,
                 IsAuthenticated = User.Identity?.IsAuthenticated,
                 Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList()
