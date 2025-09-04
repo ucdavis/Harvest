@@ -42,7 +42,7 @@ namespace Harvest.Web.Controllers.Api
             }
             permission.Token = Guid.NewGuid();
             permission.TokenExpires = DateTime.UtcNow.AddMinutes(5);
-            //var apiKey = await _apiKeyService.GenerateApiKeyAsync(permission.Id);
+
             await _dbContext.SaveChangesAsync();
 
             return Ok(permission.Token);
