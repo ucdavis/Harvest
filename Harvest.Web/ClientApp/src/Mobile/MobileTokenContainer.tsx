@@ -56,7 +56,7 @@ export const MobileTokenContainer = () => {
           <Card>
             <CardHeader>
               <h4>
-                <FontAwesomeIcon icon={faMobile} className="me-2" />
+                <FontAwesomeIcon icon={faMobile} className="mr-2" />
                 Mobile Token Generator
               </h4>
             </CardHeader>
