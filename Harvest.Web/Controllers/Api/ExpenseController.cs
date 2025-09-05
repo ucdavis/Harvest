@@ -95,11 +95,8 @@ namespace Harvest.Web.Controllers.Api
                 // Check if the worker belongs to the supervisor
                 var myWorkers = await _dbContext.Permissions
                     .Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug)
-                    .Include(a => a.Children)
-                    .ThenInclude(a => a.User)
                     .SelectMany(a => a.Children)
-                    .Select(a => a.User)
-                    .Select(a => a.Id)
+                    .Select(c => c.UserId)
                     .ToListAsync();
 
                 if (expense.CreatedById == null || !myWorkers.Contains(expense.CreatedById.Value))
