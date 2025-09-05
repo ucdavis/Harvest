@@ -95,7 +95,6 @@ export const AddProjectPermission = () => {
 
     if (response.ok) {
       const data = await response.json();
-      console.log("Project Permission Added: ", data);
       history.push(`/${team}/Project/Details/${project.id}`);
     }
   };

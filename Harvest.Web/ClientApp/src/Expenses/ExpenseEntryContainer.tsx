@@ -78,13 +78,11 @@ export const ExpenseEntryContainer = (props: Props) => {
 
     const loadExpense = async () => {
       try {
-        console.log("Loading expense data for expenseId:", expenseId);
         const response = await authenticatedFetch(
           `/api/${team}/Expense/Get/${expenseId}`
         );
         if (response.ok) {
           const expense: Expense = await response.json();
-          console.log("Loaded expense:", expense);
           getIsMounted() && setExistingExpense(expense);
 
           // Create work item from existing expense
@@ -115,7 +113,6 @@ export const ExpenseEntryContainer = (props: Props) => {
             workItems: allWorkItems,
           };
 
-          console.log("Created activity with workItems:", activity);
           getIsMounted() && setActivities([activity]);
         } else {
           console.error(
