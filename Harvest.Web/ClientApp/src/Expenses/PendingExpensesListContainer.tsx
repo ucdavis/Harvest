@@ -85,11 +85,15 @@ export const PendingExpensesListContainer = (props: Props) => {
   const approveExpense = async (expense: Expense) => {
     // Determine which API endpoint to use based on showAll
     const endpoint = showAll
-      ? `/api/${team}/Expense/ApproveExpense`
-      : `/api/${team}/Expense/ApproveMyWorkerExpense`;
+      ? `/api/${team}/Expense/ApproveExpenses`
+      : `/api/${team}/Expense/ApproveMyWorkerExpenses`;
 
-    const request = authenticatedFetch(`${endpoint}?expenseId=${expense.id}`, {
+    const request = authenticatedFetch(endpoint, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify([expense.id]),
     });
 
     setNotification(request, "Approving Expense", async (response) => {
