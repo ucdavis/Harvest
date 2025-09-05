@@ -45,7 +45,11 @@ const getDefaultActivity = (id: number) => ({
   ],
 });
 
-export const ExpenseEntryContainer = () => {
+interface Props {
+  isEditMode: boolean;
+}
+
+export const ExpenseEntryContainer = (props: Props) => {
   const history = useHistory();
 
   const { projectId, team, expenseId } = useParams<CommonRouteParams>();
@@ -54,7 +58,7 @@ export const ExpenseEntryContainer = () => {
   const context = useOrCreateValidationContext(validatorOptions);
   const [project, setProject] = useState<Project>();
   const [existingExpense, setExistingExpense] = useState<Expense | null>(null);
-  const isEditMode = Boolean(expenseId);
+  const isEditMode = props.isEditMode;
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -74,13 +78,11 @@ export const ExpenseEntryContainer = () => {
 
     const loadExpense = async () => {
       try {
-        console.log("Loading expense data for expenseId:", expenseId);
         const response = await authenticatedFetch(
           `/api/${team}/Expense/Get/${expenseId}`
         );
         if (response.ok) {
           const expense: Expense = await response.json();
-          console.log("Loaded expense:", expense);
           getIsMounted() && setExistingExpense(expense);
 
           // Create work item from existing expense
@@ -111,7 +113,6 @@ export const ExpenseEntryContainer = () => {
             workItems: allWorkItems,
           };
 
-          console.log("Created activity with workItems:", activity);
           getIsMounted() && setActivities([activity]);
         } else {
           console.error(

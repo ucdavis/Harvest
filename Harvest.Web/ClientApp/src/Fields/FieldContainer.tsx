@@ -41,8 +41,6 @@ export class FieldContainer extends React.Component<Props, State> {
 
   _addDefaultField = (e: any) => {
     const { layer } = e;
-    console.log(e);
-    console.log("creating field", this.props.fields);
 
     const newId = Math.max(...this.props.fields.map((f) => f.id), 0) + 1;
     const newField: Field = {
@@ -152,7 +150,6 @@ export class FieldContainer extends React.Component<Props, State> {
 
   // This is used to trigger the modal to open
   _updateFieldId = (field?: Field) => {
-    console.log(this.state.editFieldId);
     if (field) {
       this.setState({ editFieldId: field.id });
     } else {

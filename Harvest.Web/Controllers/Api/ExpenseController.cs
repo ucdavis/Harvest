@@ -95,11 +95,8 @@ namespace Harvest.Web.Controllers.Api
                 // Check if the worker belongs to the supervisor
                 var myWorkers = await _dbContext.Permissions
                     .Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug)
-                    .Include(a => a.Children)
-                    .ThenInclude(a => a.User)
                     .SelectMany(a => a.Children)
-                    .Select(a => a.User)
-                    .Select(a => a.Id)
+                    .Select(c => c.UserId)
                     .ToListAsync();
 
                 if (expense.CreatedById == null || !myWorkers.Contains(expense.CreatedById.Value))
@@ -317,30 +314,6 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
-        [HttpPost]
-        [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<ActionResult> ApproveMyWorkerExpense(int expenseId)
-        {
-            var user = await _userService.GetCurrentUser();
-            var myWorkers = await _dbContext.Permissions.Where(a => a.UserId == user.Id && a.Team.Slug == TeamSlug).Include(a => a.Children).ThenInclude(a => a.User)
-                .SelectMany(a => a.Children).Select(a => a.User).Select(a => a.Id).ToListAsync();
-
-            var expense = await _dbContext.Expenses.SingleOrDefaultAsync(a => a.Id == expenseId && a.Project.Team.Slug == TeamSlug && myWorkers.Contains(a.CreatedById.Value));
-            if (expense == null)
-            {
-                return NotFound();
-            }
-            if (expense.Approved)
-            {
-                return BadRequest("Expense is already approved");
-            }
-            expense.ApprovedBy = user;
-            expense.ApprovedOn = DateTime.UtcNow;
-            expense.Approved = true;
-            //await _historyService.ExpenseApproved(expense.ProjectId, expense); //TODO: Add this
-            await _dbContext.SaveChangesAsync();
-            return Ok(expense);
-        }
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
@@ -367,28 +340,6 @@ namespace Harvest.Web.Controllers.Api
 
             await _dbContext.SaveChangesAsync();
             return Ok(expenses);
-        }
-
-        [HttpPost]
-        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
-        public async Task<ActionResult> ApproveExpense(int expenseId)
-        {
-            var expense = await _dbContext.Expenses.SingleOrDefaultAsync(a => a.Id == expenseId && a.Project.Team.Slug == TeamSlug);
-            if (expense == null)
-            {
-                return NotFound();
-            }
-            if (expense.Approved)
-            {
-                return BadRequest("Expense is already approved");
-            }
-            var user = await _userService.GetCurrentUser();
-            expense.ApprovedBy = user;
-            expense.ApprovedOn = DateTime.UtcNow;
-            expense.Approved = true;
-            //await _historyService.ExpenseApproved(expense.ProjectId, expense); //TODO: Add this
-            await _dbContext.SaveChangesAsync();
-            return Ok(expense);
         }
 
         [HttpPost]

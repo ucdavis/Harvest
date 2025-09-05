@@ -204,8 +204,9 @@ function App() {
             <ConditionalRoute
               roles={["FieldManager", "Supervisor", "Worker"]}
               path="/:team/expense/entry/:projectId?"
-              component={ExpenseEntryContainer}
-            />
+            >
+              <ExpenseEntryContainer isEditMode={false} />
+            </ConditionalRoute>
             <ConditionalRoute
               roles={["Worker"]}
               exact
@@ -215,8 +216,9 @@ function App() {
             <ConditionalRoute
               roles={["FieldManager", "Supervisor"]}
               path="/:team/expense/edit/:projectId/:expenseId"
-              component={ExpenseEntryContainer}
-            />
+            >
+              <ExpenseEntryContainer isEditMode={true} />
+            </ConditionalRoute>
             <Route
               path="/:team/expense/unbilled/:projectId/:shareId?"
               component={UnbilledExpensesContainer}

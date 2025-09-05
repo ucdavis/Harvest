@@ -44,7 +44,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(13);
+            ControllerReflection.ControllerPublicMethods(11);
         }
 
         [Fact]
@@ -108,42 +108,32 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetAllPendingExpenses", countAdjustment + 3);
 
-            //8
-            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("ApproveMyWorkerExpense", countAdjustment + 3);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("ApproveMyWorkerExpense", countAdjustment + 3);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ApproveMyWorkerExpense", countAdjustment + 3);
+           
 
-            //9
+            //8
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("ApproveMyWorkerExpenses", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("ApproveMyWorkerExpenses", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ApproveMyWorkerExpenses", countAdjustment + 3);
 
-            //10
-            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("ApproveExpense", countAdjustment + 3);
-            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("ApproveExpense", countAdjustment + 3);
-            authAttribute.ShouldNotBeNull();
-            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ApproveExpense", countAdjustment + 3);
+          
 
-            //11
+            //9
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("ApproveExpenses", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("ApproveExpenses", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ApproveExpenses", countAdjustment + 3);
 
-            //12
+            //10
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("Edit", countAdjustment + 3);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Edit", countAdjustment + 3);
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.SupervisorAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("Edit", countAdjustment + 3);
 
-            //13
+            //11
             ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("Get", countAdjustment + 4, showListOfAttributes: true);
             authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("Get", countAdjustment + 4);
             authAttribute.ShouldNotBeNull();

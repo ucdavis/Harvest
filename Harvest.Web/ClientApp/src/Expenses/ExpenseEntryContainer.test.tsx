@@ -2,7 +2,6 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
 import { act, Simulate } from "react-dom/test-utils";
-import { Input } from "reactstrap";
 
 import { ExpenseEntryContainer } from "./ExpenseEntryContainer";
 import { fakeAppContext, sampleRates, fakeProject } from "../Test/mockData";
@@ -71,7 +70,7 @@ describe("Expense Entry Container", () => {
       render(
         <MemoryRouter initialEntries={["/team1/expense/entry/3"]}>
           <Route path="/:team/expense/entry/:projectId">
-            <ExpenseEntryContainer />
+            <ExpenseEntryContainer isEditMode={false} />
           </Route>
         </MemoryRouter>,
         container
@@ -89,7 +88,7 @@ describe("Expense Entry Container", () => {
       render(
         <MemoryRouter initialEntries={["/team1/expense/entry/3"]}>
           <Route path="/:team/expense/entry/:projectId">
-            <ExpenseEntryContainer />
+            <ExpenseEntryContainer isEditMode={false} />
           </Route>
         </MemoryRouter>,
         container
@@ -114,7 +113,7 @@ describe("Expense Entry Container", () => {
       render(
         <MemoryRouter initialEntries={["/team1/expense/entry/3"]}>
           <Route path="/:team/expense/entry/:projectId">
-            <ExpenseEntryContainer />
+            <ExpenseEntryContainer isEditMode={false} />
           </Route>
         </MemoryRouter>,
         container
@@ -144,7 +143,7 @@ describe("Expense Entry Container", () => {
       render(
         <MemoryRouter initialEntries={["/team1/expense/edit/3/1"]}>
           <Route path="/:team/expense/edit/:projectId/:expenseId">
-            <ExpenseEntryContainer />
+            <ExpenseEntryContainer isEditMode={true} />
           </Route>
         </MemoryRouter>,
         container

@@ -19,7 +19,6 @@ export const MobileTokenContainer = () => {
     setError("");
 
     try {
-      console.log("Generating mobile token for team:", team);
       const response = await authenticatedFetch(`/api/${team}/Link`);
 
       if (response.ok) {

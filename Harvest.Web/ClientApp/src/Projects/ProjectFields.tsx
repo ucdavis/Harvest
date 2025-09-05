@@ -30,7 +30,6 @@ export const ProjectFields = () => {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result);
         getIsMounted() && setFields(result);
       }
     };
