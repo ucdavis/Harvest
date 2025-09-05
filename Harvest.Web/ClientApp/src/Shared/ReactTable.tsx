@@ -200,28 +200,6 @@ export const ReactTable = ({
                         }
                       : undefined
                   }
-                  style={
-                    onRowClick
-                      ? {
-                          cursor: "pointer",
-                          transition: "background-color 0.2s",
-                        }
-                      : undefined
-                  }
-                  onMouseEnter={
-                    onRowClick
-                      ? (e) => {
-                          e.currentTarget.style.backgroundColor = "#f8f9fa";
-                        }
-                      : undefined
-                  }
-                  onMouseLeave={
-                    onRowClick
-                      ? (e) => {
-                          e.currentTarget.style.backgroundColor = "";
-                        }
-                      : undefined
-                  }
                 >
                   {row.cells.map((cell) => {
                     return (
