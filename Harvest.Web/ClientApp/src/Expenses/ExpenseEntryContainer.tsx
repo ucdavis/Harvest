@@ -45,7 +45,11 @@ const getDefaultActivity = (id: number) => ({
   ],
 });
 
-export const ExpenseEntryContainer = () => {
+interface Props {
+  isEditMode: boolean;
+}
+
+export const ExpenseEntryContainer = (props: Props) => {
   const history = useHistory();
 
   const { projectId, team, expenseId } = useParams<CommonRouteParams>();
@@ -54,7 +58,7 @@ export const ExpenseEntryContainer = () => {
   const context = useOrCreateValidationContext(validatorOptions);
   const [project, setProject] = useState<Project>();
   const [existingExpense, setExistingExpense] = useState<Expense | null>(null);
-  const isEditMode = Boolean(expenseId);
+  const isEditMode = props.isEditMode;
 
   // activities are groups of expenses
   const [activities, setActivities] = useState<Activity[]>([]);

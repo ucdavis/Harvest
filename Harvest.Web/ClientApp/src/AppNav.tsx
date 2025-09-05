@@ -67,7 +67,7 @@ export const AppNav = () => {
                     <NavLink href={`/${team}/project`}>All Projects</NavLink>
                   </NavItem>
                 </ShowFor>
-                <ShowFor roles={["FieldManager", "Supervisor", "Worker"]}>
+                <ShowFor roles={["Worker"]}>
                   <NavItem>
                     <NavLink href={`/${team}/mobile/token`}>App Link</NavLink>
                   </NavItem>
