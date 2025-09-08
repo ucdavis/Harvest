@@ -34,6 +34,9 @@ export const WorkerHome = () => {
             Enter Expenses for Any Project
           </Link>
         </li>
+        <li className="list-group-item">
+          <Link to={`/${team}/mobile/token`}>Link Mobile App</Link>
+        </li>
         {projects.map((project) => (
           <li key={project.id} className="list-group-item">
             <Link to={`/${team}/expense/entry/${project.id}`}>
