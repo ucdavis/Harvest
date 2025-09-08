@@ -48,7 +48,7 @@ namespace Harvest.Web.Controllers.Api
             return Ok(permission.Token);
         }
 
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
         [Route("api/getapi/{id}")]
         public async Task<IActionResult> GetApi(Guid id)
