@@ -69,6 +69,31 @@ namespace Harvest.Web.Controllers.Api
             return Ok(new { apiKey, team = permission.Team.Slug });
         }
 
+        [HttpGet]
+        [Route("/api/Link/GetTeam")]
+        public async Task<IActionResult> GetTeam()
+        {
+            var user = await _userService.GetCurrentUser();
+            var permissions = await _dbContext.Permissions
+                .Include(p => p.Team)
+                .Where(p => p.UserId == user.Id && p.Role.Name == Role.Codes.Worker)
+                .ToListAsync();
+
+            if (permissions.Count == 0)
+            {
+                return NotFound("No worker permissions found");
+            }
+
+            if (permissions.Count == 1)
+            {
+                return Ok(permissions.Single().Team.Slug);
+            }
+
+            // Multiple permissions found - ambiguous team selection
+            return BadRequest("Multiple worker permissions found - cannot determine single team");
+
+        }
+
         //Can use this for testing
         //[HttpGet]
         //[AllowAnonymous]
