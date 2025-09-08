@@ -50,6 +50,7 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
         [Route("api/getapi/{id}")]
         public async Task<IActionResult> GetApi(Guid id)
         {
@@ -58,7 +59,7 @@ namespace Harvest.Web.Controllers.Api
                 .Where(p => p.Token == id && p.TokenExpires > DateTime.UtcNow)
                 .SingleOrDefaultAsync();
             if (permission == null)
-                {
+            {
                 return NotFound();
             }
             var apiKey = await _apiKeyService.GenerateApiKeyAsync(permission.Id);
