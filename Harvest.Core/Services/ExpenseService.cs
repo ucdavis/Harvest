@@ -198,6 +198,8 @@ namespace Harvest.Core.Services
                 CreatedOn = now,
                 CreatedBy = null,
                 Account = rate.Account,
+                Approved = true, //This is an automatic expense, so we approve it
+                ApprovedOn = now,
             };
             return expense;
         }

@@ -142,6 +142,12 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.Property<bool>("Approved")
                         .HasColumnType("bit");
 
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedOn")
+                        .HasColumnType("datetime2");
+
                     b.Property<int?>("CreatedById")
                         .HasColumnType("int");
 
@@ -187,7 +193,14 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
+                    b.Property<Guid?>("WorkerMobileId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("Approved");
+
+                    b.HasIndex("ApprovedById");
 
                     b.HasIndex("CreatedById");
 
@@ -196,6 +209,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("ProjectId");
 
                     b.HasIndex("RateId");
+
+                    b.HasIndex("WorkerMobileId");
 
                     b.ToTable("Expenses");
                 });
@@ -314,20 +329,42 @@ namespace Harvest.Core.Migrations.SqlServer
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<byte[]>("Hash")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
+                    b.Property<byte[]>("Lookup")
+                        .HasMaxLength(32)
+                        .HasColumnType("varbinary(32)");
+
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+                    b.Property<byte[]>("Salt")
+                        .HasMaxLength(16)
+                        .HasColumnType("varbinary(16)");
+
                     b.Property<int?>("TeamId")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("Token")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("TokenExpires")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Lookup");
+
                     b.HasIndex("RoleId");
 
                     b.HasIndex("TeamId");
+
+                    b.HasIndex("Token");
 
                     b.HasIndex("UserId");
 
@@ -999,6 +1036,21 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("PermissionParent", b =>
+                {
+                    b.Property<int>("ChildId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ChildId", "ParentId");
+
+                    b.HasIndex("ParentId");
+
+                    b.ToTable("PermissionParent");
+                });
+
             modelBuilder.Entity("Harvest.Core.Domain.Account", b =>
                 {
                     b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
@@ -1027,6 +1079,10 @@ namespace Harvest.Core.Migrations.SqlServer
 
             modelBuilder.Entity("Harvest.Core.Domain.Expense", b =>
                 {
+                    b.HasOne("Harvest.Core.Domain.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById");
+
                     b.HasOne("Harvest.Core.Domain.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
@@ -1047,6 +1103,8 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasForeignKey("RateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApprovedBy");
 
                     b.Navigation("CreatedBy");
 
@@ -1366,6 +1424,21 @@ namespace Harvest.Core.Migrations.SqlServer
                         .IsRequired();
 
                     b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("PermissionParent", b =>
+                {
+                    b.HasOne("Harvest.Core.Domain.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Harvest.Core.Domain.Permission", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Harvest.Core.Domain.Document", b =>

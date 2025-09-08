@@ -45,19 +45,23 @@ const getDefaultActivity = (id: number) => ({
   ],
 });
 
-export const ExpenseEntryContainer = () => {
+interface Props {
+  isEditMode: boolean;
+}
+
+export const ExpenseEntryContainer = (props: Props) => {
   const history = useHistory();
 
-  const { projectId, team } = useParams<CommonRouteParams>();
+  const { projectId, team, expenseId } = useParams<CommonRouteParams>();
   const [rates, setRates] = useState<Rate[]>([]);
   const [inputErrors, setInputErrors] = useState<string[]>([]);
   const context = useOrCreateValidationContext(validatorOptions);
   const [project, setProject] = useState<Project>();
+  const [existingExpense, setExistingExpense] = useState<Expense | null>(null);
+  const isEditMode = props.isEditMode;
 
   // activities are groups of expenses
-  const [activities, setActivities] = useState<Activity[]>([
-    getDefaultActivity(1),
-  ]);
+  const [activities, setActivities] = useState<Activity[]>([]);
 
   const { roles } = useContext(AppContext).user;
 
@@ -66,16 +70,96 @@ export const ExpenseEntryContainer = () => {
   const query = useQuery();
   const getIsMounted = useIsMounted();
 
+  // Load existing expense data if in edit mode (after rates are loaded)
+  useEffect(() => {
+    if (!isEditMode || !expenseId || !team || rates.length === 0) {
+      return;
+    }
+
+    const loadExpense = async () => {
+      try {
+        const response = await authenticatedFetch(
+          `/api/${team}/Expense/Get/${expenseId}`
+        );
+        if (response.ok) {
+          const expense: Expense = await response.json();
+          getIsMounted() && setExistingExpense(expense);
+
+          // Create work item from existing expense
+          const existingWorkItem = new WorkItemImpl(1, 1, expense.type);
+          existingWorkItem.quantity = expense.quantity;
+          existingWorkItem.markup = expense.markup;
+          existingWorkItem.rate = expense.price;
+          existingWorkItem.rateId = expense.rateId;
+          existingWorkItem.description = expense.description;
+          existingWorkItem.total = expense.total;
+
+          // Create default work items for other types (excluding the existing one)
+          const defaultWorkItems = [
+            new WorkItemImpl(1, 2, "Labor"),
+            new WorkItemImpl(1, 3, "Equipment"),
+            new WorkItemImpl(1, 4, "Other"),
+          ].filter((item) => item.type !== expense.type);
+
+          // Combine existing work item with default ones
+          const allWorkItems = [existingWorkItem, ...defaultWorkItems];
+
+          const activity: Activity = {
+            id: 1,
+            name: expense.activity,
+            total: expense.total,
+            year: 0,
+            adjustment: 0,
+            workItems: allWorkItems,
+          };
+
+          getIsMounted() && setActivities([activity]);
+        } else {
+          console.error(
+            "Failed to load expense, response status:",
+            response.status
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load expense:", error);
+        toast.error("Failed to load expense data");
+      }
+    };
+
+    loadExpense();
+  }, [isEditMode, expenseId, team, getIsMounted, rates]);
+
+  // Initialize default activity only for create mode
+  useEffect(() => {
+    if (!isEditMode && activities.length === 0) {
+      setActivities([getDefaultActivity(1)]);
+    }
+  }, [isEditMode, activities.length]);
+
   const leavePage = useCallback(() => {
+    if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
+      // Check if we should return to the pending expenses list
+      const returnToShowAll = query.get(ExpenseQueryParams.ReturnToShowAll);
+      if (returnToShowAll !== null) {
+        // Navigate to the appropriate pending expenses page
+        if (returnToShowAll === "true") {
+          history.push(`/${team}/expense/GetAllPendingExpenses`);
+        } else {
+          history.push(`/${team}/expense/GetMyPendingExpenses`);
+        }
+        return;
+      }
+      // Default fallback to history.goBack()
+      history.goBack();
+      return;
+    }
+
+    // Original logic for non-return cases
     // go to the project page unless you are a worker -- worker can't see the project page
     if (roles.includes("Worker")) {
       history.push(`/${team}/team`);
     } else {
-      if (query.get(ExpenseQueryParams.ReturnOnSubmit) === "true") {
-        history.goBack();
-      } else {
-        history.push(`/${team}/project/details/${projectId}`);
-      }
+      history.push(`/${team}/project/details/${projectId}`);
     }
   }, [projectId, history, query, roles, team]);
 
@@ -162,10 +246,18 @@ export const ExpenseEntryContainer = () => {
     // we don't need to send along the whole rate description every time and we shouldn't pass along our internal ids
     const expensesBody = activities.flatMap((activity) =>
       activity.workItems
-        .filter((w) => w.rateId !== 0)
-        .flatMap(
-          (workItem): Expense => ({
-            id: 0,
+        .filter((w) => w.rateId !== 0 && w.total > 0)
+        .map((workItem): Expense => {
+          // In edit mode, the first work item in the first activity is the existing expense
+          const isExistingExpense =
+            isEditMode &&
+            existingExpense &&
+            activity.id === 1 &&
+            workItem.id === 1 &&
+            workItem.type === existingExpense.type;
+
+          return {
+            id: isExistingExpense ? existingExpense.id : 0,
             activity: activity.name,
             description: workItem.description,
             price: workItem.rate,
@@ -175,19 +267,36 @@ export const ExpenseEntryContainer = () => {
             total: workItem.total,
             rateId: workItem.rateId,
             rate: null,
-          })
-        )
+            approved: false,
+          };
+        })
     );
 
-    const request = authenticatedFetch(
-      `/api/${team}/Expense/Create/${projectId}`,
-      {
-        method: "POST",
-        body: JSON.stringify(expensesBody),
+    const endpoint = isEditMode
+      ? `/api/${team}/Expense/Edit/${projectId}`
+      : `/api/${team}/Expense/Create/${projectId}`;
+
+    const successMessage = isEditMode ? "Expense Updated" : "Expenses Saved";
+    const pendingMessage = isEditMode ? "Updating Expense" : "Saving Expenses";
+
+    const request = authenticatedFetch(endpoint, {
+      method: "POST",
+      body: JSON.stringify(expensesBody),
+    });
+
+    setNotification(request, pendingMessage, successMessage, async (error) => {
+      // Handle error cases
+      if (error.status === 404) {
+        return isEditMode ? "Expense not found" : "Project not found";
+      } else if (error.status === 400) {
+        const errorText = await error.text();
+        return errorText || "Bad request";
+      } else {
+        return isEditMode
+          ? "Failed to update expense"
+          : "Failed to save expenses";
       }
-    );
-
-    setNotification(request, "Saving Expenses", "Expenses Saved");
+    });
 
     const response = await request;
 
@@ -233,11 +342,22 @@ export const ExpenseEntryContainer = () => {
       <div className="card-wrapper">
         <div className="card-content">
           <h1>
-            Add Expenses for{" "}
+            {isEditMode ? "Edit Expense for" : "Add Expenses for"}{" "}
             <Link to={`/${team}/project/details/${projectId}`}>
               Project {projectId}
             </Link>
           </h1>
+
+          {isEditMode && (
+            <>
+              <small>
+                You are in edit mode. If you add any expenses, they will show as
+                added and approved by yourself. Changes to the existing expense
+                will still need to be approved.
+              </small>
+              <br />
+            </>
+          )}
           <br />
           <div>
             {activities.map((activity) => (
@@ -280,7 +400,7 @@ export const ExpenseEntryContainer = () => {
                 notification.pending || !isValid() || context.formErrorCount > 0
               }
             >
-              Submit Expense
+              {isEditMode ? "Update Expense" : "Submit Expense"}
             </button>
           </div>
         </div>

@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faLongArrowAltUp,
   faLongArrowAltDown,
+  faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const ReactTable = ({
@@ -22,6 +23,8 @@ export const ReactTable = ({
   filterTypes,
   hideFilters = false,
   hidePagination = false,
+  onRowClick,
+  enableExport = false,
 }: any) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -63,8 +66,75 @@ export const ReactTable = ({
     usePagination
   );
 
+  // CSV Export functionality
+  const exportToCSV = () => {
+    // Get all column headers (visible columns only)
+    const headers = columns
+      .filter((col: any) => col.accessor) // Only include columns with accessors
+      .map((col: any) => col.Header || col.accessor);
+
+    // Convert data to CSV format
+    const csvData = [
+      headers.join(","), // Header row
+      ...data.map((row: any) =>
+        columns
+          .filter((col: any) => col.accessor)
+          .map((col: any) => {
+            let value = "";
+            if (typeof col.accessor === "string") {
+              value = row[col.accessor] || "";
+            } else if (typeof col.accessor === "function") {
+              value = col.accessor(row) || "";
+            }
+
+            // Handle values that contain commas, quotes, or newlines
+            if (
+              typeof value === "string" &&
+              (value.includes(",") ||
+                value.includes('"') ||
+                value.includes("\n"))
+            ) {
+              value = `"${value.replace(/"/g, '""')}"`;
+            }
+
+            return value;
+          })
+          .join(",")
+      ),
+    ].join("\n");
+
+    // Create and download the file
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const filename = `export-${timestamp}.csv`;
+
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", filename);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   return (
     <>
+      {enableExport && (
+        <div className="mb-2">
+          <button
+            className="btn btn-link p-0 text-primary"
+            onClick={exportToCSV}
+          >
+            <FontAwesomeIcon icon={faDownload} className="me-1" /> Export CSV
+          </button>
+        </div>
+      )}
       <table
         className="table harvest-table table-bordered table-striped"
         {...getTableProps()}
@@ -110,7 +180,27 @@ export const ReactTable = ({
             rows.map((row) => {
               prepareRow(row);
               return (
-                <tr className="rt-tr-group" {...row.getRowProps()}>
+                <tr
+                  className="rt-tr-group"
+                  {...row.getRowProps()}
+                  onClick={
+                    onRowClick
+                      ? (e) => {
+                          // Don't trigger row click if clicking on a button or link
+                          const target = e.target as HTMLElement;
+                          if (
+                            target.tagName === "BUTTON" ||
+                            target.tagName === "A" ||
+                            target.closest("button") ||
+                            target.closest("a")
+                          ) {
+                            return;
+                          }
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                >
                   {row.cells.map((cell) => {
                     return (
                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>
@@ -124,7 +214,49 @@ export const ReactTable = ({
             page.map((row) => {
               prepareRow(row);
               return (
-                <tr className="rt-tr-group" {...row.getRowProps()}>
+                <tr
+                  className="rt-tr-group"
+                  {...row.getRowProps()}
+                  onClick={
+                    onRowClick
+                      ? (e) => {
+                          // Don't trigger row click if clicking on a button or link
+                          const target = e.target as HTMLElement;
+                          if (
+                            target.tagName === "BUTTON" ||
+                            target.tagName === "A" ||
+                            target.closest("button") ||
+                            target.closest("a")
+                          ) {
+                            return;
+                          }
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                  style={
+                    onRowClick
+                      ? {
+                          cursor: "pointer",
+                          transition: "background-color 0.2s",
+                        }
+                      : undefined
+                  }
+                  onMouseEnter={
+                    onRowClick
+                      ? (e) => {
+                          e.currentTarget.style.backgroundColor = "#f8f9fa";
+                        }
+                      : undefined
+                  }
+                  onMouseLeave={
+                    onRowClick
+                      ? (e) => {
+                          e.currentTarget.style.backgroundColor = "";
+                        }
+                      : undefined
+                  }
+                >
                   {row.cells.map((cell) => {
                     return (
                       <td {...cell.getCellProps()}>{cell.render("Cell")}</td>

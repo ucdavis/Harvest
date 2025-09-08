@@ -1,4 +1,3 @@
-
 export type CropType = "Row" | "Tree" | "Other";
 export interface Crop {
   id: number;
@@ -143,6 +142,10 @@ export interface Expense {
   total: number;
   createdOn?: Date;
   createdBy?: User;
+  approvedBy?: User;
+  approvedOn?: Date;
+  approved: boolean;
+  project?: Project;
 }
 
 export interface AdhocProjectModel {
@@ -154,6 +157,7 @@ export interface AdhocProjectModel {
 
 export enum ExpenseQueryParams {
   ReturnOnSubmit = "returnOnSubmit",
+  ReturnToShowAll = "returnToShowAll",
 }
 
 export interface Transfer {
@@ -422,4 +426,5 @@ export interface CommonRouteParams {
   projectId?: string;
   ticketId?: string;
   shareId?: string;
+  expenseId?: string;
 }

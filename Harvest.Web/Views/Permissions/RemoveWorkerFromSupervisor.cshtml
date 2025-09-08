@@ -1,0 +1,28 @@
+﻿@model Harvest.Web.Models.RemoveWorkerModel
+@{
+    ViewBag.Title = "Remove Worker from Supervisor";
+}
+
+<div class="card-wrapper col-md-6">
+    <div class="card-content">
+
+        <h1>Remove Worker From Supervisor</h1>
+        <h2>Supervisor: @Model.SupervisorName</h2>
+        <div>
+            <h3>Worker: @Model.WorkerName</h3>
+            <hr />
+            <form asp-action="RemoveWorkerFromSupervisor">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" name="WorkerId" value="@Model.WorkerId" />
+                <input type="hidden" name="SupervisorId" value="@Model.SupervisorId" />
+
+                <div class="form-group">
+                    <input type="submit" value="Remove Worker" class="btn btn-primary" />
+                </div>
+            </form>
+
+
+        </div>
+
+    </div>
+</div>

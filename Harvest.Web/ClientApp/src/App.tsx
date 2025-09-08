@@ -11,6 +11,7 @@ import { ConditionalRoute } from "./ConditionalRoute";
 
 import { ApprovalContainer } from "./Requests/ApprovalContainer";
 import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
+import { PendingExpensesListContainer } from "./Expenses/PendingExpensesListContainer";
 import { HomeContainer } from "./Home/HomeContainer";
 import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
@@ -32,6 +33,7 @@ import { CloseoutContainer } from "./Closeout/CloseoutContainer";
 import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationContainer";
 import { AdhocProject } from "./Projects/AdhocProject";
 import { TeamPicker } from "./Teams/TeamPicker";
+import { MobileTokenContainer } from "./Mobile/MobileTokenContainer";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -158,6 +160,20 @@ function App() {
               />
             </ConditionalRoute>
             <ConditionalRoute
+              roles={["Supervisor"]}
+              exact
+              path="/:team/expense/GetMyPendingExpenses"
+            >
+              <PendingExpensesListContainer showAll={false} />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["FieldManager"]}
+              exact
+              path="/:team/expense/GetAllPendingExpenses"
+            >
+              <PendingExpensesListContainer showAll={true} />
+            </ConditionalRoute>
+            <ConditionalRoute
               exact
               roles={["FieldManager", "Supervisor"]}
               path="/:team/ticket/needsAttention"
@@ -188,8 +204,21 @@ function App() {
             <ConditionalRoute
               roles={["FieldManager", "Supervisor", "Worker"]}
               path="/:team/expense/entry/:projectId?"
-              component={ExpenseEntryContainer}
+            >
+              <ExpenseEntryContainer isEditMode={false} />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["Worker"]}
+              exact
+              path="/:team/mobile/token"
+              component={MobileTokenContainer}
             />
+            <ConditionalRoute
+              roles={["FieldManager", "Supervisor"]}
+              path="/:team/expense/edit/:projectId/:expenseId"
+            >
+              <ExpenseEntryContainer isEditMode={true} />
+            </ConditionalRoute>
             <Route
               path="/:team/expense/unbilled/:projectId/:shareId?"
               component={UnbilledExpensesContainer}

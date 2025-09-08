@@ -52,8 +52,18 @@ namespace Harvest.Core.Domain
 
         public User CreatedBy { get; set; }
 
-        public bool Approved { get; set; } = true;
+        public bool Approved { get; set; }
+
+        public int? ApprovedById { get; set; }
+        public User ApprovedBy { get; set; }
+        public DateTime? ApprovedOn { get; set; }
+
         public bool IsPassthrough { get; set; } = false;
+
+        /// <summary>
+        /// Used by the API to prevent duplicate entries from mobile workers.
+        /// </summary>
+        public Guid? WorkerMobileId { get; set; }
 
         [Required]
         [StringLength(80)]
@@ -62,6 +72,9 @@ namespace Harvest.Core.Domain
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Expense>().HasIndex(a => a.ProjectId);
+            modelBuilder.Entity<Expense>().HasIndex(a => a.WorkerMobileId);
+            modelBuilder.Entity<Expense>().HasIndex(a => a.Approved);
+            modelBuilder.Entity<Expense>().HasIndex(a => a.CreatedById);
 
             modelBuilder.Entity<Expense>().Property(a => a.Price).HasPrecision(18, 2);
             modelBuilder.Entity<Expense>().Property(a => a.Total).HasPrecision(18, 2);

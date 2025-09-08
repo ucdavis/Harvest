@@ -134,16 +134,19 @@ export const UnbilledExpensesContainer = (props: Props) => {
         <div className="row justify-content-between mb-3">
           <div className="col">
             {expenses.length ? (
-              <h3>
-                Unbilled Expenses
-                <small> (${formatCurrency(total)} total)</small>
-                {total - project.quoteTotal > 0 && (
-                  <p style={{ color: "red" }}>
-                    <strong> Warning!</strong> Expenses exceed amount remaining
-                    by ${formatCurrency(total - project.quoteTotal)}
-                  </p>
-                )}
-              </h3>
+              <>
+                <h3>
+                  Unbilled Expenses
+                  <small> (${formatCurrency(total)} total)</small>
+                  {total - project.quoteTotal > 0 && (
+                    <p style={{ color: "red" }}>
+                      <strong> Warning!</strong> Expenses exceed amount
+                      remaining by ${formatCurrency(total - project.quoteTotal)}
+                    </p>
+                  )}
+                </h3>
+                <small>You may click on the expense row for more details</small>
+              </>
             ) : (
               <h3>No Unbilled Expenses</h3>
             )}
@@ -167,10 +170,12 @@ export const UnbilledExpensesContainer = (props: Props) => {
           <ExpenseTable
             expenses={expenses}
             deleteExpense={deleteExpense}
-            canDeleteExpense={
+            showActions={
               !notification.pending &&
               project?.status !== "PendingCloseoutApproval"
             }
+            showProject={false}
+            showApprove={false} //If we want to be able to do this here, we have to query more info to see if the worker belongs to the supervisor. We could always show for the Field Manager.
           ></ExpenseTable>
         )}
       </div>

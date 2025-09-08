@@ -12,6 +12,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
 using Harvest.Core.Utilities;
+using Harvest.Web.Authentication;
 using Harvest.Web.Handlers;
 using Harvest.Web.Middleware;
 using Harvest.Web.Models;
@@ -96,6 +97,7 @@ namespace Harvest.Web
                     return Task.CompletedTask;
                 };
             })
+            .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>(AccessCodes.ApiKey, options => { })
             .AddOpenIdConnect(oidc =>
             {
                 oidc.ClientId = Configuration["Authentication:ClientId"];
@@ -142,6 +144,9 @@ namespace Harvest.Web
 
             services.AddAuthorization(options =>
             {
+                // Add API Key policy
+                options.AddPolicy(AccessCodes.ApiKey, policy => policy.Requirements.Add(new ApiKeyRequirement()));
+                
                 // no need to specify additional roles for system admin, as an exception is made for it in VerifyRoleAccessHandler
                 options.AddPolicy(AccessCodes.SystemAccess, policy => policy.Requirements.Add(
                     new VerifyRoleAccess(AccessConfig.GetRoles(AccessCodes.SystemAccess))));
@@ -170,7 +175,7 @@ namespace Harvest.Web
             });
 
             services.AddScoped<IAuthorizationHandler, VerifyRoleAccessHandler>();
-
+            services.AddScoped<IAuthorizationHandler, ApiKeyAuthorizationHandler>();
 
             // setup entity framework
             // "Provider" config only present when using ef migrations cli
@@ -228,6 +233,7 @@ namespace Harvest.Web
             services.AddScoped<IProjectHistoryService, ProjectHistoryService>();
             services.AddScoped<IInvoiceService, InvoiceService>();
             services.AddScoped<IExpenseService, ExpenseService>();
+            services.AddScoped<IApiKeyService, ApiKeyService>();
             services.AddTransient<RoleResolver>(serviceProvider => AccessConfig.GetRoles);
             services.AddTransient<IDateTimeService, DateTimeService>();
             services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();
