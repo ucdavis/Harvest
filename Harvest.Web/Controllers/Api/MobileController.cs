@@ -60,7 +60,7 @@ namespace Harvest.Web.Controllers.Api
             // Step 1: Get recent project IDs and last activity
             var recentProjectIds = await _dbContext.Expenses
                 .AsNoTracking()
-                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id)
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
                 .GroupBy(e => new { e.ProjectId, e.Project.Name })
                 .Select(g => new
                 {
@@ -80,6 +80,12 @@ namespace Harvest.Web.Controllers.Api
                 .Include(p => p.PrincipalInvestigator)
                 .Select(ProjectMobileModel.Projection())
                 .ToListAsync();
+
+            // Preserve recency order from recentProjectIds
+            var orderMap = recentProjectIds.ToDictionary(x => x.ProjectId, x => x.Last);
+            projects = projects
+                .OrderByDescending(p => orderMap[p.Id])
+                .ToList();
 
             return Ok(projects);
         }
