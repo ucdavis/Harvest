@@ -127,13 +127,23 @@ namespace Harvest.Web.Controllers.Api
                 return Unauthorized("User information not found");
             }
             //Find my last 5 rates I have entered expenses for.
-            var recentRates = await _dbContext.Expenses
+            var recentRateIds = await _dbContext.Expenses
+                .AsNoTracking()
                 .Where(e => e.Rate.TeamId == teamId && e.CreatedById == user.Id && e.Rate.IsActive)
-                .OrderByDescending(e => e.CreatedOn)
-                .Select(e => new { e.RateId, e.Rate.Description, e.Rate.Price, e.Rate.Unit, e.Rate.Type, e.Rate.IsPassthrough })
-                .Distinct()
+                .GroupBy(e => e.RateId)
+                .Select(g => new { RateId = g.Key, Last = g.Max(e => e.CreatedOn) })
+                .OrderByDescending(x => x.Last)
                 .Take(5)
                 .ToListAsync();
+
+            var rateIds = recentRateIds.Select(x => x.RateId).ToList();
+
+            var recentRates = await _dbContext.Rates
+                .AsNoTracking()
+                .Where(r => rateIds.Contains(r.Id))
+                .Select(e => new { e.Id, e.Description, e.Price, e.Unit, e.Type, e.IsPassthrough })
+                .ToListAsync();
+
             return Ok(recentRates);
         }
 
