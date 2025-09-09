@@ -10,7 +10,6 @@ import { authenticatedFetch } from "../Util/Api";
 export const MobileTokenContainer = () => {
   const { team: routeTeam } = useParams<CommonRouteParams>();
   const [team, setTeam] = useState<string | null>(routeTeam || null);
-  const [mobileToken, setMobileToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingTeam, setIsLoadingTeam] = useState<boolean>(!routeTeam);
   const [error, setError] = useState<string>("");
@@ -57,7 +56,6 @@ export const MobileTokenContainer = () => {
 
       if (response.ok) {
         const token = await response.json();
-        setMobileToken(token);
 
         // Automatically open mobile app with the token
         const baseUrl = window.location.origin;
@@ -72,14 +70,14 @@ export const MobileTokenContainer = () => {
         toast.success("Mobile app authorized successfully!");
       } else {
         const errorText = await response.text();
-        setError(errorText || "Failed to generate mobile token");
-        toast.error("Failed to generate mobile token");
+        setError(errorText || "Failed to authorized mobile app");
+        toast.error("Failed to authorized mobile app");
       }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An unexpected error occurred";
       setError(errorMessage);
-      toast.error("Error generating mobile token");
+      toast.error("Error authorizing mobile app");
     } finally {
       setIsLoading(false);
     }
