@@ -61,11 +61,10 @@ namespace Harvest.Web.Controllers.Api
             var recentProjectIds = await _dbContext.Expenses
                 .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
-                .GroupBy(e => new { e.ProjectId, e.Project.Name })
+                .GroupBy(e => new { e.ProjectId})
                 .Select(g => new
                 {
                     ProjectId = g.Key.ProjectId,
-                    Name = g.Key.Name,
                     Last = g.Max(e => e.CreatedOn)
                 })
                 .OrderByDescending(x => x.Last)
@@ -77,7 +76,6 @@ namespace Harvest.Web.Controllers.Api
 
             var projects = await _dbContext.Projects
                 .Where(p => projectIds.Contains(p.Id))
-                .Include(p => p.PrincipalInvestigator)
                 .Select(ProjectMobileModel.Projection())
                 .ToListAsync();
 
