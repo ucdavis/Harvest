@@ -42,7 +42,7 @@ namespace Harvest.Web.Controllers.Api
                     piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty,
                 })
                 .ToListAsync();
-            
+
             return Ok(projects);
         }
 
@@ -62,16 +62,23 @@ namespace Harvest.Web.Controllers.Api
                 return Unauthorized("User information not found");
             }
             var recentProjects = await _dbContext.Expenses
+                .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id)
-                .OrderByDescending(e => e.CreatedOn)
-                .Select(e => new
-                {
-                    id = e.ProjectId,
-                    name = e.Project.Name,
-                    piName = e.Project.PrincipalInvestigator != null ? e.Project.PrincipalInvestigator.Name : string.Empty,
-                })
-                .Distinct()
+                .GroupBy(e => new { e.ProjectId, e.Project.Name })
+                .Select(g => new { g.Key.ProjectId, g.Key.Name, Last = g.Max(e => e.CreatedOn) })
+                .OrderByDescending(x => x.Last)
                 .Take(5)
+                .Join(
+                    _dbContext.Projects.Include(p => p.PrincipalInvestigator),
+                    x => x.ProjectId,
+                    p => p.Id,
+                    (x, p) => new
+                    {
+                        id = x.ProjectId,
+                        name = x.Name,
+                        piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty
+                    }
+                )
                 .ToListAsync();
 
             return Ok(recentProjects);
@@ -134,7 +141,7 @@ namespace Harvest.Web.Controllers.Api
             var teamId = TeamId;
             var teamSlug = TeamSlug;
             var permissionId = PermissionId;
-            
+
             return Ok(new
             {
                 User = new
