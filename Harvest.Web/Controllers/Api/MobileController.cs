@@ -37,8 +37,9 @@ namespace Harvest.Web.Controllers.Api
                 .Where(p => p.TeamId == teamId && p.IsActive && p.Status == Project.Statuses.Active)
                 .Select(p => new
                 {
-                    p.Id,
-                    p.Name,                    
+                    id = p.Id,
+                    name = p.Name,
+                    piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty,
                 })
                 .ToListAsync();
             
@@ -63,7 +64,12 @@ namespace Harvest.Web.Controllers.Api
             var recentProjects = await _dbContext.Expenses
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id)
                 .OrderByDescending(e => e.CreatedOn)
-                .Select(e => new { e.ProjectId ,e.Project.Name})
+                .Select(e => new
+                {
+                    id = e.ProjectId,
+                    name = e.Project.Name,
+                    piName = e.Project.PrincipalInvestigator != null ? e.Project.PrincipalInvestigator.Name : string.Empty,
+                })
                 .Distinct()
                 .Take(5)
                 .ToListAsync();
