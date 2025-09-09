@@ -45,6 +45,76 @@ namespace Harvest.Web.Controllers.Api
             return Ok(projects);
         }
 
+        [HttpGet]
+        [Route("api/mobile/recentprojects")]
+        public async Task<IActionResult> RecentProjects()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+            //Find my last 5 projects I have entered expenses for.
+            var user = await _userService.GetCurrentUser();
+            if (user == null)
+            {
+                return Unauthorized("User information not found");
+            }
+            var recentProjects = await _dbContext.Expenses
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id)
+                .OrderByDescending(e => e.CreatedOn)
+                .Select(e => new { e.ProjectId ,e.Project.Name})
+                .Distinct()
+                .Take(5)
+                .ToListAsync();
+
+            return Ok(recentProjects);
+        }
+
+        [HttpGet]
+        [Route("api/mobile/activerates")]
+        public async Task<ActionResult> ActiveRates()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+
+            if (await _dbContext.Teams.AnyAsync(t => t.Id == teamId) == false)
+            {
+                return BadRequest();
+            }
+
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
+            return Ok(rates);
+        }
+
+        [HttpGet]
+        [Route("api/mobile/recentrates")]
+        public async Task<ActionResult> RecentRates()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+            var user = await _userService.GetCurrentUser();
+            if (user == null)
+            {
+                return Unauthorized("User information not found");
+            }
+            //Find my last 5 rates I have entered expenses for.
+            var recentRates = await _dbContext.Expenses
+                .Where(e => e.Rate.TeamId == teamId && e.CreatedById == user.Id && e.Rate.IsActive)
+                .OrderByDescending(e => e.CreatedOn)
+                .Select(e => new { e.RateId, e.Rate.Description, e.Rate.Price, e.Rate.Unit, e.Rate.Type, e.Rate.IsPassthrough })
+                .Distinct()
+                .Take(5)
+                .ToListAsync();
+            return Ok(recentRates);
+        }
+
         /// <summary>
         /// Example endpoint to show how user information is now available through UserService
         /// </summary>
