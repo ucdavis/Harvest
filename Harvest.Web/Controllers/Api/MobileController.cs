@@ -61,27 +61,36 @@ namespace Harvest.Web.Controllers.Api
             {
                 return Unauthorized("User information not found");
             }
-            var recentProjects = await _dbContext.Expenses
+            // Step 1: Get recent project IDs and last activity
+            var recentProjectIds = await _dbContext.Expenses
                 .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id)
                 .GroupBy(e => new { e.ProjectId, e.Project.Name })
-                .Select(g => new { g.Key.ProjectId, g.Key.Name, Last = g.Max(e => e.CreatedOn) })
+                .Select(g => new
+                {
+                    ProjectId = g.Key.ProjectId,
+                    Name = g.Key.Name,
+                    Last = g.Max(e => e.CreatedOn)
+                })
                 .OrderByDescending(x => x.Last)
                 .Take(5)
-                .Join(
-                    _dbContext.Projects.Include(p => p.PrincipalInvestigator),
-                    x => x.ProjectId,
-                    p => p.Id,
-                    (x, p) => new
-                    {
-                        id = x.ProjectId,
-                        name = x.Name,
-                        piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty
-                    }
-                )
                 .ToListAsync();
 
-            return Ok(recentProjects);
+            // Step 2: Get PI names for those projects
+            var projectIds = recentProjectIds.Select(x => x.ProjectId).ToList();
+
+            var projects = await _dbContext.Projects
+                .Where(p => projectIds.Contains(p.Id))
+                .Include(p => p.PrincipalInvestigator)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty
+                })
+                .ToListAsync();
+
+            return Ok(projects);
         }
 
         [HttpGet]
