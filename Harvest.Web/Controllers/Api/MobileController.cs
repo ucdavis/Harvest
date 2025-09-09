@@ -1,6 +1,7 @@
 ﻿using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,12 +36,7 @@ namespace Harvest.Web.Controllers.Api
 
             var projects = await _dbContext.Projects
                 .Where(p => p.TeamId == teamId && p.IsActive && p.Status == Project.Statuses.Active)
-                .Select(p => new
-                {
-                    id = p.Id,
-                    name = p.Name,
-                    piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty,
-                })
+                .Select(ProjectMobileModel.Projection())
                 .ToListAsync();
 
             return Ok(projects);
@@ -82,12 +78,7 @@ namespace Harvest.Web.Controllers.Api
             var projects = await _dbContext.Projects
                 .Where(p => projectIds.Contains(p.Id))
                 .Include(p => p.PrincipalInvestigator)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.Name,
-                    piName = p.PrincipalInvestigator != null ? p.PrincipalInvestigator.Name : string.Empty
-                })
+                .Select(ProjectMobileModel.Projection())
                 .ToListAsync();
 
             return Ok(projects);
@@ -108,7 +99,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest();
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId).OrderBy(a => a.Description).Select(r => new { r.Price, r.Unit, r.Type, r.Description, r.Id, r.IsPassthrough }).ToArrayAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
             return Ok(rates);
         }
 
@@ -141,7 +132,7 @@ namespace Harvest.Web.Controllers.Api
             var recentRates = await _dbContext.Rates
                 .AsNoTracking()
                 .Where(r => rateIds.Contains(r.Id))
-                .Select(e => new { e.Id, e.Description, e.Price, e.Unit, e.Type, e.IsPassthrough })
+                .Select(RatesModel.Projection())
                 .ToListAsync();
 
             return Ok(recentRates);
