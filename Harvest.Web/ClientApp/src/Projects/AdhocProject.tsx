@@ -298,6 +298,24 @@ export const AdhocProject = () => {
                         <div className="custom-control custom-radio">
                           <input
                             type="radio"
+                            id="vineCropInput"
+                            name="vineCropInput"
+                            className="custom-control-input"
+                            style={{ zIndex: 1 }} //prevent class custom-control-input from blocking mouse clicks
+                            value="Vineyard"
+                            checked={project.cropType === "Vineyard"}
+                            onChange={handleCropTypeChange}
+                          />
+                          <label
+                            className="custom-control-label"
+                            htmlFor="vineCropInput"
+                          >
+                            Vineyard
+                          </label>
+                        </div>
+                        <div className="custom-control custom-radio">
+                          <input
+                            type="radio"
                             id="otherCropInput"
                             name="otherCropInput"
                             className="custom-control-input"

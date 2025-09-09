@@ -18,6 +18,12 @@
     </div>
     <div class="radio">
         <label>
+            <input type="radio" name="Type" id="TypeVine" value="@Project.CropTypes.Vineyard" @(Model.Type == Project.CropTypes.Vineyard ? "checked='checked'" : "") />
+            @Project.CropTypes.Vineyard
+        </label>
+    </div>
+    <div class="radio">
+        <label>
             <input type="radio" name="Type" id="TypeOther" value="@Project.CropTypes.Other" @(Model.Type == Project.CropTypes.Other ? "checked='checked'" : "") />
             @Project.CropTypes.Other
         </label>

@@ -1,6 +1,7 @@
 ﻿using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
+using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,14 +36,110 @@ namespace Harvest.Web.Controllers.Api
 
             var projects = await _dbContext.Projects
                 .Where(p => p.TeamId == teamId && p.IsActive && p.Status == Project.Statuses.Active)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.Name,                    
-                })
+                .Select(ProjectMobileModel.Projection())
                 .ToListAsync();
-            
+
             return Ok(projects);
+        }
+
+        [HttpGet]
+        [Route("api/mobile/recentprojects")]
+        public async Task<IActionResult> RecentProjects()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+            //Find my last 5 projects I have entered expenses for.
+            var user = await _userService.GetCurrentUser();
+            if (user == null)
+            {
+                return Unauthorized("User information not found");
+            }
+            // Step 1: Get recent project IDs and last activity
+            var recentProjectIds = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
+                .GroupBy(e => new { e.ProjectId})
+                .Select(g => new
+                {
+                    ProjectId = g.Key.ProjectId,
+                    Last = g.Max(e => e.CreatedOn)
+                })
+                .OrderByDescending(x => x.Last)
+                .Take(5)
+                .ToListAsync();
+
+            // Step 2: Get PI names for those projects
+            var projectIds = recentProjectIds.Select(x => x.ProjectId).ToList();
+
+            var projects = await _dbContext.Projects
+                .Where(p => projectIds.Contains(p.Id))
+                .Select(ProjectMobileModel.Projection())
+                .ToListAsync();
+
+            // Preserve recency order from recentProjectIds
+            var orderMap = recentProjectIds.ToDictionary(x => x.ProjectId, x => x.Last);
+            projects = projects
+                .OrderByDescending(p => orderMap[p.Id])
+                .ToList();
+
+            return Ok(projects);
+        }
+
+        [HttpGet]
+        [Route("api/mobile/activerates")]
+        public async Task<ActionResult> ActiveRates()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+
+            if (await _dbContext.Teams.AnyAsync(t => t.Id == teamId) == false)
+            {
+                return BadRequest();
+            }
+
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
+            return Ok(rates);
+        }
+
+        [HttpGet]
+        [Route("api/mobile/recentrates")]
+        public async Task<ActionResult> RecentRates()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+            var user = await _userService.GetCurrentUser();
+            if (user == null)
+            {
+                return Unauthorized("User information not found");
+            }
+            //Find my last 5 rates I have entered expenses for.
+            var recentRateIds = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(e => e.Rate.TeamId == teamId && e.CreatedById == user.Id && e.Rate.IsActive)
+                .GroupBy(e => e.RateId)
+                .Select(g => new { RateId = g.Key, Last = g.Max(e => e.CreatedOn) })
+                .OrderByDescending(x => x.Last)
+                .Take(5)
+                .ToListAsync();
+
+            var rateIds = recentRateIds.Select(x => x.RateId).ToList();
+
+            var recentRates = await _dbContext.Rates
+                .AsNoTracking()
+                .Where(r => rateIds.Contains(r.Id))
+                .Select(RatesModel.Projection())
+                .ToListAsync();
+
+            return Ok(recentRates);
         }
 
         /// <summary>
@@ -58,7 +155,7 @@ namespace Harvest.Web.Controllers.Api
             var teamId = TeamId;
             var teamSlug = TeamSlug;
             var permissionId = PermissionId;
-            
+
             return Ok(new
             {
                 User = new
