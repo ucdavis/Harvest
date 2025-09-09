@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Redirect, useParams } from "react-router-dom";
 import { Button, Card, CardBody, CardHeader, Alert } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMobile, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
+import { faMobile } from "@fortawesome/free-solid-svg-icons";
 import toast from "react-hot-toast";
 import { CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
@@ -15,6 +15,7 @@ export const MobileTokenContainer = () => {
   const [isLoadingTeam, setIsLoadingTeam] = useState<boolean>(!routeTeam);
   const [error, setError] = useState<string>("");
   const [isMobileAppOpened, setIsMobileAppOpened] = useState<boolean>(false);
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   // Fetch team if not provided from route params
   useEffect(() => {
@@ -57,7 +58,18 @@ export const MobileTokenContainer = () => {
       if (response.ok) {
         const token = await response.json();
         setMobileToken(token);
-        toast.success("Mobile token generated successfully!");
+
+        // Automatically open mobile app with the token
+        const baseUrl = window.location.origin;
+        const appLink = `harvestmobile://applink?code=${token}&baseUrl=${encodeURIComponent(
+          baseUrl
+        )}`;
+        window.location.href = appLink;
+
+        // Mark as authorized and opened
+        setIsMobileAppOpened(true);
+        setIsAuthorized(true);
+        toast.success("Mobile app authorized successfully!");
       } else {
         const errorText = await response.text();
         setError(errorText || "Failed to generate mobile token");
@@ -70,18 +82,6 @@ export const MobileTokenContainer = () => {
       toast.error("Error generating mobile token");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const openMobileApp = () => {
-    if (mobileToken) {
-      const baseUrl = window.location.origin;
-      const appLink = `harvestmobile://applink?code=${mobileToken}&baseUrl=${encodeURIComponent(
-        baseUrl
-      )}`;
-      window.location.href = appLink;
-      toast.success("Opening mobile app...");
-      setIsMobileAppOpened(true);
     }
   };
 
@@ -120,19 +120,21 @@ export const MobileTokenContainer = () => {
             </CardHeader>
             <CardBody>
               <p className="text-muted mb-4">
-                Generate a mobile token to authenticate our app.
+                Authorize Harvest Mobile App to use this team with your account.
               </p>
 
-              <div className="mb-4">
-                <Button
-                  color="primary"
-                  onClick={generateMobileToken}
-                  disabled={isLoading || isMobileAppOpened}
-                  size="lg"
-                >
-                  {isLoading ? "Generating..." : "Generate Mobile Token"}
-                </Button>
-              </div>
+              {!isAuthorized && (
+                <div className="mb-4">
+                  <Button
+                    color="primary"
+                    onClick={generateMobileToken}
+                    disabled={isLoading || isMobileAppOpened}
+                    size="lg"
+                  >
+                    {isLoading ? "Authorizing..." : "Authorize Mobile App"}
+                  </Button>
+                </div>
+              )}
 
               {error && (
                 <Alert color="danger" className="mb-4">
@@ -140,42 +142,14 @@ export const MobileTokenContainer = () => {
                 </Alert>
               )}
 
-              {mobileToken && (
-                <div className="mt-4">
-                  <h5>Mobile Token:</h5>
-                  <div className="d-flex align-items-center">
-                    <div
-                      className="form-control me-2"
-                      style={{
-                        fontFamily: "monospace",
-                        fontSize: "0.9rem",
-                        wordBreak: "break-all",
-                        minHeight: "60px",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      {mobileToken}
-                    </div>
-                    <Button
-                      color="primary"
-                      onClick={openMobileApp}
-                      title="Authorize Mobile App"
-                      size="sm"
-                    >
-                      <FontAwesomeIcon
-                        icon={faExternalLinkAlt}
-                        className="mr-2"
-                      />
-                      Authorize Mobile App
-                    </Button>
-                  </div>
-                  <small className="text-muted mt-2 d-block">
-                    Keep this token secure and use it within 5 minutes to
-                    authenticate our mobile app. Otherwise you will need to
-                    regenerate this.
-                  </small>
-                </div>
+              {isAuthorized && (
+                <Alert color="success" className="mb-4">
+                  <h5 className="mb-2">✅ Mobile App Authorized!</h5>
+                  <p className="mb-0">
+                    Your mobile app has been successfully authorized for this
+                    team. You can now close this page and use the mobile app.
+                  </p>
+                </Alert>
               )}
             </CardBody>
           </Card>
