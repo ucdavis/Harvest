@@ -70,8 +70,8 @@ export const MobileTokenContainer = () => {
         toast.success("Mobile app authorized successfully!");
       } else {
         const errorText = await response.text();
-        setError(errorText || "Failed to authorized mobile app");
-        toast.error("Failed to authorized mobile app");
+        setError(errorText || "Failed to authorize mobile app");
+        toast.error("Failed to authorize mobile app");
       }
     } catch (err) {
       const errorMessage =
