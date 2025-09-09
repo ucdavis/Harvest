@@ -1,4 +1,4 @@
-export type CropType = "Row" | "Tree" | "Vines" | "Other";
+export type CropType = "Row" | "Tree" | "Vineyard" | "Other";
 export interface Crop {
   id: number;
   type: CropType;
