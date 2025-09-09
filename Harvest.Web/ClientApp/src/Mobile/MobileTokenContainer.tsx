@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Redirect, useParams } from "react-router-dom";
 import { Button, Card, CardBody, CardHeader, Alert } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMobile, faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
@@ -8,11 +8,44 @@ import { CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
 
 export const MobileTokenContainer = () => {
-  const { team } = useParams<CommonRouteParams>();
+  const { team: routeTeam } = useParams<CommonRouteParams>();
+  const [team, setTeam] = useState<string | null>(routeTeam || null);
   const [mobileToken, setMobileToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingTeam, setIsLoadingTeam] = useState<boolean>(!routeTeam);
   const [error, setError] = useState<string>("");
   const [isMobileAppOpened, setIsMobileAppOpened] = useState<boolean>(false);
+
+  // Fetch team if not provided from route params
+  useEffect(() => {
+    const fetchTeam = async () => {
+      if (!routeTeam) {
+        setIsLoadingTeam(true);
+        try {
+          const response = await authenticatedFetch("/api/Link/GetTeam");
+          if (response.ok) {
+            const teamSlug = await response.json();
+            if (teamSlug && teamSlug.trim()) {
+              setTeam(teamSlug.trim());
+            } else {
+              // No team found, redirect to team selection
+              setTeam(null);
+            }
+          } else {
+            // API call failed, redirect to team selection
+            setTeam(null);
+          }
+        } catch (err) {
+          // Error occurred, redirect to team selection
+          setTeam(null);
+        } finally {
+          setIsLoadingTeam(false);
+        }
+      }
+    };
+
+    fetchTeam();
+  }, [routeTeam]);
 
   const generateMobileToken = async () => {
     setIsLoading(true);
@@ -51,6 +84,28 @@ export const MobileTokenContainer = () => {
       setIsMobileAppOpened(true);
     }
   };
+
+  // Show loading state while fetching team
+  if (isLoadingTeam) {
+    return (
+      <div className="container">
+        <div className="row justify-content-center">
+          <div className="col-md-8">
+            <Card>
+              <CardBody className="text-center">
+                <p>Loading...</p>
+              </CardBody>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to team selection if no team is available
+  if (!team) {
+    return <Redirect to="/team" />;
+  }
 
   return (
     <div className="container">

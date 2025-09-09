@@ -213,6 +213,11 @@ function App() {
               path="/:team/mobile/token"
               component={MobileTokenContainer}
             />
+            <Route
+              exact
+              path="/mobile/token"
+              component={MobileTokenContainer}
+            />
             <ConditionalRoute
               roles={["FieldManager", "Supervisor"]}
               path="/:team/expense/edit/:projectId/:expenseId"
