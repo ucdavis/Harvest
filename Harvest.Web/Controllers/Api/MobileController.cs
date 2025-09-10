@@ -6,7 +6,9 @@ using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
@@ -16,11 +18,13 @@ namespace Harvest.Web.Controllers.Api
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
 
-        public MobileController(AppDbContext appDbContext, IUserService userService)
+        public MobileController(AppDbContext appDbContext, IUserService userService, IProjectHistoryService historyService)
         {
             _dbContext = appDbContext;
             _userService = userService;
+            _historyService = historyService;
         }
 
         [HttpGet]
@@ -172,6 +176,68 @@ namespace Harvest.Web.Controllers.Api
                 IsAuthenticated = User.Identity?.IsAuthenticated,
                 Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList()
             });
+        }
+
+        [HttpPost]
+        [Route("api/mobile/expense/create")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
+        {
+            if(expenses == null || expenses.Length == 0)
+            {
+                return BadRequest("No expenses provided");
+            }
+            if(expenses.Any(e => e.WorkerMobileId == null))
+            {
+                return BadRequest("Missing WorkerMobileId");
+            }
+            //check to make sure all the WorkerMobileId values in expenses are the same
+            if (expenses.Select(e => e.WorkerMobileId).Distinct().Count() > 1)
+            {
+                return BadRequest("All expenses must have the same WorkerMobileId");
+            }
+
+
+
+            if (await _dbContext.Expenses.AnyAsync(a => a.WorkerMobileId == expenses.First().WorkerMobileId ))
+            {
+                return Conflict("One or more expenses with the same WorkerMobileId already exist");
+            }
+
+            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project.Status != Project.Statuses.Active
+                && project.Status != Project.Statuses.AwaitingCloseout
+                && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
+            }
+
+            var user = await _userService.GetCurrentUser();
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
+            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            foreach (var expense in expenses)
+            {
+                expense.CreatedBy = user;
+                expense.CreatedOn = DateTime.UtcNow;
+                expense.ProjectId = projectId;
+                expense.InvoiceId = null;
+                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                if (autoApprove)
+                {
+                    expense.Approved = true;
+                    expense.ApprovedBy = user;
+                    expense.ApprovedOn = DateTime.UtcNow;
+                }
+            }
+
+            _dbContext.Expenses.AddRange(expenses);
+
+            await _historyService.ExpensesCreated(projectId, expenses);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok("Success");
         }
     }
 }
