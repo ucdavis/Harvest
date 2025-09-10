@@ -251,13 +251,21 @@ namespace Harvest.Web.Controllers.Api
                 await _dbContext.SaveChangesAsync();
             }
 
+            var addedWorkerMobileIds = expensesToAdd
+                .Where(e => e.WorkerMobileId != null)
+                .Select(e => e.WorkerMobileId)
+                .Distinct()
+                .ToList();
+
+            var skippedWorkerMobileIds = wmids
+                .Where(id => !addedWorkerMobileIds.Contains(id))
+                .ToList();
+
             return Ok(new
             {
                 Success = true,
-                AddedWorkerMobileIds = expensesToAdd
-                    .Where(e => e.WorkerMobileId != null)
-                    .Select(e => e.WorkerMobileId)
-                    .ToList()
+                AddedWorkerMobileIds = addedWorkerMobileIds,
+                SkippedWorkerMobileIds = skippedWorkerMobileIds
             });
         }
     }
