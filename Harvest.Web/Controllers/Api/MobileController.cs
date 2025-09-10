@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace Harvest.Web.Controllers.Api
             var recentProjectIds = await _dbContext.Expenses
                 .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
-                .GroupBy(e => new { e.ProjectId})
+                .GroupBy(e => new { e.ProjectId })
                 .Select(g => new
                 {
                     ProjectId = g.Key.ProjectId,
@@ -183,26 +184,19 @@ namespace Harvest.Web.Controllers.Api
         [Consumes(MediaTypeNames.Application.Json)]
         public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
         {
-            if(expenses == null || expenses.Length == 0)
+            if (expenses == null || expenses.Length == 0)
             {
                 return BadRequest("No expenses provided");
             }
-            if(expenses.Any(e => e.WorkerMobileId == null))
+            if (expenses.All(e => e.WorkerMobileId == null))
             {
                 return BadRequest("Missing WorkerMobileId");
             }
-            //check to make sure all the WorkerMobileId values in expenses are the same
-            if (expenses.Select(e => e.WorkerMobileId).Distinct().Count() > 1)
-            {
-                return BadRequest("All expenses must have the same WorkerMobileId");
-            }
 
+            var wmids = expenses.Where(e => e.WorkerMobileId != null).Select(e => e.WorkerMobileId).Distinct().ToList();
 
+            var existingWorkerMobileIds = await _dbContext.Expenses.Where(e => e.WorkerMobileId != null && wmids.Contains(e.WorkerMobileId.Value)).Select(e => e.WorkerMobileId).ToListAsync();
 
-            if (await _dbContext.Expenses.AnyAsync(a => a.WorkerMobileId == expenses.First().WorkerMobileId ))
-            {
-                return Conflict("One or more expenses with the same WorkerMobileId already exist");
-            }
 
             var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
             if (project.Status != Project.Statuses.Active
@@ -215,8 +209,17 @@ namespace Harvest.Web.Controllers.Api
             var user = await _userService.GetCurrentUser();
             var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+
+            var expensesToAdd = new List<Expense>();
+
             foreach (var expense in expenses)
             {
+                if (expense.WorkerMobileId == null || existingWorkerMobileIds != null && existingWorkerMobileIds.Contains(expense.WorkerMobileId))
+                {
+                    //Skip duplicates
+                    continue;
+                }
+
                 expense.Approved = false; //DDon't trust what we pass, or use a model instead?
                 expense.ApprovedById = null;
                 expense.ApprovedOn = null;
@@ -234,15 +237,28 @@ namespace Harvest.Web.Controllers.Api
                     expense.ApprovedBy = user;
                     expense.ApprovedOn = DateTime.UtcNow;
                 }
+
+                expensesToAdd.Add(expense);
             }
 
-            _dbContext.Expenses.AddRange(expenses);
+            if (expensesToAdd.Count != 0)
+            {
 
-            await _historyService.ExpensesCreated(projectId, expenses);
+                _dbContext.Expenses.AddRange(expensesToAdd);
 
-            await _dbContext.SaveChangesAsync();
+                await _historyService.ExpensesCreated(projectId, expensesToAdd);
 
-            return Ok("Success");
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return Ok(new
+            {
+                Success = true,
+                AddedWorkerMobileIds = expensesToAdd
+                    .Where(e => e.WorkerMobileId != null)
+                    .Select(e => e.WorkerMobileId)
+                    .ToList()
+            });
         }
     }
 }
