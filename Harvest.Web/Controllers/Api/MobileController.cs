@@ -217,6 +217,11 @@ namespace Harvest.Web.Controllers.Api
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
+                expense.Approved = false; //DDon't trust what we pass, or use a model instead?
+                expense.ApprovedById = null;
+                expense.ApprovedOn = null;
+                expense.ApprovedBy = null;
+
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
                 expense.ProjectId = projectId;
