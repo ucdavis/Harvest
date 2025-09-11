@@ -180,96 +180,6 @@ namespace Harvest.Web.Controllers.Api
             });
         }
 
-        //[HttpPost]
-        //[Route("api/mobile/expense/create")]
-        //[Consumes(MediaTypeNames.Application.Json)]
-        //public async Task<ActionResult> CreateOld(int projectId, [FromBody] Expense[] expenses)
-        //{
-        //    if (expenses == null || expenses.Length == 0)
-        //    {
-        //        return BadRequest("No expenses provided");
-        //    }
-        //    if (expenses.All(e => e.WorkerMobileId == null))
-        //    {
-        //        return BadRequest("Missing WorkerMobileId");
-        //    }
-
-        //    var wmids = expenses.Where(e => e.WorkerMobileId != null).Select(e => e.WorkerMobileId).Distinct().ToList();
-
-        //    var existingWorkerMobileIds = await _dbContext.Expenses.Where(e => e.WorkerMobileId != null && wmids.Contains(e.WorkerMobileId.Value)).Select(e => e.WorkerMobileId).ToListAsync();
-
-
-        //    var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
-        //    if (project.Status != Project.Statuses.Active
-        //        && project.Status != Project.Statuses.AwaitingCloseout
-        //        && project.Status != Project.Statuses.PendingCloseoutApproval)
-        //    {
-        //        return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
-        //    }
-
-        //    var user = await _userService.GetCurrentUser();
-        //    var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
-        //    var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
-
-        //    var expensesToAdd = new List<Expense>();
-
-        //    foreach (var expense in expenses)
-        //    {
-        //        if (expense.WorkerMobileId == null || existingWorkerMobileIds != null && existingWorkerMobileIds.Contains(expense.WorkerMobileId))
-        //        {
-        //            //Skip duplicates
-        //            continue;
-        //        }
-
-        //        expense.Approved = false; //DDon't trust what we pass, or use a model instead?
-        //        expense.ApprovedById = null;
-        //        expense.ApprovedOn = null;
-        //        expense.ApprovedBy = null;
-
-        //        expense.CreatedBy = user;
-        //        expense.CreatedOn = DateTime.UtcNow;
-        //        expense.ProjectId = projectId;
-        //        expense.InvoiceId = null;
-        //        expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-        //        expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
-        //        if (autoApprove)
-        //        {
-        //            expense.Approved = true;
-        //            expense.ApprovedBy = user;
-        //            expense.ApprovedOn = DateTime.UtcNow;
-        //        }
-
-        //        expensesToAdd.Add(expense);
-        //    }
-
-        //    if (expensesToAdd.Count != 0)
-        //    {
-
-        //        _dbContext.Expenses.AddRange(expensesToAdd);
-
-        //        await _historyService.ExpensesCreated(projectId, expensesToAdd);
-
-        //        await _dbContext.SaveChangesAsync();
-        //    }
-
-        //    var addedWorkerMobileIds = expensesToAdd
-        //        .Where(e => e.WorkerMobileId != null)
-        //        .Select(e => e.WorkerMobileId)
-        //        .Distinct()
-        //        .ToList();
-
-        //    var skippedWorkerMobileIds = wmids
-        //        .Where(id => !addedWorkerMobileIds.Contains(id))
-        //        .ToList();
-
-        //    return Ok(new
-        //    {
-        //        Success = true,
-        //        AddedWorkerMobileIds = addedWorkerMobileIds,
-        //        SkippedWorkerMobileIds = skippedWorkerMobileIds
-        //    });
-        //}
-
         [HttpPost]
         [Route("api/mobile/expense/create")]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -281,7 +191,7 @@ namespace Harvest.Web.Controllers.Api
             }
             var user = await _userService.GetCurrentUser();
             var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor }); //Currently, this will never be true, just future proofing.
-            var allRates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == TeamId && a.Type != Rate.Types.Acreage).ToListAsync();
+            var allRates = await _dbContext.Rates.AsNoTracking().Where(a => a.IsActive && a.TeamId == TeamId && a.Type != Rate.Types.Acreage).ToListAsync();
 
             var results = new CreateExpenseResultsModel();
             foreach (var expense in expenses)
@@ -289,7 +199,6 @@ namespace Harvest.Web.Controllers.Api
                 var resultItem = new CreateExpenseResultItem
                 {
                     WorkerMobileId = expense.WorkerMobileId,
-                    UserId = user.Kerberos,
                 };
 
                 if(expense.WorkerMobileId == null)
@@ -306,19 +215,18 @@ namespace Harvest.Web.Controllers.Api
                     continue;
                 }
 
-                var existingExpense = await _dbContext.Expenses.Include(a => a.CreatedBy).AsNoTracking().FirstOrDefaultAsync(e => e.WorkerMobileId == expense.WorkerMobileId);
+                var existingExpense = await _dbContext.Expenses.AsNoTracking().FirstOrDefaultAsync(e => e.WorkerMobileId == expense.WorkerMobileId);
                 if (existingExpense != null)
                 {
                     resultItem.Result = "Duplicate";
                     resultItem.ExpenseId = existingExpense.Id;
-                    resultItem.UserId = existingExpense.CreatedBy.Kerberos;
                     resultItem.CreatedDate = existingExpense.CreatedOn;
                     results.Summary.Duplicate++;
                     results.Results.Add(resultItem);
                     continue;
                 }
 
-                var project = await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+                var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
 
                 if(project == null)
                 {

@@ -14,7 +14,6 @@ namespace Harvest.Web.Models.MobileModels
     public class CreateExpenseResultItem
     {
         public Guid? WorkerMobileId { get; set; }
-        public string UserId { get; set; }
         public int? ExpenseId { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Result { get; set; }
