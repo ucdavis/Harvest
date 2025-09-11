@@ -3,10 +3,15 @@ using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Services;
+using Harvest.Web.Models.MobileModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers.Api
@@ -16,11 +21,13 @@ namespace Harvest.Web.Controllers.Api
     {
         private readonly AppDbContext _dbContext;
         private readonly IUserService _userService;
+        private readonly IProjectHistoryService _historyService;
 
-        public MobileController(AppDbContext appDbContext, IUserService userService)
+        public MobileController(AppDbContext appDbContext, IUserService userService, IProjectHistoryService historyService)
         {
             _dbContext = appDbContext;
             _userService = userService;
+            _historyService = historyService;
         }
 
         [HttpGet]
@@ -61,7 +68,7 @@ namespace Harvest.Web.Controllers.Api
             var recentProjectIds = await _dbContext.Expenses
                 .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
-                .GroupBy(e => new { e.ProjectId})
+                .GroupBy(e => new { e.ProjectId })
                 .Select(g => new
                 {
                     ProjectId = g.Key.ProjectId,
@@ -103,7 +110,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest();
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId && a.Type != Rate.Types.Acreage).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
             return Ok(rates);
         }
 
@@ -172,6 +179,157 @@ namespace Harvest.Web.Controllers.Api
                 IsAuthenticated = User.Identity?.IsAuthenticated,
                 Claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList()
             });
+        }
+
+        [HttpPost]
+        [Route("api/mobile/expense/create")]
+        [Consumes(MediaTypeNames.Application.Json)]
+        public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
+        {
+            if (expenses == null || expenses.Length == 0)
+            {
+                return BadRequest("No expenses provided");
+            }
+            var user = await _userService.GetCurrentUser();
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor }); //Currently, this will never be true, just future proofing.
+            var allRates = await _dbContext.Rates.AsNoTracking().Where(a => a.IsActive && a.TeamId == TeamId && a.Type != Rate.Types.Acreage).ToListAsync();
+
+            var results = new CreateExpenseResultsModel();
+            foreach (var expense in expenses)
+            {
+                var resultItem = new CreateExpenseResultItem
+                {
+                    WorkerMobileId = expense.WorkerMobileId,
+                };
+
+                if(expense.WorkerMobileId == null)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "WorkerMobileId",
+                        Code = "Missing",
+                        Message = "Missing WorkerMobileId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                var existingExpense = await _dbContext.Expenses.AsNoTracking().FirstOrDefaultAsync(e => e.WorkerMobileId == expense.WorkerMobileId);
+                if (existingExpense != null)
+                {
+                    resultItem.Result = "Duplicate";
+                    resultItem.ExpenseId = existingExpense.Id;
+                    resultItem.CreatedDate = existingExpense.CreatedOn;
+                    results.Summary.Duplicate++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+
+                if(project == null)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "ProjectId",
+                        Code = "Invalid",
+                        Message = "Invalid ProjectId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                if (project.Status != Project.Statuses.Active
+                    && project.Status != Project.Statuses.AwaitingCloseout
+                    && project.Status != Project.Statuses.PendingCloseoutApproval)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "Project.Status",
+                        Code = "InvalidStatus",
+                        Message = $"Expenses cannot be created for project with status of {project.Status}"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                if (expense.RateId == 0 || allRates.Any(a => a.Id == expense.RateId) == false)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "RateId",
+                        Code = "Invalid",
+                        Message = "Invalid RateId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                try
+                {
+                    expense.Approved = false; //Don't trust what we pass, or use a model instead?
+                    expense.ApprovedById = null;
+                    expense.ApprovedOn = null;
+                    expense.ApprovedBy = null;
+
+                    expense.CreatedBy = user;
+                    expense.CreatedOn = DateTime.UtcNow;
+                    expense.ProjectId = projectId;
+                    expense.InvoiceId = null;
+                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    if (autoApprove)
+                    {
+                        expense.Approved = true;
+                        expense.ApprovedBy = user;
+                        expense.ApprovedOn = DateTime.UtcNow;
+                    }
+
+                    _dbContext.Expenses.Add(expense);
+                    await _dbContext.SaveChangesAsync(); //Do it here so we can catch errors per item.
+
+                    resultItem.Result = "Created";
+                    resultItem.ExpenseId = expense.Id;
+                    resultItem.CreatedDate = expense.CreatedOn;
+                    results.Summary.Created++;
+                    results.Results.Add(resultItem);
+
+
+                    try 
+                    { 
+                        await _historyService.ExpensesCreated(projectId, new List<Expense> { expense }); 
+                    }
+                    catch 
+                    {
+                        //History is not critical, ignore errors.
+                    }
+                }
+                catch (Exception ex)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "Exception",
+                        Code = "Exception",
+                        Message = "An exception occurred saving expense"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    Log.Error(ex, "Exception creating expense for mobile worker");
+                    continue;
+                }
+
+            }
+
+            return Ok(results);
         }
     }
 }
