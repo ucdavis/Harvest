@@ -16,15 +16,16 @@ namespace Harvest.Web.Models.MobileModels
         public Guid? WorkerMobileId { get; set; }
         public string UserId { get; set; }
         public int? ExpenseId { get; set; }
+        public DateTime CreatedDate { get; set; }
         public string Result { get; set; }
         public CreateExpenseErrors Errors { get; set; }
 
     }
     public class CreateExpenseSummaryModel
     {
-        public int Created { get; set; }
-        public int Duplicate { get; set; }
-        public int Rejected { get; set; }
+        public int Created { get; set; } = 0;
+        public int Duplicate { get; set; } = 0;
+        public int Rejected { get; set; } = 0;
     }
 
     public class CreateExpenseErrors

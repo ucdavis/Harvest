@@ -3,6 +3,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Services;
+using Harvest.Web.Models.MobileModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -179,6 +180,96 @@ namespace Harvest.Web.Controllers.Api
             });
         }
 
+        //[HttpPost]
+        //[Route("api/mobile/expense/create")]
+        //[Consumes(MediaTypeNames.Application.Json)]
+        //public async Task<ActionResult> CreateOld(int projectId, [FromBody] Expense[] expenses)
+        //{
+        //    if (expenses == null || expenses.Length == 0)
+        //    {
+        //        return BadRequest("No expenses provided");
+        //    }
+        //    if (expenses.All(e => e.WorkerMobileId == null))
+        //    {
+        //        return BadRequest("Missing WorkerMobileId");
+        //    }
+
+        //    var wmids = expenses.Where(e => e.WorkerMobileId != null).Select(e => e.WorkerMobileId).Distinct().ToList();
+
+        //    var existingWorkerMobileIds = await _dbContext.Expenses.Where(e => e.WorkerMobileId != null && wmids.Contains(e.WorkerMobileId.Value)).Select(e => e.WorkerMobileId).ToListAsync();
+
+
+        //    var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+        //    if (project.Status != Project.Statuses.Active
+        //        && project.Status != Project.Statuses.AwaitingCloseout
+        //        && project.Status != Project.Statuses.PendingCloseoutApproval)
+        //    {
+        //        return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
+        //    }
+
+        //    var user = await _userService.GetCurrentUser();
+        //    var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
+        //    var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+
+        //    var expensesToAdd = new List<Expense>();
+
+        //    foreach (var expense in expenses)
+        //    {
+        //        if (expense.WorkerMobileId == null || existingWorkerMobileIds != null && existingWorkerMobileIds.Contains(expense.WorkerMobileId))
+        //        {
+        //            //Skip duplicates
+        //            continue;
+        //        }
+
+        //        expense.Approved = false; //DDon't trust what we pass, or use a model instead?
+        //        expense.ApprovedById = null;
+        //        expense.ApprovedOn = null;
+        //        expense.ApprovedBy = null;
+
+        //        expense.CreatedBy = user;
+        //        expense.CreatedOn = DateTime.UtcNow;
+        //        expense.ProjectId = projectId;
+        //        expense.InvoiceId = null;
+        //        expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+        //        expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+        //        if (autoApprove)
+        //        {
+        //            expense.Approved = true;
+        //            expense.ApprovedBy = user;
+        //            expense.ApprovedOn = DateTime.UtcNow;
+        //        }
+
+        //        expensesToAdd.Add(expense);
+        //    }
+
+        //    if (expensesToAdd.Count != 0)
+        //    {
+
+        //        _dbContext.Expenses.AddRange(expensesToAdd);
+
+        //        await _historyService.ExpensesCreated(projectId, expensesToAdd);
+
+        //        await _dbContext.SaveChangesAsync();
+        //    }
+
+        //    var addedWorkerMobileIds = expensesToAdd
+        //        .Where(e => e.WorkerMobileId != null)
+        //        .Select(e => e.WorkerMobileId)
+        //        .Distinct()
+        //        .ToList();
+
+        //    var skippedWorkerMobileIds = wmids
+        //        .Where(id => !addedWorkerMobileIds.Contains(id))
+        //        .ToList();
+
+        //    return Ok(new
+        //    {
+        //        Success = true,
+        //        AddedWorkerMobileIds = addedWorkerMobileIds,
+        //        SkippedWorkerMobileIds = skippedWorkerMobileIds
+        //    });
+        //}
+
         [HttpPost]
         [Route("api/mobile/expense/create")]
         [Consumes(MediaTypeNames.Application.Json)]
@@ -188,85 +279,147 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest("No expenses provided");
             }
-            if (expenses.All(e => e.WorkerMobileId == null))
-            {
-                return BadRequest("Missing WorkerMobileId");
-            }
-
-            var wmids = expenses.Where(e => e.WorkerMobileId != null).Select(e => e.WorkerMobileId).Distinct().ToList();
-
-            var existingWorkerMobileIds = await _dbContext.Expenses.Where(e => e.WorkerMobileId != null && wmids.Contains(e.WorkerMobileId.Value)).Select(e => e.WorkerMobileId).ToListAsync();
-
-
-            var project = await _dbContext.Projects.SingleAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
-            if (project.Status != Project.Statuses.Active
-                && project.Status != Project.Statuses.AwaitingCloseout
-                && project.Status != Project.Statuses.PendingCloseoutApproval)
-            {
-                return BadRequest($"Expenses cannot be created for project with status of {project.Status}");
-            }
-
             var user = await _userService.GetCurrentUser();
-            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
-            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor }); //Currently, this will never be true, just future proofing.
+            var allRates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == TeamId && a.Type != Rate.Types.Acreage).ToListAsync();
 
-            var expensesToAdd = new List<Expense>();
-
+            var results = new CreateExpenseResultsModel();
             foreach (var expense in expenses)
             {
-                if (expense.WorkerMobileId == null || existingWorkerMobileIds != null && existingWorkerMobileIds.Contains(expense.WorkerMobileId))
+                var resultItem = new CreateExpenseResultItem
                 {
-                    //Skip duplicates
+                    WorkerMobileId = expense.WorkerMobileId,
+                    UserId = user.Kerberos,
+                };
+
+                if(expense.WorkerMobileId == null)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "WorkerMobileId",
+                        Code = "Missing",
+                        Message = "Missing WorkerMobileId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
                     continue;
                 }
 
-                expense.Approved = false; //DDon't trust what we pass, or use a model instead?
-                expense.ApprovedById = null;
-                expense.ApprovedOn = null;
-                expense.ApprovedBy = null;
-
-                expense.CreatedBy = user;
-                expense.CreatedOn = DateTime.UtcNow;
-                expense.ProjectId = projectId;
-                expense.InvoiceId = null;
-                expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-                expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
-                if (autoApprove)
+                var existingExpense = await _dbContext.Expenses.Include(a => a.CreatedBy).AsNoTracking().FirstOrDefaultAsync(e => e.WorkerMobileId == expense.WorkerMobileId);
+                if (existingExpense != null)
                 {
-                    expense.Approved = true;
-                    expense.ApprovedBy = user;
-                    expense.ApprovedOn = DateTime.UtcNow;
+                    resultItem.Result = "Duplicate";
+                    resultItem.ExpenseId = existingExpense.Id;
+                    resultItem.UserId = existingExpense.CreatedBy.Kerberos;
+                    resultItem.CreatedDate = existingExpense.CreatedOn;
+                    results.Summary.Duplicate++;
+                    results.Results.Add(resultItem);
+                    continue;
                 }
 
-                expensesToAdd.Add(expense);
+                var project = await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+
+                if(project == null)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "ProjectId",
+                        Code = "Invalid",
+                        Message = "Invalid ProjectId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                if (project.Status != Project.Statuses.Active
+                    && project.Status != Project.Statuses.AwaitingCloseout
+                    && project.Status != Project.Statuses.PendingCloseoutApproval)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "Project.Status",
+                        Code = "InvalidStatus",
+                        Message = $"Expenses cannot be created for project with status of {project.Status}"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                if (expense.RateId == 0 || allRates.Any(a => a.Id == expense.RateId) == false)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "RateId",
+                        Code = "Invalid",
+                        Message = "Invalid RateId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                try
+                {
+                    expense.Approved = false; //Don't trust what we pass, or use a model instead?
+                    expense.ApprovedById = null;
+                    expense.ApprovedOn = null;
+                    expense.ApprovedBy = null;
+
+                    expense.CreatedBy = user;
+                    expense.CreatedOn = DateTime.UtcNow;
+                    expense.ProjectId = projectId;
+                    expense.InvoiceId = null;
+                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
+                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    if (autoApprove)
+                    {
+                        expense.Approved = true;
+                        expense.ApprovedBy = user;
+                        expense.ApprovedOn = DateTime.UtcNow;
+                    }
+
+                    _dbContext.Expenses.Add(expense);
+                    await _dbContext.SaveChangesAsync(); //Do it here so we can catch errors per item.
+
+                    resultItem.Result = "Created";
+                    resultItem.ExpenseId = expense.Id;
+                    resultItem.CreatedDate = expense.CreatedOn;
+                    results.Summary.Created++;
+                    results.Results.Add(resultItem);
+
+
+                    try 
+                    { 
+                        await _historyService.ExpensesCreated(projectId, new List<Expense> { expense }); 
+                    }
+                    catch 
+                    {
+                        //History is not critical, ignore errors.
+                    }
+                }
+                catch (Exception ex)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "Exception",
+                        Code = "Exception",
+                        Message = ex.Message
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
             }
 
-            if (expensesToAdd.Count != 0)
-            {
-
-                _dbContext.Expenses.AddRange(expensesToAdd);
-
-                await _historyService.ExpensesCreated(projectId, expensesToAdd);
-
-                await _dbContext.SaveChangesAsync();
-            }
-
-            var addedWorkerMobileIds = expensesToAdd
-                .Where(e => e.WorkerMobileId != null)
-                .Select(e => e.WorkerMobileId)
-                .Distinct()
-                .ToList();
-
-            var skippedWorkerMobileIds = wmids
-                .Where(id => !addedWorkerMobileIds.Contains(id))
-                .ToList();
-
-            return Ok(new
-            {
-                Success = true,
-                AddedWorkerMobileIds = addedWorkerMobileIds,
-                SkippedWorkerMobileIds = skippedWorkerMobileIds
-            });
+            return Ok(results);
         }
     }
 }
