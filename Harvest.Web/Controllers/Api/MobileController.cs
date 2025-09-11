@@ -108,7 +108,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest();
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
+            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId && a.Type != Rate.Types.Acreage).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
             return Ok(rates);
         }
 
