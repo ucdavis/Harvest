@@ -333,6 +333,24 @@ export const ProjectDetailContainer = () => {
         </Link>
       ),
     }),
+    useFor({
+      roles: ["FieldManager"],
+      condition:
+        // all statuses with approved quotes
+        project.status === "PendingApproval",
+      children: (
+        <Link
+          className="btn btn-primary btn-sm mr-4"
+          to={
+            shareId
+              ? `/${team}/quote/details/${project.id}/${shareId}`
+              : `/${team}/quote/details/${project.id}`
+          }
+        >
+          View Pending Quote <FontAwesomeIcon icon={faEye} />
+        </Link>
+      ),
+    }),
     useForPiOnly({
       project: project,
       // all statuses
