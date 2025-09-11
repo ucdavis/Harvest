@@ -7,6 +7,7 @@ using Harvest.Web.Models.MobileModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -318,10 +319,11 @@ namespace Harvest.Web.Controllers.Api
                     {
                         Field = "Exception",
                         Code = "Exception",
-                        Message = ex.Message
+                        Message = "An exception occurred saving expense"
                     };
                     results.Summary.Rejected++;
                     results.Results.Add(resultItem);
+                    Log.Error(ex, "Exception creating expense for mobile worker");
                     continue;
                 }
 
