@@ -289,11 +289,11 @@ namespace Harvest.Web.Controllers.Api
                 .SelectMany(a => a.Children).Select(a => a.User).Select(a => a.Id).ToListAsync();
 
             //TODO: Use a projection? 
-            var pendingExpenses = await _dbContext.Expenses
+            var pendingExpenses = await _dbContext.Expenses.AsNoTracking()
                 .Include(a => a.CreatedBy)
                 .Include(a => a.ApprovedBy)
                 .Include(a => a.Project)
-                .Where(a => !a.Approved && a.CreatedBy != null && myWorkers.Contains(a.CreatedById.Value)) //Created by can be null for auto generated expenses
+                .Where(a => a.Project.Team.Slug == TeamSlug && !a.Approved && a.CreatedBy != null && myWorkers.Contains(a.CreatedById.Value)) //Created by can be null for auto generated expenses
                 .ToArrayAsync();
 
             return Ok(pendingExpenses);
@@ -303,11 +303,11 @@ namespace Harvest.Web.Controllers.Api
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<ActionResult> GetAllPendingExpenses()
         {
-            var pendingExpenses = await _dbContext.Expenses
+            var pendingExpenses = await _dbContext.Expenses.AsNoTracking()
                 .Include(a => a.CreatedBy)
                 .Include(a => a.ApprovedBy)
                 .Include(a => a.Project)
-                .Where(a => !a.Approved && a.CreatedBy != null) //Created by can be null for auto generated expenses
+                .Where(a => a.Project.Team.Slug == TeamSlug && !a.Approved && a.CreatedBy != null) //Created by can be null for auto generated expenses
                 .ToArrayAsync();
 
             return Ok(pendingExpenses);
@@ -321,11 +321,11 @@ namespace Harvest.Web.Controllers.Api
 
             var start = DateTime.UtcNow.AddMonths(-2).Date;
 
-            var approvedExpenses = await _dbContext.Expenses
+            var approvedExpenses = await _dbContext.Expenses.AsNoTracking()
                 .Include(a => a.CreatedBy)
                 .Include(a => a.ApprovedBy)
                 .Include(a => a.Project)
-                .Where(a => a.Approved && a.ApprovedOn != null && a.ApprovedOn >= start)
+                .Where(a => a.Project.Team.Slug == TeamSlug && a.Approved && a.ApprovedOn != null && a.ApprovedOn >= start)
                 .ToArrayAsync();
             return Ok(approvedExpenses);
         }
