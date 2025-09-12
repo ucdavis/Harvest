@@ -182,9 +182,9 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Route("api/mobile/expense/create")]
+        [Route("api/mobile/expense/createExpenses")]
         [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult> Create(int projectId, [FromBody] Expense[] expenses)
+        public async Task<ActionResult> CreateExpenses(int projectId, [FromBody] Expense[] expenses)
         {
             if (expenses == null || expenses.Length == 0)
             {
