@@ -129,6 +129,11 @@ export const AppNav = () => {
                           >
                             All Pending Expenses
                           </DropdownItem>
+                          <DropdownItem
+                            href={`/${team}/Expense/GetApprovedExpenses`}
+                          >
+                            All Aprroved Expenses
+                          </DropdownItem>
                         </ShowFor>
                       </ShowFor>
                       <ShowFor roles={["FieldManager", "Finance"]}>

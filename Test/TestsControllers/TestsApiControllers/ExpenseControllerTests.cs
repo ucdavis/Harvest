@@ -44,7 +44,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(11);
+            ControllerReflection.ControllerPublicMethods(12);
         }
 
         [Fact]
@@ -142,6 +142,13 @@ namespace Test.TestsControllers.TestsApiControllers
             routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("Get", countAdjustment + 4);
             routeAttribute.ShouldNotBeNull();
             routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/Expense/Get/{expenseId}");
+
+            //12
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetApprovedExpenses", countAdjustment + 3);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetApprovedExpenses", countAdjustment + 3);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetApprovedExpenses", countAdjustment + 3);
         }
 
     }
