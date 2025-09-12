@@ -63,7 +63,7 @@ namespace Harvest.Core.Domain
         /// <summary>
         /// Used by the API to prevent duplicate entries from mobile workers.
         /// </summary>
-        public Guid? WorkerMobileId { get; set; }
+        public Guid? UniqueId { get; set; }
 
         [Required]
         [StringLength(80)]
@@ -72,7 +72,7 @@ namespace Harvest.Core.Domain
         internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Expense>().HasIndex(a => a.ProjectId);
-            modelBuilder.Entity<Expense>().HasIndex(a => a.WorkerMobileId);
+            modelBuilder.Entity<Expense>().HasIndex(a => a.UniqueId);
             modelBuilder.Entity<Expense>().HasIndex(a => a.Approved);
             modelBuilder.Entity<Expense>().HasIndex(a => a.CreatedById);
 
