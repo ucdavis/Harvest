@@ -289,6 +289,8 @@ namespace Harvest.Web.Controllers.Api
 
                 try
                 {
+                    var rate = allRates.Single(a => a.Id == expense.RateId);
+
                     expense.Approved = false; //Don't trust what we pass, or use a model instead?
                     expense.ApprovedById = null;
                     expense.ApprovedOn = null;
@@ -298,8 +300,11 @@ namespace Harvest.Web.Controllers.Api
                     expense.CreatedOn = DateTime.UtcNow;
                     //expense.ProjectId = projectId; //take what is passed in.
                     expense.InvoiceId = null;
-                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    expense.Account = rate.Account;
+                    expense.Price = rate.Price;
+                    expense.Type = rate.Type;
+                    expense.Total = Math.Round(rate.Price * expense.Quantity, 2, MidpointRounding.ToZero);
+                    expense.IsPassthrough = rate.IsPassthrough;
                     if (autoApprove)
                     {
                         expense.Approved = true;
