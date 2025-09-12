@@ -45,7 +45,7 @@ export const ApprovedExpensesListContainer = (props: Props) => {
     <div className="projectlisttable-wrapper">
       <div className="row justify-content-between mb-3">
         <div className="col">
-          <h1>Approved Expenses Created withing 2 Months</h1>
+          <h1>Approved Expenses Created within 2 Months</h1>
         </div>
       </div>
 
