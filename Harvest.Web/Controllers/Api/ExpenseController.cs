@@ -314,6 +314,22 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<ActionResult> GetApprovedExpenses()
+        {
+
+            var start = DateTime.UtcNow.AddMonths(-2);
+
+            var approvedExpenses = await _dbContext.Expenses
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
+                .Include(a => a.Project)
+                .Where(a => a.Approved && a.ApprovedOn != null && a.ApprovedOn >= start)
+                .ToArrayAsync();
+            return Ok(approvedExpenses);
+        }
+
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.SupervisorAccess)]

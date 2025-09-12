@@ -34,6 +34,7 @@ import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationCo
 import { AdhocProject } from "./Projects/AdhocProject";
 import { TeamPicker } from "./Teams/TeamPicker";
 import { MobileTokenContainer } from "./Mobile/MobileTokenContainer";
+import { ApprovedExpensesListContainer } from "./Expenses/ApprovedExpensesListContainer";
 
 // Global variable containing top-level app settings and info
 declare var Harvest: AppContextShape;
@@ -172,6 +173,13 @@ function App() {
               path="/:team/expense/GetAllPendingExpenses"
             >
               <PendingExpensesListContainer showAll={true} />
+            </ConditionalRoute>
+            <ConditionalRoute
+              roles={["FieldManager"]}
+              exact
+              path="/:team/expense/GetApprovedExpenses"
+            >
+              <ApprovedExpensesListContainer />
             </ConditionalRoute>
             <ConditionalRoute
               exact
