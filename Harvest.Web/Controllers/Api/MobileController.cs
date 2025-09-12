@@ -184,7 +184,7 @@ namespace Harvest.Web.Controllers.Api
         [HttpPost]
         [Route("api/mobile/expense/createExpenses")]
         [Consumes(MediaTypeNames.Application.Json)]
-        public async Task<ActionResult> CreateExpenses(int projectId, [FromBody] Expense[] expenses)
+        public async Task<ActionResult> CreateExpenses([FromBody] Expense[] expenses)
         {
             if (expenses == null || expenses.Length == 0)
             {
@@ -199,24 +199,24 @@ namespace Harvest.Web.Controllers.Api
             {
                 var resultItem = new CreateExpenseResultItem
                 {
-                    WorkerMobileId = expense.WorkerMobileId,
+                    UniqueId = expense.UniqueId,
                 };
 
-                if(expense.WorkerMobileId == null)
+                if(expense.UniqueId == null)
                 {
                     resultItem.Result = "Rejected";
                     resultItem.Errors = new CreateExpenseErrors
                     {
-                        Field = "WorkerMobileId",
+                        Field = "UniqueId",
                         Code = "Missing",
-                        Message = "Missing WorkerMobileId"
+                        Message = "Missing UniqueId"
                     };
                     results.Summary.Rejected++;
                     results.Results.Add(resultItem);
                     continue;
                 }
 
-                var existingExpense = await _dbContext.Expenses.AsNoTracking().FirstOrDefaultAsync(e => e.WorkerMobileId == expense.WorkerMobileId);
+                var existingExpense = await _dbContext.Expenses.AsNoTracking().FirstOrDefaultAsync(e => e.UniqueId == expense.UniqueId);
                 if (existingExpense != null)
                 {
                     resultItem.Result = "Duplicate";
@@ -227,7 +227,21 @@ namespace Harvest.Web.Controllers.Api
                     continue;
                 }
 
-                var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+                if(expense.ProjectId == 0)
+                {
+                    resultItem.Result = "Rejected";
+                    resultItem.Errors = new CreateExpenseErrors
+                    {
+                        Field = "ProjectId",
+                        Code = "Missing",
+                        Message = "Missing ProjectId"
+                    };
+                    results.Summary.Rejected++;
+                    results.Results.Add(resultItem);
+                    continue;
+                }
+
+                var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == expense.ProjectId && p.Team.Slug == TeamSlug);
 
                 if(project == null)
                 {
@@ -282,7 +296,7 @@ namespace Harvest.Web.Controllers.Api
 
                     expense.CreatedBy = user;
                     expense.CreatedOn = DateTime.UtcNow;
-                    expense.ProjectId = projectId;
+                    //expense.ProjectId = projectId; //take what is passed in.
                     expense.InvoiceId = null;
                     expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                     expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
@@ -305,7 +319,7 @@ namespace Harvest.Web.Controllers.Api
 
                     try 
                     { 
-                        await _historyService.ExpensesCreated(projectId, new List<Expense> { expense }); 
+                        await _historyService.ExpensesCreated(expense.ProjectId, new List<Expense> { expense }); 
                     }
                     catch 
                     {

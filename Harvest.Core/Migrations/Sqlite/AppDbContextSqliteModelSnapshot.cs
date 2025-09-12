@@ -180,7 +180,7 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasMaxLength(15)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("WorkerMobileId")
+                    b.Property<Guid?>("UniqueId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -197,7 +197,7 @@ namespace Harvest.Core.Migrations.Sqlite
 
                     b.HasIndex("RateId");
 
-                    b.HasIndex("WorkerMobileId");
+                    b.HasIndex("UniqueId");
 
                     b.ToTable("Expenses");
                 });
