@@ -319,7 +319,7 @@ namespace Harvest.Web.Controllers.Api
         public async Task<ActionResult> GetApprovedExpenses()
         {
 
-            var start = DateTime.UtcNow.AddMonths(-2);
+            var start = DateTime.UtcNow.AddMonths(-2).Date;
 
             var approvedExpenses = await _dbContext.Expenses
                 .Include(a => a.CreatedBy)
