@@ -47,7 +47,11 @@ namespace Harvest.Web.Controllers.Api
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
-                var rate = allRates.Single(a => a.Id == expense.RateId);
+                var rate = allRates.SingleOrDefault(a => a.Id == expense.RateId);
+                if(rate == null)
+                {
+                    return BadRequest($"Rate with ID of {expense.RateId} is not valid.");
+                }
 
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
