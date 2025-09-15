@@ -1,29 +1,52 @@
 ﻿@{
     ViewBag.Title = "Help";
 }
-<div class="row justify-content-around">
-    <div class="card-wrapper no-green col-md-5">
-        <div class="card-content">
-            <h2>Question about your project or billing?</h2>
-            <h4>Please open your project and submit a ticket from there</h4>
-            <br>
-            <a href="/project/mine" class="btn mt-auto btn-sm btn-primary mb-4">Open My Projects</a>
-        </div>
+<div class="row row-cols-1 row-cols-md-3 g-4">
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+        <h2 class="card-title h5 mb-2">Question about your project or billing?</h2>
+        <p class="card-text mb-4">Please open your project and submit a ticket from there.</p>
+        <a href="/project/mine" class="btn btn-sm btn-primary mt-auto align-self-start">
+          Open My Projects
+        </a>
+      </div>
     </div>
-    <div class="card-wrapper no-green col-md-5">
-        <div class="card-content">
-            <h2>Have a technical support question?</h2>
-            <h4>Please submit a help ticket here:</h4> <br>
-            <a href="https://caeshelp.ucdavis.edu/?appname=Harvest" class="btn mt-auto btn-sm btn-primary mb-4" target="_blank" ref="noopener noreferrer">Help Ticket</a>
-        </div>
+  </div>
+
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+        <h2 class="card-title h5 mb-2">Have a technical support question?</h2>
+        <p class="card-text mb-4">Please submit a help ticket here:</p>
+        <a
+          href="https://caeshelp.ucdavis.edu/?appname=Harvest"
+          class="btn btn-sm btn-primary mt-auto align-self-start"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Help Ticket
+        </a>
+      </div>
     </div>
-    <div class="card-wrapper no-green col-md-5 mt-5">
-        <div class="card-content">
-            <h2>Want to learn more?</h2>
-            <h4>Click here to see training videos, guides, and other information:</h4> <br>
-            <a href="https://computing.caes.ucdavis.edu/documentation/harvest" class="btn mt-auto btn-sm btn-primary mb-4" target="_blank" ref="noopener noreferrer">Harvest Documentation</a>
-        </div>
+  </div>
+
+  <div class="col">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body d-flex flex-column">
+        <h2 class="card-title h5 mb-2">Want to learn more?</h2>
+        <p class="card-text mb-4">Click here to see training videos, guides, and other information:</p>
+        <a
+          href="https://computing.caes.ucdavis.edu/documentation/harvest"
+          class="btn btn-sm btn-primary mt-auto align-self-start"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Harvest Documentation
+        </a>
+      </div>
     </div>
+  </div>
 </div>
 
 

@@ -52,11 +52,11 @@ export const TeamPicker = () => {
                     Field Managers: {team.fieldManagers}
                   </p>
                   <p className="primary-font">{team.description}</p>
-                  <span className="mt-auto">
+                  <button className="mt-auto w-16 btn btn-primary">
                     <b>
                       <FontAwesomeIcon icon={faCheck} /> Use this team
                     </b>
-                  </span>
+                  </button>
                 </div>
               </div>
             </a>

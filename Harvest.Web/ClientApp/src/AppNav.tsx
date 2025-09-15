@@ -45,12 +45,12 @@ export const AppNav = () => {
   const toggle = () => setIsOpen(!isOpen);
 
   return (
-    <div className="nav-wrapper">
+    <div className="nav-wrapper px-0">
       <div className="container">
-        <Navbar color="light" light expand="md">
+        <Navbar expand="md" className="px-0">
           <NavbarToggler onClick={toggle} />
           <Collapse className="justify-content-between" isOpen={isOpen} navbar>
-            <Nav navbar>
+            <Nav className="px-0" navbar>
               <ShowFor roles={["System"]} condition={nonTeamPage}>
                 <NavItem>
                   <NavLink href="/">Home</NavLink>
