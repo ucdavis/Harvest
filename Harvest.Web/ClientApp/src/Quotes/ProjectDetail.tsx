@@ -59,6 +59,7 @@ export const ProjectDetail = (props: Props) => {
         <Row className="align-items-baseline">
           <Col>
             <Label>Acreage Rate</Label>
+            <br />
             <Input
               className={getClassName("acreageRateId")}
               type="select"

@@ -31,18 +31,19 @@ export const ProjectPermissionTable = (props: Props) => {
       },
       ...(canDeletePermission
         ? [
-            {
-              Header: "Action",
-              Cell: (data: any) => (
-                <Button
-                  color="link"
-                  onClick={() => deletePermission(data.row.original)}
-                >
-                  Delete
-                </Button>
-              ),
-            },
-          ]
+          {
+            Header: "Action",
+            Cell: (data: any) => (
+              <Button
+                color="danger"
+                size="sm"
+                onClick={() => deletePermission(data.row.original)}
+              >
+                Delete
+              </Button>
+            ),
+          },
+        ]
         : []),
     ],
     [deletePermission, canDeletePermission]

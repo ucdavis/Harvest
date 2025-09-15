@@ -144,6 +144,11 @@
 
 .map-wrapper {
   border-top: 1px solid $borders;
+  padding: 36px;
+
+  @include breakpoint(lg) {
+    padding: 16px;
+  }
 }
 
 //approval
@@ -167,6 +172,8 @@
 //project details
 
 .attached-files-list {
+  margin-bottom: 0;
+
   svg {
     margin-right: 8px;
   }

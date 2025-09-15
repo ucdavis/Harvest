@@ -435,17 +435,17 @@ export const ProjectDetailContainer = () => {
       >
         {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
           5 && (
-          <ProjectAlerts
-            skipStatusCheck={true}
-            project={project}
-            extraText={`Project has not been acted on since ${new Date(
-              project.lastStatusUpdatedOn
-            ).toLocaleDateString()}. ${getDaysDiff(
-              new Date(),
-              new Date(project.lastStatusUpdatedOn)
-            ).toFixed(0)} days.`}
-          />
-        )}
+            <ProjectAlerts
+              skipStatusCheck={true}
+              project={project}
+              extraText={`Project has not been acted on since ${new Date(
+                project.lastStatusUpdatedOn
+              ).toLocaleDateString()}. ${getDaysDiff(
+                new Date(),
+                new Date(project.lastStatusUpdatedOn)
+              ).toFixed(0)} days.`}
+            />
+          )}
       </ShowFor>
 
       {projectActions.length > 0 && (
@@ -453,7 +453,7 @@ export const ProjectDetailContainer = () => {
           <div className="card-content">
             <div className="row justify-content-between">
               <div className="col-md-12 project-actions">
-                <h4>Project actions</h4>
+                <h3>Project actions</h3>
                 {projectActions.map((action, i) => ({
                   ...action,
                   key: `action_${i}`,
@@ -463,11 +463,11 @@ export const ProjectDetailContainer = () => {
           </div>
         </div>
       )}
-      <div className="card-green-bg green-bg-border pt-3 pb-3">
+      <div className="card-green-bg green-bg-border">
         <div className="card-content">
           <div className="row">
             <div className="col-md-6">
-              <h2>Project Attachments</h2>
+              <h3>Project Attachments</h3>
 
               <ShowForPiOnly project={project}>
                 <FileUpload
@@ -573,7 +573,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -597,7 +597,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&

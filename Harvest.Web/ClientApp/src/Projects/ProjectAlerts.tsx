@@ -44,7 +44,7 @@ export const ProjectAlerts = (props: Props) => {
       {statusDetail.showAlert && (
         <div className={`card-project-status ${statusDetail.cardClass}`}>
           <div className="card-content">
-            <h4>Current Status: {convertCamelCase(project.status)}</h4>
+            <h3>Current Status: {convertCamelCase(project.status)}</h3>
             <p>{statusDetail.statusText} </p>
             {/* <Link
           to={statusDetail.linkTo}
