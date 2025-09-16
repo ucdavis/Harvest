@@ -100,7 +100,7 @@ namespace Test.TestsControllers.TestsApiControllers
             ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>(methodName, countAdjustment + 3, testMessage: "Create");
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>(methodName, countAdjustment + 3);
             var routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>(methodName, countAdjustment + 3);
-            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{controller}/{action}");
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/{controller}/{action}");
         }
     }
 }
