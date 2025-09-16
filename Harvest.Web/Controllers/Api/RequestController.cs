@@ -535,7 +535,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             // TODO: when is name determined? Currently by quote creator but can it be changed?
-            if (string.IsNullOrWhiteSpace(project.Name))
+            if (string.IsNullOrWhiteSpace(newProject.Name))
             {
                 newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
             }
