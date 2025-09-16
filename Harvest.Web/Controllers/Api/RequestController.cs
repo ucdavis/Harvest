@@ -520,17 +520,20 @@ namespace Harvest.Web.Controllers.Api
                 piName = project.PrincipalInvestigator.Name;
             }
 
-            if(newProject.PrincipalInvestigatorId != currentUser.Id)
+            if (newProject.PrincipalInvestigatorId != currentUser.Id)
             {
                 if (!await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, TeamSlug))
                 {
-                    newProject.ProjectPermissions = newProject.ProjectPermissions ?? new List<ProjectPermission>();
-                    // add the current user as a project editor
-                    newProject.ProjectPermissions.Add(new ProjectPermission
+                    if (newProject.ProjectPermissions == null || !newProject.ProjectPermissions.Any(a => a.UserId == currentUser.Id))
                     {
-                        UserId = currentUser.Id,
-                        Permission = Role.Codes.ProjectEditor,
-                    });
+                        newProject.ProjectPermissions = newProject.ProjectPermissions ?? new List<ProjectPermission>();
+                        // add the current user as a project editor
+                        newProject.ProjectPermissions.Add(new ProjectPermission
+                        {
+                            UserId = currentUser.Id,
+                            Permission = Role.Codes.ProjectEditor,
+                        });
+                    }
                 }
             }
 
