@@ -518,6 +518,17 @@ namespace Harvest.Web.Controllers.Api
                 piName = project.PrincipalInvestigator.Name;
             }
 
+            if(newProject.PrincipalInvestigatorId != currentUser.Id)
+            {
+                newProject.ProjectPermissions = newProject.ProjectPermissions ?? new List<ProjectPermission>();
+                // add the current user as a project editor
+                newProject.ProjectPermissions.Add(new ProjectPermission
+                {
+                    UserId = currentUser.Id,
+                    Permission = Role.Codes.ProjectEditor,
+                });
+            }
+
             // If there are attachments, fill out details and add to project
             foreach (var attachment in project.Attachments)
             {
