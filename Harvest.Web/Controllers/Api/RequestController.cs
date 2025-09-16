@@ -522,13 +522,16 @@ namespace Harvest.Web.Controllers.Api
 
             if(newProject.PrincipalInvestigatorId != currentUser.Id)
             {
-                newProject.ProjectPermissions = newProject.ProjectPermissions ?? new List<ProjectPermission>();
-                // add the current user as a project editor
-                newProject.ProjectPermissions.Add(new ProjectPermission
+                if (!await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, TeamSlug))
                 {
-                    UserId = currentUser.Id,
-                    Permission = Role.Codes.ProjectEditor,
-                });
+                    newProject.ProjectPermissions = newProject.ProjectPermissions ?? new List<ProjectPermission>();
+                    // add the current user as a project editor
+                    newProject.ProjectPermissions.Add(new ProjectPermission
+                    {
+                        UserId = currentUser.Id,
+                        Permission = Role.Codes.ProjectEditor,
+                    });
+                }
             }
 
             // If there are attachments, fill out details and add to project
