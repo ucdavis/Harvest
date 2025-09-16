@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,9 +33,11 @@ namespace Harvest.Web.Controllers.Api
         {
             var user = await _userService.GetCurrentUser();
 
+            var validRoles = new List<string> { Role.Codes.Worker, Role.Codes.FieldManager, Role.Codes.Supervisor };
+
 
             var permission = await _dbContext.Permissions
-                .Where(p => p.UserId == user.Id && p.Team.Slug == TeamSlug && p.Role.Name == Role.Codes.Worker)
+                .Where(p => p.UserId == user.Id && p.Team.Slug == TeamSlug && validRoles.Contains(p.Role.Name))
                 .SingleOrDefaultAsync();
             if (permission == null)
             {
