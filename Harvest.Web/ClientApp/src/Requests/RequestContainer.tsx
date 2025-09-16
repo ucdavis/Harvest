@@ -90,7 +90,7 @@ export const RequestContainer = () => {
       return;
     }
 
-    const request = authenticatedFetch(`/api/Request/Create`, {
+    const request = authenticatedFetch(`/api/${team}/Request/Create`, {
       method: "POST",
       body: JSON.stringify(project),
     });

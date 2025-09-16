@@ -423,7 +423,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Route("/api/{controller}/{action}")]
+        [Route("/api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Create([FromBody] Project project)
         {
             var currentUser = await _userService.GetCurrentUser();
@@ -445,6 +445,10 @@ namespace Harvest.Web.Controllers.Api
             
             // ensure team is set
             var team = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).SingleAsync();
+            if(team.Slug != TeamSlug) 
+            {
+                return BadRequest("Team slug in URL and body do not match");
+            }
             newProject.TeamId = team.Id;
 
             if (project.Id > 0)
