@@ -520,22 +520,7 @@ namespace Harvest.Web.Controllers.Api
                 piName = project.PrincipalInvestigator.Name;
             }
 
-            if (newProject.PrincipalInvestigatorId != currentUser.Id)
-            {
-                if (!await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, TeamSlug))
-                {
-                    if (newProject.ProjectPermissions == null || !newProject.ProjectPermissions.Any(a => a.UserId == currentUser.Id))
-                    {
-                        newProject.ProjectPermissions = newProject.ProjectPermissions ?? new List<ProjectPermission>();
-                        // add the current user as a project editor
-                        newProject.ProjectPermissions.Add(new ProjectPermission
-                        {
-                            UserId = currentUser.Id,
-                            Permission = Role.Codes.ProjectEditor,
-                        });
-                    }
-                }
-            }
+            await AddProjectEditorIfNeededAsync(newProject);
 
             // If there are attachments, fill out details and add to project
             foreach (var attachment in project.Attachments)
@@ -572,7 +557,31 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(newProject);
         }
+
+        private async Task AddProjectEditorIfNeededAsync(Project newProject)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            if (newProject.PrincipalInvestigatorId == currentUser.Id)
+            {
+                return;
+            }
+            if (await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, TeamSlug))
+            {
+                return;
+            }
+            if (newProject.ProjectPermissions != null && newProject.ProjectPermissions.Any(a => a.UserId == currentUser.Id))
+            {
+                return;
+            }
+            newProject.ProjectPermissions ??= new List<ProjectPermission>();
+            newProject.ProjectPermissions.Add(new ProjectPermission
+            {
+                UserId = currentUser.Id,
+                Permission = Role.Codes.ProjectEditor,
+            });
+        }
     }
+
 
     public class RequestApprovalModel
     {
