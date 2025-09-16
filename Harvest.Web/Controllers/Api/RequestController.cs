@@ -520,7 +520,7 @@ namespace Harvest.Web.Controllers.Api
                 piName = project.PrincipalInvestigator.Name;
             }
 
-            await AddProjectEditorIfNeededAsync(newProject);
+            await AddProjectEditorIfNeededAsync(newProject, TeamSlug);
 
             // If there are attachments, fill out details and add to project
             foreach (var attachment in project.Attachments)
@@ -558,14 +558,14 @@ namespace Harvest.Web.Controllers.Api
             return Ok(newProject);
         }
 
-        private async Task AddProjectEditorIfNeededAsync(Project newProject)
+        private async Task AddProjectEditorIfNeededAsync(Project newProject, string teamSlug)
         {
             var currentUser = await _userService.GetCurrentUser();
             if (newProject.PrincipalInvestigatorId == currentUser.Id)
             {
                 return;
             }
-            if (await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, TeamSlug))
+            if (await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, teamSlug))
             {
                 return;
             }
