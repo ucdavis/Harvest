@@ -34,7 +34,16 @@ export const TeamPicker = () => {
 
   // show loading message while we wait for teams
   if (!teams) {
-    return <div>Loading teams...</div>;
+    return (
+      <>
+        {" "}
+        <div className="p-4 text-center">
+          <LoadingHarvest size={64} />
+          {/* default color #266041 */}
+          <p>Loading Teams...</p>
+        </div>
+      </>
+    );
   }
 
   // show the list of teams in big boxes
@@ -42,10 +51,6 @@ export const TeamPicker = () => {
     <div>
       <h2>Choose Team</h2>
       <hr />
-      <div className="p-4 text-center">
-        <LoadingHarvest size={64} />{/* default color #266041 */}
-        <p>Loading Projects...</p>
-      </div>
       <div className="row">
         {teams.map((team) => (
           <div className="col-md-6 team-card" key={team.id}>
