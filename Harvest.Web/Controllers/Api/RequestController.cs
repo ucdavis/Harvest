@@ -452,14 +452,14 @@ namespace Harvest.Web.Controllers.Api
                 // this project already exists, so we are requesting a change
                 //Make sure the project exists and the user is the PI or an editor
                 var existingProject = await _dbContext.Projects.Include(p => p.PrincipalInvestigator).Include(a => a.ProjectPermissions).ThenInclude(a => a.User).SingleOrDefaultAsync(p => p.Id == project.Id);
-                if(existingProject == null)
+                if (existingProject == null)
                 {
                     return BadRequest("Project not found");
                 }
-                if(existingProject.PrincipalInvestigator.Iam != currentUser.Iam && !existingProject.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))                
+                if (existingProject.PrincipalInvestigator.Iam != currentUser.Iam && !existingProject.ProjectPermissions.Any(a => a.User.Iam == currentUser.Iam && a.Permission == Role.Codes.ProjectEditor))
                 {
                     //OK, PI is not initiating this change, so we need to check if they are a member of the team in the Field Manager role.
-                    if(!await _userService.HasAnyTeamRoles(team.Slug, new[] { Role.Codes.FieldManager }))
+                    if (!await _userService.HasAnyTeamRoles(team.Slug, new[] { Role.Codes.FieldManager }))
                     {
                         return BadRequest("Not Authorized");
                     }
@@ -469,6 +469,8 @@ namespace Harvest.Web.Controllers.Api
                 newProject.UpdateStatus(Project.Statuses.ChangeRequested);
                 newProject.OriginalProjectId = project.Id;
                 newProject.Acres = project.Acres;
+
+                newProject.Name = $"{existingProject.Name} (Change Request)";
 
                 // get the quote for this project and copy over so we have a good starting point
                 var originalProjectQuote = await _dbContext.Quotes.SingleAsync(q => q.ProjectId == project.Id);
@@ -533,8 +535,10 @@ namespace Harvest.Web.Controllers.Api
             }
 
             // TODO: when is name determined? Currently by quote creator but can it be changed?
-            newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
-
+            if (string.IsNullOrWhiteSpace(project.Name))
+            {
+                newProject.Name = piName + "-" + project.Start.ToString("MMMMyyyy");
+            }
             await _dbContext.Projects.AddAsync(newProject);
             await _historyService.RequestCreated(newProject);
             await _dbContext.SaveChangesAsync();
