@@ -4,6 +4,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { useHistory, useLocation } from "react-router-dom";
 import { Team } from "../types";
+import LoadingHarvest from "../Shared/loadingHarvest";
 
 // Allow selection of a team from a list of teams, then add that team slug to url and redirect
 export const TeamPicker = () => {
@@ -41,6 +42,10 @@ export const TeamPicker = () => {
     <div>
       <h2>Choose Team</h2>
       <hr />
+      <div className="p-4 text-center">
+        <LoadingHarvest size={64} />{/* default color #266041 */}
+        <p>Loading Projects...</p>
+      </div>
       <div className="row">
         {teams.map((team) => (
           <div className="col-md-6 team-card" key={team.id}>

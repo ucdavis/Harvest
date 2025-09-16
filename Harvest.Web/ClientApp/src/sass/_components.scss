@@ -551,3 +551,19 @@ input[type="radio" i] {
 .form-select {
   max-width: 100%;
 }
+
+/* Use your color #266041 for the three bars */
+.navbar-toggler-icon {
+  /* keep your sizing/shorthand if you like */
+  background: 50% / 100% 100% no-repeat;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(38,96,65,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+/* Optional: match border/focus to the same color */
+.navbar-toggler {
+  border-color: #266041;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 .2rem rgba(38, 96, 65, .25);
+}
