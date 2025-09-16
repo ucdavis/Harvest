@@ -520,7 +520,7 @@ namespace Harvest.Web.Controllers.Api
                 piName = project.PrincipalInvestigator.Name;
             }
 
-            await AddProjectEditorIfNeededAsync(newProject, TeamSlug);
+            await AddProjectEditorIfNeededAsync(newProject, team.Slug);
 
             // If there are attachments, fill out details and add to project
             foreach (var attachment in project.Attachments)
