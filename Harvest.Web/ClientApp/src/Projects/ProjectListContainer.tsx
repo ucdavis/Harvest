@@ -9,6 +9,7 @@ import { authenticatedFetch } from "../Util/Api";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router";
+import LoadingHarvest from "../Shared/loadingHarvest";
 
 interface Props {
   projectSource: string;
@@ -28,12 +29,14 @@ const getListTitle = (projectSource: string) => {
 
 export const ProjectListContainer = (props: Props) => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const { team } = useParams<CommonRouteParams>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // get rates so we can load up all expense types and info
+    setIsLoading(true);
     let url = props.projectSource;
     if (props.hasTeamRoute) {
       url = `/api/${team}/${props.projectSource}`;
@@ -43,7 +46,14 @@ export const ProjectListContainer = (props: Props) => {
       const response = await authenticatedFetch(url);
 
       if (response.ok) {
-        getIsMounted() && setProjects(await response.json());
+        if (getIsMounted()) {
+          setProjects(await response.json());
+          setIsLoading(false);
+        }
+      } else {
+        if (getIsMounted()) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -65,7 +75,13 @@ export const ProjectListContainer = (props: Props) => {
         </div>
       </div>
 
-      {projects.length > 0 ? (
+      {isLoading ? (
+        <div className="p-4 text-center">
+          <LoadingHarvest size={64} />
+          {/* default color #266041 */}
+          <p>Loading Projects...</p>
+        </div>
+      ) : projects.length > 0 ? (
         <ProjectTable projects={projects}></ProjectTable>
       ) : (
         <div className="alert alert-info">No projects found</div>
