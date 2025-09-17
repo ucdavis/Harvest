@@ -266,6 +266,10 @@
     }
   }
 
+  tr:hover {
+    background-color: transparentize($primary-color, .95);
+  }
+
   a {
     color: $primary-color;
 
@@ -284,8 +288,16 @@
   }
 
   tr {
-    background-color: #fff !important;
+    background-color: #fff;
   }
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #fff;
+}
+
+.table-striped tbody tr:nth-of-type(odd):hover {
+  background-color: transparentize($primary-color, .95);
 }
 
 $nchild-wide: 24%;
@@ -378,7 +390,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $california;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -414,7 +426,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $california;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -426,7 +438,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $bodega;
+    background-color: $gunrock;
     margin-right: 2px;
   }
 }
@@ -438,7 +450,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $california;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -450,7 +462,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $poppy;
+    background-color: #d5b804;
     margin-right: 2px;
   }
 }
@@ -462,7 +474,7 @@ $nchild-wide: 24%;
     width: 10px;
     height: 10px;
     border-radius: 5px;
-    background-color: $california;
+    background-color: #d5b804;
     margin-right: 6px;
   }
 }

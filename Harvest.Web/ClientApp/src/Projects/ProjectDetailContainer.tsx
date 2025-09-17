@@ -8,7 +8,7 @@ import {
   faEdit,
   faExchangeAlt,
   faEye,
-  faTimes,
+
   faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -212,7 +212,7 @@ export const ProjectDetailContainer = () => {
           className="btn btn-danger btn-sm float-right"
           onClick={() => cancelProject()}
         >
-          Cancel Request <FontAwesomeIcon icon={faTimes} />
+          Cancel Request
         </button>
       ),
     }),
