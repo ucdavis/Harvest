@@ -216,7 +216,7 @@ function App() {
               <ExpenseEntryContainer isEditMode={false} />
             </ConditionalRoute>
             <ConditionalRoute
-              roles={["Worker"]}
+              roles={["Worker", "FieldManager", "Supervisor"]}
               exact
               path="/:team/mobile/token"
               component={MobileTokenContainer}
