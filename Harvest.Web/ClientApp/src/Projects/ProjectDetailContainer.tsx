@@ -549,6 +549,12 @@ export const ProjectDetailContainer = () => {
             </div>
             <div className="col-md-6 text-right">
               {" "}
+              <Link
+                className="btn btn-lg btn-outline"
+                to={`/${team}/expense/billed/${project.id}/${shareId}`}
+              >
+                Billed Expenses
+              </Link>{" "}
               <ProjectUnbilledButton
                 projectId={project.id}
                 remaining={project.quoteTotal - project.chargedTotal}

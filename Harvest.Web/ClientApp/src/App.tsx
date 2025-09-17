@@ -14,6 +14,7 @@ import { ExpenseEntryContainer } from "./Expenses/ExpenseEntryContainer";
 import { PendingExpensesListContainer } from "./Expenses/PendingExpensesListContainer";
 import { HomeContainer } from "./Home/HomeContainer";
 import { UnbilledExpensesContainer } from "./Expenses/UnbilledExpensesContainer";
+import { BilledExpensesListContainer } from "./Expenses/BilledExpensesListContainer";
 import { RequestContainer } from "./Requests/RequestContainer";
 import { AccountChangeContainer } from "./Requests/AccountChangeContainer";
 import { QuoteContainer } from "./Quotes/QuoteContainer";
@@ -235,6 +236,10 @@ function App() {
             <Route
               path="/:team/expense/unbilled/:projectId/:shareId?"
               component={UnbilledExpensesContainer}
+            />
+            <Route
+              path="/:team/expense/billed/:projectId/:shareId?"
+              component={BilledExpensesListContainer}
             />
             <ConditionalRoute
               roles={["FieldManager", "Supervisor"]}

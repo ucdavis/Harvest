@@ -7,6 +7,7 @@ import { ExpenseTable } from "./ExpenseTable";
 import { authenticatedFetch } from "../Util/Api";
 
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { ProjectHeader } from "../Shared/ProjectHeader"; //TODO add this once it is tested and running
 
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
