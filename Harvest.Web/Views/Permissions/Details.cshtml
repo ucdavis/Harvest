@@ -59,7 +59,8 @@
                 </tbody>
             </table>
         }
-        @if (Model.Role.Name == Role.Codes.Worker) //This model is a permission, not a user with multiple permissions
+        @* This model is a permission, not a user with multiple permissions *@
+        @if (Model.Role.Name == Role.Codes.Worker)
         {
             <h2>Supervisor(s) assigned to worker</h2>
             <table id="supervisors" class="table harvest-table">
