@@ -179,7 +179,7 @@ export const ProjectDetailContainer = () => {
         project.status === "PendingCloseoutApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/expense/entry/${project.id}`}
         >
           Enter Expenses <FontAwesomeIcon icon={faEdit} />
@@ -194,7 +194,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/quote/create/${project.id}`}
         >
           Edit Quote <FontAwesomeIcon icon={faEdit} />
@@ -222,7 +222,7 @@ export const ProjectDetailContainer = () => {
         project.status === "AwaitingCloseout" || project.status === "Active",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/project/closeout/${project.id}`}
         >
           Close Out Project <FontAwesomeIcon icon={faCheck} />
@@ -234,7 +234,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "PendingCloseoutApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/project/closeoutconfirmation/${project.id}`}
         >
           Confirm Close Out
@@ -246,7 +246,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "PendingApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/approve/${project.id}`}
         >
           View Quote <FontAwesomeIcon icon={faEye} />
@@ -258,7 +258,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "Active",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/changeAccount/${project.id}`}
         >
           Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
@@ -272,7 +272,7 @@ export const ProjectDetailContainer = () => {
         addDays(new Date(project.lastStatusUpdatedOn), 18) <= new Date(),
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/approve/${project.id}`}
         >
           Override View Quote <FontAwesomeIcon icon={faEye} />
@@ -284,7 +284,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "Active",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/changeAccount/${project.id}`}
         >
           Override Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
@@ -304,7 +304,7 @@ export const ProjectDetailContainer = () => {
           userInfo.user.roles.includes("FieldManager")),
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/create/${project.id}`}
         >
           Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
@@ -322,7 +322,7 @@ export const ProjectDetailContainer = () => {
         project.status === "FinalInvoicePending",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={
             shareId
               ? `/${team}/quote/details/${project.id}/${shareId}`
@@ -340,7 +340,7 @@ export const ProjectDetailContainer = () => {
         project.status === "PendingApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={
             shareId
               ? `/${team}/quote/details/${project.id}/${shareId}`
@@ -366,7 +366,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-primary btn-sm"
+          className="btn btn-accent btn-sm"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />

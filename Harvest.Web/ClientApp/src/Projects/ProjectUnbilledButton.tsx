@@ -33,7 +33,7 @@ export const ProjectUnbilledButton = (props: Props) => {
 
   if (total === 0) {
     return (
-      <button className="btn btn-lg btn-outline-disabled" disabled>
+      <button className="btn btn-lg btn-disabled" disabled>
         Unbilled Expenses - $0.00
       </button>
     );
@@ -46,7 +46,7 @@ export const ProjectUnbilledButton = (props: Props) => {
             ? `/${team}/expense/unbilled/${props.projectId}/${props.shareId}`
             : `/${team}/expense/unbilled/${props.projectId}`
         }
-        className="btn btn-lg btn-outline"
+        className="btn btn-lg btn-primary"
       >
         View Unbilled Expenses - $
         {total === undefined ? "xx.xx" : formatCurrency(total)}
@@ -61,7 +61,7 @@ export const ProjectUnbilledButton = (props: Props) => {
           ? `/${team}/expense/unbilled/${props.projectId}/${props.shareId}`
           : `/${team}/expense/unbilled/${props.projectId}`
       }
-      className="btn btn-lg  btn-outline-danger"
+      className="btn btn-lg btn-danger"
     >
       View Unbilled Expenses - $
       {total === undefined ? "xx.xx" : formatCurrency(total)}

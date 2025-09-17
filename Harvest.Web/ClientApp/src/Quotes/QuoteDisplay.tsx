@@ -13,20 +13,20 @@ export const QuoteDisplay = (props: Props) => {
   const { quote } = props;
   return (
     <div>
-      <h1>Quote</h1>
+      <h3>Quote</h3>
+
+
+
       {quote.approvedBy && (
-        <div>
-          <h2>Approved By</h2>
-          <p>
-            {quote.approvedBy.firstName} {quote.approvedBy.lastName}
-          </p>
-        </div>
+
+        <p><b>Approved By:</b> {quote.approvedBy.firstName} {quote.approvedBy.lastName}</p>
+
       )}
       {quote.approvedOn && (
-        <div>
-          <h2>Approved On</h2>
-          <p>{new Date(quote.approvedOn).toDateString()}</p>
-        </div>
+
+        <p><b>Approved On:</b> {new Date(quote.approvedOn).toDateString()}</p>
+
+
       )}
 
       <p>
