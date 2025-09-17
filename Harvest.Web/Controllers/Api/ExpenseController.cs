@@ -249,7 +249,6 @@ namespace Harvest.Web.Controllers.Api
         // Get all unbilled expenses for the given project
         [HttpGet]
         [Authorize(Policy = AccessCodes.InvoiceAccess)]
-        //`/api/${team}/Expense/GetUnbilled/${projectId}/${shareId}`
         [Route("/api/{team}/Expense/GetUnbilled/{projectId}/{shareId?}")]
         public async Task<ActionResult> GetUnbilled(int projectId, Guid? shareId)
         {
@@ -267,6 +266,22 @@ namespace Harvest.Web.Controllers.Api
 
             //return Ok(await _dbContext.Expenses.Include(e => e.CreatedBy).Where(e => e.InvoiceId == null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug).ToArrayAsync());
 
+        }
+
+        [HttpGet]
+        [Authorize(Policy = AccessCodes.InvoiceAccess)]
+        [Route("/api/{team}/Expense/GetAllBilled/{projectId}/{shareId?}")]
+        public async Task<ActionResult> GetAllBilled(int projectId, Guid? shareId)
+        {
+            var query = _dbContext.Expenses
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
+                .Where(e => e.Invoice != null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug);
+            if (shareId.HasValue)
+            {
+                query = query.Where(e => e.Project.ShareId == shareId.Value);
+            }
+            return Ok(await query.ToArrayAsync());
         }
 
         // Get just the total of unbilled expenses for the current project
