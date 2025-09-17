@@ -423,7 +423,7 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpPost]
-        [Route("/api/{controller}/{action}")]
+        [Route("/api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Create([FromBody] Project project)
         {
             var currentUser = await _userService.GetCurrentUser();
@@ -445,6 +445,10 @@ namespace Harvest.Web.Controllers.Api
             
             // ensure team is set
             var team = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).SingleAsync();
+            if(team.Slug != TeamSlug) 
+            {
+                return BadRequest("Team slug in URL and body do not match");
+            }
             newProject.TeamId = team.Id;
 
             if (project.Id > 0)
@@ -520,6 +524,8 @@ namespace Harvest.Web.Controllers.Api
                 piName = project.PrincipalInvestigator.Name;
             }
 
+            await AddProjectEditorIfNeededAsync(newProject, team.Slug);
+
             // If there are attachments, fill out details and add to project
             foreach (var attachment in project.Attachments)
             {
@@ -555,7 +561,31 @@ namespace Harvest.Web.Controllers.Api
 
             return Ok(newProject);
         }
+
+        private async Task AddProjectEditorIfNeededAsync(Project newProject, string teamSlug)
+        {
+            var currentUser = await _userService.GetCurrentUser();
+            if (newProject.PrincipalInvestigatorId == currentUser.Id)
+            {
+                return;
+            }
+            if (await _userService.HasAccess(new[] { AccessCodes.FieldManagerAccess, AccessCodes.SupervisorAccess }, teamSlug))
+            {
+                return;
+            }
+            if (newProject.ProjectPermissions != null && newProject.ProjectPermissions.Any(a => a.UserId == currentUser.Id))
+            {
+                return;
+            }
+            newProject.ProjectPermissions ??= new List<ProjectPermission>();
+            newProject.ProjectPermissions.Add(new ProjectPermission
+            {
+                UserId = currentUser.Id,
+                Permission = Role.Codes.ProjectEditor,
+            });
+        }
     }
+
 
     public class RequestApprovalModel
     {
