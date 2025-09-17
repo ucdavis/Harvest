@@ -39,23 +39,26 @@ export const ProjectSelection = (props: Props) => {
   }
 
   return (
-    <div className="card-wrapper">
-      <div className="card-content">
-        <h2>Choose a project to view it's expenses</h2>
-        <FormGroup>
-          <Input
-            type="select"
-            name="select"
-            onChange={(e) => props.selectedProject(parseInt(e.target.value))}
-          >
-            <option value={0}>Select a Project</option>
-            {projects.map((p) => (
-              <option key={`project-${p.id}`} value={p.id}>
-                {p.name} ({p.principalInvestigator.name})
-              </option>
-            ))}
-          </Input>
-        </FormGroup>
+    <div className="col-12 col-md-6 mx-auto">
+      <div className="card-wrapper">
+        <div className="card-content">
+          <h2>Expense Entry</h2>
+          <p><b>Choose a project to view it's expenses</b></p>
+          <FormGroup>
+            <Input
+              type="select"
+              name="select"
+              onChange={(e) => props.selectedProject(parseInt(e.target.value))}
+            >
+              <option value={0}>Select a Project</option>
+              {projects.map((p) => (
+                <option key={`project-${p.id}`} value={p.id}>
+                  {p.name} ({p.principalInvestigator.name})
+                </option>
+              ))}
+            </Input>
+          </FormGroup>
+        </div>
       </div>
     </div>
   );

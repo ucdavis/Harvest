@@ -86,7 +86,7 @@ const getStatusDetail = (
     case "ChangeRequested":
       return {
         showAlert: true,
-        cardClass: "california-bg",
+        cardClass: "sunflower-bg",
         statusText:
           "This project is waiting for a quote. Use the 'edit quote' button to create one.",
         actionText: "Create Quote",

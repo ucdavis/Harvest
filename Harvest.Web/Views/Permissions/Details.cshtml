@@ -23,44 +23,47 @@
 
 
         </div>
-        @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiple permissions
+        @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiple
+            permissions
         {
-            <h2>Workers assigned to supervisor</h2>
-            <div class="col text-right">
-                <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to Supervisor<i class="fas fa-plus fa-xs"></i></a>
-            </div>
-            <table id="workers" class="table harvest-table table-striped table-bordered">
-                <thead>
+        <h2>Workers assigned to supervisor</h2>
+        <div class="col text-right">
+            <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to
+                Supervisor<i class="fas fa-plus fa-xs"></i></a>
+        </div>
+        <table id="workers" class="table harvest-table">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>Actions</th>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Children)
+                {
                     <tr>
-                        <th>
-                            Name
-                        </th>
-                        <th>
-                            Email
-                        </th>
-                        <th>Actions</th>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Children)
-                    {
-                        <tr>
-                            <td>
-                                @item.User.Name
-                            </td>
-                            <td>@Html.DisplayFor(a => item.User.Email)</td>
-                            <td>
+                        <td>
+                            @item.User.Name
+                        </td>
+                        <td>@Html.DisplayFor(a => item.User.Email)</td>
+                        <td>
 
-                                <a asp-action="RemoveWorkerFromSupervisor" asp-route-id="@Model.Id" asp-route-workerId="@item.Id"><i class="fas fa-trash-alt"></i> Remove</a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                            <a asp-action="RemoveWorkerFromSupervisor" asp-route-id="@Model.Id"
+                                asp-route-workerId="@item.Id"><i class="fas fa-trash-alt"></i> Remove</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
         }
         @if (Model.Role.Name == Role.Codes.Worker) //This model is a permission, not a user with multiple permissions
         {
             <h2>Supervisor(s) assigned to worker</h2>
-            <table id="supervisors" class="table harvest-table table-striped table-bordered">
+            <table id="supervisors" class="table harvest-table">
                 <thead>
                     <tr>
                         <th>
@@ -80,7 +83,8 @@
                             </td>
                             <td>@Html.DisplayFor(a => item.User.Email)</td>
                             <td>
-                                <a asp-action="Details" asp-route-id="@item.Id" asp-route-workerId="@Model.Id"><i class="fas fa-edit"></i> Manage</a>
+                                <a asp-action="Details" asp-route-id="@item.Id" asp-route-workerId="@Model.Id"><i
+                                        class="fas fa-edit"></i> Manage</a>
                             </td>
                         </tr>
                     }
@@ -109,18 +113,18 @@
 
     <script type="text/javascript">
         var table = $('#workers').DataTable({
-          responsive: true,
-          columnDefs: [
-            { responsivePriority: 1, targets: 0 },
-            { responsivePriority: 2, targets: 1 },
-          ]
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 },
+                { responsivePriority: 2, targets: 1 },
+            ]
         });
         var table2 = $('#supervisors').DataTable({
-          responsive: true,
-          columnDefs: [
-            { responsivePriority: 1, targets: 0 },
-            { responsivePriority: 2, targets: 1 },
-          ]
-         });
+            responsive: true,
+            columnDefs: [
+                { responsivePriority: 1, targets: 0 },
+                { responsivePriority: 2, targets: 1 },
+            ]
+        });
     </script>
 }

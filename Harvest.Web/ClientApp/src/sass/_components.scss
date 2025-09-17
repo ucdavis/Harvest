@@ -52,14 +52,14 @@
 }
 
 .btn-accent {
-  background-color: transparentize($primary-color, .80);
+  background-color: transparentize($primary-color, .90);
   border-color: $primary-color;
   color: $primary-color;
 
   &:hover {
-    background-color: $primary-color;
+    background-color: transparentize($primary-color, .70);
     border-color: $primary-color;
-    color: #fff;
+    color: $primary-color;
   }
 }
 
@@ -237,6 +237,11 @@
 }
 
 // tables
+
+table.dataTable.table-striped>tbody>tr:nth-of-type(2n+1) {
+  background-color: #fff;
+}
+
 .projectlisttable-wrapper {
   .harvest-table {
     th {
@@ -251,14 +256,24 @@
   }
 }
 
-.harvest-table {
+table.harvest-table {
   margin-bottom: 3rem;
+
+  &.dataTable {
+    border-collapse: collapse !important;
+  }
+
+  &.table-bordered {
+    border: 1px solid $borders;
+  }
 
   th {
     background-color: $primary-light;
     color: $secondary-font;
     font-size: 0.9rem;
     text-transform: uppercase;
+
+    border: 1px solid $borders;
 
     svg {
       width: 12px !important;
@@ -281,6 +296,7 @@
   td {
     padding: 0.5rem;
     vertical-align: middle;
+    border: 1px solid #dee2e6;
 
     p {
       margin-bottom: 0;
@@ -290,10 +306,6 @@
   tr {
     background-color: #fff;
   }
-}
-
-.table-striped tbody tr:nth-of-type(odd) {
-  background-color: #fff;
 }
 
 .table-striped tbody tr:nth-of-type(odd):hover {
@@ -536,7 +548,7 @@ input[type="radio" i] {
   background-color: transparentize($california, 0.9);
 
   h3 {
-    color: $california;
+    color: $primary-font;
   }
 
   a {
@@ -552,11 +564,11 @@ input[type="radio" i] {
   background-color: transparentize(#d5b804, 0.9);
 
   h3 {
-    color: $sunflower;
+    color: #A08A06;
   }
 
   a {
-    color: #d5b804;
+    color: #A08A06;
 
     &:hover {
       color: transparentize(#d5b804, 0.9);
