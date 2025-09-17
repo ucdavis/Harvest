@@ -23,42 +23,41 @@
 
 
         </div>
-        @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiple
-            permissions
+        @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiplpermissions
         {
-        <h2>Workers assigned to supervisor</h2>
-        <div class="col text-right">
-            <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to
-                Supervisor<i class="fas fa-plus fa-xs"></i></a>
-        </div>
-        <table id="workers" class="table harvest-table">
-            <thead>
-                <tr>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Email
-                    </th>
-                    <th>Actions</th>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Children)
-                {
+            <h2>Workers assigned to supervisor</h2>
+            <div class="col text-right">
+                <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to
+                    Supervisor<i class="fas fa-plus fa-xs"></i></a>
+            </div>
+            <table id="workers" class="table harvest-table">
+                <thead>
                     <tr>
-                        <td>
-                            @item.User.Name
-                        </td>
-                        <td>@Html.DisplayFor(a => item.User.Email)</td>
-                        <td>
+                        <th>
+                            Name
+                        </th>
+                        <th>
+                            Email
+                        </th>
+                        <th>Actions</th>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Children)
+                    {
+                        <tr>
+                            <td>
+                                @item.User.Name
+                            </td>
+                            <td>@Html.DisplayFor(a => item.User.Email)</td>
+                            <td>
 
-                            <a asp-action="RemoveWorkerFromSupervisor" asp-route-id="@Model.Id"
-                                asp-route-workerId="@item.Id"><i class="fas fa-trash-alt"></i> Remove</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                                <a asp-action="RemoveWorkerFromSupervisor" asp-route-id="@Model.Id"
+                                    asp-route-workerId="@item.Id"><i class="fas fa-trash-alt"></i> Remove</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         }
         @if (Model.Role.Name == Role.Codes.Worker) //This model is a permission, not a user with multiple permissions
         {
