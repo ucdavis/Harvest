@@ -231,6 +231,11 @@ namespace Harvest.Web.Controllers.Api
                 return NotFound();
             }
 
+            if(expense.InvoiceId != null)
+            {
+                return BadRequest("Cannot delete an expense that has been billed.");
+            }
+
             //TODO: Do we want to prevent supervisors from deleting expenses if they don't manage the worker wo entered them? (Still allow field managers)
             //TODO: Have an extra check to make sure only unbilled expenses can be deleted
 
