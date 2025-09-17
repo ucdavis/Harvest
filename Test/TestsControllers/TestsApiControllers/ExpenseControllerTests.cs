@@ -44,7 +44,7 @@ namespace Test.TestsControllers.TestsApiControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(12);
+            ControllerReflection.ControllerPublicMethods(13);
         }
 
         [Fact]
@@ -149,6 +149,16 @@ namespace Test.TestsControllers.TestsApiControllers
             authAttribute.ShouldNotBeNull();
             authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetApprovedExpenses", countAdjustment + 3);
+
+            //13
+            ControllerReflection.MethodExpectedAttribute<HttpGetAttribute>("GetAllBilled", countAdjustment + 4);
+            authAttribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("GetAllBilled", countAdjustment + 4);
+            authAttribute.ShouldNotBeNull();
+            authAttribute.ElementAt(0).Policy.ShouldBe(AccessCodes.InvoiceAccess);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("GetAllBilled", countAdjustment + 4);
+            routeAttribute = ControllerReflection.MethodExpectedAttribute<RouteAttribute>("GetAllBilled", countAdjustment + 4);
+            routeAttribute.ShouldNotBeNull();
+            routeAttribute.ElementAt(0).Template.ShouldBe("/api/{team}/Expense/GetAllBilled/{projectId}/{shareId?}");
         }
 
     }
