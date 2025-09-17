@@ -125,13 +125,13 @@
 }
 
 .btn-sunflower {
-  background-color: $merlot;
-  border-color: $merlot;
+  background-color: #d5b804;
+  border-color: #d5b804;
   color: #fff;
 
   &:hover {
-    background-color: lighten($merlot, 7);
-    border-color: lighten($merlot, 7);
+    background-color: lighten(#d5b804, 7);
+    border-color: lighten(#d5b804, 7);
     color: #fff;
   }
 }

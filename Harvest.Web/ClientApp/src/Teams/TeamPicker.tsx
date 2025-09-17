@@ -58,8 +58,9 @@ export const TeamPicker = () => {
               <div className="card">
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{team.name}</h5>
-                  <p className="secondary-font">
-                    Field Managers: {team.fieldManagers}
+                  <p className="secondary-font mb-2">
+                    <b>Field Managers: {team.fieldManagers}</b>
+
                   </p>
                   <p className="primary-font">{team.description}</p>
                   <button className="mt-auto w-16 btn btn-primary">
