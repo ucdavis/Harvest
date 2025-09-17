@@ -90,6 +90,7 @@ export const BilledExpensesListContainer = (props: Props) => {
             showApprove={false}
             showExport={true}
             showAll={false}
+            showInvoice={true}
           ></ExpenseTable>
         )}
       </div>

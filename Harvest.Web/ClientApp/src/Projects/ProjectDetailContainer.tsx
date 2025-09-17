@@ -551,7 +551,11 @@ export const ProjectDetailContainer = () => {
               {" "}
               <Link
                 className="btn btn-lg btn-outline"
-                to={`/${team}/expense/billed/${project.id}/${shareId}`}
+                to={
+                  shareId
+                    ? `/${team}/expense/billed/${project.id}/${shareId}`
+                    : `/${team}/expense/billed/${project.id}`
+                }
               >
                 Billed Expenses
               </Link>{" "}
