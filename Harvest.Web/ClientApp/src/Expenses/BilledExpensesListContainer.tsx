@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-import { CommonRouteParams, Expense } from "../types";
+import { CommonRouteParams, Expense, Project } from "../types";
 import { ExpenseTable } from "./ExpenseTable";
 
 import { authenticatedFetch } from "../Util/Api";
@@ -16,6 +16,7 @@ interface Props {
 export const BilledExpensesListContainer = (props: Props) => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
   const [expenses, setExpenses] = useState<Expense[] | undefined>(undefined);
+  const [project, setProject] = useState<Project>();
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -40,29 +41,58 @@ export const BilledExpensesListContainer = (props: Props) => {
     cb();
   }, [getIsMounted, projectId, shareId, team]);
 
-  return (
-    <div className="projectlisttable-wrapper">
-      <div className="row justify-content-between mb-3">
-        <div className="col">
-          <h1>All Billed Expenses</h1>
-        </div>
-      </div>
+  useEffect(() => {
+    // get project data for the ProjectHeader
+    const cb = async () => {
+      const response = await authenticatedFetch(
+        `/api/${team}/Project/Get/${projectId}/${shareId}`
+      );
 
-      {expenses === undefined ? (
-        <div className="text-center">
-          <p>Loading expenses...</p>
+      if (response.ok) {
+        const project = (await response.json()) as Project;
+        getIsMounted() && setProject(project);
+      }
+    };
+
+    if (projectId) {
+      cb();
+    }
+  }, [projectId, getIsMounted, team, shareId]);
+
+  if (project === undefined) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="card-wrapper">
+      <ProjectHeader
+        project={project}
+        title={"Field Request #" + (project?.id || "")}
+        hideBack={false}
+      />
+      <div className="card-content">
+        <div className="row justify-content-between mb-3">
+          <div className="col">
+            <h1>All Billed Expenses</h1>
+          </div>
         </div>
-      ) : (
-        <ExpenseTable
-          expenses={expenses}
-          deleteExpense={() => alert("Not supported")}
-          showActions={false}
-          showProject={false}
-          showApprove={false}
-          showExport={true}
-          showAll={false}
-        ></ExpenseTable>
-      )}
+
+        {expenses === undefined ? (
+          <div className="text-center">
+            <p>Loading expenses...</p>
+          </div>
+        ) : (
+          <ExpenseTable
+            expenses={expenses}
+            deleteExpense={() => alert("Not supported")}
+            showActions={false}
+            showProject={false}
+            showApprove={false}
+            showExport={true}
+            showAll={false}
+          ></ExpenseTable>
+        )}
+      </div>
     </div>
   );
 };
