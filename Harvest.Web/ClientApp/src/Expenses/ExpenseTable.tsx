@@ -28,7 +28,7 @@ export const ExpenseTable = (props: Props) => {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showProject] = useState(props.showProject);
-  const { team, projectId } = useParams<CommonRouteParams>();
+  const { team, projectId, shareId } = useParams<CommonRouteParams>();
   const [showInvoice] = useState(props.showInvoice ?? false);
   const history = useHistory();
 
@@ -96,7 +96,11 @@ export const ExpenseTable = (props: Props) => {
               Cell: (data: Cell<Expense>) =>
                 data.row.original.invoiceId ? (
                   <a
-                    href={`/${team}/invoice/details/${projectId}/${data.row.original.invoiceId}`}
+                    href={
+                      shareId
+                        ? `/${team}/invoice/details/${projectId}/${data.row.original.invoiceId}/${shareId}`
+                        : `/${team}/invoice/details/${projectId}/${data.row.original.invoiceId}`
+                    }
                   >
                     #{data.row.original.invoiceId}
                   </a>
