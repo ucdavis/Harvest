@@ -7,13 +7,9 @@ import { ExpenseTable } from "./ExpenseTable";
 import { authenticatedFetch } from "../Util/Api";
 
 import { useIsMounted } from "../Shared/UseIsMounted";
-import { ProjectHeader } from "../Shared/ProjectHeader"; //TODO add this once it is tested and running
+import { ProjectHeader } from "../Shared/ProjectHeader";
 
-interface Props {
-  newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
-}
-
-export const BilledExpensesListContainer = (props: Props) => {
+export const BilledExpensesListContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
   const [expenses, setExpenses] = useState<Expense[] | undefined>(undefined);
   const [project, setProject] = useState<Project>();
