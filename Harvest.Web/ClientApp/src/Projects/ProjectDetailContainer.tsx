@@ -8,7 +8,7 @@ import {
   faEdit,
   faExchangeAlt,
   faEye,
-  faTimes,
+
   faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -179,7 +179,7 @@ export const ProjectDetailContainer = () => {
         project.status === "PendingCloseoutApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/expense/entry/${project.id}`}
         >
           Enter Expenses <FontAwesomeIcon icon={faEdit} />
@@ -194,7 +194,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/quote/create/${project.id}`}
         >
           Edit Quote <FontAwesomeIcon icon={faEdit} />
@@ -212,7 +212,7 @@ export const ProjectDetailContainer = () => {
           className="btn btn-danger btn-sm float-right"
           onClick={() => cancelProject()}
         >
-          Cancel Request <FontAwesomeIcon icon={faTimes} />
+          Cancel Request
         </button>
       ),
     }),
@@ -222,7 +222,7 @@ export const ProjectDetailContainer = () => {
         project.status === "AwaitingCloseout" || project.status === "Active",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/project/closeout/${project.id}`}
         >
           Close Out Project <FontAwesomeIcon icon={faCheck} />
@@ -234,7 +234,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "PendingCloseoutApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/project/closeoutconfirmation/${project.id}`}
         >
           Confirm Close Out
@@ -246,7 +246,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "PendingApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/approve/${project.id}`}
         >
           View Quote <FontAwesomeIcon icon={faEye} />
@@ -258,7 +258,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "Active",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/changeAccount/${project.id}`}
         >
           Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
@@ -272,7 +272,7 @@ export const ProjectDetailContainer = () => {
         addDays(new Date(project.lastStatusUpdatedOn), 18) <= new Date(),
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/approve/${project.id}`}
         >
           Override View Quote <FontAwesomeIcon icon={faEye} />
@@ -284,7 +284,7 @@ export const ProjectDetailContainer = () => {
       condition: project.status === "Active",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/changeAccount/${project.id}`}
         >
           Override Change Accounts <FontAwesomeIcon icon={faExchangeAlt} />
@@ -304,7 +304,7 @@ export const ProjectDetailContainer = () => {
           userInfo.user.roles.includes("FieldManager")),
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={`/${team}/request/create/${project.id}`}
         >
           Change Requirements <FontAwesomeIcon icon={faExchangeAlt} />
@@ -322,7 +322,7 @@ export const ProjectDetailContainer = () => {
         project.status === "FinalInvoicePending",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={
             shareId
               ? `/${team}/quote/details/${project.id}/${shareId}`
@@ -340,7 +340,7 @@ export const ProjectDetailContainer = () => {
         project.status === "PendingApproval",
       children: (
         <Link
-          className="btn btn-primary btn-sm mr-4"
+          className="btn btn-accent btn-sm mr-2"
           to={
             shareId
               ? `/${team}/quote/details/${project.id}/${shareId}`
@@ -366,7 +366,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-primary btn-sm"
+          className="btn btn-accent btn-sm"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />
@@ -435,17 +435,17 @@ export const ProjectDetailContainer = () => {
       >
         {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
           5 && (
-          <ProjectAlerts
-            skipStatusCheck={true}
-            project={project}
-            extraText={`Project has not been acted on since ${new Date(
-              project.lastStatusUpdatedOn
-            ).toLocaleDateString()}. ${getDaysDiff(
-              new Date(),
-              new Date(project.lastStatusUpdatedOn)
-            ).toFixed(0)} days.`}
-          />
-        )}
+            <ProjectAlerts
+              skipStatusCheck={true}
+              project={project}
+              extraText={`Project has not been acted on since ${new Date(
+                project.lastStatusUpdatedOn
+              ).toLocaleDateString()}. ${getDaysDiff(
+                new Date(),
+                new Date(project.lastStatusUpdatedOn)
+              ).toFixed(0)} days.`}
+            />
+          )}
       </ShowFor>
 
       {projectActions.length > 0 && (
@@ -453,7 +453,7 @@ export const ProjectDetailContainer = () => {
           <div className="card-content">
             <div className="row justify-content-between">
               <div className="col-md-12 project-actions">
-                <h4>Project actions</h4>
+                <h3>Project actions</h3>
                 {projectActions.map((action, i) => ({
                   ...action,
                   key: `action_${i}`,
@@ -463,11 +463,11 @@ export const ProjectDetailContainer = () => {
           </div>
         </div>
       )}
-      <div className="card-green-bg green-bg-border pt-3 pb-3">
+      <div className="card-green-bg green-bg-border">
         <div className="card-content">
           <div className="row">
             <div className="col-md-6">
-              <h2>Project Attachments</h2>
+              <h3>Project Attachments</h3>
 
               <ShowForPiOnly project={project}>
                 <FileUpload
@@ -583,7 +583,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -607,7 +607,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&

@@ -4,6 +4,7 @@ import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { useHistory, useLocation } from "react-router-dom";
 import { Team } from "../types";
+import LoadingHarvest from "../Shared/loadingHarvest";
 
 // Allow selection of a team from a list of teams, then add that team slug to url and redirect
 export const TeamPicker = () => {
@@ -33,7 +34,16 @@ export const TeamPicker = () => {
 
   // show loading message while we wait for teams
   if (!teams) {
-    return <div>Loading teams...</div>;
+    return (
+      <>
+        {" "}
+        <div className="p-4 text-center">
+          <LoadingHarvest size={64} />
+          {/* default color #266041 */}
+          <p>Loading Teams...</p>
+        </div>
+      </>
+    );
   }
 
   // show the list of teams in big boxes
@@ -48,15 +58,16 @@ export const TeamPicker = () => {
               <div className="card">
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{team.name}</h5>
-                  <p className="secondary-font">
-                    Field Managers: {team.fieldManagers}
+                  <p className="secondary-font mb-2">
+                    <b>Field Managers: {team.fieldManagers}</b>
+
                   </p>
                   <p className="primary-font">{team.description}</p>
-                  <span className="mt-auto">
+                  <button className="mt-auto w-16 btn btn-primary">
                     <b>
                       <FontAwesomeIcon icon={faCheck} /> Use this team
                     </b>
-                  </span>
+                  </button>
                 </div>
               </div>
             </a>

@@ -108,21 +108,19 @@ export const MobileTokenContainer = () => {
   return (
     <div className="container">
       <div className="row justify-content-center">
-        <div className="col-md-8">
+        <div className="col-md-6">
           <Card>
-            <CardHeader>
-              <h4>
-                <FontAwesomeIcon icon={faMobile} className="mr-2" />
-                Mobile Token Generator
-              </h4>
-            </CardHeader>
+
             <CardBody>
-              <p className="text-muted mb-4">
+              <h2 className="mb-2">
+                Mobile Token Generator
+              </h2>
+              <p className="mb-4">
                 Authorize Harvest Mobile App to use this team with your account.
               </p>
 
               {!isAuthorized && (
-                <div className="mb-4">
+                <div className="">
                   <Button
                     color="primary"
                     onClick={generateMobileToken}
