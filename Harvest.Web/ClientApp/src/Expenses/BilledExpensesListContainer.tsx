@@ -8,6 +8,7 @@ import { authenticatedFetch } from "../Util/Api";
 
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import LoadingHarvest from "../Shared/loadingHarvest";
 
 export const BilledExpensesListContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -15,6 +16,26 @@ export const BilledExpensesListContainer = () => {
   const [project, setProject] = useState<Project>();
 
   const getIsMounted = useIsMounted();
+
+  useEffect(() => {
+    // get project data for the ProjectHeader
+    const cb = async () => {
+      const url = shareId
+        ? `/api/${team}/Project/Get/${projectId}/${shareId}`
+        : `/api/${team}/Project/Get/${projectId}`;
+      const response = await authenticatedFetch(url);
+
+      if (response.ok) {
+        const project = (await response.json()) as Project;
+        getIsMounted() && setProject(project);
+      }
+    };
+
+    if (projectId) {
+      cb();
+    }
+  }, [projectId, getIsMounted, team, shareId]);
+
   useEffect(() => {
     const cb = async () => {
       const url = shareId
@@ -39,27 +60,17 @@ export const BilledExpensesListContainer = () => {
     cb();
   }, [getIsMounted, projectId, shareId, team]);
 
-  useEffect(() => {
-    // get project data for the ProjectHeader
-    const cb = async () => {
-      const url = shareId
-        ? `/api/${team}/Project/Get/${projectId}/${shareId}`
-        : `/api/${team}/Project/Get/${projectId}`;
-      const response = await authenticatedFetch(url);
-
-      if (response.ok) {
-        const project = (await response.json()) as Project;
-        getIsMounted() && setProject(project);
-      }
-    };
-
-    if (projectId) {
-      cb();
-    }
-  }, [projectId, getIsMounted, team, shareId]);
-
   if (project === undefined) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        {" "}
+        <div className="p-4 text-center">
+          <LoadingHarvest size={64} />
+          {/* default color #266041 */}
+          <p>Loading Project Expenses...</p>
+        </div>
+      </>
+    );
   }
 
   return (
@@ -76,22 +87,16 @@ export const BilledExpensesListContainer = () => {
           </div>
         </div>
 
-        {expenses === undefined ? (
-          <div className="text-center">
-            <p>Loading expenses...</p>
-          </div>
-        ) : (
-          <ExpenseTable
-            expenses={expenses}
-            deleteExpense={() => alert("Not supported")}
-            showActions={false}
-            showProject={false}
-            showApprove={false}
-            showExport={true}
-            showAll={false}
-            showInvoice={true}
-          ></ExpenseTable>
-        )}
+        <ExpenseTable
+          expenses={expenses || []}
+          deleteExpense={() => alert("Not supported")}
+          showActions={false}
+          showProject={false}
+          showApprove={false}
+          showExport={true}
+          showAll={false}
+          showInvoice={true}
+        ></ExpenseTable>
       </div>
     </div>
   );
