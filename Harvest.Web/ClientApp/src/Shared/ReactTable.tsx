@@ -136,7 +136,7 @@ export const ReactTable = ({
         </div>
       )}
       <table
-        className="table harvest-table table-bordered table-striped"
+        className="table harvest-table"
         {...getTableProps()}
       >
         <thead>
@@ -145,13 +145,12 @@ export const ReactTable = ({
               {headerGroup.headers.map((column) => (
                 <th
                   {...column.getHeaderProps(column.getSortByToggleProps())}
-                  className={`sort-${
-                    column.isSorted
-                      ? column.isSortedDesc
-                        ? "desc"
-                        : "asc"
-                      : "none"
-                  }`}
+                  className={`sort-${column.isSorted
+                    ? column.isSortedDesc
+                      ? "desc"
+                      : "asc"
+                    : "none"
+                    }`}
                 >
                   {column.render("Header")}
                   {/* Render the columns filter UI */}
@@ -186,18 +185,18 @@ export const ReactTable = ({
                   onClick={
                     onRowClick
                       ? (e) => {
-                          // Don't trigger row click if clicking on a button or link
-                          const target = e.target as HTMLElement;
-                          if (
-                            target.tagName === "BUTTON" ||
-                            target.tagName === "A" ||
-                            target.closest("button") ||
-                            target.closest("a")
-                          ) {
-                            return;
-                          }
-                          onRowClick(row.original);
+                        // Don't trigger row click if clicking on a button or link
+                        const target = e.target as HTMLElement;
+                        if (
+                          target.tagName === "BUTTON" ||
+                          target.tagName === "A" ||
+                          target.closest("button") ||
+                          target.closest("a")
+                        ) {
+                          return;
                         }
+                        onRowClick(row.original);
+                      }
                       : undefined
                   }
                 >
@@ -220,40 +219,40 @@ export const ReactTable = ({
                   onClick={
                     onRowClick
                       ? (e) => {
-                          // Don't trigger row click if clicking on a button or link
-                          const target = e.target as HTMLElement;
-                          if (
-                            target.tagName === "BUTTON" ||
-                            target.tagName === "A" ||
-                            target.closest("button") ||
-                            target.closest("a")
-                          ) {
-                            return;
-                          }
-                          onRowClick(row.original);
+                        // Don't trigger row click if clicking on a button or link
+                        const target = e.target as HTMLElement;
+                        if (
+                          target.tagName === "BUTTON" ||
+                          target.tagName === "A" ||
+                          target.closest("button") ||
+                          target.closest("a")
+                        ) {
+                          return;
                         }
+                        onRowClick(row.original);
+                      }
                       : undefined
                   }
                   style={
                     onRowClick
                       ? {
-                          cursor: "pointer",
-                          transition: "background-color 0.2s",
-                        }
+                        cursor: "pointer",
+                        transition: "background-color 0.2s",
+                      }
                       : undefined
                   }
                   onMouseEnter={
                     onRowClick
                       ? (e) => {
-                          e.currentTarget.style.backgroundColor = "#f8f9fa";
-                        }
+                        e.currentTarget.style.backgroundColor = "#f8f9fa";
+                      }
                       : undefined
                   }
                   onMouseLeave={
                     onRowClick
                       ? (e) => {
-                          e.currentTarget.style.backgroundColor = "";
-                        }
+                        e.currentTarget.style.backgroundColor = "";
+                      }
                       : undefined
                   }
                 >
