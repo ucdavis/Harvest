@@ -21,7 +21,9 @@ export const BilledExpensesListContainer = (props: Props) => {
   const getIsMounted = useIsMounted();
   useEffect(() => {
     const cb = async () => {
-      let url = `/api/${team}/Expense/GetAllBilled/${projectId}/${shareId}`;
+      const url = shareId
+        ? `/api/${team}/Expense/GetAllBilled/${projectId}/${shareId}`
+        : `/api/${team}/Expense/GetAllBilled/${projectId}`;
 
       const response = await authenticatedFetch(url);
 
@@ -44,9 +46,10 @@ export const BilledExpensesListContainer = (props: Props) => {
   useEffect(() => {
     // get project data for the ProjectHeader
     const cb = async () => {
-      const response = await authenticatedFetch(
-        `/api/${team}/Project/Get/${projectId}/${shareId}`
-      );
+      const url = shareId
+        ? `/api/${team}/Project/Get/${projectId}/${shareId}`
+        : `/api/${team}/Project/Get/${projectId}`;
+      const response = await authenticatedFetch(url);
 
       if (response.ok) {
         const project = (await response.json()) as Project;
