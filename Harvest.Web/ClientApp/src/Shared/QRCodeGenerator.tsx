@@ -17,6 +17,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [qrCodeGenerated, setQrCodeGenerated] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
 
   useEffect(() => {
     const generateQRCode = async () => {
@@ -38,6 +39,10 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             },
             width: 256,
           });
+
+          // Store the data URL for printing
+          const dataUrl = canvasRef.current.toDataURL("image/png", 1.0);
+          setQrDataUrl(dataUrl);
           setQrCodeGenerated(true);
         } catch (error) {
           console.error("Error generating QR code:", error);
@@ -49,11 +54,13 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   }, [project.id, team, shareId]);
 
   const handlePrint = () => {
-    const printWindow = window.open("", "_blank");
-    if (printWindow && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const dataUrl = canvas.toDataURL();
+    if (!qrDataUrl) {
+      console.error("QR Code not generated yet");
+      return;
+    }
 
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
       const printContent = `
         <!DOCTYPE html>
         <html>
@@ -87,6 +94,11 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             .qr-code {
               margin: 20px 0;
             }
+            .qr-code img {
+              max-width: 100%;
+              height: auto;
+              border: 1px solid #ddd;
+            }
             .instructions {
               font-size: 14px;
               color: #888;
@@ -115,6 +127,11 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             @media print {
               body { margin: 0; }
               .qr-container { border: 1px solid #333; }
+              .qr-code img { 
+                border: 1px solid #333;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+              }
             }
           </style>
         </head>
@@ -130,13 +147,16 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               </div>
               <div class="detail-row">
                 <span class="detail-label">Project Name:</span>
-                <span class="detail-value">${project.name}</span>
+                <span class="detail-value">${project.name.replace(
+                  /"/g,
+                  "&quot;"
+                )}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Principal Investigator:</span>
-                <span class="detail-value">${
+                <span class="detail-value">${(
                   project.principalInvestigator?.name || "N/A"
-                }</span>
+                ).replace(/"/g, "&quot;")}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Status:</span>
@@ -149,7 +169,9 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             </div>
             
             <div class="qr-code">
-              <img src="${dataUrl}" alt="QR Code for Project ${project.id}" />
+              <img src="${qrDataUrl}" alt="QR Code for Project ${
+        project.id
+      }" width="256" height="256" />
             </div>
             
             <div class="instructions">
@@ -163,9 +185,13 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
 
       printWindow.document.write(printContent);
       printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
+
+      // Wait a moment for the content to load before printing
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+      }, 500);
     }
   };
 
@@ -215,7 +241,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               type="button"
               className="btn btn-primary"
               onClick={handlePrint}
-              disabled={!qrCodeGenerated}
+              disabled={!qrCodeGenerated || !qrDataUrl}
             >
               Print QR Code
             </button>
