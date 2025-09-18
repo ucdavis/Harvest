@@ -18,6 +18,7 @@ import { ProjectHeader } from "../Shared/ProjectHeader";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import LoadingHarvest from "../Shared/loadingHarvest";
 
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
@@ -88,7 +89,16 @@ export const UnbilledExpensesContainer = (props: Props) => {
   }, [projectId, getIsMounted, team, shareId]);
 
   if (project === undefined) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        {" "}
+        <div className="p-4 text-center">
+          <LoadingHarvest size={64} />
+          {/* default color #266041 */}
+          <p>Loading Expenses...</p>
+        </div>
+      </>
+    );
   }
 
   const deleteExpense = async (expense: Expense) => {

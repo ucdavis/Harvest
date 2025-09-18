@@ -11,6 +11,7 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "reactstrap";
+import LoadingHarvest from "../Shared/loadingHarvest";
 
 interface Props {
   newExpenseCount?: number; // just used to force a refresh of data when new expenses are created outside of this component
@@ -192,6 +193,19 @@ export const PendingExpensesListContainer = (props: Props) => {
     );
   };
 
+  if (expenses === undefined) {
+    return (
+      <>
+        {" "}
+        <div className="p-4 text-center">
+          <LoadingHarvest size={64} />
+          {/* default color #266041 */}
+          <p>Loading Expenses...</p>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div className="projectlisttable-wrapper">
       <div className="row justify-content-between mb-3">
@@ -214,22 +228,16 @@ export const PendingExpensesListContainer = (props: Props) => {
         </div>
       </div>
 
-      {expenses === undefined ? (
-        <div className="text-center">
-          <p>Loading expenses...</p>
-        </div>
-      ) : (
-        <ExpenseTable
-          expenses={expenses}
-          deleteExpense={deleteExpense}
-          showActions={!notification.pending}
-          showProject={true}
-          showApprove={true}
-          approveExpense={approveExpense}
-          showExport={true}
-          showAll={showAll}
-        ></ExpenseTable>
-      )}
+      <ExpenseTable
+        expenses={expenses}
+        deleteExpense={deleteExpense}
+        showActions={!notification.pending}
+        showProject={true}
+        showApprove={true}
+        approveExpense={approveExpense}
+        showExport={true}
+        showAll={showAll}
+      ></ExpenseTable>
     </div>
   );
 };
