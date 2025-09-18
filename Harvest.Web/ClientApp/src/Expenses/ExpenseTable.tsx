@@ -20,6 +20,7 @@ interface Props {
   approveExpense?: (expense: Expense) => void;
   showExport?: boolean;
   showAll?: boolean; // indicates if we're showing all expenses or just user's workers
+  showInvoice?: boolean;
 }
 
 export const ExpenseTable = (props: Props) => {
@@ -27,7 +28,8 @@ export const ExpenseTable = (props: Props) => {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showProject] = useState(props.showProject);
-  const { team, projectId } = useParams<CommonRouteParams>();
+  const { team, projectId, shareId } = useParams<CommonRouteParams>();
+  const [showInvoice] = useState(props.showInvoice ?? false);
   const history = useHistory();
 
   const { deleteExpense, showActions, approveExpense, showApprove } = props;
@@ -79,6 +81,28 @@ export const ExpenseTable = (props: Props) => {
                     href={`/${team}/Project/Details/${data.row.original.project.id}`}
                   >
                     {data.row.original.project.name}
+                  </a>
+                ) : (
+                  "N/A"
+                ),
+            },
+          ]
+        : []),
+      ...(showInvoice
+        ? [
+            {
+              Header: "Invoice",
+              accessor: (row: Expense) => row.invoiceId,
+              Cell: (data: Cell<Expense>) =>
+                data.row.original.invoiceId ? (
+                  <a
+                    href={
+                      shareId
+                        ? `/${team}/invoice/details/${projectId}/${data.row.original.invoiceId}/${shareId}`
+                        : `/${team}/invoice/details/${projectId}/${data.row.original.invoiceId}`
+                    }
+                  >
+                    #{data.row.original.invoiceId}
                   </a>
                 ) : (
                   "N/A"

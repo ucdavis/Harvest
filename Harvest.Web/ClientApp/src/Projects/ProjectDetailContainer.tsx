@@ -8,7 +8,6 @@ import {
   faEdit,
   faExchangeAlt,
   faEye,
-
   faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -435,17 +434,17 @@ export const ProjectDetailContainer = () => {
       >
         {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
           5 && (
-            <ProjectAlerts
-              skipStatusCheck={true}
-              project={project}
-              extraText={`Project has not been acted on since ${new Date(
-                project.lastStatusUpdatedOn
-              ).toLocaleDateString()}. ${getDaysDiff(
-                new Date(),
-                new Date(project.lastStatusUpdatedOn)
-              ).toFixed(0)} days.`}
-            />
-          )}
+          <ProjectAlerts
+            skipStatusCheck={true}
+            project={project}
+            extraText={`Project has not been acted on since ${new Date(
+              project.lastStatusUpdatedOn
+            ).toLocaleDateString()}. ${getDaysDiff(
+              new Date(),
+              new Date(project.lastStatusUpdatedOn)
+            ).toFixed(0)} days.`}
+          />
+        )}
       </ShowFor>
 
       {projectActions.length > 0 && (
@@ -549,6 +548,16 @@ export const ProjectDetailContainer = () => {
             </div>
             <div className="col-md-6 text-right">
               {" "}
+              <Link
+                className="btn btn-lg btn-primary"
+                to={
+                  shareId
+                    ? `/${team}/expense/billed/${project.id}/${shareId}`
+                    : `/${team}/expense/billed/${project.id}`
+                }
+              >
+                Billed Expenses
+              </Link>{" "}
               <ProjectUnbilledButton
                 projectId={project.id}
                 remaining={project.quoteTotal - project.chargedTotal}
@@ -573,7 +582,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                userInfo.user.detail.iam ||
+                  userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -597,7 +606,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                userInfo.user.detail.iam ||
+                  userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
