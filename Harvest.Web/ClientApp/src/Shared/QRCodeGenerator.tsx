@@ -4,7 +4,7 @@ import { Project } from "../types";
 
 interface QRCodeGeneratorProps {
   project: Project;
-  team: string;
+  team?: string;
   onClose: () => void;
 }
 
@@ -23,7 +23,8 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         try {
           // Build the URL that the QR code will contain
           const baseUrl = window.location.origin;
-          const projectUrl = `${baseUrl}/${team}/project/details/${project.id}`;
+          const teamSlug = team || project.team?.slug || "unknown";
+          const projectUrl = `${baseUrl}/${teamSlug}/project/details/${project.id}`;
 
           // Generate QR code
           await QRCode.toCanvas(canvasRef.current, projectUrl, {
@@ -47,7 +48,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
     };
 
     generateQRCode();
-  }, [project.id, team]);
+  }, [project.id, project.team?.slug, team]);
 
   const handlePrint = () => {
     if (!qrDataUrl) {
@@ -156,7 +157,17 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               </div>
               <div class="detail-row">
                 <span class="detail-label">Team:</span>
-                <span class="detail-value">${team}</span>
+                <span class="detail-value">${project.team?.name || team} (${
+        project.team?.slug || team
+      })</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Timeline:</span>
+                <span class="detail-value">${new Date(
+                  project.start
+                ).toLocaleDateString()} through ${new Date(
+        project.end
+      ).toLocaleDateString()}</span>
               </div>
             </div>
             
