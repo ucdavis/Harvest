@@ -379,7 +379,7 @@ export const ProjectDetailContainer = () => {
     {
       children: (
         <button
-          className="btn btn-info btn-sm mr-2"
+          className="btn btn-accent btn-sm mr-2"
           onClick={() => setShowQRCode(true)}
         >
           QR Code <FontAwesomeIcon icon={faQrcode} />
