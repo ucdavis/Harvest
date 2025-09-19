@@ -375,8 +375,9 @@ export const ProjectDetailContainer = () => {
         </button>
       ),
     }),
-    // QR Code button - available for all roles and statuses
-    {
+    useFor({
+      roles: ["FieldManager", "Supervisor", "System"],
+      condition: project.status === "Active",
       children: (
         <button
           className="btn btn-accent btn-sm mr-2"
@@ -385,7 +386,7 @@ export const ProjectDetailContainer = () => {
           QR Code <FontAwesomeIcon icon={faQrcode} />
         </button>
       ),
-    },
+    }),
   ].filter((a) => a !== null);
 
   if (isLoading) {
@@ -467,15 +468,9 @@ export const ProjectDetailContainer = () => {
             <div className="row justify-content-between">
               <div className="col-md-12 project-actions">
                 <h3>Project actions</h3>
-                {projectActions.map((action, i) => (
-                  <span key={`action_${i}`}>
-                    {action &&
-                    typeof action === "object" &&
-                    "children" in action
-                      ? action.children
-                      : action}
-                  </span>
-                ))}
+                {projectActions.map((action, i) =>
+                  action ? <span key={`action_${i}`}>{action}</span> : null
+                )}
               </div>
             </div>
           </div>
