@@ -186,8 +186,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         </html>
       `;
 
-      printWindow.document.write(printContent);
-      printWindow.document.close();
+      printWindow.document.documentElement.innerHTML = printContent;
 
       // Wait a moment for the content to load before printing
       setTimeout(() => {
