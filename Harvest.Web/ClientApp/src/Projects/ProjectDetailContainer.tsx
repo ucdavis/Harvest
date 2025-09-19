@@ -8,11 +8,13 @@ import {
   faEdit,
   faExchangeAlt,
   faEye,
+  faQrcode,
   faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import { QRCodeGenerator } from "../Shared/QRCodeGenerator";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
@@ -46,6 +48,7 @@ export const ProjectDetailContainer = () => {
   const [pendingChangeRequests, setPendingChangeRequests] = useState<
     PendingChangeRequest[]
   >([]);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -372,6 +375,18 @@ export const ProjectDetailContainer = () => {
         </button>
       ),
     }),
+    useFor({
+      roles: ["FieldManager", "Supervisor", "System"],
+      condition: project.status === "Active",
+      children: (
+        <button
+          className="btn btn-accent btn-sm mr-2"
+          onClick={() => setShowQRCode(true)}
+        >
+          QR Code <FontAwesomeIcon icon={faQrcode} />
+        </button>
+      ),
+    }),
   ].filter((a) => a !== null);
 
   if (isLoading) {
@@ -453,10 +468,9 @@ export const ProjectDetailContainer = () => {
             <div className="row justify-content-between">
               <div className="col-md-12 project-actions">
                 <h3>Project actions</h3>
-                {projectActions.map((action, i) => ({
-                  ...action,
-                  key: `action_${i}`,
-                }))}
+                {projectActions.map((action, i) =>
+                  action ? <span key={`action_${i}`}>{action}</span> : null
+                )}
               </div>
             </div>
           </div>
@@ -619,6 +633,15 @@ export const ProjectDetailContainer = () => {
           </div>
         )}
       </div>
+
+      {/* QR Code Modal */}
+      {showQRCode && team && (
+        <QRCodeGenerator
+          project={project}
+          team={team}
+          onClose={() => setShowQRCode(false)}
+        />
+      )}
     </div>
   );
 };
