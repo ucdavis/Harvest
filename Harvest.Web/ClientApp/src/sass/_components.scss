@@ -282,7 +282,7 @@ table.harvest-table {
   }
 
   tr:hover {
-    background-color: transparentize($primary-color, .95);
+    background-color: transparentize($primary-color, .88);
   }
 
   a {
@@ -290,6 +290,7 @@ table.harvest-table {
 
     &:hover {
       color: darken($primary-color, 3);
+      text-decoration: none;
     }
   }
 
