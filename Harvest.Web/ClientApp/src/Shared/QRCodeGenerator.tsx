@@ -5,14 +5,12 @@ import { Project } from "../types";
 interface QRCodeGeneratorProps {
   project: Project;
   team: string;
-  shareId?: string;
   onClose: () => void;
 }
 
 export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   project,
   team,
-  shareId,
   onClose,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,9 +23,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         try {
           // Build the URL that the QR code will contain
           const baseUrl = window.location.origin;
-          const projectUrl = shareId
-            ? `${baseUrl}/${team}/project/details/${project.id}/${shareId}`
-            : `${baseUrl}/${team}/project/details/${project.id}`;
+          const projectUrl = `${baseUrl}/${team}/project/details/${project.id}`;
 
           // Generate QR code
           await QRCode.toCanvas(canvasRef.current, projectUrl, {
@@ -51,7 +47,7 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
     };
 
     generateQRCode();
-  }, [project.id, team, shareId]);
+  }, [project.id, team]);
 
   const handlePrint = () => {
     if (!qrDataUrl) {

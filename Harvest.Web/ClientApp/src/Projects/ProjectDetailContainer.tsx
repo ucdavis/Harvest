@@ -639,7 +639,6 @@ export const ProjectDetailContainer = () => {
         <QRCodeGenerator
           project={project}
           team={team}
-          shareId={shareId}
           onClose={() => setShowQRCode(false)}
         />
       )}
