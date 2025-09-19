@@ -105,7 +105,14 @@ export const ProjectHeader = (props: Props) => {
             <p className="lede">Requirements</p>
             {projectReqs}
             <Modal isOpen={modal} toggle={toggleModal}>
-              <ModalHeader toggle={toggleModal}>
+              <ModalHeader
+                toggle={toggleModal}
+                close={
+                  <button className="close" onClick={toggleModal}>
+                    &times;
+                  </button>
+                }
+              >
                 Project Requirements
               </ModalHeader>
               <ModalBody>{project.requirements}</ModalBody>
