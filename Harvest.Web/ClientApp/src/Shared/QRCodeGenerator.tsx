@@ -156,18 +156,18 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
                 ).replace(/"/g, "&quot;")}</span>
               </div>
               <div class="detail-row">
-                <span class="detail-label">Team:</span>
-                <span class="detail-value">${project.team?.name || team} (${
-        project.team?.slug || team
-      })</span>
-              </div>
-              <div class="detail-row">
                 <span class="detail-label">Timeline:</span>
                 <span class="detail-value">${new Date(
                   project.start
                 ).toLocaleDateString()} through ${new Date(
         project.end
       ).toLocaleDateString()}</span>
+              </div>
+                            <div class="detail-row">
+                <span class="detail-label">Team:</span>
+                <span class="detail-value">${project.team?.name || team} (${
+        project.team?.slug || team
+      })</span>
               </div>
             </div>
             
