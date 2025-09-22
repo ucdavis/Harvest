@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { Cell, Column, TableState } from "react-table";
 import { Progress } from "reactstrap";
 
@@ -22,6 +22,7 @@ interface Props {
 }
 
 export const ProjectTable = (props: Props) => {
+  const history = useHistory();
   const projectData = useMemo(() => props.projects, [props.projects]);
   const columns: Column<Project>[] = useMemo(
     () => [
@@ -119,6 +120,10 @@ export const ProjectTable = (props: Props) => {
     pageSize: ReactTableUtil.getPageSize(),
   };
 
+  const handleRowClick = (project: Project) => {
+    history.push(`/${project.team.slug}/project/details/${project.id}`);
+  };
+
   return (
     <ReactTable
       columns={columns}
@@ -129,6 +134,7 @@ export const ProjectTable = (props: Props) => {
         startDate: startDateFilter,
         endDate: endDateFilter,
       }}
+      onRowClick={handleRowClick}
     />
   );
 };

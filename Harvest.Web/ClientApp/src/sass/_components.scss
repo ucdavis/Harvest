@@ -258,6 +258,9 @@ table.dataTable.table-striped>tbody>tr:nth-of-type(2n+1) {
 
 table.harvest-table {
   margin-bottom: 3rem;
+  display: block;
+  width: 100%;
+  overflow-x: auto;
 
   &.dataTable {
     border-collapse: collapse !important;
@@ -282,7 +285,7 @@ table.harvest-table {
   }
 
   tr:hover {
-    background-color: transparentize($primary-color, .95);
+    background-color: transparentize($primary-color, .88);
   }
 
   a {
@@ -290,6 +293,7 @@ table.harvest-table {
 
     &:hover {
       color: darken($primary-color, 3);
+      text-decoration: none;
     }
   }
 
