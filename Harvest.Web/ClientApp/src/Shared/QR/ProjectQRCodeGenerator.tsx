@@ -78,10 +78,10 @@ export const ProjectQRCodeGenerator: React.FC<ProjectQRCodeGeneratorProps> = ({
         <div>
           <canvas
             ref={canvasRef}
-            style={{ border: "1px solid #ddd", borderRadius: "4px" }}
+            style={{ border: "1px solid #c7c8cc", borderRadius: "4px" }}
           />
           <div className="mt-3">
-            <p className="small text-muted">
+            <p>
               Scan this QR code to quickly access this project on mobile
               devices.
             </p>

@@ -38,11 +38,11 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
           </div>
           <div className="modal-body text-center">
             <div className="mb-3">
-              <h6>#{itemId}</h6>
-              <p className="text-muted">{itemName}</p>
+              <h4><b>#{itemId}</b></h4>
+              <h2>{itemName}</h2>
             </div>
-
             {children}
+
           </div>
           <div className="modal-footer">
             <button

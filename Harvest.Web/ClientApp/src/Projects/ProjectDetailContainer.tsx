@@ -368,7 +368,7 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-accent btn-sm"
+          className="btn btn-accent btn-sm mr-2"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />
@@ -449,17 +449,17 @@ export const ProjectDetailContainer = () => {
       >
         {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
           5 && (
-          <ProjectAlerts
-            skipStatusCheck={true}
-            project={project}
-            extraText={`Project has not been acted on since ${new Date(
-              project.lastStatusUpdatedOn
-            ).toLocaleDateString()}. ${getDaysDiff(
-              new Date(),
-              new Date(project.lastStatusUpdatedOn)
-            ).toFixed(0)} days.`}
-          />
-        )}
+            <ProjectAlerts
+              skipStatusCheck={true}
+              project={project}
+              extraText={`Project has not been acted on since ${new Date(
+                project.lastStatusUpdatedOn
+              ).toLocaleDateString()}. ${getDaysDiff(
+                new Date(),
+                new Date(project.lastStatusUpdatedOn)
+              ).toFixed(0)} days.`}
+            />
+          )}
       </ShowFor>
 
       {projectActions.length > 0 && (
@@ -596,7 +596,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -620,7 +620,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
