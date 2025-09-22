@@ -13,12 +13,18 @@
     <hr />
     @await Html.PartialAsync("_RateDetails", Model)
 </div>
+@if(Model.Rate.IsActive && (Model.Rate.Type == Rate.Types.Equipment || Model.Rate.Type == Rate.Types.Other))
+{
+    <div>
+        <button id="rate-qr-button" class="btn btn-primary" onclick="showRateQRCode()">
+            <i class="fas fa-qrcode"></i> Generate QR Code
+        </button>
+    </div>
+    <br />
+}
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Rate.Id }) |
-    <a asp-action="Index">Back to List</a> |
-    <button id="rate-qr-button" class="btn btn-info" onclick="showRateQRCode()">
-        <i class="fas fa-qrcode"></i> Generate QR Code
-    </button>
+    <a asp-action="Index">Back to List</a>
 </div>
 
 @* React component placeholder for QR Code *@
@@ -51,3 +57,8 @@
         }
     }
 </script>
+
+@section Styles
+{
+    @{ await Html.RenderPartialAsync("_FaStylesPartial"); }
+}
