@@ -14,7 +14,7 @@ import {
 
 import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
-import { QRCodeGenerator } from "../Shared/QRCodeGenerator";
+import { ProjectQRCodeGenerator } from "../Shared/QR";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
@@ -636,7 +636,7 @@ export const ProjectDetailContainer = () => {
 
       {/* QR Code Modal */}
       {showQRCode && team && (
-        <QRCodeGenerator
+        <ProjectQRCodeGenerator
           project={project}
           team={team}
           onClose={() => setShowQRCode(false)}
