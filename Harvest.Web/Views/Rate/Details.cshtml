@@ -1,4 +1,5 @@
 ﻿@using Harvest.Core.Extensions
+@using System.Text.Json
 @model Harvest.Web.Models.RateModels.RateDetailsModel
 
 @{
@@ -14,5 +15,39 @@
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Rate.Id }) |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List</a> |
+    <button id="rate-qr-button" class="btn btn-info" onclick="showRateQRCode()">
+        <i class="fas fa-qrcode"></i> Generate QR Code
+    </button>
 </div>
+
+@* React component placeholder for QR Code *@
+<div id="rate-qr-container" style="display: none;"></div>
+
+@* Pass server data to JavaScript *@
+<script>
+    window.rateQRData = @Html.Raw(JsonSerializer.Serialize(new { 
+        rateData = new { 
+            id = Model.Rate.Id, 
+            description = Model.Rate.Description,
+            type = Model.Rate.Type,
+            price = Model.Rate.Price,
+            unit = Model.Rate.Unit ?? "",
+            isPassthrough = Model.Rate.IsPassthrough
+        },
+        teamSlug = Model.TeamSlug 
+    }));
+
+    function showRateQRCode() {
+        if (window.HarvestMvcHelpers && window.HarvestMvcHelpers.mountRateQRCode) {
+            window.HarvestMvcHelpers.mountRateQRCode({
+                rateData: window.rateQRData.rateData,
+                teamSlug: window.rateQRData.teamSlug,
+                containerId: 'rate-qr-container'
+            });
+        } else {
+            console.error('HarvestMvcHelpers not loaded. Make sure React app is running.');
+            alert('QR Code functionality is not available. Please ensure the application is fully loaded.');
+        }
+    }
+</script>

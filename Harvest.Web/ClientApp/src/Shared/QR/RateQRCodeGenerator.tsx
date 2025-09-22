@@ -18,7 +18,7 @@ export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
   // Build the URL that the QR code will contain
   const baseUrl = window.location.origin;
   const teamSlug = team || "unknown";
-  const rateUrl = `${baseUrl}/${teamSlug}/rate/details/${rate.id}`;
+  const rateUrl = `${baseUrl}/${teamSlug}/Rate/Details/${rate.id}`;
 
   const { canvasRef, qrCodeGenerated, qrDataUrl, error } =
     useQRCodeGeneration(rateUrl);

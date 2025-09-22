@@ -83,7 +83,7 @@ namespace Harvest.Web.Controllers
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
-            var model = new RateDetailsModel { Rate = rate, TeamName = team.Name };
+            var model = new RateDetailsModel { Rate = rate, TeamName = team.Name, TeamSlug = team.Slug };
             if (_aeSettings.UseCoA)
             {
                 model.AccountValidation = await _aggieEnterpriseService.IsAccountValid(rate.Account, validateRate: true);
@@ -92,7 +92,7 @@ namespace Harvest.Web.Controllers
             {
                 model.AccountValidation = await _financialService.IsValid(model.Rate.Account);
             }
-            
+
             return View(model);
         }
 
@@ -113,7 +113,7 @@ namespace Harvest.Web.Controllers
             {
                 model.Rate.Account = "3-";
             }
-            
+
             return View(model);
         }
 
@@ -169,11 +169,11 @@ namespace Harvest.Web.Controllers
                 ErrorMessage = "This COA has associated warnings, please select details to review them.";
             }
 
-            
+
 
             if (model.Rate.IsPassthrough)
             {
-                if(model.Rate.Type != Rate.Types.Other)
+                if (model.Rate.Type != Rate.Types.Other)
                 {
                     ModelState.AddModelError("Rate.IsPassthrough", errorMessage: "Pass through can only be checked for Other types.");
                 }
@@ -200,7 +200,7 @@ namespace Harvest.Web.Controllers
 
             var rateToCreate = new Rate();
             UpdateCommonValues(model, rateToCreate, accountValidation, user);
-            rateToCreate.IsActive  = true;
+            rateToCreate.IsActive = true;
             rateToCreate.CreatedBy = user;
             rateToCreate.CreatedOn = rateToCreate.UpdatedOn;
             rateToCreate.TeamId = team.Id;
@@ -210,7 +210,7 @@ namespace Harvest.Web.Controllers
                 await _dbContext.Rates.AddAsync(rateToCreate);
                 await _dbContext.SaveChangesAsync();
                 Message = "Rate Created";
-                
+
                 if (_aeSettings.UseCoA)
                 {
                     //if(rateToCreate.IsPassthrough && accountValidation.CoaChartType == AggieEnterpriseApi.Validation.FinancialChartStringType.Gl && accountValidation.GlSegments.Account != "775001")
@@ -273,7 +273,7 @@ namespace Harvest.Web.Controllers
             model.UseCoA = _aeSettings.UseCoA;
             model.Rate.Account = model.Rate.Account?.ToUpper().Trim();
             model.TeamName = team.Name;
-            
+
             if (!ModelState.IsValid)
             {
                 ErrorMessage = "There are validation errors, please correct them and try again.";
@@ -378,15 +378,15 @@ namespace Harvest.Web.Controllers
             {
                 destinationRate.Account = accountValidation.KfsAccount.ToString();
             }
-            
-            destinationRate.BillingUnit   = model.Rate.BillingUnit;
-            destinationRate.Description   = model.Rate.Description;
-            destinationRate.EffectiveOn   = model.Rate.EffectiveOn.FromPacificTime();
-            destinationRate.Price         = model.Rate.Price; 
-            destinationRate.Type          = model.Rate.Type;
-            destinationRate.Unit          = model.Rate.Unit;
-            destinationRate.UpdatedOn     = DateTime.UtcNow;
-            destinationRate.UpdatedBy     = user;
+
+            destinationRate.BillingUnit = model.Rate.BillingUnit;
+            destinationRate.Description = model.Rate.Description;
+            destinationRate.EffectiveOn = model.Rate.EffectiveOn.FromPacificTime();
+            destinationRate.Price = model.Rate.Price;
+            destinationRate.Type = model.Rate.Type;
+            destinationRate.Unit = model.Rate.Unit;
+            destinationRate.UpdatedOn = DateTime.UtcNow;
+            destinationRate.UpdatedBy = user;
             destinationRate.IsPassthrough = model.Rate.Type == Rate.Types.Other && model.Rate.IsPassthrough;
         }
 
@@ -406,7 +406,7 @@ namespace Harvest.Web.Controllers
                 .Include(a => a.UpdatedBy)
                 .Include(a => a.CreatedBy)
                 .SingleAsync(a => a.Id == id && a.TeamId == team.Id);
-            var model = new RateDetailsModel { Rate = rate }; 
+            var model = new RateDetailsModel { Rate = rate };
             model.TeamName = team.Name;
             if (_aeSettings.UseCoA)
             {
@@ -436,7 +436,7 @@ namespace Harvest.Web.Controllers
             var rateToDelete = await _dbContext.Rates.SingleAsync(a => a.Id == id && a.IsActive && a.TeamId == team.Id);
             var user = await _userService.GetCurrentUser();
 
-            rateToDelete.IsActive  = false;
+            rateToDelete.IsActive = false;
             rateToDelete.UpdatedOn = DateTime.UtcNow;
             rateToDelete.UpdatedBy = user;
             try
