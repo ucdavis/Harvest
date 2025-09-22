@@ -41,7 +41,8 @@
             unit = Model.Rate.Unit ?? "",
             isPassthrough = Model.Rate.IsPassthrough
         },
-        teamSlug = Model.TeamSlug 
+        teamSlug = Model.TeamSlug,
+        teamName = Model.TeamName
     }));
 
     function showRateQRCode() {
@@ -49,6 +50,7 @@
             window.HarvestMvcHelpers.mountRateQRCode({
                 rateData: window.rateQRData.rateData,
                 teamSlug: window.rateQRData.teamSlug,
+                teamName: window.rateQRData.teamName,
                 containerId: 'rate-qr-container'
             });
         } else {

@@ -15,6 +15,7 @@ interface MvcRateData {
 interface RateQRMountOptions {
   rateData: MvcRateData;
   teamSlug: string;
+  teamName: string;
   containerId: string;
 }
 
@@ -23,7 +24,7 @@ interface RateQRMountOptions {
  * This function is called from MVC Razor views to embed React QR functionality
  */
 export const mountRateQRCode = (options: RateQRMountOptions): void => {
-  const { rateData, teamSlug, containerId } = options;
+  const { rateData, teamSlug, teamName, containerId } = options;
   const container = document.getElementById(containerId);
 
   if (!container) {
@@ -51,7 +52,11 @@ export const mountRateQRCode = (options: RateQRMountOptions): void => {
   container.style.display = "block";
 
   ReactDOM.render(
-    <RateQRCodeGenerator rate={rate} team={teamSlug} onClose={handleClose} />,
+    <RateQRCodeGenerator
+      rate={rate}
+      teamInfo={{ name: teamName, slug: teamSlug }}
+      onClose={handleClose}
+    />,
     container
   );
 };

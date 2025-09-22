@@ -6,18 +6,23 @@ import { printQRCode, PrintDetail } from "./printUtils";
 
 interface RateQRCodeGeneratorProps {
   rate: Rate;
-  team?: string;
+  team?: string; // For backwards compatibility, this will be the slug
+  teamInfo?: {
+    name: string;
+    slug: string;
+  };
   onClose: () => void;
 }
 
 export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
   rate,
   team,
+  teamInfo,
   onClose,
 }) => {
   // Build the URL that the QR code will contain
   const baseUrl = window.location.origin;
-  const teamSlug = team || "unknown";
+  const teamSlug = teamInfo?.slug || team || "unknown";
   const rateUrl = `${baseUrl}/${teamSlug}/Rate/Details/${rate.id}`;
 
   const { canvasRef, qrCodeGenerated, qrDataUrl, error } =
@@ -37,7 +42,12 @@ export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
       { label: "Passthrough", value: rate.isPassthrough ? "Yes" : "No" },
     ];
 
-    if (team) {
+    if (teamInfo) {
+      printDetails.push({
+        label: "Team",
+        value: `${teamInfo.name} (${teamInfo.slug})`,
+      });
+    } else if (team) {
       printDetails.push({ label: "Team", value: team });
     }
 
