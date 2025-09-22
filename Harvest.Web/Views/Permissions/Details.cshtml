@@ -26,7 +26,7 @@
         @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiplpermissions
         {
             <h2>Workers assigned to supervisor</h2>
-            <div class="col text-right">
+            <div class="mb-2 text-right">
                 <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to
                     Supervisor<i class="fas fa-plus fa-xs"></i></a>
             </div>
