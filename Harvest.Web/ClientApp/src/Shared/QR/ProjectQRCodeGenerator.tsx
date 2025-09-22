@@ -3,6 +3,7 @@ import { Project } from "../../types";
 import { useQRCodeGeneration } from "./useQRCodeGeneration";
 import { QRCodeModal } from "./QRCodeModal";
 import { printQRCode, PrintDetail } from "./printUtils";
+import { createProjectLeafLogo } from "./qrLogos";
 
 interface ProjectQRCodeGeneratorProps {
   project: Project;
@@ -20,8 +21,18 @@ export const ProjectQRCodeGenerator: React.FC<ProjectQRCodeGeneratorProps> = ({
   const teamSlug = team || project.team?.slug || "unknown";
   const projectUrl = `${baseUrl}/${teamSlug}/project/details/${project.id}`;
 
-  const { canvasRef, qrCodeGenerated, qrDataUrl, error } =
-    useQRCodeGeneration(projectUrl);
+  const { canvasRef, qrCodeGenerated, qrDataUrl, error } = useQRCodeGeneration(
+    projectUrl,
+    {
+      logo: {
+        src: createProjectLeafLogo(48),
+        size: 18, // 18% of QR code size
+        backgroundColor: "#ffffff",
+        padding: 4,
+        borderRadius: 8,
+      },
+    }
+  );
 
   const handlePrint = () => {
     if (!qrDataUrl) {

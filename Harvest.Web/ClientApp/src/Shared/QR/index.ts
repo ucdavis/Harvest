@@ -4,6 +4,11 @@ export { RateQRCodeGenerator } from "./RateQRCodeGenerator";
 export { QRCodeModal } from "./QRCodeModal";
 export { useQRCodeGeneration } from "./useQRCodeGeneration";
 export { printQRCode, generateQRCodePrintHTML } from "./printUtils";
+export {
+  createProjectLeafLogo,
+  createRateTractorLogo,
+  createUCDavisLogo,
+} from "./qrLogos";
 export type {
   QRCodeGenerationOptions,
   UseQRCodeGenerationResult,

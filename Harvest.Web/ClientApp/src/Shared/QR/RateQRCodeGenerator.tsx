@@ -3,6 +3,7 @@ import { Rate } from "../../types";
 import { useQRCodeGeneration } from "./useQRCodeGeneration";
 import { QRCodeModal } from "./QRCodeModal";
 import { printQRCode, PrintDetail } from "./printUtils";
+import { createRateTractorLogo } from "./qrLogos";
 
 interface RateQRCodeGeneratorProps {
   rate: Rate;
@@ -25,8 +26,18 @@ export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
   const teamSlug = teamInfo?.slug || team || "unknown";
   const rateUrl = `${baseUrl}/${teamSlug}/Rate/Details/${rate.id}`;
 
-  const { canvasRef, qrCodeGenerated, qrDataUrl, error } =
-    useQRCodeGeneration(rateUrl);
+  const { canvasRef, qrCodeGenerated, qrDataUrl, error } = useQRCodeGeneration(
+    rateUrl,
+    {
+      logo: {
+        src: createRateTractorLogo(48),
+        size: 18, // 18% of QR code size
+        backgroundColor: "#ffffff",
+        padding: 4,
+        borderRadius: 8,
+      },
+    }
+  );
 
   const handlePrint = () => {
     if (!qrDataUrl) {
