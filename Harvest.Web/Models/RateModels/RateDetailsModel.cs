@@ -13,5 +13,6 @@ namespace Harvest.Web.Models.RateModels
         public AccountValidationModel AccountValidation { get; set; }
 
         public string TeamName { get; set; }
+        public string TeamSlug { get; set; }
     }
 }

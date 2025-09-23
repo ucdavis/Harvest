@@ -8,11 +8,13 @@ import {
   faEdit,
   faExchangeAlt,
   faEye,
+  faQrcode,
   faUndo,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { FileUpload } from "../Shared/FileUpload";
 import { ProjectHeader } from "../Shared/ProjectHeader";
+import { ProjectQRCodeGenerator } from "../Shared/QR";
 import { RecentInvoicesContainer } from "../Invoices/RecentInvoicesContainer";
 import { RecentTicketsContainer } from "../Tickets/RecentTicketsContainer";
 import { RecentHistoriesContainer } from "../Histories/RecentHistoriesContainer";
@@ -46,6 +48,7 @@ export const ProjectDetailContainer = () => {
   const [pendingChangeRequests, setPendingChangeRequests] = useState<
     PendingChangeRequest[]
   >([]);
+  const [showQRCode, setShowQRCode] = useState(false);
 
   const [notification, setNotification] = usePromiseNotification();
 
@@ -365,10 +368,22 @@ export const ProjectDetailContainer = () => {
         project.status === "QuoteRejected",
       children: (
         <button
-          className="btn btn-accent btn-sm"
+          className="btn btn-accent btn-sm mr-2"
           onClick={() => resetShareLink()}
         >
           Reset Share <FontAwesomeIcon icon={faUndo} />
+        </button>
+      ),
+    }),
+    useFor({
+      roles: ["FieldManager", "Supervisor", "System"],
+      condition: project.status === "Active",
+      children: (
+        <button
+          className="btn btn-accent btn-sm mr-2"
+          onClick={() => setShowQRCode(true)}
+        >
+          QR Code <FontAwesomeIcon icon={faQrcode} />
         </button>
       ),
     }),
@@ -434,17 +449,17 @@ export const ProjectDetailContainer = () => {
       >
         {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
           5 && (
-          <ProjectAlerts
-            skipStatusCheck={true}
-            project={project}
-            extraText={`Project has not been acted on since ${new Date(
-              project.lastStatusUpdatedOn
-            ).toLocaleDateString()}. ${getDaysDiff(
-              new Date(),
-              new Date(project.lastStatusUpdatedOn)
-            ).toFixed(0)} days.`}
-          />
-        )}
+            <ProjectAlerts
+              skipStatusCheck={true}
+              project={project}
+              extraText={`Project has not been acted on since ${new Date(
+                project.lastStatusUpdatedOn
+              ).toLocaleDateString()}. ${getDaysDiff(
+                new Date(),
+                new Date(project.lastStatusUpdatedOn)
+              ).toFixed(0)} days.`}
+            />
+          )}
       </ShowFor>
 
       {projectActions.length > 0 && (
@@ -453,10 +468,9 @@ export const ProjectDetailContainer = () => {
             <div className="row justify-content-between">
               <div className="col-md-12 project-actions">
                 <h3>Project actions</h3>
-                {projectActions.map((action, i) => ({
-                  ...action,
-                  key: `action_${i}`,
-                }))}
+                {projectActions.map((action, i) =>
+                  action ? <span key={`action_${i}`}>{action}</span> : null
+                )}
               </div>
             </div>
           </div>
@@ -582,7 +596,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -606,7 +620,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                  userInfo.user.detail.iam ||
+                userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -619,6 +633,15 @@ export const ProjectDetailContainer = () => {
           </div>
         )}
       </div>
+
+      {/* QR Code Modal */}
+      {showQRCode && team && (
+        <ProjectQRCodeGenerator
+          project={project}
+          team={team}
+          onClose={() => setShowQRCode(false)}
+        />
+      )}
     </div>
   );
 };
