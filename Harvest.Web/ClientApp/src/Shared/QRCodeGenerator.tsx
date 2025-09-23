@@ -74,19 +74,19 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               max-width: 600px;
               margin: 0 auto;
               padding: 30px;
-              border: 2px solid #333;
+              border: 2px solid #1f1f1f;
               border-radius: 10px;
             }
             .qr-title {
               font-size: 24px;
               font-weight: bold;
               margin-bottom: 10px;
-              color: #333;
+              color: #1f1f1f;
             }
             .project-info {
               margin-bottom: 20px;
               font-size: 16px;
-              color: #666;
+              color: #a5a5a5;
             }
             .qr-code {
               margin: 20px 0;
@@ -94,16 +94,16 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             .qr-code img {
               max-width: 100%;
               height: auto;
-              border: 1px solid #ddd;
+              border: 1px solid #c7c8cc;
             }
             .instructions {
               font-size: 14px;
-              color: #888;
+              color: #a5a5a5;
               margin-top: 20px;
               line-height: 1.4;
             }
             .project-details {
-              background-color: #f5f5f5;
+              background-color: #f7f7f7;
               padding: 15px;
               border-radius: 5px;
               margin: 15px 0;
@@ -116,16 +116,16 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             }
             .detail-label {
               font-weight: bold;
-              color: #333;
+              color: #1f1f1f;
             }
             .detail-value {
-              color: #666;
+              color: #a5a5a5;
             }
             @media print {
               body { margin: 0; }
-              .qr-container { border: 1px solid #333; }
+              .qr-container { border: 1px solid #1f1f1f; }
               .qr-code img { 
-                border: 1px solid #333;
+                border: 1px solid #1f1f1f;
                 print-color-adjust: exact;
                 -webkit-print-color-adjust: exact;
               }
@@ -145,36 +145,34 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               <div class="detail-row">
                 <span class="detail-label">Project Name:</span>
                 <span class="detail-value">${project.name.replace(
-                  /"/g,
-                  "&quot;"
-                )}</span>
+        /"/g,
+        "&quot;"
+      )}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Principal Investigator:</span>
                 <span class="detail-value">${(
-                  project.principalInvestigator?.name || "N/A"
-                ).replace(/"/g, "&quot;")}</span>
+          project.principalInvestigator?.name || "N/A"
+        ).replace(/"/g, "&quot;")}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Timeline:</span>
                 <span class="detail-value">${new Date(
-                  project.start
-                ).toLocaleDateString()} through ${new Date(
-        project.end
-      ).toLocaleDateString()}</span>
+          project.start
+        ).toLocaleDateString()} through ${new Date(
+          project.end
+        ).toLocaleDateString()}</span>
               </div>
                             <div class="detail-row">
                 <span class="detail-label">Team:</span>
-                <span class="detail-value">${project.team?.name || team} (${
-        project.team?.slug || team
-      })</span>
+                <span class="detail-value">${project.team?.name || team} (${project.team?.slug || team
+        })</span>
               </div>
             </div>
             
             <div class="qr-code">
-              <img src="${qrDataUrl}" alt="QR Code for Project ${
-        project.id
-      }" width="256" height="256" />
+              <img src="${qrDataUrl}" alt="QR Code for Project ${project.id
+        }" width="256" height="256" />
             </div>
             
             <div class="instructions">
@@ -215,17 +213,17 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
           <div className="modal-body text-center">
             <div className="mb-3">
               <h6>Field Request #{project.id}</h6>
-              <p className="text-muted">{project.name}</p>
+              <p>{project.name}</p>
             </div>
 
             {qrCodeGenerated ? (
               <div>
                 <canvas
                   ref={canvasRef}
-                  style={{ border: "1px solid #ddd", borderRadius: "4px" }}
+                  style={{ border: "1px solid #c7c8cc", borderRadius: "2px" }}
                 />
                 <div className="mt-3">
-                  <p className="small text-muted">
+                  <p>
                     Scan this QR code to quickly access this project on mobile
                     devices.
                   </p>
@@ -257,6 +255,6 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };

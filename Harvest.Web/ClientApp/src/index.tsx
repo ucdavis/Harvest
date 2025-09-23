@@ -8,6 +8,9 @@ import "react-bootstrap-typeahead/css/Typeahead.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "./sass/harvest.scss";
 
+// Import MVC helpers to make them globally available
+import "./Shared/MvcHelpers/RateQRHelper";
+
 const rootElement = document.getElementById("root");
 
 if (rootElement) {

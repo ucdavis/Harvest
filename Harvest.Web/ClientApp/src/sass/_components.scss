@@ -221,6 +221,10 @@
   background-color: $primary-light;
 }
 
+.modal-footer {
+  background-color: $bg-primary;
+}
+
 .leaflet-popup-content {
   p {
     margin: 0;
@@ -256,11 +260,16 @@ table.dataTable.table-striped>tbody>tr:nth-of-type(2n+1) {
   }
 }
 
+
 table.harvest-table {
   margin-bottom: 3rem;
   display: block;
   width: 100%;
   overflow-x: auto;
+
+  @include breakpoint(md) {
+    display: inline-table;
+  }
 
   &.dataTable {
     border-collapse: collapse !important;
@@ -308,6 +317,14 @@ table.harvest-table {
   }
 
   tr {
+    background-color: #fff;
+  }
+}
+
+table.dataTable>tbody>tr {
+  background-color: #fff;
+
+  &:hover {
     background-color: #fff;
   }
 }
