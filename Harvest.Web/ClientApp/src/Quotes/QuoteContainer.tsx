@@ -174,7 +174,7 @@ export const QuoteContainer = () => {
         grandTotal: activitiesTotal + acreageTotal,
       };
     });
-  }, [quote.activities, quote.acreageRate, quote.acres]);
+  }, [quote.activities, quote.acreageRate, quote.acres, quote.years]);
 
   const cropArray = useMemo(
     () => (project ? project.crop.split(",") : []),
