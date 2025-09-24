@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { CommonRouteParams, Project, ProjectAccount } from "../types";
 import {
   Button,
@@ -15,6 +15,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from "@fortawesome/free-solid-svg-icons";
 import { ShowForPiOnly } from "./ShowForPiOnly";
 import { useParams } from "react-router-dom";
+import { ShowFor } from "./ShowFor";
+import { authenticatedFetch } from "../Util/Api";
+import { useIsMounted } from "../Shared/UseIsMounted";
 
 interface Props {
   project: Project;
@@ -25,8 +28,45 @@ interface Props {
 export const ProjectHeader = (props: Props) => {
   const { project, title } = props;
   const [modal, setModal] = useState<boolean>(false);
+  const [originalProject, setOriginalProject] = useState<Project | undefined>(
+    undefined
+  );
+  const [isLoadingOriginalProject, setIsLoadingOriginalProject] =
+    useState<boolean>(false);
   const toggleModal = () => setModal((modal) => !modal);
   const { shareId } = useParams<CommonRouteParams>();
+  const getIsMounted = useIsMounted();
+
+  // Fetch original project when status is ChangeRequested and originalProjectId exists
+  useEffect(() => {
+    const fetchOriginalProject = async () => {
+      if (project.status === "ChangeRequested" && project.originalProjectId) {
+        setIsLoadingOriginalProject(true);
+        try {
+          const response = await authenticatedFetch(
+            `/api/${project.team.slug}/Project/Get/${project.originalProjectId}`
+          );
+          if (response.ok && getIsMounted()) {
+            const originalProj: Project = await response.json();
+            setOriginalProject(originalProj);
+          }
+        } catch (error) {
+          console.error("Error fetching original project:", error);
+        } finally {
+          if (getIsMounted()) {
+            setIsLoadingOriginalProject(false);
+          }
+        }
+      }
+    };
+
+    fetchOriginalProject();
+  }, [
+    project.status,
+    project.originalProjectId,
+    project.team.slug,
+    getIsMounted,
+  ]);
 
   // Function to show a truncated version of project.requirements if the
   // character count is above 256
@@ -142,6 +182,39 @@ export const ProjectHeader = (props: Props) => {
                     {new Date(project.start).toLocaleDateString()} through{" "}
                     {new Date(project.end).toLocaleDateString()}
                   </p>
+                  <ShowFor condition={project.status === "ChangeRequested"}>
+                    {isLoadingOriginalProject ? (
+                      <p className="text-muted">
+                        <small>Loading original project dates...</small>
+                      </p>
+                    ) : originalProject ? (
+                      <>
+                        {(new Date(project.start).toLocaleDateString() !==
+                          new Date(
+                            originalProject.start
+                          ).toLocaleDateString() ||
+                          new Date(project.end).toLocaleDateString() !==
+                          new Date(
+                            originalProject.end
+                          ).toLocaleDateString()) && (
+                            <>
+                              <div className="text-danger">
+                                <p className="lede">Original Timeline</p>
+                                <p>
+                                  {new Date(
+                                    originalProject.start
+                                  ).toLocaleDateString()}{" "}
+                                  through{" "}
+                                  {new Date(
+                                    originalProject.end
+                                  ).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </>
+                          )}
+                      </>
+                    ) : null}
+                  </ShowFor>
                   <p className="lede">Team</p>
                   <p>{project.team.name}</p>
                   <p className="lede">Crops</p>
