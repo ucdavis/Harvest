@@ -197,18 +197,20 @@ export const ProjectHeader = (props: Props) => {
                             new Date(
                               originalProject.end
                             ).toLocaleDateString()) && (
-                          <div className="text-danger">
-                            <small>
-                              <b>Original dates:</b>{" "}
-                              {new Date(
-                                originalProject.start
-                              ).toLocaleDateString()}{" "}
-                              through{" "}
-                              {new Date(
-                                originalProject.end
-                              ).toLocaleDateString()}
-                            </small>
-                          </div>
+                          <>
+                            <div className="text-custom-danger">
+                              <p className="lede">Original Timeline</p>
+                              <p>
+                                {new Date(
+                                  originalProject.start
+                                ).toLocaleDateString()}{" "}
+                                through{" "}
+                                {new Date(
+                                  originalProject.end
+                                ).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </>
                         )}
                       </>
                     ) : null}
