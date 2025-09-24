@@ -90,6 +90,16 @@ namespace Harvest.Web.Controllers.Api
                 model.Quote.ApprovedOn = project.Quote?.ApprovedOn;
             }
 
+            if(project.QuoteId == null && project.OriginalProjectId != null)
+            {
+                // Ok, we want to try to view the pending change request's quote.
+                var newQuote = await _dbContext.Quotes.SingleOrDefaultAsync(q => q.ProjectId == project.Id);
+                if(newQuote != null)
+                {
+                    model.Quote = QuoteDetail.Deserialize(newQuote.Text);
+                }
+            }
+
             return Ok(model);
         }
 
