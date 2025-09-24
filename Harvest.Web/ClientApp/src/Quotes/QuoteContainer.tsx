@@ -75,6 +75,26 @@ export const QuoteContainer = () => {
           }
 
           if (projectWithQuote.quote) {
+            // The number of years may have changed since the quote was created, so update it
+            //console.log("Current Years: " + projectWithQuote.quote.years);
+            const newYears = Math.max(
+              1,
+              new Date(projectWithQuote.project.end).getFullYear() -
+                new Date(projectWithQuote.project.start).getFullYear()
+            );
+            //console.log("New Years: " + newYears);
+
+            if (newYears !== projectWithQuote.quote.years) {
+              alert(
+                "The project duration has changed since this quote was created.  The number of years has been updated from " +
+                  projectWithQuote.quote.years +
+                  " to " +
+                  newYears +
+                  ".  Please review the quote details to ensure they are still accurate."
+              );
+            }
+            projectWithQuote.quote.years = newYears;
+
             // quote already exists, so we'll just set it
             setQuote({
               ...projectWithQuote.quote,
