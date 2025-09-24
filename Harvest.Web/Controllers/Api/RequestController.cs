@@ -149,6 +149,9 @@ namespace Harvest.Web.Controllers.Api
                 changeRequestProject.UpdateStatus(Project.Statuses.ChangeApplied);
                 changeRequestProject.Quote = originalQuote;
 
+                var saveStart = project.Start;
+                var saveEnd = project.End;
+
                 // replace original project info with newly approved project info
                 project.PrincipalInvestigatorId = changeRequestProject.PrincipalInvestigatorId;
                 project.Crop = changeRequestProject.Crop;
@@ -176,6 +179,11 @@ namespace Harvest.Web.Controllers.Api
                     {
                         attachment.Project = project;
                     }
+                }
+
+                if (project.Start.Date != saveStart.Date || project.End.Date != saveEnd.Date)
+                {
+                    await _historyService.AdhocHistory(project.Id, "ProjectDatesChanged", $"Project Dates Changed. \nOld: {saveStart:d} - {saveEnd:d} \nNew: {project.Start:d} - {project.End:d}", null, true);
                 }
 
                 //There may be visible history values for the change request, but if they get copied over, they might be more confusing...
@@ -442,7 +450,11 @@ namespace Harvest.Web.Controllers.Api
                 Requirements = project.Requirements,
                 Status = Project.Statuses.Requested
             };
-            
+
+            //There may be some issues with the start and end dates. Not sure if this is consistent with always UTC or pacific time.
+            //It seems like with a new project, it has a time of 7Am, but when I do a change request, the time is 2
+            //Don't want to change it here and cause other issues, but something to keep in mind.
+
             // ensure team is set
             var team = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).SingleAsync();
             if(team.Slug != TeamSlug) 
