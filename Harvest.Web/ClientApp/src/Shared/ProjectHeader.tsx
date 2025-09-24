@@ -194,24 +194,24 @@ export const ProjectHeader = (props: Props) => {
                             originalProject.start
                           ).toLocaleDateString() ||
                           new Date(project.end).toLocaleDateString() !==
-                            new Date(
-                              originalProject.end
-                            ).toLocaleDateString()) && (
-                          <>
-                            <div className="text-custom-danger">
-                              <p className="lede">Original Timeline</p>
-                              <p>
-                                {new Date(
-                                  originalProject.start
-                                ).toLocaleDateString()}{" "}
-                                through{" "}
-                                {new Date(
-                                  originalProject.end
-                                ).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </>
-                        )}
+                          new Date(
+                            originalProject.end
+                          ).toLocaleDateString()) && (
+                            <>
+                              <div className="text-danger">
+                                <p className="lede">Original Timeline</p>
+                                <p>
+                                  {new Date(
+                                    originalProject.start
+                                  ).toLocaleDateString()}{" "}
+                                  through{" "}
+                                  {new Date(
+                                    originalProject.end
+                                  ).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </>
+                          )}
                       </>
                     ) : null}
                   </ShowFor>
