@@ -181,7 +181,7 @@ namespace Harvest.Web.Controllers.Api
                     }
                 }
 
-                if(project.Start.Date != saveStart.Date || project.End.Date != saveEnd.Date)
+                if (project.Start.Date != saveStart.Date || project.End.Date != saveEnd.Date)
                 {
                     await _historyService.AdhocHistory(project.Id, "ProjectDatesChanged", $"Project Dates Changed. \nOld: {saveStart:d} - {saveEnd:d} \nNew: {project.Start:d} - {project.End:d}", null, true);
                 }
@@ -450,7 +450,11 @@ namespace Harvest.Web.Controllers.Api
                 Requirements = project.Requirements,
                 Status = Project.Statuses.Requested
             };
-            
+
+            //There may be some issues with the start and end dates. Not sure if this is consistent with always UTC or pacific time.
+            //It seems like with a new project, it has a time of 7Am, but when I do a change request, the time is 2
+            //Don't want to change it here and cause other issues, but something to keep in mind.
+
             // ensure team is set
             var team = await _dbContext.Teams.Where(t => t.Slug == project.Team.Slug).SingleAsync();
             if(team.Slug != TeamSlug) 
