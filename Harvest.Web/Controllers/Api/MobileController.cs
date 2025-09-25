@@ -110,7 +110,13 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest();
             }
 
-            var rates = await _dbContext.Rates.Where(a => a.IsActive && a.TeamId == teamId && a.Type != Rate.Types.Acreage).OrderBy(a => a.Description).Select(RatesModel.Projection()).ToArrayAsync();
+            var rates = await _dbContext.Rates
+                .Where(a => a.IsActive && a.TeamId == teamId && a.Type != Rate.Types.Acreage)
+                .OrderBy(a => a.Type == Rate.Types.Labor ? 0 : a.Type == Rate.Types.Equipment ? 1 : 2)
+                .ThenBy(a => a.Description)
+                .Select(RatesModel.Projection())
+        .       ToArrayAsync();
+
             return Ok(rates);
         }
 
@@ -202,7 +208,7 @@ namespace Harvest.Web.Controllers.Api
                     UniqueId = expense.UniqueId,
                 };
 
-                if(expense.UniqueId == null)
+                if (expense.UniqueId == null)
                 {
                     resultItem.Result = "Rejected";
                     resultItem.Errors = new CreateExpenseErrors
@@ -227,7 +233,7 @@ namespace Harvest.Web.Controllers.Api
                     continue;
                 }
 
-                if(expense.ProjectId == 0)
+                if (expense.ProjectId == 0)
                 {
                     resultItem.Result = "Rejected";
                     resultItem.Errors = new CreateExpenseErrors
@@ -243,7 +249,7 @@ namespace Harvest.Web.Controllers.Api
 
                 var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(p => p.Id == expense.ProjectId && p.Team.Slug == TeamSlug);
 
-                if(project == null)
+                if (project == null)
                 {
                     resultItem.Result = "Rejected";
                     resultItem.Errors = new CreateExpenseErrors
@@ -322,11 +328,11 @@ namespace Harvest.Web.Controllers.Api
                     results.Results.Add(resultItem);
 
 
-                    try 
-                    { 
-                        await _historyService.ExpensesCreated(expense.ProjectId, new List<Expense> { expense }); 
+                    try
+                    {
+                        await _historyService.ExpensesCreated(expense.ProjectId, new List<Expense> { expense });
                     }
-                    catch 
+                    catch
                     {
                         //History is not critical, ignore errors.
                     }
