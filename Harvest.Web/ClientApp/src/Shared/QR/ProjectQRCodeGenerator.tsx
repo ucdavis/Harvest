@@ -50,7 +50,7 @@ export const ProjectQRCodeGenerator: React.FC<ProjectQRCodeGeneratorProps> = ({
 
     printQRCode({
       title: "UC Davis Harvest",
-      subtitle: "Field Request QR Code",
+      subtitle: "Project QR Code",
       itemId: project.id,
       itemName: project.name,
       details: printDetails,
