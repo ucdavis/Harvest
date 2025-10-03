@@ -96,6 +96,30 @@ namespace Harvest.Web.Controllers.Api
         }
 
         [HttpGet]
+        [Route("api/mobile/recentexpenses")]
+        public async Task<IActionResult> RecentExpenses()
+        {
+            var teamId = TeamId;
+            if (teamId == null)
+            {
+                return Unauthorized("Team information not found");
+            }
+            var user = await _userService.GetCurrentUser();
+            if (user == null)
+            {
+                return Unauthorized("User information not found");
+            }
+            //Find my last 5 expenses I have entered.
+            var recentExpenses = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
+                .OrderByDescending(e => e.CreatedOn)
+                .Take(5)
+                .ToListAsync();
+            return Ok(recentExpenses);
+        }
+
+        [HttpGet]
         [Route("api/mobile/activerates")]
         public async Task<ActionResult> ActiveRates()
         {
