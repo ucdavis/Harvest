@@ -109,13 +109,41 @@ namespace Harvest.Web.Controllers.Api
             {
                 return Unauthorized("User information not found");
             }
-            //Find my last 5 expenses I have entered.
-            var recentExpenses = await _dbContext.Expenses
+
+            // Step 1: Get recent distinct expense data with creation dates
+            var recentDistinctExpenses = await _dbContext.Expenses
                 .AsNoTracking()
-                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
-                .OrderByDescending(e => e.CreatedOn)
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active && e.Rate.IsActive)
+                .GroupBy(e => new { e.Type, e.Activity, e.Description, e.Price, e.Quantity, e.ProjectId, e.RateId })
+                .Select(g => new
+                {
+                    Type = g.Key.Type,
+                    Activity = g.Key.Activity,
+                    Description = g.Key.Description,
+                    Price = g.Key.Price,
+                    Quantity = g.Key.Quantity,
+                    ProjectId = g.Key.ProjectId,
+                    RateId = g.Key.RateId,
+                    LastCreated = g.Max(e => e.CreatedOn)
+                })
+                .OrderByDescending(x => x.LastCreated)
                 .Take(5)
                 .ToListAsync();
+
+            // Step 2: Convert to RecentExpensesModel while preserving order
+            var recentExpenses = recentDistinctExpenses
+                .Select(e => new RecentExpensesModel
+                {
+                    Type = e.Type,
+                    Activity = e.Activity,
+                    Description = e.Description,
+                    Price = e.Price,
+                    Quantity = e.Quantity,
+                    ProjectId = e.ProjectId,
+                    RateId = e.RateId
+                })
+                .ToList();
+
             return Ok(recentExpenses);
         }
 
@@ -139,7 +167,7 @@ namespace Harvest.Web.Controllers.Api
                 .OrderBy(a => a.Type == Rate.Types.Labor ? 0 : a.Type == Rate.Types.Equipment ? 1 : 2)
                 .ThenBy(a => a.Description)
                 .Select(RatesModel.Projection())
-        .       ToArrayAsync();
+                .ToArrayAsync();
 
             return Ok(rates);
         }
