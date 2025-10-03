@@ -111,9 +111,12 @@ namespace Harvest.Web.Controllers.Api
             }
             //Find my last 5 expenses I have entered.
             var recentExpenses = await _dbContext.Expenses
+                .Include(e => e.Project)
+                .Include(e => e.Rate)
                 .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
                 .OrderByDescending(e => e.CreatedOn)
+                .Select(RecentExpensesModel.Projection())
                 .Take(5)
                 .ToListAsync();
             return Ok(recentExpenses);
