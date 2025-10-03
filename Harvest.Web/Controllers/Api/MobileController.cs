@@ -113,7 +113,7 @@ namespace Harvest.Web.Controllers.Api
             // Step 1: Get recent distinct expense data with creation dates
             var recentDistinctExpenses = await _dbContext.Expenses
                 .AsNoTracking()
-                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active)
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.Project.IsActive && e.Project.Status == Project.Statuses.Active && e.Rate.IsActive)
                 .GroupBy(e => new { e.Type, e.Activity, e.Description, e.Price, e.Quantity, e.ProjectId, e.RateId })
                 .Select(g => new
                 {
