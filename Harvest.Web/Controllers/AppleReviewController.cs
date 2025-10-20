@@ -11,24 +11,30 @@ using System.Threading.Tasks;
 
 namespace Harvest.Web.Controllers
 {
-    public class AppleController : Controller
+    public class AppleReviewController : Controller
     {
         private readonly AppDbContext _dbContext;
         private readonly AuthSettings _authSettings;
 
-        public AppleController(AppDbContext dbContext, IOptions<AuthSettings> authSettings)
+        public AppleReviewController(AppDbContext dbContext, IOptions<AuthSettings> authSettings)
         {
             _dbContext = dbContext;
             _authSettings = authSettings.Value;
+        }
+
+        /// <summary>
+        /// Provides a login link for the iPhone app review process without needing CAS or DUO
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public async Task<IActionResult> LoginIPhone(string key)
+        {
             if (string.IsNullOrEmpty(_authSettings.IPhoneKey) || _authSettings.IPhoneKey == "[External]")
             {
                 throw new InvalidOperationException("IPhone configuration is required");
             }
-        }
-        public async Task<IActionResult> LoginIPhone(string key)
-        {           
-            //TODO: Key Checks
-            if(string.IsNullOrWhiteSpace(key))
+
+            if (string.IsNullOrWhiteSpace(key))
             {
                 return BadRequest();
             }

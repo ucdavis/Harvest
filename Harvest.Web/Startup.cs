@@ -290,7 +290,7 @@ namespace Harvest.Web
                         name: "default",
                         pattern: "{controller}/{action}/{id?}",
                         defaults: new { controller = "Home", action = "Index" },
-                        constraints: new { controller = "(account|crop|home|system|help|error|apple)" }
+                        constraints: new { controller = "(account|crop|home|system|help|error|applereview)" }
                     );
 
                     // API routes map to all other controllers
@@ -321,7 +321,7 @@ namespace Harvest.Web
                         name: "default",
                         pattern: "{controller}/{action}/{id?}",
                         defaults: new { controller = "Home", action = "Index" },
-                        constraints: new { controller = "(account|crop|home|system|help|error|apple)" }
+                        constraints: new { controller = "(account|crop|home|system|help|error|applereview)" }
                     );
 
                     // API routes map to all other controllers
