@@ -143,34 +143,39 @@ export const SelectColumnFilter = ({
             boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
           }}
         >
-          <div
-            style={{ padding: "8px 12px", cursor: "pointer" }}
-            onClick={() => {
-              setFilter(undefined);
-              setIsOpen(false);
-            }}
-          >
+          <div style={{ padding: "8px 12px" }}>
             <input
               type="checkbox"
+              id={`${id}-filter-all`}
               checked={!selectedValues || selectedValues.length === 0}
-              onChange={() => {}}
-              style={{ marginRight: "8px" }}
+              onChange={() => {
+                setFilter(undefined);
+                setIsOpen(false);
+              }}
+              style={{ marginRight: "8px", cursor: "pointer" }}
             />
-            All
+            <label
+              htmlFor={`${id}-filter-all`}
+              style={{ cursor: "pointer", marginBottom: 0 }}
+            >
+              All
+            </label>
           </div>
           {options.map((option: any, i: number) => (
-            <div
-              key={i}
-              style={{ padding: "8px 12px", cursor: "pointer" }}
-              onClick={() => handleToggle(option)}
-            >
+            <div key={i} style={{ padding: "8px 12px" }}>
               <input
                 type="checkbox"
+                id={`${id}-filter-${i}`}
                 checked={selectedValues.includes(option)}
-                onChange={() => {}}
-                style={{ marginRight: "8px" }}
+                onChange={() => handleToggle(option)}
+                style={{ marginRight: "8px", cursor: "pointer" }}
               />
-              {convertCamelCase(option)}
+              <label
+                htmlFor={`${id}-filter-${i}`}
+                style={{ cursor: "pointer", marginBottom: 0 }}
+              >
+                {convertCamelCase(option)}
+              </label>
             </div>
           ))}
         </div>
