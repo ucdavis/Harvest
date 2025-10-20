@@ -80,7 +80,7 @@ export const ProjectTable = (props: Props) => {
         Header: "Crop Type",
         accessor: "cropType",
         Filter: SelectColumnFilter,
-        filter: multiSelectFilter,
+        filter: "multiSelect",
       },
       {
         id: "startDate",
@@ -111,7 +111,7 @@ export const ProjectTable = (props: Props) => {
           </span>
         ),
         Filter: SelectColumnFilter,
-        filter: multiSelectFilter,
+        filter: "multiSelect",
       },
     ],
     []
@@ -135,6 +135,7 @@ export const ProjectTable = (props: Props) => {
         progress: progressFilter,
         startDate: startDateFilter,
         endDate: endDateFilter,
+        multiSelect: multiSelectFilter,
       }}
       onRowClick={handleRowClick}
     />
