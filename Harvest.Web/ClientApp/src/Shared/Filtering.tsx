@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import { Row, HeaderGroup } from "react-table";
 import { convertCamelCase } from "../Util/StringFormatting";
@@ -46,6 +46,29 @@ export const DefaultColumnFilter = ({
 export const SelectColumnFilter = ({
   column: { filterValue, setFilter, preFilteredRows, id },
 }: any) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   // Calculate the options for filtering
   // using the preFilteredRows
   const options = React.useMemo(() => {
@@ -57,22 +80,117 @@ export const SelectColumnFilter = ({
   }, [id, preFilteredRows]);
 
   // Render a multi-select box
+  const selectedValues = filterValue || [];
+
+  const handleToggle = (value: any) => {
+    if (value === "") {
+      // "All" was clicked, clear the filter
+      setFilter(undefined);
+    } else {
+      const currentSelected = filterValue || [];
+      if (currentSelected.includes(value)) {
+        // Remove the value
+        const newSelected = currentSelected.filter((v: any) => v !== value);
+        setFilter(newSelected.length > 0 ? newSelected : undefined);
+      } else {
+        // Add the value
+        setFilter([...currentSelected, value]);
+      }
+    }
+  };
+
+  const displayText =
+    !selectedValues || selectedValues.length === 0
+      ? "All"
+      : selectedValues.length === 1
+      ? convertCamelCase(selectedValues[0])
+      : `${selectedValues.length} selected`;
+
   return (
-    <select
-      className="form-control"
-      value={filterValue}
-      onChange={(e) => {
-        setFilter(e.target.value || undefined);
-      }}
-    >
-      <option value="">All</option>
-      {options.map((option: any, i: number) => (
-        <option key={i} value={option}>
-          {convertCamelCase(option)}
-        </option>
-      ))}
-    </select>
+    <div ref={dropdownRef} style={{ position: "relative" }}>
+      <button
+        className="form-control"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          textAlign: "left",
+          backgroundColor: "white",
+          border: "1px solid #ced4da",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          display: "block",
+          width: "100%",
+        }}
+        type="button"
+      >
+        {displayText} <span style={{ float: "right" }}>▼</span>
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            minWidth: "200px",
+            width: "max-content",
+            backgroundColor: "white",
+            border: "1px solid #ced4da",
+            borderRadius: "4px",
+            marginTop: "2px",
+            maxHeight: "250px",
+            overflowY: "auto",
+            zIndex: 1000,
+            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+          }}
+        >
+          <div
+            style={{ padding: "8px 12px", cursor: "pointer" }}
+            onClick={() => {
+              setFilter(undefined);
+              setIsOpen(false);
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={!selectedValues || selectedValues.length === 0}
+              onChange={() => {}}
+              style={{ marginRight: "8px" }}
+            />
+            All
+          </div>
+          {options.map((option: any, i: number) => (
+            <div
+              key={i}
+              style={{ padding: "8px 12px", cursor: "pointer" }}
+              onClick={() => handleToggle(option)}
+            >
+              <input
+                type="checkbox"
+                checked={selectedValues.includes(option)}
+                onChange={() => {}}
+                style={{ marginRight: "8px" }}
+              />
+              {convertCamelCase(option)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
+};
+
+// Custom filter function for multi-select
+export const multiSelectFilter = (rows: any[], id: any, filterValue: any) => {
+  // If filterValue is undefined or empty, show all rows
+  if (!filterValue || filterValue.length === 0) {
+    return rows;
+  }
+
+  // Filter rows where the cell value matches any of the selected values
+  return rows.filter((row) => {
+    const rowValue = row.values[id];
+    return filterValue.includes(rowValue);
+  });
 };
 
 export const SelectColumnFilterRange = ({
