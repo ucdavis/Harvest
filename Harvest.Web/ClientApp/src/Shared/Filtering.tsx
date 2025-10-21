@@ -103,7 +103,7 @@ export const SelectColumnFilter = ({
     !selectedValues || selectedValues.length === 0
       ? "All"
       : selectedValues.length === 1
-      ? convertCamelCase(selectedValues[0])
+      ? convertCamelCase(String(selectedValues[0]))
       : `${selectedValues.length} selected`;
 
   return (
@@ -170,23 +170,34 @@ export const SelectColumnFilter = ({
               All
             </label>
           </div>
-          {options.map((option: any, i: number) => (
-            <div key={i} style={{ padding: "8px 12px" }}>
-              <input
-                type="checkbox"
-                id={`${id}-filter-${i}`}
-                checked={selectedValues.includes(option)}
-                onChange={() => handleToggle(option)}
-                style={{ marginRight: "8px", cursor: "pointer" }}
-              />
-              <label
-                htmlFor={`${id}-filter-${i}`}
-                style={{ cursor: "pointer", marginBottom: 0 }}
+          {options.map((option: any) => {
+            const optionKey = String(option);
+            const displayValue =
+              typeof option === "string"
+                ? convertCamelCase(option)
+                : String(option);
+
+            return (
+              <div
+                key={`${id}-filter-${optionKey}`}
+                style={{ padding: "8px 12px" }}
               >
-                {convertCamelCase(option)}
-              </label>
-            </div>
-          ))}
+                <input
+                  type="checkbox"
+                  id={`${id}-filter-${optionKey}`}
+                  checked={selectedValues.includes(option)}
+                  onChange={() => handleToggle(option)}
+                  style={{ marginRight: "8px", cursor: "pointer" }}
+                />
+                <label
+                  htmlFor={`${id}-filter-${optionKey}`}
+                  style={{ cursor: "pointer", marginBottom: 0 }}
+                >
+                  {displayValue}
+                </label>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
