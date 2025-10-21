@@ -12,6 +12,7 @@ import {
   progressFilter,
   startDateFilter,
   endDateFilter,
+  multiSelectFilter,
 } from "../Shared/Filtering";
 import { Project } from "../types";
 import { formatCurrency } from "../Util/NumberFormatting";
@@ -79,6 +80,7 @@ export const ProjectTable = (props: Props) => {
         Header: "Crop Type",
         accessor: "cropType",
         Filter: SelectColumnFilter,
+        filter: "multiSelect",
       },
       {
         id: "startDate",
@@ -109,7 +111,7 @@ export const ProjectTable = (props: Props) => {
           </span>
         ),
         Filter: SelectColumnFilter,
-        filter: "equals",
+        filter: "multiSelect",
       },
     ],
     []
@@ -133,6 +135,7 @@ export const ProjectTable = (props: Props) => {
         progress: progressFilter,
         startDate: startDateFilter,
         endDate: endDateFilter,
+        multiSelect: multiSelectFilter,
       }}
       onRowClick={handleRowClick}
     />
