@@ -60,12 +60,19 @@ namespace Harvest.Web.Controllers
                 return NotFound();
             }
 
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            //Check base url is for test only: https://harvest-test.azurewebsites.net
+            if(!baseUrl.Equals("https://harvest-test.azurewebsites.net", StringComparison.OrdinalIgnoreCase) )
+            {
+                return BadRequest("This endpoint can only be used in test environment");
+            }
+
             permission.Token = Guid.NewGuid();
             permission.TokenExpires = DateTime.UtcNow.AddMinutes(5);
 
             await _dbContext.SaveChangesAsync();
 
-            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            
             var appLink = $"harvestmobile://applink?code={permission.Token}&baseUrl={Uri.EscapeDataString(baseUrl)}";
             return Redirect(appLink);
         }
