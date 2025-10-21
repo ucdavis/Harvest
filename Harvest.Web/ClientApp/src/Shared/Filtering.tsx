@@ -115,15 +115,24 @@ export const SelectColumnFilter = ({
           textAlign: "left",
           backgroundColor: "white",
           border: "1px solid #ced4da",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          display: "block",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
           width: "100%",
         }}
         type="button"
       >
-        {displayText} <span style={{ float: "right" }}>▼</span>
+        <span
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            flex: 1,
+          }}
+        >
+          {displayText}
+        </span>
+        <span style={{ marginLeft: "8px", flexShrink: 0 }}>▼</span>
       </button>
       {isOpen && (
         <div
@@ -201,19 +210,104 @@ export const multiSelectFilter = (rows: any[], id: any, filterValue: any) => {
 export const SelectColumnFilterRange = ({
   column: { filterValue, setFilter, preFilteredRows, id },
 }: any) => {
-  // Render a multi-select box
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const options = [
+    { value: "all", label: "All" },
+    { value: "rangeOne", label: "<25%" },
+    { value: "rangeTwo", label: "25-50%" },
+    { value: "rangeThree", label: "50-75%" },
+    { value: "rangeFour", label: ">75%" },
+  ];
+
+  const displayText =
+    options.find((opt) => opt.value === filterValue)?.label || "All";
+
   return (
-    <select
-      className="form-control"
-      value={filterValue}
-      onChange={(e) => setFilter(e.target.value || undefined)}
-    >
-      <option value="all">All</option>
-      <option value="rangeOne">{"<25%"}</option>
-      <option value="rangeTwo">25-50%</option>
-      <option value="rangeThree">50-75%</option>
-      <option value="rangeFour">{">75%"}</option>
-    </select>
+    <div ref={dropdownRef} style={{ position: "relative" }}>
+      <button
+        className="form-control"
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          textAlign: "left",
+          backgroundColor: "white",
+          border: "1px solid #ced4da",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          display: "block",
+          width: "100%",
+        }}
+        type="button"
+      >
+        {displayText} <span style={{ float: "right" }}>▼</span>
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            minWidth: "200px",
+            width: "max-content",
+            backgroundColor: "white",
+            border: "1px solid #ced4da",
+            borderRadius: "4px",
+            marginTop: "2px",
+            maxHeight: "250px",
+            overflowY: "auto",
+            zIndex: 1000,
+            boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+          }}
+        >
+          {options.map((option, i) => (
+            <div
+              key={i}
+              style={{
+                padding: "8px 12px",
+                cursor: "pointer",
+                backgroundColor:
+                  filterValue === option.value ? "#f0f0f0" : "white",
+              }}
+              onClick={() => {
+                setFilter(option.value === "all" ? undefined : option.value);
+                setIsOpen(false);
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f8f9fa")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor =
+                  filterValue === option.value ? "#f0f0f0" : "white")
+              }
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 
