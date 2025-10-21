@@ -2,7 +2,28 @@
 @charset "utf-8";
 
 @import "import", "typography", "layout", "regions", "components";
+@import "https://js.arcgis.com/4.28/@arcgis/core/assets/esri/themes/light/main.css";
 
-.searchPersonsClearButton > button{
-    margin: -1.3em .5em 0em 0em;
+.searchPersonsClearButton > button {
+  margin: -1.3em 0.5em 0em 0em;
+}
+
+// map css
+.mapDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  // position: absolute;
+}
+
+// add to all parent divs of the map
+.fullHeightWidth {
+  height: 100%;
+  width: 100%;
+}
+
+// highest level div
+#root {
+  height: 100%;
 }
