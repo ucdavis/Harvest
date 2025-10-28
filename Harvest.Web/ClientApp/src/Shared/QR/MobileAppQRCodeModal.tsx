@@ -61,26 +61,21 @@ export const MobileAppQRCodeModal: React.FC<MobileAppQRCodeModalProps> = ({
             )}
 
             {qrCodeGenerated && (
-              <div className="mt-3">
-                <p className="small text-muted">
-                  Or visit directly: <br />
-                  <a
-                    href={appStoreUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {appStoreUrl}
-                  </a>
-                </p>
+              <div className="mt-3 text-center">
+                <p className="small text-muted mb-1">Or visit directly:</p>
+                <a
+                  href={appStoreUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="small text-muted d-block"
+                >
+                  {appStoreUrl}
+                </a>
               </div>
             )}
           </div>
           <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-            >
+            <button type="button" className="btn btn-danger" onClick={onClose}>
               Close
             </button>
           </div>
