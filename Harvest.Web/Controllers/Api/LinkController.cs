@@ -109,7 +109,7 @@ namespace Harvest.Web.Controllers.Api
             if (!string.IsNullOrEmpty(team))
             {
                 // Verify the user has appropriate permissions for this team
-                
+
 
                 var hasPermission = await _dbContext.Permissions
                     .Include(p => p.Team)
@@ -124,8 +124,8 @@ namespace Harvest.Web.Controllers.Api
                 }
                 else
                 {
-                    // User doesn't have permission for the specified team, redirect to team selector with mobile parameter
-                    return Redirect("/team?mobile=token");
+                    // User doesn't have permission for the specified team, redirect to team selector with redirect parameter
+                    return Redirect("/team?redirect=mobile/token");
                 }
             }
 
@@ -150,7 +150,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
 
-            return Redirect("/team?mobile=token");
+            return Redirect("/team?redirect=mobile/token");
 
         }
 

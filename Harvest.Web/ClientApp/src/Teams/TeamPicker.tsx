@@ -13,9 +13,9 @@ export const TeamPicker = () => {
 
   const history = useHistory();
 
-  // check if we have a mobile token parameter
+  // check if we have a redirect parameter
   const searchParams = new URLSearchParams(location.search);
-  const mobileToken = searchParams.get("mobile");
+  const redirectPath = searchParams.get("redirect");
 
   // store teams in state
   const [teams, setTeams] = useState<Team[]>();
@@ -28,9 +28,9 @@ export const TeamPicker = () => {
 
       // if there is only one team, redirect to that team's page immediately
       if (data.length === 1) {
-        // Check if we have a mobile token parameter to redirect to mobile token page
-        if (mobileToken) {
-          history.replace(`/${data[0].slug}/mobile/token`);
+        // Check if we have a redirect parameter to redirect to specific path
+        if (redirectPath) {
+          history.replace(`/${data[0].slug}/${redirectPath}`);
         } else {
           history.replace(`/${data[0].slug}${location.pathname}`);
         }
@@ -39,7 +39,7 @@ export const TeamPicker = () => {
       }
     };
     getTeams();
-  }, [history, location.pathname, mobileToken]);
+  }, [history, location.pathname, redirectPath]);
 
   // show loading message while we wait for teams
   if (!teams) {
@@ -65,8 +65,8 @@ export const TeamPicker = () => {
           <div className="col-md-6 team-card" key={team.id}>
             <a
               href={
-                mobileToken
-                  ? `/${team.slug}/mobile/token`
+                redirectPath
+                  ? `/${team.slug}/${redirectPath}`
                   : `/${team.slug}${location.pathname}`
               }
             >
