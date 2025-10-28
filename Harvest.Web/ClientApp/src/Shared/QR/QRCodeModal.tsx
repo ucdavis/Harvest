@@ -38,11 +38,12 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
           </div>
           <div className="modal-body text-center">
             <div className="mb-3">
-              <h4><b>#{itemId}</b></h4>
+              <h4>
+                #{itemId}
+              </h4>
               <h2>{itemName}</h2>
             </div>
             {children}
-
           </div>
           <div className="modal-footer">
             <button
@@ -53,11 +54,7 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
             >
               Print QR Code
             </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-            >
+            <button type="button" className="btn btn-danger" onClick={onClose}>
               Close
             </button>
           </div>
