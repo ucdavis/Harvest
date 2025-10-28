@@ -145,34 +145,36 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
               <div class="detail-row">
                 <span class="detail-label">Project Name:</span>
                 <span class="detail-value">${project.name.replace(
-        /"/g,
-        "&quot;"
-      )}</span>
+                  /"/g,
+                  "&quot;"
+                )}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Principal Investigator:</span>
                 <span class="detail-value">${(
-          project.principalInvestigator?.name || "N/A"
-        ).replace(/"/g, "&quot;")}</span>
+                  project.principalInvestigator?.name || "N/A"
+                ).replace(/"/g, "&quot;")}</span>
               </div>
               <div class="detail-row">
                 <span class="detail-label">Timeline:</span>
                 <span class="detail-value">${new Date(
-          project.start
-        ).toLocaleDateString()} through ${new Date(
-          project.end
-        ).toLocaleDateString()}</span>
+                  project.start
+                ).toLocaleDateString()} through ${new Date(
+        project.end
+      ).toLocaleDateString()}</span>
               </div>
                             <div class="detail-row">
                 <span class="detail-label">Team:</span>
-                <span class="detail-value">${project.team?.name || team} (${project.team?.slug || team
-        })</span>
+                <span class="detail-value">${project.team?.name || team} (${
+        project.team?.slug || team
+      })</span>
               </div>
             </div>
             
             <div class="qr-code">
-              <img src="${qrDataUrl}" alt="QR Code for Project ${project.id
-        }" width="256" height="256" />
+              <img src="${qrDataUrl}" alt="QR Code for Project ${
+        project.id
+      }" width="256" height="256" />
             </div>
             
             <div class="instructions">
@@ -245,16 +247,12 @@ export const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
             >
               Print QR Code
             </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-            >
+            <button type="button" className="btn btn-danger" onClick={onClose}>
               Close
             </button>
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
