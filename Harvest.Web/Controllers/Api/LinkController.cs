@@ -97,6 +97,63 @@ namespace Harvest.Web.Controllers.Api
 
         }
 
+        [HttpGet]
+        [Route("/mobileToken")]
+        [Route("/mobileToken/{team?}")]
+        public async Task<IActionResult> CheckTeamAccess(string team = null)
+        {
+            var user = await _userService.GetCurrentUser();
+            var validRoles = new List<string> { Role.Codes.Worker, Role.Codes.FieldManager, Role.Codes.Supervisor };
+
+            // If a specific team slug is provided, use it directly
+            if (!string.IsNullOrEmpty(team))
+            {
+                // Verify the user has appropriate permissions for this team
+
+
+                var hasPermission = await _dbContext.Permissions
+                    .Include(p => p.Team)
+                    .Include(p => p.Role)
+                    .AnyAsync(p => p.UserId == user.Id &&
+                                  p.Team.Slug == team &&
+                                  validRoles.Contains(p.Role.Name));
+
+                if (hasPermission)
+                {
+                    return Redirect($"/{team}/mobile/token");
+                }
+                else
+                {
+                    // User doesn't have permission for the specified team, redirect to team selector with redirect parameter
+                    return Redirect("/team?redirect=mobile/token");
+                }
+            }
+
+
+            var permissions = await _dbContext.Permissions
+                .Include(p => p.Team)
+                .Include(p => p.Role)
+                .Where(p => p.UserId == user.Id && validRoles.Contains(p.Role.Name))
+                .ToListAsync();
+
+            // Group by team to get unique teams where user has qualifying permissions
+            var teamsWithAccess = permissions
+                .GroupBy(p => p.Team.Slug)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (teamsWithAccess.Count == 1)
+            {
+                // Single team - redirect to mobile token page
+                var singleTeamSlug = teamsWithAccess.Single();
+                return Redirect($"/{singleTeamSlug}/mobile/token");
+            }
+
+
+            return Redirect("/team?redirect=mobile/token");
+
+        }
+
         //Can use this for testing
         //[HttpGet]
         //[AllowAnonymous]

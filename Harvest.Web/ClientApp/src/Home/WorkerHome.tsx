@@ -37,9 +37,6 @@ export const WorkerHome = () => {
           </Link>
         </li>
         <li className="list-group-item">
-          <Link to={`/${team}/mobile/token`}>Link Mobile App</Link>
-        </li>
-        <li className="list-group-item">
           <Link to="#" onClick={() => setShowMobileAppQR(true)}>
             Download Mobile App (iPhone)
           </Link>
