@@ -39,7 +39,7 @@ export const QRCodeModal: React.FC<QRCodeModalProps> = ({
           <div className="modal-body text-center">
             <div className="mb-3">
               <h4>
-                <b>#{itemId}</b>
+                #{itemId}
               </h4>
               <h2>{itemName}</h2>
             </div>
