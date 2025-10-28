@@ -13,6 +13,10 @@ export const TeamPicker = () => {
 
   const history = useHistory();
 
+  // check if we have a redirect parameter
+  const searchParams = new URLSearchParams(location.search);
+  const redirectPath = searchParams.get("redirect");
+
   // store teams in state
   const [teams, setTeams] = useState<Team[]>();
 
@@ -24,13 +28,18 @@ export const TeamPicker = () => {
 
       // if there is only one team, redirect to that team's page immediately
       if (data.length === 1) {
-        history.replace(`/${data[0].slug}${location.pathname}`);
+        // Check if we have a redirect parameter to redirect to specific path
+        if (redirectPath) {
+          history.replace(`/${data[0].slug}/${redirectPath}`);
+        } else {
+          history.replace(`/${data[0].slug}${location.pathname}`);
+        }
       } else {
         setTeams(data);
       }
     };
     getTeams();
-  }, [history, location.pathname]);
+  }, [history, location.pathname, redirectPath]);
 
   // show loading message while we wait for teams
   if (!teams) {
@@ -54,13 +63,18 @@ export const TeamPicker = () => {
       <div className="row">
         {teams.map((team) => (
           <div className="col-md-6 team-card" key={team.id}>
-            <a href={`/${team.slug}${location.pathname}`}>
+            <a
+              href={
+                redirectPath
+                  ? `/${team.slug}/${redirectPath}`
+                  : `/${team.slug}${location.pathname}`
+              }
+            >
               <div className="card">
                 <div className="card-body d-flex flex-column">
                   <h5 className="card-title">{team.name}</h5>
                   <p className="secondary-font mb-2">
                     <b>Field Managers: {team.fieldManagers}</b>
-
                   </p>
                   <p className="primary-font">{team.description}</p>
                   <button className="mt-auto w-16 btn btn-primary">
