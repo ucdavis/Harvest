@@ -62,7 +62,7 @@ export const MobileAppQRCodeModal: React.FC<MobileAppQRCodeModalProps> = ({
 
             {qrCodeGenerated && (
               <div className="mt-3 text-center">
-                <p className="mb-1">Or visit directly:</p>
+                <p className="mb-0">Or visit directly:</p>
                 <a
                   href={appStoreUrl}
                   target="_blank"
