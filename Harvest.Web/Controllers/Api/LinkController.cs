@@ -123,8 +123,8 @@ namespace Harvest.Web.Controllers.Api
                 }
                 else
                 {
-                    // User doesn't have permission for the specified team, redirect to team selector
-                    return Redirect("/team");
+                    // User doesn't have permission for the specified team, redirect to team selector with mobile parameter
+                    return Redirect("/team?mobile=token");
                 }
             }
 
@@ -151,7 +151,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
 
-            return Redirect("/team");
+            return Redirect("/team?mobile=token");
 
         }
 
