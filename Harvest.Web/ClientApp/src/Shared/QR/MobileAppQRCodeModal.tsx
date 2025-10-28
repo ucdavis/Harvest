@@ -23,7 +23,7 @@ export const MobileAppQRCodeModal: React.FC<MobileAppQRCodeModalProps> = ({
       <div className="modal-dialog modal-lg">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Download Harvest Mobile App</h5>
+            <h5 className="modal-title">Download Harvest mobile app</h5>
             <button
               type="button"
               className="close"
@@ -35,7 +35,7 @@ export const MobileAppQRCodeModal: React.FC<MobileAppQRCodeModalProps> = ({
           </div>
           <div className="modal-body text-center">
             <div className="mb-3">
-              <h4>Harvest Mobile iPhone App</h4>
+              <h4>Harvest mobile iPhone app</h4>
               <p className="text-muted">
                 Scan this QR code with your iPhone camera to download the
                 Harvest mobile app
