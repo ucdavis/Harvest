@@ -88,11 +88,14 @@ export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
               Scan this QR code to quickly access this rate information on
               mobile devices.
             </p>
-            <div className="small">
-              <strong>Rate Details:</strong>
-              <br />
-              Type: {rate.type} | Price: ${rate.price.toFixed(2)}
-              {rate.unit && ` per ${rate.unit}`}
+            <div>
+              <p>
+                <strong>Rate Details:</strong>
+                <br />
+                Type: {rate.type} | Price: ${rate.price.toFixed(2)}
+                {rate.unit && ` per ${rate.unit}`}
+              </p>
+
             </div>
           </div>
         </div>
