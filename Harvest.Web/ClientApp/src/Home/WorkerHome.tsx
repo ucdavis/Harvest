@@ -4,9 +4,11 @@ import { Link, useParams } from "react-router-dom";
 import { Project, CommonRouteParams } from "../types";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
+import { MobileAppQRCodeModal } from "../Shared/QR";
 
 export const WorkerHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
+  const [showMobileAppQR, setShowMobileAppQR] = useState(false);
 
   const { team } = useParams<CommonRouteParams>();
 
@@ -34,6 +36,11 @@ export const WorkerHome = () => {
             Enter Expenses for Any Project
           </Link>
         </li>
+        <li className="list-group-item">
+          <Link to="#" onClick={() => setShowMobileAppQR(true)}>
+            Download Mobile App (iPhone)
+          </Link>
+        </li>
         {projects.map((project) => (
           <li key={project.id} className="list-group-item">
             <Link to={`/${team}/expense/entry/${project.id}`}>
@@ -43,6 +50,11 @@ export const WorkerHome = () => {
           </li>
         ))}
       </ul>
+
+      {/* Mobile App QR Code Modal */}
+      {showMobileAppQR && (
+        <MobileAppQRCodeModal onClose={() => setShowMobileAppQR(false)} />
+      )}
     </>
   );
 };

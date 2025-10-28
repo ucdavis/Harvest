@@ -2,6 +2,7 @@
 export { ProjectQRCodeGenerator } from "./ProjectQRCodeGenerator";
 export { RateQRCodeGenerator } from "./RateQRCodeGenerator";
 export { QRCodeModal } from "./QRCodeModal";
+export { MobileAppQRCodeModal } from "./MobileAppQRCodeModal";
 export { useQRCodeGeneration } from "./useQRCodeGeneration";
 export { printQRCode, generateQRCodePrintHTML } from "./printUtils";
 export type {
@@ -9,4 +10,5 @@ export type {
   UseQRCodeGenerationResult,
 } from "./useQRCodeGeneration";
 export type { QRCodeModalProps } from "./QRCodeModal";
+export type { MobileAppQRCodeModalProps } from "./MobileAppQRCodeModal";
 export type { PrintDetail, QRCodePrintOptions } from "./printUtils";
