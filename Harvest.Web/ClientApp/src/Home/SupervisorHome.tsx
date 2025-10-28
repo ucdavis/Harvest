@@ -4,10 +4,12 @@ import { Project, Ticket, CommonRouteParams } from "../types";
 import { authenticatedFetch } from "../Util/Api";
 import { StatusToActionRequired } from "../Util/MessageHelpers";
 import { useIsMounted } from "../Shared/UseIsMounted";
+import { MobileAppQRCodeModal } from "../Shared/QR";
 
 export const SupervisorHome = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [showMobileAppQR, setShowMobileAppQR] = useState(false);
 
   const { team } = useParams<CommonRouteParams>();
 
@@ -52,7 +54,14 @@ export const SupervisorHome = () => {
           <Link to={`/${team}/expense/entry`}>Enter Project Expenses</Link>
         </li>
         <li className="list-group-item">
-            <Link to={`/${team}/expense/getmypendingexpenses`}>My Worker's Pending Expenses</Link>
+          <Link to="#" onClick={() => setShowMobileAppQR(true)}>
+            Download Mobile App (iPhone)
+          </Link>
+        </li>
+        <li className="list-group-item">
+          <Link to={`/${team}/expense/getmypendingexpenses`}>
+            My Worker's Pending Expenses
+          </Link>
         </li>
         {projects.slice(0, 3).map((project) => (
           <li key={project.id} className="list-group-item">
@@ -88,6 +97,10 @@ export const SupervisorHome = () => {
             ))}
           </ul>
         </>
+      )}
+      {/* Mobile App QR Code Modal */}
+      {showMobileAppQR && (
+        <MobileAppQRCodeModal onClose={() => setShowMobileAppQR(false)} />
       )}
     </>
   );
