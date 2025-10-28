@@ -103,12 +103,13 @@ namespace Harvest.Web.Controllers.Api
         public async Task<IActionResult> CheckTeamAccess(string team = null)
         {
             var user = await _userService.GetCurrentUser();
+            var validRoles = new List<string> { Role.Codes.Worker, Role.Codes.FieldManager, Role.Codes.Supervisor };
 
             // If a specific team slug is provided, use it directly
             if (!string.IsNullOrEmpty(team))
             {
                 // Verify the user has appropriate permissions for this team
-                var validRoles = new List<string> { Role.Codes.Worker, Role.Codes.FieldManager, Role.Codes.Supervisor };
+                
 
                 var hasPermission = await _dbContext.Permissions
                     .Include(p => p.Team)
@@ -128,12 +129,11 @@ namespace Harvest.Web.Controllers.Api
                 }
             }
 
-            var validRoles2 = new List<string> { Role.Codes.Worker, Role.Codes.FieldManager, Role.Codes.Supervisor };
 
             var permissions = await _dbContext.Permissions
                 .Include(p => p.Team)
                 .Include(p => p.Role)
-                .Where(p => p.UserId == user.Id && validRoles2.Contains(p.Role.Name))
+                .Where(p => p.UserId == user.Id && validRoles.Contains(p.Role.Name))
                 .ToListAsync();
 
             // Group by team to get unique teams where user has qualifying permissions
@@ -146,7 +146,6 @@ namespace Harvest.Web.Controllers.Api
             {
                 // Single team - redirect to mobile token page
                 var singleTeamSlug = teamsWithAccess.Single();
-                //return Ok(new { redirectUrl = $"/{teamSlug}/mobile/token", hasAccess = true, teamCount = 1, team = teamSlug });
                 return Redirect($"/{singleTeamSlug}/mobile/token");
             }
 
