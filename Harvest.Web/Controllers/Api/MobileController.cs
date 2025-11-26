@@ -349,6 +349,9 @@ namespace Harvest.Web.Controllers.Api
                 {
                     var rate = allRates.Single(a => a.Id == expense.RateId);
 
+                    var markupPrice = expense.Markup ? rate.Price * 1.2m : rate.Price;
+                    //TODO: Mobile needs to send the markup flag for Other rates.
+
                     expense.Approved = false; //Don't trust what we pass, or use a model instead?
                     expense.ApprovedById = null;
                     expense.ApprovedOn = null;
@@ -361,7 +364,7 @@ namespace Harvest.Web.Controllers.Api
                     expense.Account = rate.Account;
                     expense.Price = rate.Price;
                     expense.Type = rate.Type;
-                    expense.Total = Math.Round(rate.Price * expense.Quantity, 2, MidpointRounding.ToZero);
+                    expense.Total = Math.Round(markupPrice * expense.Quantity, 2, MidpointRounding.AwayFromZero); //was MidpointRounding.ToZero
                     expense.IsPassthrough = rate.IsPassthrough;
                     if (autoApprove)
                     {
