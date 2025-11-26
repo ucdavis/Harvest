@@ -53,6 +53,10 @@ namespace Harvest.Web.Controllers.Api
                     return BadRequest($"Rate with ID of {expense.RateId} is not valid.");
                 }
 
+                //expense.Markup is 20% when true so rate.Price * 1.2
+
+                var markupPrice = expense.Markup ? rate.Price * 1.2m : rate.Price;
+
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
                 expense.ProjectId = projectId;
@@ -60,7 +64,7 @@ namespace Harvest.Web.Controllers.Api
                 expense.Account = rate.Account;
                 expense.Price = rate.Price;
                 expense.Type = rate.Type;
-                expense.Total = Math.Round(rate.Price * expense.Quantity, 2, MidpointRounding.ToZero);
+                expense.Total = Math.Round(markupPrice * expense.Quantity, 2, MidpointRounding.AwayFromZero); //was MidpointRounding.ToZero
                 expense.IsPassthrough = rate.IsPassthrough;
                 if (autoApprove)
                 {

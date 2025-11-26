@@ -147,6 +147,7 @@ export interface Expense {
   approved: boolean;
   project?: Project;
   invoiceId?: number;
+  isPassthrough?: boolean;
 }
 
 export interface AdhocProjectModel {

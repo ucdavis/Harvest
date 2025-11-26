@@ -46,6 +46,10 @@ export const ExpenseDetailsModal = ({ expense, isOpen, toggle }: Props) => {
               <td>{expense.markup ? "Yes" : "No"}</td>
             </tr>
             <tr>
+                <th>Passthrough</th>
+                <td>{expense.isPassthrough ? "Yes" : "No"}</td>
+            </tr>
+            <tr>
               <th>Rate</th>
               <td>${formatCurrency(expense.price)}</td>
             </tr>
