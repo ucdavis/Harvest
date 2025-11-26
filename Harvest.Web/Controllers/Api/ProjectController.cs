@@ -452,6 +452,11 @@ namespace Harvest.Web.Controllers.Api
                     expense.InvoiceId = null;
                     expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
                     expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+
+                    expense.Approved = true;
+                    expense.ApprovedOn = DateTime.UtcNow;
+                    expense.ApprovedBy = currentUser;
+
                     newProject.Expenses.Add(expense);
                 }
 
