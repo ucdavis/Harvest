@@ -211,6 +211,9 @@ namespace Harvest.Web.Controllers.Api
 
             }
 
+            //if markup is true, price is rate.Price * 1.2
+            //But we don't have to deal with it here because we are using the client side total
+
             if (newExpenses.Count > 0)
             {
                 _dbContext.Expenses.AddRange(newExpenses);
