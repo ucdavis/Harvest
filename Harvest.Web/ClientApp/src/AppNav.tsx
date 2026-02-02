@@ -111,7 +111,7 @@ export const AppNav = () => {
                           Open Tickets
                         </DropdownItem>
                         <DropdownItem divider />
-                        <ShowFor roles={["Supervisor"]}>
+                        <ShowFor roles={["Supervisor", "FieldManager"]}>
                           <DropdownItem
                             href={`/${team}/Expense/GetMyPendingExpenses`}
                           >
