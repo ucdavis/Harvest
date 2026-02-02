@@ -569,7 +569,7 @@ namespace Harvest.Web.Controllers
             {
                 _dbContext.Permissions.Remove(workerPermission);
                 await _dbContext.SaveChangesAsync();
-                Message = "Worker removed from Supervisor/Field Mamager and Worker role.";
+                Message = "Worker removed from Supervisor/Field Manager and Worker role.";
             }
             else
             {
