@@ -127,7 +127,7 @@ export const AppNav = () => {
                           <DropdownItem
                             href={`/${team}/Expense/GetApprovedExpenses`}
                           >
-                            All Aprroved Expenses
+                            All Approved Expenses
                           </DropdownItem>
                         </ShowFor>
                       </ShowFor>
