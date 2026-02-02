@@ -111,7 +111,7 @@ export const AppNav = () => {
                           Open Tickets
                         </DropdownItem>
                         <DropdownItem divider />
-                        <ShowFor roles={["Supervisor"]}>
+                        <ShowFor roles={["Supervisor", "FieldManager"]}>
                           <DropdownItem
                             href={`/${team}/Expense/GetMyPendingExpenses`}
                           >
@@ -127,7 +127,7 @@ export const AppNav = () => {
                           <DropdownItem
                             href={`/${team}/Expense/GetApprovedExpenses`}
                           >
-                            All Aprroved Expenses
+                            All Approved Expenses
                           </DropdownItem>
                         </ShowFor>
                       </ShowFor>

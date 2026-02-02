@@ -1,7 +1,8 @@
-﻿@model Harvest.Core.Domain.Permission
+﻿@using Humanizer
+@model Harvest.Core.Domain.Permission
 
 @{
-    ViewData["Title"] = "Permission Details";
+    ViewData["Title"] = "Permission Details";    
 }
 
 <div class="row justify-content-between mb-3">
@@ -23,12 +24,13 @@
 
 
         </div>
-        @if (Model.Role.Name == Role.Codes.Supervisor) //This model is a permission, not a user with multiplpermissions
+        @if (Model.Role.Name == Role.Codes.Supervisor || Model.Role.Name == Role.Codes.FieldManager) //This model is a permission, not a user with multiplpermissions
         {
-            <h2>Workers assigned to supervisor</h2>
+            <h2>Workers assigned to @Model.Role.Name.Humanize(LetterCasing.Title)</h2>
             <div class="mb-2 text-right">
                 <a class="btn btn-sm btn-primary" asp-action="AddWorkerToSupervisor" asp-route-id="@Model.Id">Add Worker to
-                    Supervisor <i class="fas fa-plus fa-xs"></i></a>
+                    @Model.Role.Name.Humanize(LetterCasing.Title) <i class="fas fa-plus fa-xs"></i>
+                </a>
             </div>
             <table id="workers" class="table harvest-table">
                 <thead>

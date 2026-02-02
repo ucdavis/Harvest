@@ -64,7 +64,7 @@ namespace Harvest.Web.Controllers
                 {
                     viewModel.UserRoles.Add(new UserRole(permission));
                 }
-                if (permission.Role.Name == Role.Codes.Supervisor)
+                if (permission.Role.Name == Role.Codes.Supervisor || permission.Role.Name == Role.Codes.FieldManager)
                 {
                     viewModel.UserRoles.Single(a => a.User.Id == permission.User.Id).SupervisorPermissionId = permission.Id;
                 }
@@ -342,13 +342,13 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             var supervisorPermission = await _dbContext.Permissions
-                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Where(a => a.Id == id && (a.Role.Name == Role.Codes.Supervisor || a.Role.Name == Role.Codes.FieldManager) && a.TeamId == team.Id)
                 .Include(a => a.User)
                 //.Include(a => a.Children).ThenInclude(c => c.User)
                 .SingleOrDefaultAsync();
             if (supervisorPermission == null)
             {
-                ErrorMessage = "Supervisor not found.";
+                ErrorMessage = "Supervisor/Field Manager not found.";
                 return RedirectToAction("Index");
             }
 
@@ -379,18 +379,18 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             var supervisorPermission = await _dbContext.Permissions
-                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Where(a => a.Id == id && (a.Role.Name == Role.Codes.Supervisor || a.Role.Name == Role.Codes.FieldManager) && a.TeamId == team.Id)
                 .Include(a => a.User)
                 .Include(a => a.Children).ThenInclude(c => c.User)
                 .SingleOrDefaultAsync();
             if (supervisorPermission == null)
                 {
-                ErrorMessage = "Supervisor not found.";
+                ErrorMessage = "Supervisor/Field Manager not found.";
                 return RedirectToAction("Index");
             }
             if(supervisorPermission.Children.Any(a => a.User.Email.ToLower() == UserEmail.Trim().ToLower()))
             {
-                ErrorMessage = "That user is already a worker for that supervisor.";
+                ErrorMessage = "That user is already a worker for that Supervisor/Field Manager.";
                 return RedirectToAction("Details", new { id = supervisorPermission.Id });
             }
             var viewModel = new AddUserRolesModel
@@ -412,7 +412,7 @@ namespace Harvest.Web.Controllers
                 .SingleOrDefaultAsync(a => a.User.Email.ToLower() == UserEmail.Trim().ToLower());
             if(existingWorkerPermission != null)
             {
-                Message = "Warning, that user is already assigned to another supervisor. "; 
+                Message = "Warning, that user is already assigned to another Supervisor/Field Manager. "; 
             }
 
             //var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email == model.UserEmail || u.Kerberos == model.UserEmail);
@@ -504,19 +504,19 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             var supervisorPermission = await _dbContext.Permissions
-                .Where(a => a.Id == id && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Where(a => a.Id == id && (a.Role.Name == Role.Codes.Supervisor || a.Role.Name == Role.Codes.FieldManager) && a.TeamId == team.Id)
                 .Include(a => a.User)
                 .Include(a => a.Children).ThenInclude(c => c.User)
                 .SingleOrDefaultAsync();
             if (supervisorPermission == null)
             {
-                ErrorMessage = "Supervisor not found.";
+                ErrorMessage = "Supervisor/Field Manager not found.";
                 return RedirectToAction("Index");
             }
             var workerPermission = supervisorPermission.Children.SingleOrDefault(a => a.Id == workerId);
             if (workerPermission == null)
             {
-                ErrorMessage = "Worker not found for that supervisor.";
+                ErrorMessage = "Worker not found for that Supervisor/Field Manager.";
                 return RedirectToAction("Details", new { id = supervisorPermission.Id });
             }
 
@@ -541,19 +541,19 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
             var supervisorPermission = await _dbContext.Permissions
-                .Where(a => a.Id == model.SupervisorId && a.Role.Name == Role.Codes.Supervisor && a.TeamId == team.Id)
+                .Where(a => a.Id == model.SupervisorId && (a.Role.Name == Role.Codes.Supervisor || a.Role.Name == Role.Codes.FieldManager) && a.TeamId == team.Id)
                 .Include(a => a.User)
                 .Include(a => a.Children).ThenInclude(c => c.User)
                 .SingleOrDefaultAsync();
             if (supervisorPermission == null)
             {
-                ErrorMessage = "Supervisor not found.";
+                ErrorMessage = "Supervisor/Field Manager not found.";
                 return RedirectToAction("Index");
             }
             var workerPermission = supervisorPermission.Children.SingleOrDefault(a => a.Id == model.WorkerId);
             if (workerPermission == null)
             {
-                ErrorMessage = "Worker not found for that supervisor.";
+                ErrorMessage = "Worker not found for that Supervisor/Field Manager.";
                 return RedirectToAction("Details", new { id = supervisorPermission.Id });
             }
             supervisorPermission.Children.Remove(workerPermission);
@@ -569,11 +569,11 @@ namespace Harvest.Web.Controllers
             {
                 _dbContext.Permissions.Remove(workerPermission);
                 await _dbContext.SaveChangesAsync();
-                Message = "Worker removed from Supervisor and Worker role.";
+                Message = "Worker removed from Supervisor/Field Manager and Worker role.";
             }
             else
             {
-                Message = "Worker removed from Supervisor";
+                Message = "Worker removed from Supervisor/Field Manager";
             }
 
 
