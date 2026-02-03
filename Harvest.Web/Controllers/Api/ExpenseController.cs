@@ -149,7 +149,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest("Only one expense can be edited at a time.");
             }
 
-            var existingExpense = await _dbContext.Expenses.Include(e => e.Project).SingleOrDefaultAsync(e => e.Id == expenseIds[0] && e.Project.Team.Slug == TeamSlug);
+            var existingExpense = await _dbContext.Expenses.Include(e => e.Project).Include(a => a.CreatedBy).SingleOrDefaultAsync(e => e.Id == expenseIds[0] && e.Project.Team.Slug == TeamSlug);
             if (existingExpense == null)
             {
                 return NotFound();
@@ -198,7 +198,7 @@ namespace Harvest.Web.Controllers.Api
             var newExpenses = expenses.Where(e => e.Id == 0).ToList();
             foreach (var newExpense in newExpenses)
             {
-                newExpense.CreatedBy = expense.CreatedBy;
+                newExpense.CreatedBy = existingExpense.CreatedBy;
                 newExpense.CreatedOn = DateTime.UtcNow;
                 newExpense.ProjectId = projectId;
                 newExpense.InvoiceId = null;
