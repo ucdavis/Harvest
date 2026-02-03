@@ -43,7 +43,7 @@ namespace Harvest.Web.Controllers.Api
             }
 
             var user = await _userService.GetCurrentUser();
-            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor });
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager });
             var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
             foreach (var expense in expenses)
             {
@@ -149,7 +149,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest("Only one expense can be edited at a time.");
             }
 
-            var existingExpense = await _dbContext.Expenses.Include(e => e.Project).SingleOrDefaultAsync(e => e.Id == expenseIds[0] && e.Project.Team.Slug == TeamSlug);
+            var existingExpense = await _dbContext.Expenses.Include(e => e.Project).Include(a => a.CreatedBy).SingleOrDefaultAsync(e => e.Id == expenseIds[0] && e.Project.Team.Slug == TeamSlug);
             if (existingExpense == null)
             {
                 return NotFound();
@@ -198,16 +198,20 @@ namespace Harvest.Web.Controllers.Api
             var newExpenses = expenses.Where(e => e.Id == 0).ToList();
             foreach (var newExpense in newExpenses)
             {
-                newExpense.CreatedBy = user; //Possibly we could get the worker that created the original expense and use them here
+                newExpense.CreatedBy = existingExpense.CreatedBy;
                 newExpense.CreatedOn = DateTime.UtcNow;
                 newExpense.ProjectId = projectId;
                 newExpense.InvoiceId = null;
                 newExpense.Account = allRates.Single(a => a.Id == newExpense.RateId).Account;
                 newExpense.IsPassthrough = allRates.Single(a => a.Id == newExpense.RateId).IsPassthrough;
 
-                newExpense.Approved = true;
-                newExpense.ApprovedBy = user;
-                newExpense.ApprovedOn = DateTime.UtcNow;
+                ////Ok, new expenses are being created with an edit here, so we need to make sure 
+                //if (isFieldManager)
+                //{
+                //    newExpense.Approved = true;
+                //    newExpense.ApprovedBy = user;
+                //    newExpense.ApprovedOn = DateTime.UtcNow;
+                //}
 
             }
 
