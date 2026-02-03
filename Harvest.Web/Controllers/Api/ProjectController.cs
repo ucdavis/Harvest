@@ -526,6 +526,11 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest("Only projects in Requested status can be overridden.");
             }
 
+            if(project.Start.Date > project.End.Date)
+            {
+                return BadRequest("Project start date cannot be after end date.");
+            }
+
             existingProject.Name = project.Name;
             //Ignore time changes for start and end dates
             if (existingProject.Start.Date != project.Start.Date || existingProject.End.Date != project.End.Date)
