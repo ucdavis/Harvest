@@ -249,7 +249,7 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest("No expenses provided");
             }
             var user = await _userService.GetCurrentUser();
-            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.Supervisor }); //Currently, this will never be true, just future proofing.
+            var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager }); //Currently, this will never be true, just future proofing.
             var allRates = await _dbContext.Rates.AsNoTracking().Where(a => a.IsActive && a.TeamId == TeamId && a.Type != Rate.Types.Acreage).ToListAsync();
 
             var results = new CreateExpenseResultsModel();
