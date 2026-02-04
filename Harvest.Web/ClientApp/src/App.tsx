@@ -33,6 +33,7 @@ import { TicketDetailContainer } from "./Tickets/TicketDetailContainer";
 import { CloseoutContainer } from "./Closeout/CloseoutContainer";
 import { CloseoutConfirmationContainer } from "./Closeout/CloseoutConfirmationContainer";
 import { AdhocProject } from "./Projects/AdhocProject";
+import { OverrideProjectContainer } from "./Projects/OverrideProjectContainer";
 import { TeamPicker } from "./Teams/TeamPicker";
 import { MobileTokenContainer } from "./Mobile/MobileTokenContainer";
 import { ApprovedExpensesListContainer } from "./Expenses/ApprovedExpensesListContainer";
@@ -108,6 +109,11 @@ function App() {
               roles={["FieldManager"]}
               path="/:team/project/adhocproject"
               component={AdhocProject}
+            />
+            <ConditionalRoute
+              roles={["System", "FieldManager"]}
+              path="/:team/project/override/:projectId"
+              component={OverrideProjectContainer}
             />
             <ConditionalRoute
               roles={["PI"]}

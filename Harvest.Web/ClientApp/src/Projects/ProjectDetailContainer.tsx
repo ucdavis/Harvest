@@ -387,6 +387,18 @@ export const ProjectDetailContainer = () => {
         </button>
       ),
     }),
+    useFor({
+      roles: ["System", "FieldManager"],
+      condition: project.status === "Requested",
+      children: (
+        <Link
+          className="btn btn-accent btn-sm mr-2"
+          to={`/${team}/project/override/${project.id}`}
+        >
+          Override Project <FontAwesomeIcon icon={faEdit} />
+        </Link>
+      ),
+    }),
   ].filter((a) => a !== null);
 
   if (isLoading) {
@@ -449,17 +461,17 @@ export const ProjectDetailContainer = () => {
       >
         {getDaysDiff(new Date(), new Date(project.lastStatusUpdatedOn)) >=
           5 && (
-            <ProjectAlerts
-              skipStatusCheck={true}
-              project={project}
-              extraText={`Project has not been acted on since ${new Date(
-                project.lastStatusUpdatedOn
-              ).toLocaleDateString()}. ${getDaysDiff(
-                new Date(),
-                new Date(project.lastStatusUpdatedOn)
-              ).toFixed(0)} days.`}
-            />
-          )}
+          <ProjectAlerts
+            skipStatusCheck={true}
+            project={project}
+            extraText={`Project has not been acted on since ${new Date(
+              project.lastStatusUpdatedOn
+            ).toLocaleDateString()}. ${getDaysDiff(
+              new Date(),
+              new Date(project.lastStatusUpdatedOn)
+            ).toFixed(0)} days.`}
+          />
+        )}
       </ShowFor>
 
       {projectActions.length > 0 && (
@@ -596,7 +608,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                userInfo.user.detail.iam ||
+                  userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
@@ -620,7 +632,7 @@ export const ProjectDetailContainer = () => {
               roles={["PI"]}
               condition={
                 project.principalInvestigator.iam ===
-                userInfo.user.detail.iam ||
+                  userInfo.user.detail.iam ||
                 project.projectPermissions?.some(
                   (pp) =>
                     pp.user.iam === userInfo.user.detail.iam &&
