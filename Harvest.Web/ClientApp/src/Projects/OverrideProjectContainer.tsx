@@ -79,7 +79,8 @@ export const OverrideProjectContainer = () => {
     return <div>Loading...</div>;
   }
 
-  const isFormValid = projectName && startDate && endDate;
+  const isFormValid =
+    !!projectName && !!startDate && !!endDate && startDate <= endDate;
 
   return (
     <div className="card-wrapper">
