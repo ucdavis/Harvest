@@ -8,6 +8,7 @@ import {
   faEdit,
   faExchangeAlt,
   faEye,
+  faMoneyBill,
   faQrcode,
   faUndo,
 } from "@fortawesome/free-solid-svg-icons";
@@ -169,6 +170,22 @@ export const ProjectDetailContainer = () => {
           ...project,
           shareId: shareId,
         });
+    }
+  };
+
+  //refresh the project total
+  const refreshTotal = async () => {
+    const request = authenticatedFetch(
+      `/api/${team}/Project/RefreshTotal/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
+    setNotification(request, "Refreshing Total", "Total Refreshed");
+    const response = await request;
+    if (response.ok) {
+      //Refresh the page
+      window.location.reload();
     }
   };
 
@@ -388,15 +405,15 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
-      roles: ["System", "FieldManager"],
-      condition: project.status === "Requested",
+      roles: ["System"],
+      condition: project.status === "Active",
       children: (
-        <Link
+        <button
           className="btn btn-accent btn-sm mr-2"
-          to={`/${team}/project/override/${project.id}`}
+          onClick={() => refreshTotal()}
         >
-          Override Project <FontAwesomeIcon icon={faEdit} />
-        </Link>
+          Refresh Billed Amount <FontAwesomeIcon icon={faMoneyBill} />
+        </button>
       ),
     }),
   ].filter((a) => a !== null);

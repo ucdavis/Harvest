@@ -755,8 +755,15 @@ namespace Harvest.Core.Services
 
                                 break;
                             case SlothStatuses.Cancelled:
-                                Log.Information("Invoice {transferId} was cancelled. What do we do?!!!!", invoice.Id);
+                                Log.Information("Invoice {transferId} was cancelled.", invoice.Id);
                                 await _historyService.InvoiceCancelled(invoice.ProjectId, invoice);
+
+                                //Update the invoice status and the charged total.
+                                invoice.Status = Invoice.Statuses.Cancelled;
+                                invoice.Project.ChargedTotal -= invoice.Total;
+                                //Possibly could recalculate charged total from scratch here to be safe?
+
+                                await _dbContext.SaveChangesAsync();
 
                                 //await _emailService.InvoiceDone(invoice, SlothStatuses.Cancelled); //Email the PI that it was canceled? 
                                 //Probably what we want to do is to set the expense invoiceIds to null, then delete the invoice

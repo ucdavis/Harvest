@@ -284,10 +284,17 @@ namespace Harvest.Web.Controllers.Api
         [Route("/api/{team}/Expense/GetAllBilled/{projectId}/{shareId?}")]
         public async Task<ActionResult> GetAllBilled(int projectId, Guid? shareId)
         {
+            var billedInvoiceStatuses = new[]
+            {
+                Invoice.Statuses.Created,
+                Invoice.Statuses.Pending,
+                Invoice.Statuses.Completed,
+            };
+
             var query = _dbContext.Expenses
                 .Include(e => e.CreatedBy)
                 .Include(e => e.ApprovedBy)
-                .Where(e => e.Invoice != null && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug);
+                .Where(e => e.Invoice != null && billedInvoiceStatuses.Contains(e.Invoice.Status) && e.ProjectId == projectId && e.Project.Team.Slug == TeamSlug);
             if (shareId.HasValue)
             {
                 query = query.Where(e => e.Project.ShareId == shareId.Value);
