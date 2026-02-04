@@ -510,5 +510,44 @@ namespace Harvest.Web.Controllers.Api
                 return Ok(newProject);
             }
         }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<IActionResult> OverrideProject([FromBody] Project project)
+        {
+            //allow the name, start and end dates to be overridden
+            var existingProject = await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == project.Id && p.Team.Slug == TeamSlug);
+            if (existingProject == null)
+            {
+                return NotFound();
+            }
+            if(existingProject.Status != Project.Statuses.Requested)
+            {
+                return BadRequest("Only projects in Requested status can be overridden.");
+            }
+
+            if(project.Start.Date > project.End.Date)
+            {
+                return BadRequest("Project start date cannot be after end date.");
+            }
+
+            existingProject.Name = project.Name;
+            //Ignore time changes for start and end dates
+            if (existingProject.Start.Date != project.Start.Date || existingProject.End.Date != project.End.Date)
+            {
+                var oldStart = existingProject.Start;
+                var oldEnd = existingProject.End;
+
+
+                existingProject.Start = project.Start;
+                existingProject.End = project.End;
+
+                var historyNotes = $"Project dates overridden from {oldStart.ToShortDateString()} - {oldEnd.ToShortDateString()} to {existingProject.Start.ToShortDateString()} - {existingProject.End.ToShortDateString()}";
+                await _historyService.AdhocHistory(project.Id, "ProjectDatesOverridden", historyNotes, existingProject, true);
+                
+            }
+            await _dbContext.SaveChangesAsync();
+            return Ok(existingProject);
+        }
     }
 }
