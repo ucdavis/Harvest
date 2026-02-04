@@ -151,6 +151,7 @@ export const OverrideProjectContainer = () => {
                 </Button>{" "}
                 <Button
                   color="secondary"
+                  className="btn btn-danger"
                   onClick={() =>
                     history.push(`/${team}/project/details/${projectId}`)
                   }
