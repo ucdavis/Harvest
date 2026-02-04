@@ -405,6 +405,18 @@ export const ProjectDetailContainer = () => {
       ),
     }),
     useFor({
+      roles: ["System", "FieldManager"],
+      condition: project.status === "Requested",
+      children: (
+        <Link
+          className="btn btn-accent btn-sm mr-2"
+          to={`/${team}/project/override/${project.id}`}
+        >
+          Override Project <FontAwesomeIcon icon={faEdit} />
+        </Link>
+      ),
+    }),
+    useFor({
       roles: ["System"],
       condition: project.status === "Active",
       children: (
