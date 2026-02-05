@@ -1025,10 +1025,10 @@ namespace Test.TestsServices
             MockData();
 
             await slothService.ProcessTransferUpdates();
-            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Once); //It didn't save anything though
+            MockDbContext.Verify(a => a.SaveChangesAsync(It.IsAny<CancellationToken>()), times: Times.Exactly(2)); //It didn't save anything though
             MockDbContext.Verify(a => a.SaveChanges(), times: Times.Never);
             MockEmailService.Verify(a => a.InvoiceDone(It.IsAny<Invoice>(), It.IsAny<string>()), Times.Never);
-            Invoices[1].Status.ShouldBe(Invoice.Statuses.Pending);
+            Invoices[1].Status.ShouldBe(Invoice.Statuses.Cancelled);
 
             MockProjectHistoryService.Verify(a => a.InvoiceCancelled(Invoices[1].Project.Id, Invoices[1]), Times.Once);
             MockProjectHistoryService.Verify(a => a.InvoiceCompleted(It.IsAny<int>(), It.IsAny<Invoice>()), Times.Never);

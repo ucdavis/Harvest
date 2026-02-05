@@ -354,10 +354,11 @@ namespace Harvest.Web.Controllers.Api
             var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
             var invoiceTotal = await _dbContext.Invoices.Where(a => a.Project.Team.Slug == TeamSlug &&
                     a.ProjectId == projectId &&
-                    (a.Status == Invoice.Statuses.Pending || a.Status == Invoice.Statuses.Completed)).Select(a => a.Total).SumAsync();
+                    (a.Status == Invoice.Statuses.Created || a.Status == Invoice.Statuses.Pending || a.Status == Invoice.Statuses.Completed)).Select(a => a.Total).SumAsync();
             var originalTotal = project.ChargedTotal;
             if (project.ChargedTotal != invoiceTotal)
             {
+                await _historyService.ProjectTotalRefreshed(project.Id, project);
                 project.ChargedTotal = invoiceTotal;
 
                 await _historyService.ProjectTotalRefreshed(project.Id, project);

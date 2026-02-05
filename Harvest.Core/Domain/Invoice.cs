@@ -63,12 +63,14 @@ namespace Harvest.Core.Domain
             public const string Created = "Created";
             public const string Pending = "Pending";
             public const string Completed = "Completed";
+            public const string Cancelled = "Cancelled";
 
             public static List<string> TypeList = new List<string>
             {
                 Created,
                 Pending,
                 Completed,
+                Cancelled
             }.ToList();
         }
     }
