@@ -761,7 +761,18 @@ namespace Harvest.Core.Services
                                 //Update the invoice status and the charged total.
                                 invoice.Status = Invoice.Statuses.Cancelled;
                                 invoice.Project.ChargedTotal -= invoice.Total;
+                                
                                 //Possibly could recalculate charged total from scratch here to be safe?
+                                //var invoiceStatuses = new[] { Invoice.Statuses.Created, Invoice.Statuses.Pending, Invoice.Statuses.Completed };
+                                //var expenseTotal = await _dbContext.Expenses.Where(a => 
+                                //    a.ProjectId == invoice.ProjectId && 
+                                //    a.Invoice != null && 
+                                //    a.InvoiceId != invoice.Id && 
+                                //    invoiceStatuses.Contains(a.Invoice.Status)).SumAsync(a => a.Total);
+                                //if (expenseTotal != invoice.Project.ChargedTotal)
+                                //{
+                                //    Log.Warning("Expense total {expenseTotal} is not equal charged total {chargedTotal} for project {projectId} after cancelling invoice {invoiceId}.", expenseTotal, invoice.Project.ChargedTotal, invoice.ProjectId, invoice.Id);
+                                //}
 
                                 await _dbContext.SaveChangesAsync();
 
