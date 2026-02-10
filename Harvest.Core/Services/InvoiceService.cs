@@ -119,7 +119,7 @@ namespace Harvest.Core.Services
                 }
 
                 //Check to see if there is an invoice within current month
-                if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == now.Year && a.CreatedOn.Month == now.Month))
+                if (await _dbContext.Invoices.AnyAsync(a => a.ProjectId == projectId && a.CreatedOn.Year == now.Year && a.CreatedOn.Month == now.Month && a.Status != Invoice.Statuses.Cancelled))
                 {
                     return Result.Error("An invoice already exists for current month: {projectId}", projectId);
                 }
@@ -147,11 +147,16 @@ namespace Harvest.Core.Services
             }
 
             //Don't exceed quoted amount
-            var allExpenses = await _dbContext.Expenses.Where(e => e.Approved && e.ProjectId == projectId).ToArrayAsync();
+            var allExpenses = await _dbContext.Expenses
+                .Include(e => e.Invoice)
+                .Where(e => e.Approved && e.ProjectId == projectId)
+                .ToArrayAsync();
             var totalExpenses = allExpenses.Sum(e => e.Total);
             if (totalExpenses > project.QuoteTotal)
             {
-                var billedTotal = allExpenses.Where(e => e.InvoiceId != null).Sum(e => e.Total);
+                var billedTotal = allExpenses
+                    .Where(e => e.InvoiceId != null && e.Invoice.Status != Invoice.Statuses.Cancelled)
+                    .Sum(e => e.Total);
                 var invoiceAmount = allExpenses.Where(e => e.InvoiceId == null).Sum(e => e.Total);
                 var quoteRemaining = project.QuoteTotal - billedTotal;
                 //Only send notification if it is first business day of month
