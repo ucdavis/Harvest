@@ -2,7 +2,7 @@ import React from "react";
 import { Rate } from "../../types";
 import { useQRCodeGeneration } from "./useQRCodeGeneration";
 import { QRCodeModal } from "./QRCodeModal";
-import { printQRCode, PrintDetail } from "./printUtils";
+import { printQRCode, PrintDetail, printRateIdCard } from "./printUtils";
 
 interface RateQRCodeGeneratorProps {
   rate: Rate;
@@ -31,6 +31,16 @@ export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
   const handlePrint = () => {
     if (!qrDataUrl) {
       console.error("QR Code not generated yet");
+      return;
+    }
+
+    if (rate.type === "Labor") {
+      const fallbackTeam = teamInfo?.name || team || "Team";
+      printRateIdCard({
+        teamName: fallbackTeam,
+        rateName: rate.description,
+        qrDataUrl,
+      });
       return;
     }
 
@@ -95,7 +105,6 @@ export const RateQRCodeGenerator: React.FC<RateQRCodeGeneratorProps> = ({
                 Type: {rate.type} | Price: ${rate.price.toFixed(2)}
                 {rate.unit && ` per ${rate.unit}`}
               </p>
-
             </div>
           </div>
         </div>

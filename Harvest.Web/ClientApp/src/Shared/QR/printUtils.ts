@@ -13,6 +13,12 @@ export interface QRCodePrintOptions {
   instructions?: string;
 }
 
+export interface RateIdCardPrintOptions {
+  teamName: string;
+  rateName: string;
+  qrDataUrl: string;
+}
+
 export const generateQRCodePrintHTML = (
   options: QRCodePrintOptions
 ): string => {
@@ -156,6 +162,104 @@ export const printQRCode = (printOptions: QRCodePrintOptions): void => {
     printWindow.document.documentElement.innerHTML = printContent;
 
     // Wait a moment for the content to load before printing
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  }
+};
+
+export const generateRateIdCardPrintHTML = (
+  options: RateIdCardPrintOptions
+): string => {
+  const { teamName, rateName, qrDataUrl } = options;
+
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Rate ID Card - ${rateName.replace(/"/g, "&quot;")}</title>
+      <style>
+        @page {
+          size: 3.375in 2.125in;
+          margin: 0;
+        }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          width: 3.375in;
+          height: 2.125in;
+        }
+        .card {
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+          padding: 0.2in 0.18in;
+          display: grid;
+          grid-template-columns: 1fr 1.05in;
+          column-gap: 0.18in;
+          align-items: center;
+          border: 1px solid #222;
+          border-radius: 0.06in;
+        }
+        .meta {
+          display: flex;
+          flex-direction: column;
+          gap: 0.1in;
+        }
+        .team {
+          font-size: 0.22in;
+          font-weight: bold;
+          color: #111;
+        }
+        .rate {
+          font-size: 0.18in;
+          line-height: 1.2;
+          color: #333;
+        }
+        .qr {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .qr img {
+          width: 1.05in;
+          height: 1.05in;
+          border: 1px solid #222;
+        }
+        @media print {
+          body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+          .qr img { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <div class="meta">
+          <div class="team">${teamName.replace(/"/g, "&quot;")}</div>
+          <div class="rate">${rateName.replace(/"/g, "&quot;")}</div>
+        </div>
+        <div class="qr">
+          <img src="${qrDataUrl}" alt="QR Code for ${rateName.replace(
+    /"/g,
+    "&quot;"
+  )}" />
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+};
+
+export const printRateIdCard = (options: RateIdCardPrintOptions): void => {
+  const printContent = generateRateIdCardPrintHTML(options);
+  const printWindow = window.open("", "_blank");
+
+  if (printWindow) {
+    printWindow.document.documentElement.innerHTML = printContent;
+
     setTimeout(() => {
       printWindow.focus();
       printWindow.print();

@@ -13,7 +13,7 @@
     <hr />
     @await Html.PartialAsync("_RateDetails", Model)
 </div>
-@if(Model.Rate.IsActive && (Model.Rate.Type == Rate.Types.Equipment || Model.Rate.Type == Rate.Types.Other))
+@if(Model.Rate.IsActive && (Model.Rate.Type == Rate.Types.Equipment || Model.Rate.Type == Rate.Types.Other || Model.Rate.Type == Rate.Types.Labor))
 {
     <div>
         <button id="rate-qr-button" class="btn btn-primary" onclick="showRateQRCode()">
