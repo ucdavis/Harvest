@@ -151,9 +151,10 @@ namespace Harvest.Core.Services
                 .Include(e => e.Invoice)
                 .Where(e => e.Approved && e.ProjectId == projectId)
                 .ToArrayAsync();
-            var totalExpenses = allExpenses.Sum(e => e.Total);
+            var totalExpenses = allExpenses.Where(e => e.Invoice == null || e.Invoice.Status != Invoice.Statuses.Cancelled).Sum(e => e.Total);
             if (totalExpenses > project.QuoteTotal)
             {
+                //I'm filtering out cancelled invoices above, but it doesn't hurt having this check here too.
                 var billedTotal = allExpenses
                     .Where(e => e.InvoiceId != null && e.Invoice.Status != Invoice.Statuses.Cancelled)
                     .Sum(e => e.Total);
