@@ -70,7 +70,7 @@ namespace Harvest.Web.Models.ReportModels
                 CreatedOn = project.CreatedOn.ToPacificTime(),
                 PrincipalInvestigatorName = project.PrincipalInvestigator.Name,
                 PrincipalInvestigatorEmail = project.PrincipalInvestigator.Email,
-                InvoiceTotal = project.Invoices.Sum(i => i.Total)
+                InvoiceTotal = project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(i => i.Total)
             };            
         }
 
