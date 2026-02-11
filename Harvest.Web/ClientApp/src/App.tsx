@@ -47,7 +47,10 @@ function App() {
       <ModalProvider>
         <Toaster />
         <AppNav />
-        <main role="main" className="main-content-wrapper container">
+        <main
+          role="main"
+          className="main-content-wrapper container fullHeightWidth"
+        >
           <Switch>
             {/* Match any server-side routes and send empty content to let MVC return the view details */}
             <Route
