@@ -1,7 +1,11 @@
 ﻿using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
 using Harvest.Email.Models;
+using Harvest.Email.Models.Invoice;
+using Harvest.Email.Models.Ticket;
+using Harvest.Web.Models.MobileModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +13,6 @@ using Razor.Templating.Core;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Harvest.Email.Models.Invoice;
-using Harvest.Email.Models.Ticket;
 
 namespace Harvest.Web.Controllers
 {
@@ -34,7 +36,7 @@ namespace Harvest.Web.Controllers
         public async Task<IActionResult> TestBody()
         {
             var model = new ProjectClosedModel();
-      
+
 
 
             var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/ProjectClosed_mjml.cshtml", model);
@@ -50,10 +52,11 @@ namespace Harvest.Web.Controllers
             var model = await _dbContext.Projects.Where(a => a.IsActive && a.Name != null && a.End <= DateTime.UtcNow.AddYears(1))
                 .OrderBy(a => a.End).Take(5).Select(s => new ExpiringProjectsModel
                 {
-                    EndDate = s.End.ToShortDateString(), Name = s.Name,
+                    EndDate = s.End.ToShortDateString(),
+                    Name = s.Name,
                     ProjectUrl = $"https://harvest.caes.ucdavis.edu/Project/Details/{s.Id}"
                 }).ToArrayAsync();
-            
+
 
 
             var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ExpiringProjects.cshtml", model);
@@ -106,7 +109,7 @@ namespace Harvest.Web.Controllers
         {
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects.Include(a => a.PrincipalInvestigator).Include(a => a.Accounts).SingleAsync(a => a.Id == 1);
-            if (await _emailService.ApproveAccounts(project, new []{user.Email}))
+            if (await _emailService.ApproveAccounts(project, new[] { user.Email }))
             {
                 return Content("Done.");
             }
@@ -157,6 +160,21 @@ namespace Harvest.Web.Controllers
             var rtValue = await _emailService.ProjectClosed(project, true);
 
             return Content($"Email was {rtValue}");
+        }
+
+        public async Task<IActionResult> TestRecentExpenses()
+        {
+            var team = await _dbContext.Teams.Where(a => a.Slug == "caes").SingleAsync();
+            var teamId = team.Id;
+            var user = await _userService.GetCurrentUser();
+            var cutoffDate = DateTime.UtcNow.AddDays(-7);
+
+            var recentExpenses = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.CreatedOn >= cutoffDate)
+                .Select(RecentExpensesModel.Projection())
+                .ToListAsync();
+            return Json(recentExpenses);
         }
     }
 }
