@@ -110,13 +110,19 @@ namespace Harvest.Web.Controllers.Api
                 return Unauthorized("User information not found");
             }
 
+            if(days <= 0 || days > 30)
+            {
+                return BadRequest("Days must be between 1 and 30");
+            }
+
             var cutoffDate = DateTime.UtcNow.AddDays(-days);
 
 
             var recentExpenses = await _dbContext.Expenses
                 .AsNoTracking()
                 .Where(e => e.Project.TeamId == teamId && e.CreatedById == user.Id && e.CreatedOn >= cutoffDate)
-                .Select(RecentExpensesModel.Projection())
+                .OrderByDescending(e => e.CreatedOn)
+                .Select(RecentExpensesModel.Projection())                
                 .ToListAsync();
 
             return Ok(recentExpenses);
