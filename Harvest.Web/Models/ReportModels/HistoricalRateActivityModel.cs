@@ -48,8 +48,8 @@ namespace Harvest.Web.Models.ReportModels
                 Description = rate.Description,
                 Account = rate.Account,
                 Price = rate.Price,
-                TotalQuantity = rate.Expenses.Where(a => a.CreatedOn >= start && a.CreatedOn <= end).Sum(a => a.Quantity),
-                TotalAmount = rate.Expenses.Where(a => a.CreatedOn >= start && a.CreatedOn <= end).Sum(a => a.Total)
+                TotalQuantity = rate.Expenses.Where(a => a.CreatedOn >= start && a.CreatedOn <= end && a.Invoice != null && a.Invoice.Status != Invoice.Statuses.Cancelled).Sum(a => a.Quantity),
+                TotalAmount = rate.Expenses.Where(a => a.CreatedOn >= start && a.CreatedOn <= end && a.Invoice != null && a.Invoice.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total)
             };
         }
     }
