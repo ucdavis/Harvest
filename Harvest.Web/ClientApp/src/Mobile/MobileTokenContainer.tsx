@@ -70,8 +70,14 @@ export const MobileTokenContainer = () => {
         toast.success("Mobile app authorized successfully!");
       } else {
         const errorText = await response.text();
-        setError(errorText || "Failed to authorize mobile app");
-        toast.error("Failed to authorize mobile app");
+        const env = window.location.origin.startsWith(
+          "https://harvest.caes.ucdavis.edu"
+        )
+          ? "production"
+          : "test";
+        const permissionError = `You do not have permissions in ${env} in team ${team} to use the mobile app.`;
+        setError(errorText || permissionError);
+        toast.error(errorText || permissionError);
       }
     } catch (err) {
       const errorMessage =
@@ -110,11 +116,8 @@ export const MobileTokenContainer = () => {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <Card>
-
             <CardBody>
-              <h2 className="mb-2">
-                Mobile Token Generator
-              </h2>
+              <h2 className="mb-2">Mobile Token Generator</h2>
               <p className="mb-4">
                 Authorize Harvest Mobile App to use this team with your account.
               </p>
