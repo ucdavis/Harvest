@@ -69,14 +69,15 @@ export const MobileTokenContainer = () => {
         setIsAuthorized(true);
         toast.success("Mobile app authorized successfully!");
       } else {
+        const errorText = await response.text();
         const env = window.location.origin.startsWith(
           "https://harvest.caes.ucdavis.edu"
         )
           ? "production"
           : "test";
         const permissionError = `You do not have permissions in ${env} in team ${team} to use the mobile app.`;
-        setError(permissionError);
-        toast.error(permissionError);
+        setError(errorText || permissionError);
+        toast.error(errorText || permissionError);
       }
     } catch (err) {
       const errorMessage =

@@ -41,7 +41,7 @@ namespace Harvest.Web.Controllers.Api
                 .SingleOrDefaultAsync();
             if (permission == null)
             {
-                return NotFound();
+                return NotFound($"No valid permission found for team {TeamSlug}"); 
             }
             permission.Token = Guid.NewGuid();
             permission.TokenExpires = DateTime.UtcNow.AddMinutes(5);
