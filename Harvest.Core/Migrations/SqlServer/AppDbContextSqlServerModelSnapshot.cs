@@ -689,6 +689,11 @@ namespace Harvest.Core.Migrations.SqlServer
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<int>("TeamId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
@@ -714,6 +719,8 @@ namespace Harvest.Core.Migrations.SqlServer
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Description");
+
+                    b.HasIndex("SortOrder");
 
                     b.HasIndex("TeamId");
 

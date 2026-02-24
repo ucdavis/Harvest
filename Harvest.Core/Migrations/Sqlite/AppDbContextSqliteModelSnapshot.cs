@@ -655,6 +655,11 @@ namespace Harvest.Core.Migrations.Sqlite
                         .HasPrecision(18, 2)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("SortOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
+
                     b.Property<int>("TeamId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
@@ -680,6 +685,8 @@ namespace Harvest.Core.Migrations.Sqlite
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("Description");
+
+                    b.HasIndex("SortOrder");
 
                     b.HasIndex("TeamId");
 

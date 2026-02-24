@@ -63,6 +63,9 @@ namespace Harvest.Core.Domain
         [Display(Name = "Pass Through")]
         public bool IsPassthrough { get; set; } = false;
 
+        [Display(Name = "Order")]
+        public int SortOrder { get; set; } = 0;
+
         // projects using this rate
         [JsonIgnore]
         public List<Project> Projects { get; set; }
@@ -80,7 +83,9 @@ namespace Harvest.Core.Domain
             modelBuilder.Entity<Rate>().HasIndex(a => a.Description);
             modelBuilder.Entity<Rate>().HasIndex(a => a.CreatedById);
             modelBuilder.Entity<Rate>().HasIndex(a => a.UpdatedById);
+            modelBuilder.Entity<Rate>().HasIndex(a => a.SortOrder);
             modelBuilder.Entity<Rate>().Property(a => a.IsPassthrough).HasDefaultValue(false);
+            modelBuilder.Entity<Rate>().Property(a => a.SortOrder).HasDefaultValue(0);
 
 
             modelBuilder.Entity<Rate>().Property(a => a.Price).HasPrecision(18, 2);
