@@ -64,6 +64,7 @@ namespace Harvest.Core.Domain
         public bool IsPassthrough { get; set; } = false;
 
         [Display(Name = "Order")]
+        [Range(0, int.MaxValue, ErrorMessage = "Order must be 0 or greater")]
         public int SortOrder { get; set; } = 0;
 
         // projects using this rate

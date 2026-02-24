@@ -1,6 +1,12 @@
 ﻿@model Harvest.Web.Models.RateModels.RateEditModel
 
 <div class="form-group">
+    <label asp-for="Rate.SortOrder" class="control-label"></label>
+    <input asp-for="Rate.SortOrder" class="form-control" min="0" />
+    <span asp-validation-for="Rate.SortOrder" class="text-danger"></span>
+</div>
+
+<div class="form-group">
     <label asp-for="Rate.Description" class="control-label"></label>
     <input asp-for="Rate.Description" class="form-control" />
     <span asp-validation-for="Rate.Description" class="text-danger"></span>
