@@ -3,6 +3,7 @@
 <div class="form-group">
     <label asp-for="Rate.SortOrder" class="control-label"></label>
     <input asp-for="Rate.SortOrder" class="form-control" min="0" />
+    <div class="form-text text-muted">Higher numbers will appear first.</div>
     <span asp-validation-for="Rate.SortOrder" class="text-danger"></span>
 </div>
 
