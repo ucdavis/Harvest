@@ -388,7 +388,7 @@ namespace Harvest.Web.Controllers
             destinationRate.UpdatedOn = DateTime.UtcNow;
             destinationRate.UpdatedBy = user;
             destinationRate.IsPassthrough = model.Rate.Type == Rate.Types.Other && model.Rate.IsPassthrough;
-            destinationRate.SortOrder = Math.Abs(model.Rate.SortOrder);
+            destinationRate.SortOrder = model.Rate.SortOrder;
         }
 
         // GET: RateController/Delete/5
