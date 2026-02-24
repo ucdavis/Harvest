@@ -147,6 +147,7 @@ namespace Harvest.Web.Controllers.Api
             var rates = await _dbContext.Rates
                 .Where(a => a.IsActive && a.TeamId == teamId && a.Type != Rate.Types.Acreage)
                 .OrderBy(a => a.Type == Rate.Types.Labor ? 0 : a.Type == Rate.Types.Equipment ? 1 : 2)
+                .ThenByDescending(a => a.SortOrder)
                 .ThenBy(a => a.Description)
                 .Select(RatesModel.Projection())
                 .ToArrayAsync();

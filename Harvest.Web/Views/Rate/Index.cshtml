@@ -21,6 +21,7 @@
 <table class="table harvest-table">
     <thead>
         <tr>
+            <th>@Html.DisplayNameFor(model => model.SortOrder)</th>
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
@@ -52,6 +53,9 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SortOrder)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Description)
                 </td>
@@ -112,6 +116,7 @@
     <script type="text/javascript">
         var table = $('.table').DataTable({
             responsive: true,
+            order: [[0, 'desc'], [1, 'asc']],
             columnDefs: [
                 { responsivePriority: 1, targets: 0 },
                 { responsivePriority: 2, targets: 1 },
@@ -122,14 +127,19 @@
                 { responsivePriority: 7, targets: 6 },
                 { responsivePriority: 8, targets: 7 },
                 { responsivePriority: 9, targets: 8 },
+                { responsivePriority: 10, targets: 9 },
                 {
                     type: "boolean",
-                    targets: [2]
+                    targets: [3]
                 },
                 {
                     type: "date",
-                    targets: [7]
-                }
+                    targets: [8]
+                },
+                {
+                    orderable: false,
+                    targets: -1
+                },
             ]
         });
     </script>
