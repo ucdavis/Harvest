@@ -189,6 +189,20 @@ export const ProjectDetailContainer = () => {
     }
   };
 
+  const returnProjectToActive = async () => {
+    const request = authenticatedFetch(
+      `/api/${team}/Project/ReturnToActive/${projectId}`,
+      {
+        method: "POST",
+      }
+    );
+    setNotification(request, "Updating Status", "Project Status Changed");
+    const response = await request;
+    if (response.ok) {
+      window.location.reload();
+    }
+  };
+
   const projectActions = [
     useFor({
       roles: ["Supervisor", "FieldManager"],
@@ -246,6 +260,20 @@ export const ProjectDetailContainer = () => {
         >
           Close Out Project <FontAwesomeIcon icon={faCheck} />
         </Link>
+      ),
+    }),
+    useFor({
+      roles: ["FieldManager", "System"],
+      condition:
+        project.status === "AwaitingCloseout" ||
+        project.status === "PendingCloseoutApproval",
+      children: (
+        <button
+          className="btn btn-danger btn-sm mr-2"
+          onClick={() => returnProjectToActive()}
+        >
+          Return To Active <FontAwesomeIcon icon={faUndo} />
+        </button>
       ),
     }),
     useForPiOnly({

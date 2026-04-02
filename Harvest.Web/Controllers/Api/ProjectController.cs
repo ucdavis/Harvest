@@ -371,6 +371,43 @@ namespace Harvest.Web.Controllers.Api
 
         [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<IActionResult> ReturnToActive(int projectId)
+        {
+            var project = await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            if (project.Status != Project.Statuses.AwaitingCloseout && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return BadRequest("Only projects in AwaitingCloseout or PendingCloseoutApproval status can be set back to Active.");
+            }
+
+            var previousStatus = project.Status;
+            project.UpdateStatus(Project.Statuses.Active);
+
+            await _historyService.AdhocHistory(
+                projectId,
+                "ProjectReturnedToActive",
+                $"Project status override! Status changed from {previousStatus.SplitCamelCase()} to Active.",
+                new
+                {
+                    PreviousStatus = previousStatus,
+                    NewStatus = project.Status,
+                    project.Id,
+                    project.Name,
+                    project.LastStatusUpdatedOn,
+                },
+                true);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(project);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<IActionResult> CreateAdhoc([FromBody] AdhocPostModel postModel)
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
