@@ -348,10 +348,11 @@ namespace Harvest.Web.Controllers.Api
             return View(project);
         }
 
+        [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<IActionResult> RefreshTotal(int projectId)
         {
-            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId);
+            var project = await _dbContext.Projects.SingleAsync(a => a.Id == projectId && a.Team.Slug == TeamSlug);
             var invoiceTotal = await _dbContext.Invoices.Where(a => a.Project.Team.Slug == TeamSlug &&
                     a.ProjectId == projectId &&
                     (a.Status == Invoice.Statuses.Created || a.Status == Invoice.Statuses.Pending || a.Status == Invoice.Statuses.Completed)).Select(a => a.Total).SumAsync();
@@ -367,6 +368,43 @@ namespace Harvest.Web.Controllers.Api
             }
 
             return Content("Project already up to date.");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = AccessCodes.FieldManagerAccess)]
+        public async Task<IActionResult> ReturnToActive(int projectId)
+        {
+            var project = await _dbContext.Projects.SingleOrDefaultAsync(p => p.Id == projectId && p.Team.Slug == TeamSlug);
+            if (project == null)
+            {
+                return NotFound();
+            }
+
+            if (project.Status != Project.Statuses.AwaitingCloseout && project.Status != Project.Statuses.PendingCloseoutApproval)
+            {
+                return BadRequest("Only projects in AwaitingCloseout or PendingCloseoutApproval status can be set back to Active.");
+            }
+
+            var previousStatus = project.Status;
+            project.UpdateStatus(Project.Statuses.Active);
+
+            await _historyService.AdhocHistory(
+                projectId,
+                "ProjectReturnedToActive",
+                $"Project status override! Status changed from {previousStatus.SplitCamelCase()} to Active.",
+                new
+                {
+                    PreviousStatus = previousStatus,
+                    NewStatus = project.Status,
+                    project.Id,
+                    project.Name,
+                    project.LastStatusUpdatedOn,
+                },
+                true);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(project);
         }
 
         [HttpPost]

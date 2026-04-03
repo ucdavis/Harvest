@@ -38,6 +38,7 @@ import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
 import { PermissionListContainer } from "../ProjectPermissions/PermissionListContainer";
 import { convertCamelCase } from "../Util/StringFormatting";
+import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -50,8 +51,38 @@ export const ProjectDetailContainer = () => {
     PendingChangeRequest[]
   >([]);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [isReturningToActive, setIsReturningToActive] = useState(false);
 
   const [notification, setNotification] = usePromiseNotification();
+  const projectEndDatePassed =
+    !!project?.end &&
+    (() => {
+      const projectEndDate = new Date(project.end);
+      projectEndDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return projectEndDate < today;
+    })();
+  const [confirmReturnToActive] = useConfirmationDialog(
+    {
+      title: "Return Project To Active",
+      message: (
+        <div>
+          <p>Are you sure you want to return this project to Active?</p>
+          {projectEndDatePassed && (
+            <p>
+              This project's end date has passed. After it is returned to
+              Active, the status will change back to Awaiting Closeout the next
+              day, so you will only have a short amount of time to make edits.
+            </p>
+          )}
+        </div>
+      ),
+    },
+    [projectEndDatePassed]
+  );
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -189,6 +220,35 @@ export const ProjectDetailContainer = () => {
     }
   };
 
+  const returnProjectToActive = async () => {
+    if (isReturningToActive) {
+      return;
+    }
+
+    const [confirmed] = await confirmReturnToActive();
+    if (!confirmed || isReturningToActive) {
+      return;
+    }
+
+    setIsReturningToActive(true);
+
+    try {
+      const request = authenticatedFetch(
+        `/api/${team}/Project/ReturnToActive/${projectId}`,
+        {
+          method: "POST",
+        }
+      );
+      setNotification(request, "Updating Status", "Project Status Changed");
+      const response = await request;
+      if (response.ok) {
+        window.location.reload();
+      }
+    } finally {
+      setIsReturningToActive(false);
+    }
+  };
+
   const projectActions = [
     useFor({
       roles: ["Supervisor", "FieldManager"],
@@ -246,6 +306,21 @@ export const ProjectDetailContainer = () => {
         >
           Close Out Project <FontAwesomeIcon icon={faCheck} />
         </Link>
+      ),
+    }),
+    useFor({
+      roles: ["FieldManager", "System"],
+      condition:
+        project.status === "AwaitingCloseout" ||
+        project.status === "PendingCloseoutApproval",
+      children: (
+        <button
+          className="btn btn-danger btn-sm mr-2"
+          disabled={isReturningToActive}
+          onClick={() => returnProjectToActive()}
+        >
+          Return To Active <FontAwesomeIcon icon={faUndo} />
+        </button>
       ),
     }),
     useForPiOnly({
