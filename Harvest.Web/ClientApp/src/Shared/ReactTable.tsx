@@ -70,6 +70,25 @@ const savePersistedTableState = (
   );
 };
 
+const hasActiveFilters = (tableState: any) => {
+  return (
+    (Array.isArray(tableState?.filters) && tableState.filters.length > 0) ||
+    Boolean(tableState?.globalFilter)
+  );
+};
+
+const getRestoredStateAlertMessage = (tableState: any) => {
+  if (!tableState) {
+    return "";
+  }
+
+  if (hasActiveFilters(tableState)) {
+    return "Filters from your last visit were restored, so this list may not show every result.";
+  }
+
+  return "";
+};
+
 export const ReactTable = ({
   columns,
   data,
@@ -89,11 +108,15 @@ export const ReactTable = ({
     []
   );
 
-  const persistedInitialState = React.useMemo(() => {
-    const restoredState = loadPersistedTableState(
+  const restoredTableState = React.useMemo(() => {
+    return loadPersistedTableState(
       stateStorageKey,
       stateStorageTtlMs
     );
+  }, [stateStorageKey, stateStorageTtlMs]);
+
+  const persistedInitialState = React.useMemo(() => {
+    const restoredState = restoredTableState;
 
     if (!restoredState) {
       return initialState;
@@ -103,7 +126,7 @@ export const ReactTable = ({
       ...initialState,
       ...restoredState,
     };
-  }, [initialState, stateStorageKey, stateStorageTtlMs]);
+  }, [initialState, restoredTableState]);
 
   const {
     getTableProps,
@@ -121,6 +144,8 @@ export const ReactTable = ({
     nextPage,
     previousPage,
     setPageSize,
+    setAllFilters,
+    setGlobalFilter,
     state: { filters, globalFilter, sortBy, pageIndex, pageSize },
   } = useTable(
     {
@@ -142,6 +167,7 @@ export const ReactTable = ({
   );
 
   const persistedTableStateRef = React.useRef<any>();
+  const hasInitializedAlertRef = React.useRef(false);
 
   React.useEffect(() => {
     const tableState = {
@@ -168,6 +194,48 @@ export const ReactTable = ({
       savePersistedTableState(stateStorageKey, persistedTableStateRef.current);
     };
   }, [stateStorageKey]);
+
+  const currentTableState = React.useMemo(
+    () => ({
+      filters,
+      globalFilter,
+      sortBy,
+      pageIndex,
+      pageSize,
+    }),
+    [filters, globalFilter, pageIndex, pageSize, sortBy]
+  );
+
+  const [showRestoredStateAlert, setShowRestoredStateAlert] = React.useState(
+    () => Boolean(getRestoredStateAlertMessage(restoredTableState))
+  );
+
+  React.useEffect(() => {
+    setShowRestoredStateAlert(
+      Boolean(getRestoredStateAlertMessage(restoredTableState))
+    );
+    hasInitializedAlertRef.current = false;
+  }, [restoredTableState, stateStorageKey]);
+
+  React.useEffect(() => {
+    if (!hasInitializedAlertRef.current) {
+      hasInitializedAlertRef.current = true;
+      return;
+    }
+
+    setShowRestoredStateAlert(false);
+  }, [filters, globalFilter]);
+
+  const restoredStateAlertMessage = showRestoredStateAlert
+    ? getRestoredStateAlertMessage(restoredTableState)
+    : "";
+
+  const handleClearFilters = React.useCallback(() => {
+    setAllFilters([]);
+    setGlobalFilter(undefined);
+    gotoPage(0);
+    setShowRestoredStateAlert(false);
+  }, [gotoPage, setAllFilters, setGlobalFilter]);
 
   // CSV Export functionality
   const exportToCSV = () => {
@@ -228,6 +296,20 @@ export const ReactTable = ({
 
   return (
     <>
+      {restoredStateAlertMessage && (
+        <div className="alert alert-info d-flex justify-content-between align-items-center">
+          <span>{restoredStateAlertMessage}</span>
+          {hasActiveFilters(currentTableState) && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-info ms-3"
+              onClick={handleClearFilters}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      )}
       {enableExport && (
         <div className="mb-2">
           <button
