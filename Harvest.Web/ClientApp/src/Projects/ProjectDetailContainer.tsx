@@ -38,6 +38,7 @@ import { getDaysDiff } from "../Util/Calculations";
 import AppContext from "../Shared/AppContext";
 import { PermissionListContainer } from "../ProjectPermissions/PermissionListContainer";
 import { convertCamelCase } from "../Util/StringFormatting";
+import { useConfirmationDialog } from "../Shared/ConfirmationDialog";
 
 export const ProjectDetailContainer = () => {
   const { projectId, team, shareId } = useParams<CommonRouteParams>();
@@ -52,6 +53,26 @@ export const ProjectDetailContainer = () => {
   const [showQRCode, setShowQRCode] = useState(false);
 
   const [notification, setNotification] = usePromiseNotification();
+  const projectEndDatePassed =
+    !!project?.end && new Date(project.end) < new Date();
+  const [confirmReturnToActive] = useConfirmationDialog(
+    {
+      title: "Return Project To Active",
+      message: (
+        <div>
+          <p>Are you sure you want to return this project to Active?</p>
+          {projectEndDatePassed && (
+            <p>
+              This project's end date has passed. After it is returned to
+              Active, the status will change back to Awaiting Closeout the next
+              day, so you will only have a short amount of time to make edits.
+            </p>
+          )}
+        </div>
+      ),
+    },
+    [projectEndDatePassed]
+  );
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
@@ -190,6 +211,11 @@ export const ProjectDetailContainer = () => {
   };
 
   const returnProjectToActive = async () => {
+    const [confirmed] = await confirmReturnToActive();
+    if (!confirmed) {
+      return;
+    }
+
     const request = authenticatedFetch(
       `/api/${team}/Project/ReturnToActive/${projectId}`,
       {

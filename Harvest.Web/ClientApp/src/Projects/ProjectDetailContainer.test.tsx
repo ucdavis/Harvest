@@ -343,4 +343,169 @@ describe("Project Detail Container", () => {
     const projectActions = container.querySelector(".project-actions")?.textContent;
     expect(projectActions).toContain("Return To Active");
   });
+
+  it("Shows a confirmation dialog before returning a project to active", async () => {
+    const awaitingCloseoutProjectResponse = Promise.resolve({
+      status: 200,
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          ...fakeProject,
+          status: "AwaitingCloseout",
+        }),
+    });
+
+    await act(async () => {
+      global.fetch = jest.fn().mockImplementation((x) =>
+        responseMap(x, {
+          "/api/team1/Project/Get/": awaitingCloseoutProjectResponse,
+          "/api/team1/Invoice/List/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeInvoices),
+          }),
+          "/api/team1/Ticket/GetList": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeTickets),
+          }),
+          "/api/team1/expense/getunbilledtotal/": Promise.resolve({
+            status: 200,
+            ok: true,
+            text: () => Promise.resolve("0.00"),
+          }),
+          "/api/File/GetUploadDetails": Promise.resolve({
+            status: 200,
+            ok: true,
+            text: () => Promise.resolve("file 1"),
+          }),
+          "/api/team1/Project/ListHistory/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeHistories),
+          }),
+          "/api/team1/Project/GetPendingChangeRequests/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve([]),
+          }),
+        })
+      );
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const returnToActiveButton = Array.from(
+      document.querySelectorAll("button")
+    ).find((button) => button.textContent?.includes("Return To Active"));
+
+    expect(returnToActiveButton).toBeTruthy();
+
+    await act(async () => {
+      returnToActiveButton?.dispatchEvent(
+        new MouseEvent("click", { bubbles: true })
+      );
+    });
+
+    expect(document.body.textContent).toContain(
+      "Are you sure you want to return this project to Active?"
+    );
+    expect(document.body.textContent).toContain(
+      "status will change back to Awaiting Closeout the next day"
+    );
+  });
+
+  it("Omits the end date warning in the confirmation dialog when the end date has not passed", async () => {
+    const awaitingCloseoutProjectResponse = Promise.resolve({
+      status: 200,
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          ...fakeProject,
+          status: "AwaitingCloseout",
+          end: new Date("2099-03-29T00:00:00"),
+        }),
+    });
+
+    await act(async () => {
+      global.fetch = jest.fn().mockImplementation((x) =>
+        responseMap(x, {
+          "/api/team1/Project/Get/": awaitingCloseoutProjectResponse,
+          "/api/team1/Invoice/List/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeInvoices),
+          }),
+          "/api/team1/Ticket/GetList": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeTickets),
+          }),
+          "/api/team1/expense/getunbilledtotal/": Promise.resolve({
+            status: 200,
+            ok: true,
+            text: () => Promise.resolve("0.00"),
+          }),
+          "/api/File/GetUploadDetails": Promise.resolve({
+            status: 200,
+            ok: true,
+            text: () => Promise.resolve("file 1"),
+          }),
+          "/api/team1/Project/ListHistory/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeHistories),
+          }),
+          "/api/team1/Project/GetPendingChangeRequests/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve([]),
+          }),
+        })
+      );
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const returnToActiveButton = Array.from(
+      document.querySelectorAll("button")
+    ).find((button) => button.textContent?.includes("Return To Active"));
+
+    expect(returnToActiveButton).toBeTruthy();
+
+    await act(async () => {
+      returnToActiveButton?.dispatchEvent(
+        new MouseEvent("click", { bubbles: true })
+      );
+    });
+
+    expect(document.body.textContent).toContain(
+      "Are you sure you want to return this project to Active?"
+    );
+    expect(document.body.textContent).not.toContain(
+      "status will change back to Awaiting Closeout the next day"
+    );
+  });
 });
