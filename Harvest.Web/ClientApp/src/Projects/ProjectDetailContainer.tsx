@@ -54,7 +54,16 @@ export const ProjectDetailContainer = () => {
 
   const [notification, setNotification] = usePromiseNotification();
   const projectEndDatePassed =
-    !!project?.end && new Date(project.end) < new Date();
+    !!project?.end &&
+    (() => {
+      const projectEndDate = new Date(project.end);
+      projectEndDate.setHours(0, 0, 0, 0);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      return projectEndDate < today;
+    })();
   const [confirmReturnToActive] = useConfirmationDialog(
     {
       title: "Return Project To Active",
