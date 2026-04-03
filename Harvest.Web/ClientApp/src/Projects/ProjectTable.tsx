@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useHistory, useLocation } from "react-router-dom";
 import { Cell, Column, TableState } from "react-table";
 import { Progress } from "reactstrap";
 
@@ -22,8 +22,11 @@ interface Props {
   projects: Project[];
 }
 
+const PROJECT_TABLE_STATE_TTL_MS = 30 * 60 * 1000;
+
 export const ProjectTable = (props: Props) => {
   const history = useHistory();
+  const location = useLocation();
   const projectData = useMemo(() => props.projects, [props.projects]);
   const columns: Column<Project>[] = useMemo(
     () => [
@@ -121,6 +124,7 @@ export const ProjectTable = (props: Props) => {
     sortBy: [{ id: "name" }],
     pageSize: ReactTableUtil.getPageSize(),
   };
+  const tableStateStorageKey = `HarvestProjectTableState:${location.pathname}`;
 
   const handleRowClick = (project: Project) => {
     history.push(`/${project.team.slug}/project/details/${project.id}`);
@@ -138,6 +142,8 @@ export const ProjectTable = (props: Props) => {
         multiSelect: multiSelectFilter,
       }}
       onRowClick={handleRowClick}
+      stateStorageKey={tableStateStorageKey}
+      stateStorageTtlMs={PROJECT_TABLE_STATE_TTL_MS}
     />
   );
 };

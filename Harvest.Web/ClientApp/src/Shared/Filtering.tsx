@@ -347,8 +347,18 @@ export const progressFilter = (rows: any[], id: any, filterValue: any) => {
 export const DatePickerFilter = ({
   column: { filterValue, setFilter },
 }: any) => {
-  const [dateRange, setDateRange] = useState([undefined, undefined]);
-  const [startDate, endDate] = dateRange;
+  const normalizeDate = (value: any) => {
+    if (!value) {
+      return null;
+    }
+
+    const normalizedDate = value instanceof Date ? value : new Date(value);
+    return Number.isNaN(normalizedDate.getTime()) ? null : normalizedDate;
+  };
+
+  const [startDate, endDate] = Array.isArray(filterValue)
+    ? [normalizeDate(filterValue[0]), normalizeDate(filterValue[1])]
+    : [null, null];
 
   return (
     <DatePicker
@@ -357,7 +367,6 @@ export const DatePickerFilter = ({
       startDate={startDate}
       endDate={endDate}
       onChange={(e: any) => {
-        setDateRange(e);
         setFilter(e);
       }}
       isClearable

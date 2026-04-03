@@ -16,6 +16,60 @@ import {
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
+const loadPersistedTableState = (
+  stateStorageKey: string | undefined,
+  stateStorageTtlMs: number
+) => {
+  if (!stateStorageKey || typeof window === "undefined") {
+    return undefined;
+  }
+
+  const rawState = window.localStorage.getItem(stateStorageKey);
+  if (!rawState) {
+    return undefined;
+  }
+
+  try {
+    const parsedState = JSON.parse(rawState);
+
+    if (
+      typeof parsedState?.savedAt !== "number" ||
+      typeof parsedState?.state !== "object" ||
+      parsedState.state === null
+    ) {
+      window.localStorage.removeItem(stateStorageKey);
+      return undefined;
+    }
+
+    if (Date.now() - parsedState.savedAt > stateStorageTtlMs) {
+      window.localStorage.removeItem(stateStorageKey);
+      return undefined;
+    }
+
+    return parsedState.state;
+  } catch {
+    window.localStorage.removeItem(stateStorageKey);
+    return undefined;
+  }
+};
+
+const savePersistedTableState = (
+  stateStorageKey: string | undefined,
+  tableState: any
+) => {
+  if (!stateStorageKey || typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(
+    stateStorageKey,
+    JSON.stringify({
+      savedAt: Date.now(),
+      state: tableState,
+    })
+  );
+};
+
 export const ReactTable = ({
   columns,
   data,
@@ -25,6 +79,8 @@ export const ReactTable = ({
   hidePagination = false,
   onRowClick,
   enableExport = false,
+  stateStorageKey,
+  stateStorageTtlMs = 30 * 60 * 1000,
 }: any) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -32,6 +88,22 @@ export const ReactTable = ({
     }),
     []
   );
+
+  const persistedInitialState = React.useMemo(() => {
+    const restoredState = loadPersistedTableState(
+      stateStorageKey,
+      stateStorageTtlMs
+    );
+
+    if (!restoredState) {
+      return initialState;
+    }
+
+    return {
+      ...initialState,
+      ...restoredState,
+    };
+  }, [initialState, stateStorageKey, stateStorageTtlMs]);
 
   const {
     getTableProps,
@@ -49,13 +121,16 @@ export const ReactTable = ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize },
+    state: { filters, globalFilter, sortBy, pageIndex, pageSize },
   } = useTable(
     {
       columns,
       data,
       defaultColumn,
-      initialState: { ...initialState, pageIndex: 0 },
+      initialState: {
+        ...persistedInitialState,
+        pageIndex: persistedInitialState?.pageIndex ?? 0,
+      },
       filterTypes,
       autoResetSortBy: false,
       autoResetFilters: false,
@@ -65,6 +140,34 @@ export const ReactTable = ({
     useSortBy,
     usePagination
   );
+
+  const persistedTableStateRef = React.useRef<any>();
+
+  React.useEffect(() => {
+    const tableState = {
+      filters,
+      globalFilter,
+      sortBy,
+      pageIndex,
+      pageSize,
+    };
+
+    persistedTableStateRef.current = tableState;
+    savePersistedTableState(stateStorageKey, tableState);
+  }, [
+    filters,
+    globalFilter,
+    pageIndex,
+    pageSize,
+    sortBy,
+    stateStorageKey,
+  ]);
+
+  React.useEffect(() => {
+    return () => {
+      savePersistedTableState(stateStorageKey, persistedTableStateRef.current);
+    };
+  }, [stateStorageKey]);
 
   // CSV Export functionality
   const exportToCSV = () => {
