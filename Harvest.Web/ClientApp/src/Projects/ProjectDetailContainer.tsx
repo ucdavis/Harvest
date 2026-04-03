@@ -51,6 +51,7 @@ export const ProjectDetailContainer = () => {
     PendingChangeRequest[]
   >([]);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [isReturningToActive, setIsReturningToActive] = useState(false);
 
   const [notification, setNotification] = usePromiseNotification();
   const projectEndDatePassed =
@@ -220,21 +221,31 @@ export const ProjectDetailContainer = () => {
   };
 
   const returnProjectToActive = async () => {
-    const [confirmed] = await confirmReturnToActive();
-    if (!confirmed) {
+    if (isReturningToActive) {
       return;
     }
 
-    const request = authenticatedFetch(
-      `/api/${team}/Project/ReturnToActive/${projectId}`,
-      {
-        method: "POST",
+    const [confirmed] = await confirmReturnToActive();
+    if (!confirmed || isReturningToActive) {
+      return;
+    }
+
+    setIsReturningToActive(true);
+
+    try {
+      const request = authenticatedFetch(
+        `/api/${team}/Project/ReturnToActive/${projectId}`,
+        {
+          method: "POST",
+        }
+      );
+      setNotification(request, "Updating Status", "Project Status Changed");
+      const response = await request;
+      if (response.ok) {
+        window.location.reload();
       }
-    );
-    setNotification(request, "Updating Status", "Project Status Changed");
-    const response = await request;
-    if (response.ok) {
-      window.location.reload();
+    } finally {
+      setIsReturningToActive(false);
     }
   };
 
@@ -305,6 +316,7 @@ export const ProjectDetailContainer = () => {
       children: (
         <button
           className="btn btn-danger btn-sm mr-2"
+          disabled={isReturningToActive}
           onClick={() => returnProjectToActive()}
         >
           Return To Active <FontAwesomeIcon icon={faUndo} />

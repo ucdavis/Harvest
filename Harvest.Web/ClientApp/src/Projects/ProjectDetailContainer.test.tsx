@@ -508,4 +508,129 @@ describe("Project Detail Container", () => {
       "status will change back to Awaiting Closeout the next day"
     );
   });
+
+  it("Disables Return To Active and avoids duplicate POSTs while the request is pending", async () => {
+    let resolveReturnToActive: (value: {
+      status: number;
+      ok: boolean;
+      json: () => Promise<undefined>;
+    }) => void;
+    const returnToActiveResponse = new Promise<{
+      status: number;
+      ok: boolean;
+      json: () => Promise<undefined>;
+    }>((resolve) => {
+      resolveReturnToActive = resolve;
+    });
+
+    const awaitingCloseoutProjectResponse = Promise.resolve({
+      status: 200,
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          ...fakeProject,
+          status: "AwaitingCloseout",
+        }),
+    });
+
+    await act(async () => {
+      global.fetch = jest.fn().mockImplementation((x) =>
+        responseMap(x, {
+          "/api/team1/Project/Get/": awaitingCloseoutProjectResponse,
+          "/api/team1/Project/ReturnToActive/": returnToActiveResponse,
+          "/api/team1/Invoice/List/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeInvoices),
+          }),
+          "/api/team1/Ticket/GetList": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeTickets),
+          }),
+          "/api/team1/expense/getunbilledtotal/": Promise.resolve({
+            status: 200,
+            ok: true,
+            text: () => Promise.resolve("0.00"),
+          }),
+          "/api/File/GetUploadDetails": Promise.resolve({
+            status: 200,
+            ok: true,
+            text: () => Promise.resolve("file 1"),
+          }),
+          "/api/team1/Project/ListHistory/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve(fakeHistories),
+          }),
+          "/api/team1/Project/GetPendingChangeRequests/": Promise.resolve({
+            status: 200,
+            ok: true,
+            json: () => Promise.resolve([]),
+          }),
+        })
+      );
+
+      render(
+        <AppContext.Provider value={(global as any).Harvest}>
+          <ModalProvider>
+            <MemoryRouter initialEntries={["team1/project/details/3"]}>
+              <Route path=":team/project/details/:projectId">
+                <ProjectDetailContainer />
+              </Route>
+            </MemoryRouter>
+          </ModalProvider>
+        </AppContext.Provider>,
+        container
+      );
+    });
+
+    const returnToActiveButton = Array.from(
+      document.querySelectorAll("button")
+    ).find((button) => button.textContent?.includes("Return To Active"));
+
+    expect(returnToActiveButton).toBeTruthy();
+
+    await act(async () => {
+      returnToActiveButton?.dispatchEvent(
+        new MouseEvent("click", { bubbles: true })
+      );
+    });
+
+    const confirmButton = Array.from(document.querySelectorAll("button")).find(
+      (button) => button.textContent?.includes("Confirm")
+    ) as HTMLButtonElement | undefined;
+
+    expect(confirmButton).toBeTruthy();
+
+    await act(async () => {
+      confirmButton?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      await Promise.resolve();
+    });
+
+    expect(returnToActiveButton).toBeDisabled();
+
+    await act(async () => {
+      returnToActiveButton?.dispatchEvent(
+        new MouseEvent("click", { bubbles: true })
+      );
+      await Promise.resolve();
+    });
+
+    const returnToActiveCalls = (global.fetch as jest.Mock).mock.calls.filter(
+      ([url]) =>
+        typeof url === "string" && url.includes("/Project/ReturnToActive/")
+    );
+
+    expect(returnToActiveCalls).toHaveLength(1);
+
+    await act(async () => {
+      resolveReturnToActive({
+        status: 200,
+        ok: false,
+        json: () => Promise.resolve(undefined),
+      });
+      await Promise.resolve();
+    });
+  });
 });
