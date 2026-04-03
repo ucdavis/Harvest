@@ -16,6 +16,83 @@ import {
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 
+const loadPersistedTableState = (
+  stateStorageKey: string | undefined,
+  stateStorageTtlMs: number
+) => {
+  if (!stateStorageKey || typeof window === "undefined") {
+    return undefined;
+  }
+
+  try {
+    const rawState = window.localStorage.getItem(stateStorageKey);
+    if (!rawState) {
+      return undefined;
+    }
+
+    const parsedState = JSON.parse(rawState);
+
+    if (
+      typeof parsedState?.savedAt !== "number" ||
+      typeof parsedState?.state !== "object" ||
+      parsedState.state === null
+    ) {
+      window.localStorage.removeItem(stateStorageKey);
+      return undefined;
+    }
+
+    if (Date.now() - parsedState.savedAt > stateStorageTtlMs) {
+      window.localStorage.removeItem(stateStorageKey);
+      return undefined;
+    }
+
+    return parsedState.state;
+  } catch {
+    window.localStorage.removeItem(stateStorageKey);
+    return undefined;
+  }
+};
+
+const savePersistedTableState = (
+  stateStorageKey: string | undefined,
+  tableState: any
+) => {
+  if (!stateStorageKey || typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.localStorage.setItem(
+      stateStorageKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        state: tableState,
+      })
+    );
+  } catch {
+    // Fail open if storage is unavailable or blocked.
+  }
+};
+
+const hasActiveFilters = (tableState: any) => {
+  return (
+    (Array.isArray(tableState?.filters) && tableState.filters.length > 0) ||
+    Boolean(tableState?.globalFilter)
+  );
+};
+
+const getRestoredStateAlertMessage = (tableState: any) => {
+  if (!tableState) {
+    return "";
+  }
+
+  if (hasActiveFilters(tableState)) {
+    return "Filters from your last visit were restored, so this list may not show every result.";
+  }
+
+  return "";
+};
+
 export const ReactTable = ({
   columns,
   data,
@@ -25,6 +102,8 @@ export const ReactTable = ({
   hidePagination = false,
   onRowClick,
   enableExport = false,
+  stateStorageKey,
+  stateStorageTtlMs = 30 * 60 * 1000,
 }: any) => {
   const defaultColumn = React.useMemo(
     () => ({
@@ -32,6 +111,26 @@ export const ReactTable = ({
     }),
     []
   );
+
+  const restoredTableState = React.useMemo(() => {
+    return loadPersistedTableState(
+      stateStorageKey,
+      stateStorageTtlMs
+    );
+  }, [stateStorageKey, stateStorageTtlMs]);
+
+  const persistedInitialState = React.useMemo(() => {
+    const restoredState = restoredTableState;
+
+    if (!restoredState) {
+      return initialState;
+    }
+
+    return {
+      ...initialState,
+      ...restoredState,
+    };
+  }, [initialState, restoredTableState]);
 
   const {
     getTableProps,
@@ -49,13 +148,18 @@ export const ReactTable = ({
     nextPage,
     previousPage,
     setPageSize,
-    state: { pageIndex, pageSize },
+    setAllFilters,
+    setGlobalFilter,
+    state: { filters, globalFilter, sortBy, pageIndex, pageSize },
   } = useTable(
     {
       columns,
       data,
       defaultColumn,
-      initialState: { ...initialState, pageIndex: 0 },
+      initialState: {
+        ...persistedInitialState,
+        pageIndex: persistedInitialState?.pageIndex ?? 0,
+      },
       filterTypes,
       autoResetSortBy: false,
       autoResetFilters: false,
@@ -65,6 +169,77 @@ export const ReactTable = ({
     useSortBy,
     usePagination
   );
+
+  const persistedTableStateRef = React.useRef<any>();
+  const hasInitializedAlertRef = React.useRef(false);
+
+  React.useEffect(() => {
+    const tableState = {
+      filters,
+      globalFilter,
+      sortBy,
+      pageIndex,
+      pageSize,
+    };
+
+    persistedTableStateRef.current = tableState;
+    savePersistedTableState(stateStorageKey, tableState);
+  }, [
+    filters,
+    globalFilter,
+    pageIndex,
+    pageSize,
+    sortBy,
+    stateStorageKey,
+  ]);
+
+  React.useEffect(() => {
+    return () => {
+      savePersistedTableState(stateStorageKey, persistedTableStateRef.current);
+    };
+  }, [stateStorageKey]);
+
+  const currentTableState = React.useMemo(
+    () => ({
+      filters,
+      globalFilter,
+      sortBy,
+      pageIndex,
+      pageSize,
+    }),
+    [filters, globalFilter, pageIndex, pageSize, sortBy]
+  );
+
+  const [showRestoredStateAlert, setShowRestoredStateAlert] = React.useState(
+    () => Boolean(getRestoredStateAlertMessage(restoredTableState))
+  );
+
+  React.useEffect(() => {
+    setShowRestoredStateAlert(
+      Boolean(getRestoredStateAlertMessage(restoredTableState))
+    );
+    hasInitializedAlertRef.current = false;
+  }, [restoredTableState, stateStorageKey]);
+
+  React.useEffect(() => {
+    if (!hasInitializedAlertRef.current) {
+      hasInitializedAlertRef.current = true;
+      return;
+    }
+
+    setShowRestoredStateAlert(false);
+  }, [filters, globalFilter]);
+
+  const restoredStateAlertMessage = showRestoredStateAlert
+    ? getRestoredStateAlertMessage(restoredTableState)
+    : "";
+
+  const handleClearFilters = React.useCallback(() => {
+    setAllFilters([]);
+    setGlobalFilter(undefined);
+    gotoPage(0);
+    setShowRestoredStateAlert(false);
+  }, [gotoPage, setAllFilters, setGlobalFilter]);
 
   // CSV Export functionality
   const exportToCSV = () => {
@@ -125,6 +300,20 @@ export const ReactTable = ({
 
   return (
     <>
+      {restoredStateAlertMessage && (
+        <div className="alert alert-info d-flex justify-content-between align-items-center">
+          <span>{restoredStateAlertMessage}</span>
+          {hasActiveFilters(currentTableState) && (
+            <button
+              type="button"
+              className="btn btn-sm btn-outline-info ms-3"
+              onClick={handleClearFilters}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      )}
       {enableExport && (
         <div className="mb-2">
           <button
