@@ -113,10 +113,11 @@ namespace Test.TestsControllers.TestsApiControllers
 
             //9
             attribute = null;
-            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("RefreshTotal", countAdjustment + 2, testMessage: "RefreshTotal");
+            attribute = ControllerReflection.MethodExpectedAttribute<AuthorizeAttribute>("RefreshTotal", countAdjustment + 3, testMessage: "RefreshTotal");
             attribute.ShouldNotBeNull();
             attribute.ElementAt(0).Policy.ShouldBe(AccessCodes.FieldManagerAccess);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RefreshTotal", countAdjustment + 2);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("RefreshTotal", countAdjustment + 3);
+            ControllerReflection.MethodExpectedAttribute<HttpPostAttribute>("RefreshTotal", countAdjustment + 3);
 
             //10
             methodName = "ReturnToActive";

@@ -348,6 +348,7 @@ namespace Harvest.Web.Controllers.Api
             return View(project);
         }
 
+        [HttpPost]
         [Authorize(Policy = AccessCodes.FieldManagerAccess)]
         public async Task<IActionResult> RefreshTotal(int projectId)
         {
