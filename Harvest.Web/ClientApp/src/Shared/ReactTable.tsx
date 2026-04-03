@@ -24,12 +24,12 @@ const loadPersistedTableState = (
     return undefined;
   }
 
-  const rawState = window.localStorage.getItem(stateStorageKey);
-  if (!rawState) {
-    return undefined;
-  }
-
   try {
+    const rawState = window.localStorage.getItem(stateStorageKey);
+    if (!rawState) {
+      return undefined;
+    }
+
     const parsedState = JSON.parse(rawState);
 
     if (
@@ -61,13 +61,17 @@ const savePersistedTableState = (
     return;
   }
 
-  window.localStorage.setItem(
-    stateStorageKey,
-    JSON.stringify({
-      savedAt: Date.now(),
-      state: tableState,
-    })
-  );
+  try {
+    window.localStorage.setItem(
+      stateStorageKey,
+      JSON.stringify({
+        savedAt: Date.now(),
+        state: tableState,
+      })
+    );
+  } catch {
+    // Fail open if storage is unavailable or blocked.
+  }
 };
 
 const hasActiveFilters = (tableState: any) => {
