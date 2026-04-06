@@ -131,18 +131,44 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            var expenses = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(a => a.InvoiceId == null && a.Project.TeamId == team.Id)
+                .OrderBy(a => a.Project.Name)
+                .ThenBy(a => a.ProjectId)
+                .ThenBy(a => a.CreatedOn)
+                .ThenBy(a => a.Id)
+                .Select(UnbilledExpenseReportRowModel.Projection())
+                .ToListAsync();
+
+            var projectIds = expenses.Select(a => a.ProjectId).Distinct().ToArray();
+            if (projectIds.Length > 0)
+            {
+                var projectAggregates = await _dbContext.Projects
+                    .AsNoTracking()
+                    .Where(a => a.TeamId == team.Id && projectIds.Contains(a.Id))
+                    .Select(UnbilledExpenseProjectAggregateModel.Projection())
+                    .ToDictionaryAsync(a => a.ProjectId);
+
+                foreach (var expense in expenses)
+                {
+                    if (!projectAggregates.TryGetValue(expense.ProjectId, out var projectAggregate))
+                    {
+                        continue;
+                    }
+
+                    expense.QuoteAmount = projectAggregate.QuoteAmount;
+                    expense.ProjectAmountBilled = projectAggregate.ProjectAmountBilled;
+                    expense.RemainingQuote = projectAggregate.RemainingQuote;
+                    expense.ProjectUnbilledTotal = projectAggregate.ProjectUnbilledTotal;
+                    expense.WillExceedRemainingQuote = projectAggregate.WillExceedRemainingQuote;
+                }
+            }
+
             var model = new UnbilledExpensesReportModel
             {
                 TeamName = team.Name,
-                Expenses = await _dbContext.Expenses
-                    .AsNoTracking()
-                    .Where(a => a.InvoiceId == null && a.Project.TeamId == team.Id)
-                    .OrderBy(a => a.Project.Name)
-                    .ThenBy(a => a.ProjectId)
-                    .ThenBy(a => a.CreatedOn)
-                    .ThenBy(a => a.Id)
-                    .Select(UnbilledExpenseReportRowModel.Projection())
-                    .ToListAsync()
+                Expenses = expenses
             };
 
             return View(model);

@@ -55,6 +55,29 @@ namespace Harvest.Web.Models.ReportModels
         public List<UnbilledExpenseReportRowModel> Expenses { get; set; } = new();
     }
 
+    public class UnbilledExpenseProjectAggregateModel
+    {
+        public int ProjectId { get; set; }
+        public decimal QuoteAmount { get; set; }
+        public decimal ProjectAmountBilled { get; set; }
+        public decimal RemainingQuote { get; set; }
+        public decimal ProjectUnbilledTotal { get; set; }
+        public bool WillExceedRemainingQuote { get; set; }
+
+        public static Expression<Func<Project, UnbilledExpenseProjectAggregateModel>> Projection()
+        {
+            return project => new UnbilledExpenseProjectAggregateModel
+            {
+                ProjectId = project.Id,
+                QuoteAmount = project.QuoteTotal,
+                ProjectAmountBilled = project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total),
+                RemainingQuote = project.QuoteTotal - project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total),
+                ProjectUnbilledTotal = project.Expenses.Where(a => a.InvoiceId == null).Sum(a => a.Total),
+                WillExceedRemainingQuote = project.Expenses.Where(a => a.InvoiceId == null).Sum(a => a.Total) > (project.QuoteTotal - project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total))
+            };
+        }
+    }
+
     public class UnbilledExpenseReportRowModel
     {
         [Display(Name = "Project Id")]
@@ -124,12 +147,7 @@ namespace Harvest.Web.Models.ReportModels
                 CreatedByName = expense.CreatedBy != null ? expense.CreatedBy.FirstName + " " + expense.CreatedBy.LastName : string.Empty,
                 Quantity = expense.Quantity,
                 Price = expense.Price,
-                Total = expense.Total,
-                ProjectAmountBilled = expense.Project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total),
-                QuoteAmount = expense.Project.QuoteTotal,
-                RemainingQuote = expense.Project.QuoteTotal - expense.Project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total),
-                ProjectUnbilledTotal = expense.Project.Expenses.Where(a => a.InvoiceId == null).Sum(a => a.Total),
-                WillExceedRemainingQuote = expense.Project.Expenses.Where(a => a.InvoiceId == null).Sum(a => a.Total) > (expense.Project.QuoteTotal - expense.Project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total))
+                Total = expense.Total
             };
         }
     }
