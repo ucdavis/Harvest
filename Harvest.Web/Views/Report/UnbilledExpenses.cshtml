@@ -1,0 +1,200 @@
+@model Harvest.Web.Models.ReportModels.UnbilledExpensesReportModel
+@{
+    ViewData["Title"] = "Unbilled Expenses";
+}
+
+<div>
+    <div>
+        <h1>Unbilled Expenses for Team: @Model.TeamName</h1>
+        <p>Expenses are grouped by project. Each project section includes billed, quoted, remaining, and unbilled totals.</p>
+    </div>
+</div>
+
+<table id="unbilled-expenses-report" class="table harvest-table">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Expense Id</th>
+            <th>Created</th>
+            <th>Approved</th>
+            <th>Type</th>
+            <th>Activity</th>
+            <th>Description</th>
+            <th>Account</th>
+            <th>Entered By</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th>Expense Total</th>
+            <th>Project Amount Already Billed</th>
+            <th>Quote Amount</th>
+            <th>Remaining Quote</th>
+            <th>Exceeds Remaining Quote</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.ProjectGroups.Any())
+        {
+            <tr>
+                <td colspan="16">No unbilled expenses found for this team.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var projectGroup in Model.ProjectGroups)
+            {
+                <tr class="project-group-row">
+                    <td>
+                        <a href=@($"/{ViewContext.RouteData.Values["team"]}/project/details/{projectGroup.ProjectId}") target="_blank">
+                            @projectGroup.ProjectName (@projectGroup.ProjectId)
+                        </a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>Project Summary</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>@projectGroup.ProjectUnbilledTotal.ToString("C")</td>
+                    <td>@projectGroup.ProjectAmountBilled.ToString("C")</td>
+                    <td>@projectGroup.QuoteAmount.ToString("C")</td>
+                    <td>@projectGroup.RemainingQuote.ToString("C")</td>
+                    <td>@(projectGroup.WillExceedRemainingQuote ? "Yes" : "No")</td>
+                </tr>
+
+                @foreach (var item in projectGroup.Expenses)
+                {
+                    <tr>
+                        <td>@item.ProjectName</td>
+                        <td>@item.ExpenseId</td>
+                        <td data-sort="@item.CreatedOn.ToString("yyyy-MM-dd")">@item.CreatedOn.ToString("d")</td>
+                        <td>@item.IsApproved</td>
+                        <td>@item.ExpenseType</td>
+                        <td>@item.Activity</td>
+                        <td>@item.Description</td>
+                        <td>@item.Account</td>
+                        <td>@item.CreatedByName</td>
+                        <td>@item.Quantity</td>
+                        <td>@item.Price.ToString("C")</td>
+                        <td>@item.Total.ToString("C")</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
+
+                <tr class="project-subtotal-row">
+                    <td><strong>@projectGroup.ProjectName Subtotal</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>@projectGroup.ProjectUnbilledTotal.ToString("C")</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            }
+        }
+    </tbody>
+    <tfoot>
+        <tr class="grand-total-row">
+            <th colspan="11" class="text-right">Grand Total</th>
+            <th>@Model.GrandTotal.ToString("C")</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </tfoot>
+</table>
+
+@section Styles
+{
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+
+    <style>
+        #unbilled-expenses-report .project-group-row {
+            background-color: #f4f7f5;
+            font-weight: 600;
+        }
+
+        #unbilled-expenses-report .project-subtotal-row {
+            background-color: #fafafa;
+        }
+
+        #unbilled-expenses-report .grand-total-row {
+            background-color: #eef4ef;
+            font-weight: 700;
+        }
+    </style>
+}
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('#unbilled-expenses-report').DataTable({
+            "dom": 'lBfrtip',
+            "paging": false,
+            "ordering": false,
+            "buttons": [
+                {
+                    extend: 'copyHtml5',
+                    footer: true,
+                    className: 'btn-primary btn-sm',
+                    init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    footer: true,
+                    className: 'btn-primary btn-sm',
+                    init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    footer: true,
+                    className: 'btn-primary btn-sm',
+                    init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                {
+                    extend: 'print',
+                    footer: true,
+                    className: 'btn-primary btn-sm',
+                    init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+            ],
+            columnDefs: [{
+                type: "date",
+                targets: [2]
+            }]
+        });
+    </script>
+}

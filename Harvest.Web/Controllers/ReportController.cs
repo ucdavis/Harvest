@@ -120,5 +120,32 @@ namespace Harvest.Web.Controllers
             return View(model);
 
         }
+
+        public async Task<IActionResult> UnbilledExpenses()
+        {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = new UnbilledExpensesReportModel
+            {
+                TeamName = team.Name,
+                Expenses = await _dbContext.Expenses
+                    .AsNoTracking()
+                    .Where(a => a.InvoiceId == null && a.Project.TeamId == team.Id)
+                    .OrderBy(a => a.Project.Name)
+                    .ThenBy(a => a.ProjectId)
+                    .ThenBy(a => a.CreatedOn)
+                    .ThenBy(a => a.Id)
+                    .Select(UnbilledExpenseReportRowModel.Projection())
+                    .ToListAsync()
+            };
+
+            return View(model);
+        }
     }
 }
