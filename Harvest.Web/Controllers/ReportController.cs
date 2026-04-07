@@ -47,7 +47,7 @@ namespace Harvest.Web.Controllers
             {
                 start = new(DateTime.Now.Year - 1, 1, 1);
             }
-            
+
             if (!end.HasValue)
             {
                 end = new DateTime(DateTime.Now.Year - 1, 12, 31);
@@ -134,6 +134,7 @@ namespace Harvest.Web.Controllers
             var model = new UnbilledExpensesReportModel
             {
                 TeamName = team.Name,
+                Slug = team.Slug,
                 Projects = await _dbContext.Projects
                     .AsNoTracking()
                     .Where(a => a.TeamId == team.Id && a.Expenses.Any(e => e.InvoiceId == null && e.Approved))

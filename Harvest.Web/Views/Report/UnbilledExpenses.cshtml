@@ -34,14 +34,14 @@
             {
                 <tr>
                     <td>
-                        <a href=@($"/{ViewContext.RouteData.Values["team"]}/project/details/{item.ProjectId}") target="_blank">
+                        <a href=@($"/{Model.Slug}/project/details/{item.ProjectId}") target="_blank">
                             @item.ProjectName (@item.ProjectId)
                         </a>
                     </td>
-                    <td>@item.TotalUnbilledExpenses.ToString("C")</td>
-                    <td>@item.ProjectAmountBilled.ToString("C")</td>
-                    <td>@item.QuoteAmount.ToString("C")</td>
-                    <td>@item.RemainingQuote.ToString("C")</td>
+                    <td>@item.TotalUnbilledExpenses</td>
+                    <td>@item.ProjectAmountBilled</td>
+                    <td>@item.QuoteAmount</td>
+                    <td>@item.RemainingQuote</td>
                     <td>@(item.WillExceedRemainingQuote ? "Yes" : "No")</td>
                 </tr>
             }
@@ -68,7 +68,11 @@
     <script type="text/javascript">
         var table = $('#unbilled-expenses-report').DataTable({
             "dom": 'lBfrtip',
-            "buttons": [
+            columnDefs: [{
+                type: "num-fmt",
+                targets: [1, 2, 3, 4]
+            }],
+            buttons: [
                 {
                     extend: 'copyHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
                         $(node).removeClass('btn-secondary')

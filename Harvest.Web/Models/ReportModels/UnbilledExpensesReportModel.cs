@@ -12,6 +12,7 @@ namespace Harvest.Web.Models.ReportModels
         public List<UnbilledExpenseProjectReportRowModel> Projects { get; set; } = new();
 
         public string TeamName { get; set; }
+        public string Slug { get; set; }
     }
 
     public class UnbilledExpenseProjectReportRowModel
