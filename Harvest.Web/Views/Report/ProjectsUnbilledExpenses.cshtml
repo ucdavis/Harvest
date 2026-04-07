@@ -78,16 +78,8 @@
                         $(node).removeClass('btn-secondary')
                     }
                 },
-                {
-                    extend: 'excelHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
-                    }
-                },
-                {
-                    extend: 'csvHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
-                    }
-                },
+                window.HarvestReportExports.createHtml5ExportButton('excelHtml5', 'ProjectsUnbilledExpenses'),
+                window.HarvestReportExports.createHtml5ExportButton('csvHtml5', 'ProjectsUnbilledExpenses'),
                 {
                     extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
                         $(node).removeClass('btn-secondary')
