@@ -14,6 +14,7 @@ import {
 } from "reactstrap";
 import AppContext from "./Shared/AppContext";
 import { useLocation } from "react-router-dom";
+import { RoleName } from "./types";
 
 const getFirstPath = (pathName: string) => {
   // return the first path token in the pathName
@@ -41,6 +42,8 @@ export const AppNav = () => {
 
   const nonTeamPage =
     firstPath === "system" || firstPath === "project" || firstPath === "team";
+  const teamAdminRoles: RoleName[] = ["FieldManager", "Supervisor", "Finance"];
+  const teamReportRoles: RoleName[] = ["FieldManager", "Finance"];
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -62,7 +65,7 @@ export const AppNav = () => {
                 </NavItem>
               </ShowFor>
               <ShowFor condition={!nonTeamPage}>
-                <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
+                <ShowFor roles={teamAdminRoles}>
                   <NavItem>
                     <NavLink href={`/${team}/project`}>All Projects</NavLink>
                   </NavItem>
@@ -72,7 +75,7 @@ export const AppNav = () => {
                     <NavLink href={`/${team}/expense/entry`}>Expenses</NavLink>
                   </NavItem>
                 </ShowFor>
-                <ShowFor roles={["FieldManager", "Supervisor", "Finance"]}>
+                <ShowFor roles={teamAdminRoles}>
                   <UncontrolledDropdown nav inNavbar>
                     <DropdownToggle nav caret>
                       Team Admin
@@ -131,23 +134,31 @@ export const AppNav = () => {
                           </DropdownItem>
                         </ShowFor>
                       </ShowFor>
-                      <ShowFor roles={["FieldManager", "Finance"]}>
-                        <DropdownItem divider />
-                        <DropdownItem href={`/${team}/Report/AllProjects`}>
-                          Reports - Projects
-                        </DropdownItem>
-                        <DropdownItem
-                          href={`/${team}/Report/HistoricalRateActivity`}
-                        >
-                          Reports - Historical Rate Activity
-                        </DropdownItem>
-                        <DropdownItem href={`/${team}/Report/ProjectsUnbilledExpenses`}>
-                          Reports - Projects Unbilled Expenses
-                        </DropdownItem>
-                        <DropdownItem href={`/${team}/Report/StaleProjects`}>
-                          Reports - Stale Projects
-                        </DropdownItem>
-                      </ShowFor>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                </ShowFor>
+                <ShowFor roles={teamReportRoles}>
+                  <UncontrolledDropdown nav inNavbar>
+                    <DropdownToggle nav caret>
+                      Team Reports
+                    </DropdownToggle>
+                    <DropdownMenu end>
+                      <DropdownItem href={`/${team}/Report/AllProjects`}>
+                        Projects
+                      </DropdownItem>
+                      <DropdownItem
+                        href={`/${team}/Report/HistoricalRateActivity`}
+                      >
+                        Historical Rate Activity
+                      </DropdownItem>
+                      <DropdownItem
+                        href={`/${team}/Report/ProjectsUnbilledExpenses`}
+                      >
+                        Projects Unbilled Expenses
+                      </DropdownItem>
+                      <DropdownItem href={`/${team}/Report/StaleProjects`}>
+                        Stale Projects
+                      </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </ShowFor>
