@@ -43,7 +43,7 @@ namespace Test.TestsControllers
         [Fact]
         public void TestControllerContainsExpectedNumberOfPublicMethods()
         {
-            ControllerReflection.ControllerPublicMethods(5);
+            ControllerReflection.ControllerPublicMethods(6);
         }
 
         [Fact]
@@ -60,6 +60,7 @@ namespace Test.TestsControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("HistoricalRateActivity", countAdjustment + 1);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("StaleProjects", countAdjustment + 1);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ProjectsUnbilledExpenses", countAdjustment + 1);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("UnbilledExpenses", countAdjustment + 1);
         }
     }
 }
