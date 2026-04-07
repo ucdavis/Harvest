@@ -87,6 +87,8 @@ namespace Harvest.Core.Services
 
         public async Task<Result<int>> CreateInvoice(int projectId, bool isCloseout = false, bool isAutoCloseout = false)
         {
+            Log.Information("Starting invoice creation for project {projectId}. isCloseout: {isCloseout}, isAutoCloseout: {isAutoCloseout}", projectId, isCloseout, isAutoCloseout);
+
             var now = _dateTimeService.DateTimeUtcNow();// DateTime.UtcNow;
 
             //Look for an active project
@@ -224,6 +226,8 @@ namespace Harvest.Core.Services
                 await _emailService.ProjectClosed(project, isAutoCloseout);
             }
 
+            Log.Information("Saving invoice changes for project {projectId}", projectId);
+
             await _dbContext.SaveChangesAsync();
 
             if (newInvoice != null)
@@ -244,6 +248,8 @@ namespace Harvest.Core.Services
             var counter = 0;
             foreach (var activeProject in activeProjects)
             {
+                Log.Information("Processing active project {projectId}", activeProject.Id);
+
                 if (!(await CreateInvoice(activeProject.Id, manualOverride)).IsError)
                 {
                     //Log something if invoice created?
