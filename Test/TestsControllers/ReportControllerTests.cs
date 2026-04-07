@@ -59,7 +59,7 @@ namespace Test.TestsControllers
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("AllProjects", countAdjustment + 1);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("HistoricalRateActivity", countAdjustment + 1);
             ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("StaleProjects", countAdjustment + 1);
-            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("UnbilledExpenses", countAdjustment + 1);
+            ControllerReflection.MethodExpectedAttribute<AsyncStateMachineAttribute>("ProjectsUnbilledExpenses", countAdjustment + 1);
         }
     }
 }

@@ -7,15 +7,15 @@ using System.Linq.Expressions;
 
 namespace Harvest.Web.Models.ReportModels
 {
-    public class UnbilledExpensesReportModel
+    public class ProjectsUnbilledExpensesReportModel
     {
-        public List<UnbilledExpenseProjectReportRowModel> Projects { get; set; } = new();
+        public List<ProjectsUnbilledExpensesProjectRowModel> Projects { get; set; } = new();
 
         public string TeamName { get; set; }
         public string Slug { get; set; }
     }
 
-    public class UnbilledExpenseProjectReportRowModel
+    public class ProjectsUnbilledExpensesProjectRowModel
     {
         [Display(Name = "Project Id")]
         public int ProjectId { get; set; }
@@ -38,9 +38,9 @@ namespace Harvest.Web.Models.ReportModels
         [Display(Name = "Exceeds Remaining Quote")]
         public bool WillExceedRemainingQuote { get; set; }
 
-        public static Expression<Func<Project, UnbilledExpenseProjectReportRowModel>> Projection()
+        public static Expression<Func<Project, ProjectsUnbilledExpensesProjectRowModel>> Projection()
         {
-            return project => new UnbilledExpenseProjectReportRowModel
+            return project => new ProjectsUnbilledExpensesProjectRowModel
             {
                 ProjectId = project.Id,
                 ProjectName = project.Name,

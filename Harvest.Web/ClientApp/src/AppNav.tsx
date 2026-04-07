@@ -141,8 +141,8 @@ export const AppNav = () => {
                         >
                           Reports - Historical Rate Activity
                         </DropdownItem>
-                        <DropdownItem href={`/${team}/Report/UnbilledExpenses`}>
-                          Reports - Unbilled Expenses
+                        <DropdownItem href={`/${team}/Report/ProjectsUnbilledExpenses`}>
+                          Reports - Projects Unbilled Expenses
                         </DropdownItem>
                         <DropdownItem href={`/${team}/Report/StaleProjects`}>
                           Reports - Stale Projects

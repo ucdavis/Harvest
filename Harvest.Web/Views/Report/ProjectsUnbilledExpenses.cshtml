@@ -1,16 +1,16 @@
-@model Harvest.Web.Models.ReportModels.UnbilledExpensesReportModel
+@model Harvest.Web.Models.ReportModels.ProjectsUnbilledExpensesReportModel
 @{
-    ViewData["Title"] = "Unbilled Expenses";
+    ViewData["Title"] = "Projects Unbilled Expenses";
 }
 
 <div>
     <div>
-        <h1>Approved Unbilled Expenses for Team: @Model.TeamName</h1>
+        <h1>Project's Approved Unbilled Expenses for Team: @Model.TeamName</h1>
         <p>This report shows approved unbilled expenses summarized at the project level.</p>
     </div>
 </div>
 
-<table id="unbilled-expenses-report" class="table harvest-table">
+<table id="projects-unbilled-expenses-report" class="table harvest-table">
     <thead>
         <tr>
             <th>Project</th>
@@ -66,7 +66,7 @@
     }
 
     <script type="text/javascript">
-        var table = $('#unbilled-expenses-report').DataTable({
+        var table = $('#projects-unbilled-expenses-report').DataTable({
             "dom": 'lBfrtip',
             columnDefs: [{
                 type: "num-fmt",

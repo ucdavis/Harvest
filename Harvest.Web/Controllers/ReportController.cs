@@ -121,7 +121,7 @@ namespace Harvest.Web.Controllers
 
         }
 
-        public async Task<IActionResult> UnbilledExpenses()
+        public async Task<IActionResult> ProjectsUnbilledExpenses()
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
 
@@ -131,7 +131,7 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var model = new UnbilledExpensesReportModel
+            var model = new ProjectsUnbilledExpensesReportModel
             {
                 TeamName = team.Name,
                 Slug = team.Slug,
@@ -140,7 +140,7 @@ namespace Harvest.Web.Controllers
                     .Where(a => a.TeamId == team.Id && a.Expenses.Any(e => e.InvoiceId == null && e.Approved))
                     .OrderBy(a => a.Name)
                     .ThenBy(a => a.Id)
-                    .Select(UnbilledExpenseProjectReportRowModel.Projection())
+                    .Select(ProjectsUnbilledExpensesProjectRowModel.Projection())
                     .ToListAsync()
             };
 
