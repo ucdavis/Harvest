@@ -263,7 +263,7 @@ namespace Harvest.Core.Services
                 {
                     // Each project is independent, so clear tracked entities between iterations
                     // to avoid carrying forward large graphs and duplicate entity instances.
-                    _dbContext.ChangeTracker.Clear();
+                    _dbContext.ChangeTracker?.Clear();
                 }
             }
 
