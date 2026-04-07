@@ -241,19 +241,29 @@ namespace Harvest.Core.Services
 
         public async Task<int> CreateInvoices(bool manualOverride = false)
         {
-            var activeProjects = await _dbContext.Projects
-                .Include(p => p.PrincipalInvestigator)
+            var activeProjectIds = await _dbContext.Projects
+                .AsNoTracking()
                 .Where(a => a.IsActive && a.Status == Project.Statuses.Active && a.Accounts.Any())
+                .Select(a => a.Id)
                 .ToListAsync();
             var counter = 0;
-            foreach (var activeProject in activeProjects)
+            foreach (var activeProjectId in activeProjectIds)
             {
-                Log.Information("Processing active project {projectId}", activeProject.Id);
+                Log.Information("Processing active project {projectId}", activeProjectId);
 
-                if (!(await CreateInvoice(activeProject.Id, manualOverride)).IsError)
+                try
                 {
-                    //Log something if invoice created?
-                    counter++;
+                    if (!(await CreateInvoice(activeProjectId, manualOverride)).IsError)
+                    {
+                        //Log something if invoice created?
+                        counter++;
+                    }
+                }
+                finally
+                {
+                    // Each project is independent, so clear tracked entities between iterations
+                    // to avoid carrying forward large graphs and duplicate entity instances.
+                    _dbContext.ChangeTracker.Clear();
                 }
             }
 

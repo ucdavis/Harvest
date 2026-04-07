@@ -797,30 +797,30 @@ namespace Harvest.Core.Services
         }
 
         /// <summary>
+        /// Loads a detached project graph for email rendering so we don't merge
+        /// no-tracking users and permissions back into tracked project entities.
+        /// </summary>
+        private async Task<Project> LoadProjectEmailData(int projectId)
+        {
+            return await _dbContext.Projects
+                .AsNoTracking()
+                .AsSplitQuery()
+                .Include(a => a.PrincipalInvestigator)
+                .Include(a => a.Accounts)
+                .Include(a => a.Team)
+                .Include(a => a.ProjectPermissions)
+                    .ThenInclude(a => a.User)
+                .SingleAsync(a => a.Id == projectId);
+        }
+
+        /// <summary>
         /// Gets missing info if it wasn't included in the initial call
         /// </summary>
         /// <param name="invoice"></param>
         /// <returns></returns>
         private async Task<Project> CheckForMissingDataForInvoice(Invoice invoice)
         {
-            var project = invoice.Project;
-            if (project == null || project.PrincipalInvestigator == null || project.Accounts == null)
-            {
-                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
-                    .SingleAsync(a => a.Id == invoice.ProjectId);
-            }
-            if (project.Team == null)
-            {
-                project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
-            }
-
-            if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
-            {
-                project.ProjectPermissions = await _dbContext.ProjectPermissions.Include(a => a.User).AsNoTracking()
-                    .Where(a => a.ProjectId == project.Id).ToListAsync();
-            }
-
-            return project;
+            return await LoadProjectEmailData(invoice.ProjectId);
         }
 
         private async Task<Project> CheckForMissingDataForProject(Project project)
@@ -830,25 +830,7 @@ namespace Harvest.Core.Services
                 throw new Exception("Project is null");
             }
 
-            if (project.PrincipalInvestigator == null || project.Accounts == null)
-            {
-                project = await _dbContext.Projects.AsNoTracking().Include(a => a.PrincipalInvestigator).Include(a => a.Accounts)
-                    .SingleAsync(a => a.Id == project.Id);
-            }
-
-            if(project.Team == null)
-            {
-                project.Team = await _dbContext.Teams.AsNoTracking().SingleAsync(a => a.Id == project.TeamId);
-            }
-
-            //I don't know if the null check would find it, so populate this.
-            if(project.ProjectPermissions == null || project.ProjectPermissions.Count() <= 0)
-            {
-                project.ProjectPermissions = await _dbContext.ProjectPermissions.Include(a => a.User).AsNoTracking()
-                    .Where(a => a.ProjectId == project.Id).ToListAsync();
-            }
-
-            return project;
+            return await LoadProjectEmailData(project.Id);
         }
 
         public async Task<bool> AdhocProjectCreated(Project project)
