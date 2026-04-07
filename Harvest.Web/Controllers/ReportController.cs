@@ -157,19 +157,27 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
+            var expenses = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(a => a.Project.TeamId == team.Id && a.InvoiceId == null && a.Approved)
+                .OrderBy(a => a.Project.Name)
+                .ThenBy(a => a.ProjectId)
+                .ThenBy(a => a.CreatedOn)
+                .ThenBy(a => a.Id)
+                .Select(UnbilledExpenseRowModel.Projection())
+                .ToListAsync();
+
+            foreach (var expense in expenses)
+            {
+                expense.CreatedOnLocal = expense.CreatedOn.ToPacificTime();
+                expense.ApprovedOnLocal = expense.ApprovedOn.ToPacificTime();
+            }
+
             var model = new UnbilledExpensesReportModel
             {
                 TeamName = team.Name,
                 Slug = team.Slug,
-                Expenses = await _dbContext.Expenses
-                    .AsNoTracking()
-                    .Where(a => a.Project.TeamId == team.Id && a.InvoiceId == null && a.Approved)
-                    .OrderBy(a => a.Project.Name)
-                    .ThenBy(a => a.ProjectId)
-                    .ThenBy(a => a.CreatedOn)
-                    .ThenBy(a => a.Id)
-                    .Select(UnbilledExpenseRowModel.Projection())
-                    .ToListAsync()
+                Expenses = expenses
             };
 
             return View(model);

@@ -46,6 +46,8 @@ namespace Harvest.Web.Models.ReportModels
 
         public decimal Total { get; set; }
 
+        public DateTime CreatedOn { get; set; }
+
         [Display(Name = "Entered On")]
         [DisplayFormat(DataFormatString = "{0:g}")]
         public DateTime CreatedOnLocal { get; set; }
@@ -57,6 +59,8 @@ namespace Harvest.Web.Models.ReportModels
 
         [Display(Name = "Approved By")]
         public string ApprovedByName { get; set; }
+
+        public DateTime? ApprovedOn { get; set; }
 
         [Display(Name = "Approved On")]
         [DisplayFormat(DataFormatString = "{0:g}")]
@@ -78,11 +82,13 @@ namespace Harvest.Web.Models.ReportModels
                 RateName = expense.Rate != null ? expense.Rate.Description : string.Empty,
                 Price = expense.Price,
                 Total = expense.Total,
-                CreatedOnLocal = expense.CreatedOn.ToPacificTime(),
+                CreatedOn = expense.CreatedOn,
+                CreatedOnLocal = expense.CreatedOn,
                 CreatedByName = expense.CreatedBy != null ? expense.CreatedBy.Name : string.Empty,
                 Approved = expense.Approved,
                 ApprovedByName = expense.ApprovedBy != null ? expense.ApprovedBy.Name : string.Empty,
-                ApprovedOnLocal = expense.ApprovedOn.ToPacificTime()
+                ApprovedOn = expense.ApprovedOn,
+                ApprovedOnLocal = expense.ApprovedOn
             };
         }
     }
