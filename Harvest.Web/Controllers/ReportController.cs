@@ -47,7 +47,7 @@ namespace Harvest.Web.Controllers
             {
                 start = new(DateTime.Now.Year - 1, 1, 1);
             }
-            
+
             if (!end.HasValue)
             {
                 end = new DateTime(DateTime.Now.Year - 1, 12, 31);
@@ -119,6 +119,32 @@ namespace Harvest.Web.Controllers
 
             return View(model);
 
+        }
+
+        public async Task<IActionResult> UnbilledExpenses()
+        {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = new UnbilledExpensesReportModel
+            {
+                TeamName = team.Name,
+                Slug = team.Slug,
+                Projects = await _dbContext.Projects
+                    .AsNoTracking()
+                    .Where(a => a.TeamId == team.Id && a.Expenses.Any(e => e.InvoiceId == null && e.Approved))
+                    .OrderBy(a => a.Name)
+                    .ThenBy(a => a.Id)
+                    .Select(UnbilledExpenseProjectReportRowModel.Projection())
+                    .ToListAsync()
+            };
+
+            return View(model);
         }
     }
 }
