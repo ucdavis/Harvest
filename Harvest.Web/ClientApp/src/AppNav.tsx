@@ -43,7 +43,7 @@ export const AppNav = () => {
   const nonTeamPage =
     firstPath === "system" || firstPath === "project" || firstPath === "team";
   const teamAdminRoles: RoleName[] = ["FieldManager", "Supervisor", "Finance"];
-  const teamReportRoles: RoleName[] = ["FieldManager", "Finance"];
+  const teamReportRoles: RoleName[] = ["FieldManager", "Supervisor", "Finance"];
 
   const toggle = () => setIsOpen(!isOpen);
 
@@ -143,27 +143,37 @@ export const AppNav = () => {
                       Team Reports
                     </DropdownToggle>
                     <DropdownMenu end>
-                      <DropdownItem href={`/${team}/Report/AllProjects`}>
-                        Projects
-                      </DropdownItem>
-                      <DropdownItem href={`/${team}/Report/StaleProjects`}>
-                        Stale Projects
-                      </DropdownItem>
+                      <ShowFor roles={["FieldManager", "Finance"]}>
+                        <DropdownItem href={`/${team}/Report/AllProjects`}>
+                          Projects
+                        </DropdownItem>
+                        <DropdownItem href={`/${team}/Report/StaleProjects`}>
+                          Stale Projects
+                        </DropdownItem>
 
-                      <DropdownItem
-                        href={`/${team}/Report/ProjectsUnbilledExpenses`}
-                      >
-                        Projects Unbilled Expenses
-                      </DropdownItem>
-                      <DropdownItem href={`/${team}/Report/UnbilledExpenses`}>
-                        Unbilled Expenses
-                      </DropdownItem>
-                      <DropdownItem divider />
-                      <DropdownItem
-                        href={`/${team}/Report/HistoricalRateActivity`}
-                      >
-                        Historical Rate Activity
-                      </DropdownItem>
+                        <DropdownItem
+                          href={`/${team}/Report/ProjectsUnbilledExpenses`}
+                        >
+                          Projects Unbilled Expenses
+                        </DropdownItem>
+                        <DropdownItem href={`/${team}/Report/UnbilledExpenses`}>
+                          Unbilled Expenses
+                        </DropdownItem>
+                        <DropdownItem divider />
+                        <DropdownItem
+                          href={`/${team}/Report/HistoricalRateActivity`}
+                        >
+                          Historical Rate Activity
+                        </DropdownItem>
+                      </ShowFor>
+                      <ShowFor roles={["FieldManager", "Supervisor"]}>
+                        <ShowFor roles={["FieldManager", "Finance"]}>
+                          <DropdownItem divider />
+                        </ShowFor>
+                        <DropdownItem href={`/${team}/Report/WeeklyHoursByWorker`}>
+                          Weekly Hours by Worker
+                        </DropdownItem>
+                      </ShowFor>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </ShowFor>

@@ -1,38 +1,43 @@
-﻿using Harvest.Core.Data;
+using Harvest.Core.Data;
+using Harvest.Core.Domain;
 using Harvest.Core.Extensions;
 using Harvest.Core.Models;
+using Harvest.Core.Services;
 using Harvest.Web.Models.ReportModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Harvest.Core.Domain.Project;
 
 namespace Harvest.Web.Controllers
 {
-    [Authorize(Policy = AccessCodes.ReportAccess)]
     public class ReportController : SuperController
     {
         private readonly AppDbContext _dbContext;
+        private readonly IUserService _userService;
 
-        public ReportController(AppDbContext dbContext)
+        public ReportController(AppDbContext dbContext, IUserService userService)
         {
             _dbContext = dbContext;
+            _userService = userService;
         }
+
+        [Authorize(Policy = AccessCodes.ReportAccess)]
         public IActionResult Index()
         {
             return View();
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="start">Filter for project creation date </param>
         /// <param name="end"></param>
         /// <returns></returns>
+        [Authorize(Policy = AccessCodes.ReportAccess)]
         public async Task<IActionResult> AllProjects(DateTime? start, DateTime? end)
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -52,18 +57,22 @@ namespace Harvest.Web.Controllers
             {
                 end = new DateTime(DateTime.Now.Year - 1, 12, 31);
             }
-            var model = new ProjectsListModel();
-            model.Start = start.Value;
-            model.End = end.Value;
-            model.TeamName = team.Name;
-            model.ProjectInvoiceSummaries = await _dbContext.Projects.Include(a => a.Invoices).Include(a => a.PrincipalInvestigator)
-                .Where(a => a.TeamId == team.Id && a.CreatedOn >= start.FromPacificTime() && a.CreatedOn <= end.FromPacificTime())
-                .Select(ProjectInvoiceSummaryModel.ProjectInvoiceSummaryProjection()).ToListAsync();
+
+            var model = new ProjectsListModel
+            {
+                Start = start.Value,
+                End = end.Value,
+                TeamName = team.Name,
+                ProjectInvoiceSummaries = await _dbContext.Projects.Include(a => a.Invoices).Include(a => a.PrincipalInvestigator)
+                    .Where(a => a.TeamId == team.Id && a.CreatedOn >= start.FromPacificTime() && a.CreatedOn <= end.FromPacificTime())
+                    .Select(ProjectInvoiceSummaryModel.ProjectInvoiceSummaryProjection())
+                    .ToListAsync()
+            };
 
             return View(model);
-
         }
 
+        [Authorize(Policy = AccessCodes.ReportAccess)]
         public async Task<IActionResult> HistoricalRateActivity(DateTime? start, DateTime? end)
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -83,18 +92,21 @@ namespace Harvest.Web.Controllers
             {
                 end = new DateTime(DateTime.Now.Year - 1, 12, 31);
             }
-            var model = new HistoricalRateActivityModelList();
-            model.Start = start.Value;
-            model.End = end.Value;
-            model.TeamName = team.Name;
 
-            model.HistoricalRates = await _dbContext.Rates.Where(a => a.TeamId == team.Id).Include(a => a.Expenses)
-                .Select(HistoricalRateActivityModel.Projection(start.Value.Date.FromPacificTime(), end.Value.Date.FromPacificTime()))
-                .ToListAsync();
+            var model = new HistoricalRateActivityModelList
+            {
+                Start = start.Value,
+                End = end.Value,
+                TeamName = team.Name,
+                HistoricalRates = await _dbContext.Rates.Where(a => a.TeamId == team.Id).Include(a => a.Expenses)
+                    .Select(HistoricalRateActivityModel.Projection(start.Value.Date.FromPacificTime(), end.Value.Date.FromPacificTime()))
+                    .ToListAsync()
+            };
 
             return View(model);
         }
 
+        [Authorize(Policy = AccessCodes.ReportAccess)]
         public async Task<IActionResult> StaleProjects()
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -104,23 +116,25 @@ namespace Harvest.Web.Controllers
                 ErrorMessage = $"Team not found! Team: {TeamSlug}";
                 return RedirectToAction("Index", "Home");
             }
+
             var staleDate = DateTime.UtcNow.AddDays(-18);
-            var statuses = new string[] { Statuses.PendingApproval, Statuses.PendingCloseoutApproval };
+            var statuses = new[] { Statuses.PendingApproval, Statuses.PendingCloseoutApproval };
 
-            var model = new StaleProjectsListModel();
-            model.TeamName = team.Name;
-            model.StaleProjects = await _dbContext.Projects
-                .Include(a => a.PrincipalInvestigator)
-                .Include(a => a.Team)
-                .Where(a => a.TeamId == team.Id && statuses.Contains(a.Status) && a.LastStatusUpdatedOn <= staleDate)
-                .Select(StaleProjectModel.Projection())
-                .ToListAsync();
-
+            var model = new StaleProjectsListModel
+            {
+                TeamName = team.Name,
+                StaleProjects = await _dbContext.Projects
+                    .Include(a => a.PrincipalInvestigator)
+                    .Include(a => a.Team)
+                    .Where(a => a.TeamId == team.Id && statuses.Contains(a.Status) && a.LastStatusUpdatedOn <= staleDate)
+                    .Select(StaleProjectModel.Projection())
+                    .ToListAsync()
+            };
 
             return View(model);
-
         }
 
+        [Authorize(Policy = AccessCodes.ReportAccess)]
         public async Task<IActionResult> ProjectsUnbilledExpenses()
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -147,6 +161,7 @@ namespace Harvest.Web.Controllers
             return View(model);
         }
 
+        [Authorize(Policy = AccessCodes.ReportAccess)]
         public async Task<IActionResult> UnbilledExpenses()
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
@@ -181,6 +196,119 @@ namespace Harvest.Web.Controllers
             };
 
             return View(model);
+        }
+
+        [Authorize(Policy = AccessCodes.SupervisorAccess)]
+        public async Task<IActionResult> WeeklyHoursByWorker(DateTime? selectedDate, DateTime? start, DateTime? end, string selectedRateType)
+        {
+            var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
+
+            if (team == null)
+            {
+                ErrorMessage = $"Team not found! Team: {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (selectedDate.HasValue)
+            {
+                var selectedWeek = GetWeekRangeForPacificDate(selectedDate.Value.Date);
+                start = selectedWeek.Start;
+                end = selectedWeek.End;
+            }
+            else if (!start.HasValue || !end.HasValue)
+            {
+                var defaultRange = GetMostRecentCompletedWeekRange();
+                start = defaultRange.Start;
+                end = defaultRange.End;
+            }
+
+            var currentUser = await _userService.GetCurrentUser();
+            var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.System });
+
+            var workerPermissionsQuery = _dbContext.Permissions
+                .AsNoTracking()
+                .Where(a => a.TeamId == team.Id && a.Role.Name == Role.Codes.Worker);
+
+            if (!isFieldManager)
+            {
+                workerPermissionsQuery = workerPermissionsQuery.Where(a =>
+                    a.Parents.Any(p =>
+                        p.UserId == currentUser.Id &&
+                        p.TeamId == team.Id &&
+                        (p.Role.Name == Role.Codes.Supervisor || p.Role.Name == Role.Codes.FieldManager)));
+            }
+
+            var workerIds = await workerPermissionsQuery
+                .Select(a => a.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            var availableRateTypes = Rate.Types.TypeList.ToList();
+            var useAllRateTypes = string.IsNullOrWhiteSpace(selectedRateType)
+                || string.Equals(selectedRateType, "All", StringComparison.OrdinalIgnoreCase)
+                || !availableRateTypes.Contains(selectedRateType);
+
+            var startUtc = start.Value.Date.FromPacificTime();
+            var endUtcExclusive = end.Value.Date.AddDays(1).FromPacificTime();
+
+            var entries = await _dbContext.Expenses
+                .AsNoTracking()
+                .Where(a =>
+                    a.Project.TeamId == team.Id &&
+                    a.CreatedById.HasValue &&
+                    workerIds.Contains(a.CreatedById.Value) &&
+                    a.CreatedOn >= startUtc &&
+                    a.CreatedOn < endUtcExclusive &&
+                    a.Rate.Unit == "Hourly" &&
+                    (useAllRateTypes || a.Rate.Type == selectedRateType))
+                .OrderBy(a => a.CreatedBy.LastName)
+                .ThenBy(a => a.CreatedBy.FirstName)
+                .ThenBy(a => a.CreatedOn)
+                .ThenBy(a => a.Project.Name)
+                .ThenBy(a => a.Id)
+                .Select(WeeklyHoursByWorkerRowModel.Projection())
+                .ToListAsync();
+
+            foreach (var entry in entries)
+            {
+                entry.EnteredOnLocal = entry.EnteredOnLocal.ToPacificTime();
+            }
+
+            var model = new WeeklyHoursByWorkerReportModel
+            {
+                SelectedDate = start.Value.Date,
+                Start = start.Value.Date,
+                End = end.Value.Date,
+                SelectedRateType = useAllRateTypes ? "All" : selectedRateType,
+                AvailableRateTypes = availableRateTypes,
+                TeamName = team.Name,
+                Slug = team.Slug,
+                Workers = entries
+                    .GroupBy(a => a.WorkerName)
+                    .Select(a => new WeeklyHoursByWorkerWorkerGroupModel
+                    {
+                        WorkerName = a.Key,
+                        Entries = a.ToList()
+                    })
+                    .ToList()
+            };
+
+            return View(model);
+        }
+
+        private static (DateTime Start, DateTime End) GetMostRecentCompletedWeekRange()
+        {
+            var today = DateTime.UtcNow.ToPacificTime().Date;
+            var currentWeekStart = GetWeekRangeForPacificDate(today).Start;
+
+            return (currentWeekStart.AddDays(-7), currentWeekStart.AddDays(-1));
+        }
+
+        private static (DateTime Start, DateTime End) GetWeekRangeForPacificDate(DateTime date)
+        {
+            var daysSinceMonday = ((int)date.DayOfWeek - (int)DayOfWeek.Monday + 7) % 7;
+            var start = date.AddDays(-daysSinceMonday);
+            return (start, start.AddDays(6));
         }
     }
 }
