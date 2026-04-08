@@ -199,7 +199,7 @@ namespace Harvest.Web.Controllers
         }
 
         [Authorize(Policy = AccessCodes.SupervisorAccess)]
-        public async Task<IActionResult> WeeklyHoursByWorker(DateTime? selectedDate, DateTime? start, DateTime? end, string selectedRateType)
+        public async Task<IActionResult> WeeklyHoursByWorker(DateTime? selectedDate, string selectedRateType)
         {
             var team = await _dbContext.Teams.SingleOrDefaultAsync(t => t.Slug == TeamSlug);
 
@@ -209,18 +209,9 @@ namespace Harvest.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (selectedDate.HasValue)
-            {
-                var selectedWeek = GetWeekRangeForPacificDate(selectedDate.Value.Date);
-                start = selectedWeek.Start;
-                end = selectedWeek.End;
-            }
-            else if (!start.HasValue || !end.HasValue)
-            {
-                var defaultRange = GetMostRecentCompletedWeekRange();
-                start = defaultRange.Start;
-                end = defaultRange.End;
-            }
+            var selectedWeek = selectedDate.HasValue
+                ? GetWeekRangeForPacificDate(selectedDate.Value.Date)
+                : GetMostRecentCompletedWeekRange();
 
             var currentUser = await _userService.GetCurrentUser();
             var isFieldManager = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager, Role.Codes.System });
@@ -248,8 +239,8 @@ namespace Harvest.Web.Controllers
                 || string.Equals(selectedRateType, "All", StringComparison.OrdinalIgnoreCase)
                 || !availableRateTypes.Contains(selectedRateType);
 
-            var startUtc = start.Value.Date.FromPacificTime();
-            var endUtcExclusive = end.Value.Date.AddDays(1).FromPacificTime();
+            var startUtc = selectedWeek.Start.Date.FromPacificTime();
+            var endUtcExclusive = selectedWeek.End.Date.AddDays(1).FromPacificTime();
 
             var entries = await _dbContext.Expenses
                 .AsNoTracking()
@@ -276,9 +267,9 @@ namespace Harvest.Web.Controllers
 
             var model = new WeeklyHoursByWorkerReportModel
             {
-                SelectedDate = start.Value.Date,
-                Start = start.Value.Date,
-                End = end.Value.Date,
+                SelectedDate = selectedWeek.Start,
+                Start = selectedWeek.Start,
+                End = selectedWeek.End,
                 SelectedRateType = useAllRateTypes ? "All" : selectedRateType,
                 AvailableRateTypes = availableRateTypes,
                 TeamName = team.Name,
