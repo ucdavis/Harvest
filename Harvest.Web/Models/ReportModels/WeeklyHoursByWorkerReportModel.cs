@@ -19,7 +19,7 @@ namespace Harvest.Web.Models.ReportModels
         public DateTime End { get; set; }
 
         [Display(Name = "Rate Type")]
-        public string SelectedRateType { get; set; } = "All";
+        public string SelectedRateType { get; set; } = Rate.Types.Labor;
 
         public List<string> AvailableRateTypes { get; set; } = new();
 

@@ -234,10 +234,11 @@ namespace Harvest.Web.Controllers
                 .Distinct()
                 .ToListAsync();
 
-            var availableRateTypes = Rate.Types.TypeList.ToList();
-            var useAllRateTypes = string.IsNullOrWhiteSpace(selectedRateType)
-                || string.Equals(selectedRateType, "All", StringComparison.OrdinalIgnoreCase)
-                || !availableRateTypes.Contains(selectedRateType);
+            var availableRateTypes = Rate.Types.WorkerRateTypes.ToList();
+            var useAllRateTypes = string.Equals(selectedRateType, "All", StringComparison.OrdinalIgnoreCase);
+            var activeSelectedRateType = useAllRateTypes || availableRateTypes.Contains(selectedRateType)
+                ? selectedRateType
+                : Rate.Types.Labor;
 
             var startUtc = selectedWeek.Start.Date.FromPacificTime();
             var endUtcExclusive = selectedWeek.End.Date.AddDays(1).FromPacificTime();
@@ -251,7 +252,7 @@ namespace Harvest.Web.Controllers
                     a.CreatedOn >= startUtc &&
                     a.CreatedOn < endUtcExclusive &&
                     a.Rate.Unit == "Hourly" &&
-                    (useAllRateTypes || a.Rate.Type == selectedRateType))
+                    (useAllRateTypes || a.Rate.Type == activeSelectedRateType))
                 .OrderBy(a => a.CreatedBy.LastName)
                 .ThenBy(a => a.CreatedBy.FirstName)
                 .ThenBy(a => a.CreatedOn)
@@ -270,7 +271,7 @@ namespace Harvest.Web.Controllers
                 SelectedDate = selectedWeek.Start,
                 Start = selectedWeek.Start,
                 End = selectedWeek.End,
-                SelectedRateType = useAllRateTypes ? "All" : selectedRateType,
+                SelectedRateType = useAllRateTypes ? "All" : activeSelectedRateType,
                 AvailableRateTypes = availableRateTypes,
                 TeamName = team.Name,
                 Slug = team.Slug,
