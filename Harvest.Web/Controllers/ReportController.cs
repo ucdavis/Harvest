@@ -251,7 +251,6 @@ namespace Harvest.Web.Controllers
                     workerIds.Contains(a.CreatedById.Value) &&
                     a.CreatedOn >= startUtc &&
                     a.CreatedOn < endUtcExclusive &&
-                    a.Rate.Unit == "Hourly" &&
                     (useAllRateTypes || a.Rate.Type == activeSelectedRateType))
                 .OrderBy(a => a.CreatedBy.LastName)
                 .ThenBy(a => a.CreatedBy.FirstName)

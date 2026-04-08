@@ -58,6 +58,12 @@ namespace Harvest.Web.Models.ReportModels
         [Display(Name = "Hours")]
         public decimal Hours { get; set; }
 
+        [Display(Name = "Quantity")]
+        public decimal? NonHourlyQuantity { get; set; }
+
+        [Display(Name = "Unit")]
+        public string NonHourlyUnit { get; set; }
+
         public static Expression<Func<Expense, WeeklyHoursByWorkerRowModel>> Projection()
         {
             return expense => new WeeklyHoursByWorkerRowModel
@@ -70,7 +76,9 @@ namespace Harvest.Web.Models.ReportModels
                 Type = expense.Type,
                 Description = expense.Description,
                 Approved = expense.Approved,
-                Hours = expense.Quantity
+                Hours = expense.Rate != null && expense.Rate.Unit == "Hourly" ? expense.Quantity : 0,
+                NonHourlyQuantity = expense.Rate != null && expense.Rate.Unit == "Hourly" ? null : expense.Quantity,
+                NonHourlyUnit = expense.Rate != null && expense.Rate.Unit == "Hourly" ? string.Empty : expense.Rate.Unit
             };
         }
     }

@@ -6,7 +6,7 @@
 <div>
     <div>
         <h1>Weekly Hours by Worker for Team: @Model.TeamName</h1>
-        <p>This report shows hourly entries created by workers for the selected timeframe.</p>
+        <p>This report shows worker entries for the selected timeframe, with hours separated from non-hourly quantities.</p>
     </div>
     <div>
         <form asp-action="WeeklyHoursByWorker" method="get">
@@ -52,13 +52,17 @@
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Description)</th>
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Approved)</th>
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Hours)</th>
+            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].NonHourlyQuantity)</th>
+            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].NonHourlyUnit)</th>
         </tr>
     </thead>
     <tbody>
         @if (!Model.Workers.Any())
         {
             <tr>
-                <td>No hourly worker entries found for this timeframe.</td>
+                <td>No worker entries found for this timeframe.</td>
+                <td></td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -87,6 +91,8 @@
                         <td>@Html.DisplayFor(modelItem => item.Description)</td>
                         <td>@(item.Approved ? "Yes" : "No")</td>
                         <td>@Html.DisplayFor(modelItem => item.Hours)</td>
+                        <td>@Html.DisplayFor(modelItem => item.NonHourlyQuantity)</td>
+                        <td>@Html.DisplayFor(modelItem => item.NonHourlyUnit)</td>
                     </tr>
                 }
                 <tr class="table-secondary font-weight-bold">
@@ -98,6 +104,8 @@
                     <td></td>
                     <td></td>
                     <td>@worker.TotalHours</td>
+                    <td></td>
+                    <td></td>
                 </tr>
             }
         }
@@ -191,7 +199,7 @@
             },
             {
                 type: "num-fmt",
-                targets: [7]
+                targets: [7, 8]
             }],
             buttons: [
                 {
