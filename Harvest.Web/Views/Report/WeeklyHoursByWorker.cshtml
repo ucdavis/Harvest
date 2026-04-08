@@ -50,6 +50,7 @@
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Activity)</th>
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Type)</th>
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Approved)</th>
             <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Hours)</th>
         </tr>
     </thead>
@@ -58,6 +59,7 @@
         {
             <tr>
                 <td>No hourly worker entries found for this timeframe.</td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -83,11 +85,13 @@
                         <td>@Html.DisplayFor(modelItem => item.Activity)</td>
                         <td>@Html.DisplayFor(modelItem => item.Type)</td>
                         <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                        <td>@(item.Approved ? "Yes" : "No")</td>
                         <td>@Html.DisplayFor(modelItem => item.Hours)</td>
                     </tr>
                 }
                 <tr class="table-secondary font-weight-bold">
                     <td>Subtotal for @worker.WorkerName</td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -118,7 +122,7 @@
 
     <script type="text/javascript">
         var reportDateRange = '@($"{Model.Start:yyyyMMdd}-to-{Model.End:yyyyMMdd}")';
-        var reportFileName = 'WeeklyHoursByWorker-' + reportDateRange;
+        var reportFileName = 'WeeklyHoursByWorker(' + reportDateRange + ')';
         var selectedDateInput = document.getElementById('selectedDate');
         var selectedDateRangePreview = document.getElementById('selectedDateRangePreview');
 
@@ -187,7 +191,7 @@
             },
             {
                 type: "num-fmt",
-                targets: [6]
+                targets: [7]
             }],
             buttons: [
                 {

@@ -53,6 +53,7 @@ namespace Harvest.Web.Models.ReportModels
         public string Activity { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
+        public bool Approved { get; set; }
 
         [Display(Name = "Hours")]
         public decimal Hours { get; set; }
@@ -68,6 +69,7 @@ namespace Harvest.Web.Models.ReportModels
                 Activity = expense.Activity,
                 Type = expense.Type,
                 Description = expense.Description,
+                Approved = expense.Approved,
                 Hours = expense.Quantity
             };
         }

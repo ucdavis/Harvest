@@ -30,7 +30,7 @@
     return pathSegments.length > 0 ? pathSegments[0] : 'unknown-team';
     },
     getExportFileName: function (reportName) {
-    var safeReportName = (reportName || 'Report').replace(/[^A-Za-z0-9_-]/g, '');
+    var safeReportName = (reportName || 'Report').replace(/[^A-Za-z0-9_() -]/g, '').replace(/\s+/g, '');
     return 'Harvest-' + this.getTeamSlug() + '-' + safeReportName + '-' + this.getExportTimestamp();
     },
     createHtml5ExportButton: function (extend, reportName) {
