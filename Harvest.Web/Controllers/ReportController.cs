@@ -275,10 +275,11 @@ namespace Harvest.Web.Controllers
                 TeamName = team.Name,
                 Slug = team.Slug,
                 Workers = entries
-                    .GroupBy(a => a.WorkerName)
+                    .GroupBy(a => new { a.WorkerId, a.WorkerName })
                     .Select(a => new WeeklyHoursByWorkerWorkerGroupModel
                     {
-                        WorkerName = a.Key,
+                        WorkerId = a.Key.WorkerId,
+                        WorkerName = a.Key.WorkerName,
                         Entries = a.ToList()
                     })
                     .ToList()

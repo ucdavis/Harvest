@@ -30,6 +30,7 @@ namespace Harvest.Web.Models.ReportModels
 
     public class WeeklyHoursByWorkerWorkerGroupModel
     {
+        public int WorkerId { get; set; }
         public string WorkerName { get; set; }
         public List<WeeklyHoursByWorkerRowModel> Entries { get; set; } = new();
         public decimal TotalHours => System.Linq.Enumerable.Sum(Entries, a => a.Hours);
@@ -37,6 +38,8 @@ namespace Harvest.Web.Models.ReportModels
 
     public class WeeklyHoursByWorkerRowModel
     {
+        public int WorkerId { get; set; }
+
         [Display(Name = "Worker")]
         public string WorkerName { get; set; }
 
@@ -68,6 +71,7 @@ namespace Harvest.Web.Models.ReportModels
         {
             return expense => new WeeklyHoursByWorkerRowModel
             {
+                WorkerId = expense.CreatedById.HasValue ? expense.CreatedById.Value : 0,
                 WorkerName = expense.CreatedBy != null ? expense.CreatedBy.Name : string.Empty,
                 EnteredOnLocal = expense.CreatedOn,
                 ProjectId = expense.ProjectId,
