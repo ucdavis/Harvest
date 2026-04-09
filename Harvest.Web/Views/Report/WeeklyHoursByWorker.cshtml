@@ -85,7 +85,7 @@
                                 <td>@worker.WorkerName</td>
                                 <td>@Html.DisplayFor(modelItem => item.EnteredOnLocal)</td>
                                 <td>
-                                    <a href=@($"/{Model.Slug}/project/details/{item.ProjectId}") target="_blank">
+                                    <a href="@($"/{Model.Slug}/project/details/{item.ProjectId}")" target="_blank" rel="noopener noreferrer">
                                         @item.ProjectName (@item.ProjectId)
                                     </a>
                                 </td>
