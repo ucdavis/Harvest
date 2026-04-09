@@ -6,7 +6,8 @@
 <div>
     <div>
         <h1>Weekly Hours by Worker for Team: @Model.TeamName</h1>
-        <p>This report shows worker entries for the selected timeframe, with hours separated from non-hourly quantities.</p>
+        <p>This report shows worker entries for the selected timeframe, with hours separated from non-hourly quantities.
+        </p>
     </div>
     <div>
         <form asp-action="WeeklyHoursByWorker" method="get">
@@ -15,206 +16,207 @@
                 <div class="form-group col-sm-6 col-md-4 col-lg-3">
                     <label asp-for="SelectedDate" class="control-label"></label>
                     <input asp-for="SelectedDate" type="date" class="form-control" />
-                    <small class="form-text text-muted">Pick any day and the report will use that full Pacific Time week, Monday through Sunday.</small>
-                    <small id="selectedDateRangePreview" class="form-text text-muted">
-                        Report week: @Model.Start.ToString("MMM d, yyyy") - @Model.End.ToString("MMM d, yyyy") (Pacific Time)
-                    </small>
-                    <span asp-validation-for="SelectedDate" class="text-danger"></span>
+                    <small class="form-text text-muted">The date picked will use the week, Monday through
+                        Sunday.</small>
+                        <small id="selectedDateRangePreview" class="form-text text-muted">
+                            Report week: @Model.Start.ToString("MMM d, yyyy") - @Model.End.ToString("MMM d, yyyy")
+                        </small>
+                        <span asp-validation-for="SelectedDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-sm-6 col-md-4 col-lg-3">
+                        <label asp-for="SelectedRateType" class="control-label"></label>
+                        <select asp-for="SelectedRateType" class="form-control">
+                            <option value="All">All</option>
+                            @foreach (var rateType in Model.AvailableRateTypes)
+                            {
+                                <option value="@rateType">@rateType</option>
+                            }
+                        </select>
+                        <span asp-validation-for="SelectedRateType" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="form-group col-sm-6 col-md-4 col-lg-3">
-                    <label asp-for="SelectedRateType" class="control-label"></label>
-                    <select asp-for="SelectedRateType" class="form-control">
-                        <option value="All">All</option>
-                        @foreach (var rateType in Model.AvailableRateTypes)
-                        {
-                            <option value="@rateType">@rateType</option>
-                        }
-                    </select>
-                    <span asp-validation-for="SelectedRateType" class="text-danger"></span>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-accent btn-sm"><i class="fas fa-sync-alt fa-sm"></i> Refresh Report</button>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-accent btn-sm"><i class="fas fa-sync-alt fa-sm"></i> Refresh
+                        Report</button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-</div>
+        </div>
 
-<table id="weekly-hours-by-worker-report" class="table harvest-table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].WorkerName)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].EnteredOnLocal)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].ProjectName)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Activity)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Type)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Description)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Approved)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Hours)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].NonHourlyQuantity)</th>
-            <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].NonHourlyUnit)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (!Model.Workers.Any())
-        {
-            <tr>
-                <td>No worker entries found for this timeframe.</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-        }
-        else
-        {
-            @foreach (var worker in Model.Workers)
-            {
-                @foreach (var item in worker.Entries)
+        <table id="weekly-hours-by-worker-report" class="table harvest-table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].WorkerName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].EnteredOnLocal)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].ProjectName)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Activity)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Type)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Description)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Approved)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].Hours)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].NonHourlyQuantity)</th>
+                    <th>@Html.DisplayNameFor(model => model.Workers[0].Entries[0].NonHourlyUnit)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Workers.Any())
                 {
                     <tr>
-                        <td>@worker.WorkerName</td>
-                        <td>@Html.DisplayFor(modelItem => item.EnteredOnLocal)</td>
-                        <td>
-                            <a href=@($"/{Model.Slug}/project/details/{item.ProjectId}") target="_blank">
-                                @item.ProjectName (@item.ProjectId)
-                            </a>
-                        </td>
-                        <td>@Html.DisplayFor(modelItem => item.Activity)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Type)</td>
-                        <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                        <td>@(item.Approved ? "Yes" : "No")</td>
-                        <td>@Html.DisplayFor(modelItem => item.Hours)</td>
-                        <td>@Html.DisplayFor(modelItem => item.NonHourlyQuantity)</td>
-                        <td>@Html.DisplayFor(modelItem => item.NonHourlyUnit)</td>
+                        <td>No worker entries found for this timeframe.</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                 }
-                <tr class="table-secondary font-weight-bold">
-                    <td>Subtotal for @worker.WorkerName</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>@worker.TotalHours</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            }
-        }
-    </tbody>
-</table>
-
-@section Styles
-{
-    @{
-        await Html.RenderPartialAsync("_ReportStylesPartial");
-    }
-    @{
-        await Html.RenderPartialAsync("_FaStylesPartial");
-    }
-}
-
-@section Scripts
-{
-    @{
-        await Html.RenderPartialAsync("_ReportScriptsPartial");
-    }
-
-    <script type="text/javascript">
-        var reportDateRange = '@($"{Model.Start:yyyyMMdd}-to-{Model.End:yyyyMMdd}")';
-        var reportFileName = 'WeeklyHoursByWorker(' + reportDateRange + ')';
-        var selectedDateInput = document.getElementById('SelectedDate');
-        var selectedDateRangePreview = document.getElementById('selectedDateRangePreview');
-
-        function parseDateInputValue(value) {
-            if (!value) {
-                return null;
-            }
-
-            var parts = value.split('-');
-            if (parts.length !== 3) {
-                return null;
-            }
-
-            return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-        }
-
-        function formatPreviewDate(date) {
-            return date.toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric'
-            });
-        }
-
-        function updateSelectedDateRangePreview() {
-            if (!selectedDateInput || !selectedDateRangePreview) {
-                return;
-            }
-
-            var selectedDate = parseDateInputValue(selectedDateInput.value);
-            if (!selectedDate) {
-                selectedDateRangePreview.textContent = 'Pick a day to preview the Pacific Time week range.';
-                return;
-            }
-
-            var dayOfWeek = selectedDate.getDay();
-            var daysSinceMonday = (dayOfWeek + 6) % 7;
-            var startOfWeek = new Date(selectedDate);
-            startOfWeek.setDate(selectedDate.getDate() - daysSinceMonday);
-
-            var endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-
-            selectedDateRangePreview.textContent =
-                'Report week: ' +
-                formatPreviewDate(startOfWeek) +
-                ' - ' +
-                formatPreviewDate(endOfWeek) +
-                ' (Pacific Time)';
-        }
-
-        updateSelectedDateRangePreview();
-        if (selectedDateInput) {
-            selectedDateInput.addEventListener('input', updateSelectedDateRangePreview);
-            selectedDateInput.addEventListener('change', updateSelectedDateRangePreview);
-        }
-
-        var table = $('#weekly-hours-by-worker-report').DataTable({
-            "dom": 'Bfrtip',
-            "paging": false,
-            "ordering": false,
-            "info": false,
-            columnDefs: [{
-                type: "date",
-                targets: [1]
-            },
-            {
-                type: "num-fmt",
-                targets: [7, 8]
-            }],
-            buttons: [
+                else
                 {
-                    extend: 'copyHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
+                    @foreach (var worker in Model.Workers)
+                    {
+                        @foreach (var item in worker.Entries)
+                        {
+                            <tr>
+                                <td>@worker.WorkerName</td>
+                                <td>@Html.DisplayFor(modelItem => item.EnteredOnLocal)</td>
+                                <td>
+                                    <a href=@($"/{Model.Slug}/project/details/{item.ProjectId}") target="_blank">
+                                        @item.ProjectName (@item.ProjectId)
+                                    </a>
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.Activity)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Type)</td>
+                                <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                                <td>@(item.Approved ? "Yes" : "No")</td>
+                                <td>@Html.DisplayFor(modelItem => item.Hours)</td>
+                                <td>@Html.DisplayFor(modelItem => item.NonHourlyQuantity)</td>
+                                <td>@Html.DisplayFor(modelItem => item.NonHourlyUnit)</td>
+                            </tr>
+                        }
+                        <tr class="table-secondary font-weight-bold">
+                            <td>Subtotal for @worker.WorkerName</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>@worker.TotalHours</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     }
-                },
-                window.HarvestReportExports.createHtml5ExportButton('excelHtml5', reportFileName),
-                window.HarvestReportExports.createHtml5ExportButton('csvHtml5', reportFileName),
-                {
-                    extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
+                }
+            </tbody>
+        </table>
+
+        @section Styles
+        {
+            @{
+                await Html.RenderPartialAsync("_ReportStylesPartial");
+            }
+            @{
+                await Html.RenderPartialAsync("_FaStylesPartial");
+            }
+        }
+
+        @section Scripts
+        {
+            @{
+                await Html.RenderPartialAsync("_ReportScriptsPartial");
+            }
+
+            <script type="text/javascript">
+                var reportDateRange = '@($"{Model.Start:yyyyMMdd}-to-{Model.End:yyyyMMdd}")';
+                var reportFileName = 'WeeklyHoursByWorker(' + reportDateRange + ')';
+                var selectedDateInput = document.getElementById('SelectedDate');
+                var selectedDateRangePreview = document.getElementById('selectedDateRangePreview');
+
+                function parseDateInputValue(value) {
+                    if (!value) {
+                        return null;
                     }
-                },
-            ]
-        });
-    </script>
-}
+
+                    var parts = value.split('-');
+                    if (parts.length !== 3) {
+                        return null;
+                    }
+
+                    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+                }
+
+                function formatPreviewDate(date) {
+                    return date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                }
+
+                function updateSelectedDateRangePreview() {
+                    if (!selectedDateInput || !selectedDateRangePreview) {
+                        return;
+                    }
+
+                    var selectedDate = parseDateInputValue(selectedDateInput.value);
+                    if (!selectedDate) {
+                        selectedDateRangePreview.textContent = 'Pick a day to preview the Pacific Time week range.';
+                        return;
+                    }
+
+                    var dayOfWeek = selectedDate.getDay();
+                    var daysSinceMonday = (dayOfWeek + 6) % 7;
+                    var startOfWeek = new Date(selectedDate);
+                    startOfWeek.setDate(selectedDate.getDate() - daysSinceMonday);
+
+                    var endOfWeek = new Date(startOfWeek);
+                    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+                    selectedDateRangePreview.textContent =
+                        'Report week: ' +
+                        formatPreviewDate(startOfWeek) +
+                        ' - ' +
+                        formatPreviewDate(endOfWeek);
+                }
+
+                updateSelectedDateRangePreview();
+                if (selectedDateInput) {
+                    selectedDateInput.addEventListener('input', updateSelectedDateRangePreview);
+                    selectedDateInput.addEventListener('change', updateSelectedDateRangePreview);
+                }
+
+                var table = $('#weekly-hours-by-worker-report').DataTable({
+                    "dom": 'Bfrtip',
+                    "paging": false,
+                    "ordering": false,
+                    "info": false,
+                    columnDefs: [{
+                        type: "date",
+                        targets: [1]
+                    },
+                    {
+                        type: "num-fmt",
+                        targets: [7, 8]
+                    }],
+                    buttons: [
+                        {
+                            extend: 'copyHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                                $(node).removeClass('btn-secondary')
+                            }
+                        },
+                        window.HarvestReportExports.createHtml5ExportButton('excelHtml5', reportFileName),
+                        window.HarvestReportExports.createHtml5ExportButton('csvHtml5', reportFileName),
+                        {
+                            extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                                $(node).removeClass('btn-secondary')
+                            }
+                        },
+                    ]
+                });
+            </script>
+        }
