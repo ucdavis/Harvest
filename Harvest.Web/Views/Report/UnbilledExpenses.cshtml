@@ -6,7 +6,7 @@
 <div>
     <div>
         <h1>Approved Unbilled Expenses for Team: @Model.TeamName</h1>
-        <p>This report shows approved unbilled expenses summarized at the project level.</p>
+        <p>This report shows each approved unbilled expense with its related project.</p>
     </div>
 </div>
 
@@ -14,23 +14,33 @@
     <thead>
         <tr>
             <th>Project</th>
-            <th>Total Unbilled Expenses</th>
-            <th>Project Amount Already Billed</th>
-            <th>Quote Amount</th>
-            <th>Remaining Quote</th>
-            <th>Exceeds Remaining Quote</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Activity)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Type)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Description)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Quantity)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Markup)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].IsPassthrough)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Account)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].RateName)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Price)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Total)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].CreatedByName)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].CreatedOnLocal)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].Approved)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].ApprovedByName)</th>
+            <th>@Html.DisplayNameFor(model => model.Expenses[0].ApprovedOnLocal)</th>
         </tr>
     </thead>
     <tbody>
-        @if (!Model.Projects.Any())
+        @if (!Model.Expenses.Any())
         {
             <tr>
-                <td colspan="6">No approved unbilled expenses found for this team.</td>
+                <td colspan="16">No approved unbilled expenses found for this team.</td>
             </tr>
         }
         else
         {
-            @foreach (var item in Model.Projects)
+            @foreach (var item in Model.Expenses)
             {
                 <tr>
                     <td>
@@ -38,11 +48,21 @@
                             @item.ProjectName (@item.ProjectId)
                         </a>
                     </td>
-                    <td>@item.TotalUnbilledExpenses</td>
-                    <td>@item.ProjectAmountBilled</td>
-                    <td>@item.QuoteAmount</td>
-                    <td>@item.RemainingQuote</td>
-                    <td>@(item.WillExceedRemainingQuote ? "Yes" : "No")</td>
+                    <td>@Html.DisplayFor(modelItem => item.Activity)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Type)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
+                    <td>@(item.Markup ? "Yes" : "No")</td>
+                    <td>@(item.IsPassthrough ? "Yes" : "No")</td>
+                    <td>@Html.DisplayFor(modelItem => item.Account)</td>
+                    <td>@Html.DisplayFor(modelItem => item.RateName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Price)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Total)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CreatedByName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.CreatedOnLocal)</td>
+                    <td>@(item.Approved ? "Yes" : "No")</td>
+                    <td>@Html.DisplayFor(modelItem => item.ApprovedByName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.ApprovedOnLocal)</td>
                 </tr>
             }
         }
@@ -68,9 +88,14 @@
     <script type="text/javascript">
         var table = $('#unbilled-expenses-report').DataTable({
             "dom": 'lBfrtip',
+            "order": [[0, "asc"], [11, "asc"]],
             columnDefs: [{
                 type: "num-fmt",
-                targets: [1, 2, 3, 4]
+                targets: [4, 9, 10]
+            },
+            {
+                type: "date",
+                targets: [12, 15]
             }],
             buttons: [
                 {
@@ -78,16 +103,8 @@
                         $(node).removeClass('btn-secondary')
                     }
                 },
-                {
-                    extend: 'excelHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
-                    }
-                },
-                {
-                    extend: 'csvHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
-                    }
-                },
+                window.HarvestReportExports.createHtml5ExportButton('excelHtml5', 'UnbilledExpenses'),
+                window.HarvestReportExports.createHtml5ExportButton('csvHtml5', 'UnbilledExpenses'),
                 {
                     extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
                         $(node).removeClass('btn-secondary')

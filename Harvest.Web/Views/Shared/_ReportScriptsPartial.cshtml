@@ -1,7 +1,5 @@
-<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.6.0.min.js"
-        asp-fallback-src="~/lib/jquery/jquery.js"
-        asp-fallback-test="window.jQuery"
-        crossorigin="anonymous"
+<script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.6.0.min.js" asp-fallback-src="~/lib/jquery/jquery.js"
+        asp-fallback-test="window.jQuery" crossorigin="anonymous"
         integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK">
 </script>
 
@@ -14,5 +12,39 @@
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.bootstrap4.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.3/js/buttons.print.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js"></script>
+<script type="text/javascript"
+        src="https://cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.4.0/js/responsive.bootstrap4.js"></script>
+<script type="text/javascript">
+    window.HarvestReportExports = {
+    getExportTimestamp: function () {
+    var now = new Date();
+    var pad = function (value) { return value.toString().padStart(2, '0'); };
+
+    return now.getFullYear().toString() +
+    pad(now.getMonth() + 1) +
+    pad(now.getDate())
+    },
+    getTeamSlug: function () {
+    var pathSegments = window.location.pathname.split('/').filter(Boolean);
+    return pathSegments.length > 0 ? pathSegments[0] : 'unknown-team';
+    },
+    getExportFileName: function (reportName) {
+    var safeReportName = (reportName || 'Report').replace(/[^A-Za-z0-9_() -]/g, '').replace(/\s+/g, '');
+    return 'Harvest-' + this.getTeamSlug() + '-' + safeReportName + '-' + this.getExportTimestamp();
+    },
+    createHtml5ExportButton: function (extend, reportName) {
+    var exportsHelper = this;
+    return {
+    extend: extend,
+    filename: function () {
+    return exportsHelper.getExportFileName(reportName);
+    },
+    className: 'btn-primary btn-sm',
+    init: function (api, node, config) {
+    $(node).removeClass('btn-secondary');
+    }
+    };
+    }
+    };
+</script>

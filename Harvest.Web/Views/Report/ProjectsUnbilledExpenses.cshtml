@@ -1,0 +1,91 @@
+@model Harvest.Web.Models.ReportModels.ProjectsUnbilledExpensesReportModel
+@{
+    ViewData["Title"] = "Projects Unbilled Expenses";
+}
+
+<div>
+    <div>
+        <h1>Project's Approved Unbilled Expenses for Team: @Model.TeamName</h1>
+        <p>This report shows approved unbilled expenses summarized at the project level.</p>
+    </div>
+</div>
+
+<table id="projects-unbilled-expenses-report" class="table harvest-table">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Total Unbilled Expenses</th>
+            <th>Project Amount Already Billed</th>
+            <th>Quote Amount</th>
+            <th>Remaining Quote</th>
+            <th>Exceeds Remaining Quote</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Projects.Any())
+        {
+            <tr>
+                <td colspan="6">No approved unbilled expenses found for this team.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model.Projects)
+            {
+                <tr>
+                    <td>
+                        <a href="@($"/{Model.Slug}/project/details/{item.ProjectId}")" target="_blank" rel="noopener noreferrer">
+                            @item.ProjectName (@item.ProjectId)
+                        </a>
+                    </td>
+                    <td>@item.TotalUnbilledExpenses</td>
+                    <td>@item.ProjectAmountBilled</td>
+                    <td>@item.QuoteAmount</td>
+                    <td>@item.RemainingQuote</td>
+                    <td>@(item.WillExceedRemainingQuote ? "Yes" : "No")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section Styles
+{
+    @{
+        await Html.RenderPartialAsync("_ReportStylesPartial");
+    }
+    @{
+        await Html.RenderPartialAsync("_FaStylesPartial");
+    }
+}
+
+@section Scripts
+{
+    @{
+        await Html.RenderPartialAsync("_ReportScriptsPartial");
+    }
+
+    <script type="text/javascript">
+        var table = $('#projects-unbilled-expenses-report').DataTable({
+            "dom": 'lBfrtip',
+            columnDefs: [{
+                type: "num-fmt",
+                targets: [1, 2, 3, 4]
+            }],
+            buttons: [
+                {
+                    extend: 'copyHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+                window.HarvestReportExports.createHtml5ExportButton('excelHtml5', 'ProjectsUnbilledExpenses'),
+                window.HarvestReportExports.createHtml5ExportButton('csvHtml5', 'ProjectsUnbilledExpenses'),
+                {
+                    extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
+                        $(node).removeClass('btn-secondary')
+                    }
+                },
+            ]
+        });
+    </script>
+}

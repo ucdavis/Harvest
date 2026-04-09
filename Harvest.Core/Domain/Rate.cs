@@ -114,6 +114,13 @@ namespace Harvest.Core.Domain
                 Equipment,
                 Other,
             }.ToList();
+
+            public static List<string> WorkerRateTypes = new List<string>
+            {
+                Labor,
+                Equipment,
+                Other,
+            }.ToList();
         }
     }
 }

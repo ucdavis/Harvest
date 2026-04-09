@@ -65,16 +65,8 @@
                         $(node).removeClass('btn-secondary')
                     }
                 },
-                {
-                    extend: 'excelHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
-                    }
-                },
-                {
-                    extend: 'csvHtml5', className: 'btn-primary btn-sm', init: function (api, node, config) {
-                        $(node).removeClass('btn-secondary')
-                    }
-                },
+                window.HarvestReportExports.createHtml5ExportButton('excelHtml5', 'StaleProjects'),
+                window.HarvestReportExports.createHtml5ExportButton('csvHtml5', 'StaleProjects'),
                 {
                     extend: 'print', className: 'btn-primary btn-sm', init: function (api, node, config) {
                         $(node).removeClass('btn-secondary')

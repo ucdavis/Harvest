@@ -1,21 +1,21 @@
 using Harvest.Core.Domain;
+using Harvest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace Harvest.Web.Models.ReportModels
 {
     public class UnbilledExpensesReportModel
     {
-        public List<UnbilledExpenseProjectReportRowModel> Projects { get; set; } = new();
+        public List<UnbilledExpenseRowModel> Expenses { get; set; } = new();
 
         public string TeamName { get; set; }
         public string Slug { get; set; }
     }
 
-    public class UnbilledExpenseProjectReportRowModel
+    public class UnbilledExpenseRowModel
     {
         [Display(Name = "Project Id")]
         public int ProjectId { get; set; }
@@ -23,32 +23,72 @@ namespace Harvest.Web.Models.ReportModels
         [Display(Name = "Project Name")]
         public string ProjectName { get; set; }
 
-        [Display(Name = "Total Unbilled Expenses")]
-        public decimal TotalUnbilledExpenses { get; set; }
+        public string Activity { get; set; }
 
-        [Display(Name = "Project Amount Already Billed")]
-        public decimal ProjectAmountBilled { get; set; }
+        public string Type { get; set; }
 
-        [Display(Name = "Quote Amount")]
-        public decimal QuoteAmount { get; set; }
+        public string Description { get; set; }
 
-        [Display(Name = "Remaining Quote")]
-        public decimal RemainingQuote { get; set; }
+        public decimal Quantity { get; set; }
 
-        [Display(Name = "Exceeds Remaining Quote")]
-        public bool WillExceedRemainingQuote { get; set; }
+        public bool Markup { get; set; }
 
-        public static Expression<Func<Project, UnbilledExpenseProjectReportRowModel>> Projection()
+        [Display(Name = "Pass Through")]
+        public bool IsPassthrough { get; set; }
+
+        public string Account { get; set; }
+
+        [Display(Name = "Rate")]
+        public string RateName { get; set; }
+
+        [Display(Name = "Unit Rate")]
+        public decimal Price { get; set; }
+
+        public decimal Total { get; set; }
+
+        public DateTime CreatedOn { get; set; }
+
+        [Display(Name = "Entered On")]
+        [DisplayFormat(DataFormatString = "{0:g}")]
+        public DateTime CreatedOnLocal { get; set; }
+
+        [Display(Name = "Entered By")]
+        public string CreatedByName { get; set; }
+
+        public bool Approved { get; set; }
+
+        [Display(Name = "Approved By")]
+        public string ApprovedByName { get; set; }
+
+        public DateTime? ApprovedOn { get; set; }
+
+        [Display(Name = "Approved On")]
+        [DisplayFormat(DataFormatString = "{0:g}")]
+        public DateTime? ApprovedOnLocal { get; set; }
+
+        public static Expression<Func<Expense, UnbilledExpenseRowModel>> Projection()
         {
-            return project => new UnbilledExpenseProjectReportRowModel
+            return expense => new UnbilledExpenseRowModel
             {
-                ProjectId = project.Id,
-                ProjectName = project.Name,
-                TotalUnbilledExpenses = project.Expenses.Where(a => a.InvoiceId == null && a.Approved).Sum(a => a.Total),
-                ProjectAmountBilled = project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total),
-                QuoteAmount = project.QuoteTotal,
-                RemainingQuote = project.QuoteTotal - project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total),
-                WillExceedRemainingQuote = project.Expenses.Where(a => a.InvoiceId == null && a.Approved).Sum(a => a.Total) > (project.QuoteTotal - project.Invoices.Where(a => a.Status != Invoice.Statuses.Cancelled).Sum(a => a.Total))
+                ProjectId = expense.ProjectId,
+                ProjectName = expense.Project != null ? expense.Project.Name : string.Empty,
+                Activity = expense.Activity,
+                Type = expense.Type,
+                Description = expense.Description,
+                Quantity = expense.Quantity,
+                Markup = expense.Markup,
+                IsPassthrough = expense.IsPassthrough,
+                Account = expense.Account,
+                RateName = expense.Rate != null ? expense.Rate.Description : string.Empty,
+                Price = expense.Price,
+                Total = expense.Total,
+                CreatedOn = expense.CreatedOn,
+                CreatedOnLocal = expense.CreatedOn,
+                CreatedByName = expense.CreatedBy != null ? expense.CreatedBy.Name : string.Empty,
+                Approved = expense.Approved,
+                ApprovedByName = expense.ApprovedBy != null ? expense.ApprovedBy.Name : string.Empty,
+                ApprovedOn = expense.ApprovedOn,
+                ApprovedOnLocal = expense.ApprovedOn
             };
         }
     }
