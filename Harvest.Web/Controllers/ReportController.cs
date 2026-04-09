@@ -236,7 +236,7 @@ namespace Harvest.Web.Controllers
 
             var availableRateTypes = Rate.Types.WorkerRateTypes.ToList();
             var useAllRateTypes = string.Equals(selectedRateType, "All", StringComparison.OrdinalIgnoreCase);
-            var activeSelectedRateType = useAllRateTypes || availableRateTypes.Contains(selectedRateType)
+            var activeSelectedRateType = !string.IsNullOrWhiteSpace(selectedRateType) && availableRateTypes.Contains(selectedRateType)
                 ? selectedRateType
                 : Rate.Types.Labor;
 
@@ -251,7 +251,9 @@ namespace Harvest.Web.Controllers
                     workerIds.Contains(a.CreatedById.Value) &&
                     a.CreatedOn >= startUtc &&
                     a.CreatedOn < endUtcExclusive &&
-                    (useAllRateTypes || a.Rate.Type == activeSelectedRateType))
+                    (useAllRateTypes
+                        ? Rate.Types.WorkerRateTypes.Contains(a.Rate.Type)
+                        : a.Rate.Type == activeSelectedRateType))
                 .OrderBy(a => a.CreatedBy.LastName)
                 .ThenBy(a => a.CreatedBy.FirstName)
                 .ThenBy(a => a.CreatedOn)
