@@ -82,7 +82,7 @@ namespace Harvest.Web.Models.ReportModels
                 Approved = expense.Approved,
                 Hours = expense.Rate != null && expense.Rate.Unit == "Hourly" ? expense.Quantity : 0,
                 NonHourlyQuantity = expense.Rate != null && expense.Rate.Unit == "Hourly" ? null : expense.Quantity,
-                NonHourlyUnit = expense.Rate != null && expense.Rate.Unit == "Hourly" ? string.Empty : expense.Rate.Unit
+                NonHourlyUnit = expense.Rate != null && expense.Rate.Unit != "Hourly" ? expense.Rate.Unit : string.Empty
             };
         }
     }
