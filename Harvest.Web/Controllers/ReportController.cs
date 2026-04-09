@@ -222,11 +222,12 @@ namespace Harvest.Web.Controllers
 
             if (!isFieldManager)
             {
+                //FM see all so even though workers can have field managers, but this will not get hit if they are a field manager, so we don't need to worry about accidentally including extra workers for field managers here
                 workerPermissionsQuery = workerPermissionsQuery.Where(a =>
                     a.Parents.Any(p =>
                         p.UserId == currentUser.Id &&
                         p.TeamId == team.Id &&
-                        (p.Role.Name == Role.Codes.Supervisor || p.Role.Name == Role.Codes.FieldManager)));
+                        p.Role.Name == Role.Codes.Supervisor ));
             }
 
             var workerIds = await workerPermissionsQuery
