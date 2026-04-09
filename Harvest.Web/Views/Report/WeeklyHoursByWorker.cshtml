@@ -14,7 +14,7 @@
             <div class="row">
                 <div class="form-group col-sm-6 col-md-4 col-lg-3">
                     <label asp-for="SelectedDate" class="control-label"></label>
-                    <input id="selectedDate" asp-for="SelectedDate" type="date" class="form-control" />
+                    <input asp-for="SelectedDate" type="date" class="form-control" />
                     <small class="form-text text-muted">Pick any day and the report will use that full Pacific Time week, Monday through Sunday.</small>
                     <small id="selectedDateRangePreview" class="form-text text-muted">
                         Report week: @Model.Start.ToString("MMM d, yyyy") - @Model.End.ToString("MMM d, yyyy") (Pacific Time)
@@ -131,7 +131,7 @@
     <script type="text/javascript">
         var reportDateRange = '@($"{Model.Start:yyyyMMdd}-to-{Model.End:yyyyMMdd}")';
         var reportFileName = 'WeeklyHoursByWorker(' + reportDateRange + ')';
-        var selectedDateInput = document.getElementById('selectedDate');
+        var selectedDateInput = document.getElementById('SelectedDate');
         var selectedDateRangePreview = document.getElementById('selectedDateRangePreview');
 
         function parseDateInputValue(value) {
