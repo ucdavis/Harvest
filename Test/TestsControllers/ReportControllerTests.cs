@@ -34,7 +34,6 @@ namespace Test.TestsControllers
             ControllerReflection.ControllerInherits("SuperController");
             ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
             ControllerReflection.ClassExpectedAttribute<AutoValidateAntiforgeryTokenAttribute>(2);
-            ControllerReflection.ClassExpectedAttribute<ControllerAttribute>(2);
         }
 
         [Fact]
