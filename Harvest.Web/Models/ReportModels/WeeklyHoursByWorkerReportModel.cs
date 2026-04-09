@@ -72,7 +72,9 @@ namespace Harvest.Web.Models.ReportModels
             return expense => new WeeklyHoursByWorkerRowModel
             {
                 WorkerId = expense.CreatedById.HasValue ? expense.CreatedById.Value : 0,
-                WorkerName = expense.CreatedBy != null ? expense.CreatedBy.Name : string.Empty,
+                WorkerName = expense.CreatedBy != null
+                    ? ((expense.CreatedBy.FirstName ?? string.Empty) + " " + (expense.CreatedBy.LastName ?? string.Empty)).Trim()
+                    : string.Empty,
                 EnteredOnLocal = expense.CreatedOn,
                 ProjectId = expense.ProjectId,
                 ProjectName = expense.Project != null ? expense.Project.Name : string.Empty,
