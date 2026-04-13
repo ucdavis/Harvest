@@ -8,9 +8,18 @@ import { FileUpload } from "../Shared/FileUpload";
 import { SearchPerson } from "./SearchPerson";
 import { Crops } from "./Crops";
 import { requestSchema } from "../schemas";
-import { Project, CropType, Team, CommonRouteParams } from "../types";
+import {
+  Project,
+  CropType,
+  Team,
+  CommonRouteParams,
+  PendingChangeRequest,
+} from "../types";
 import AppContext from "../Shared/AppContext";
-import { usePromiseNotification } from "../Util/Notifications";
+import {
+  genericErrorMessage,
+  usePromiseNotification,
+} from "../Util/Notifications";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { useIsMounted } from "../Shared/UseIsMounted";
 import { authenticatedFetch } from "../Util/Api";
@@ -37,7 +46,12 @@ export const RequestContainer = () => {
     principalInvestigator: userDetail,
   } as Project);
   const [originalProject, setOriginalProject] = useState<Project>();
-
+  const [pendingChangeRequests, setPendingChangeRequests] = useState<
+    PendingChangeRequest[]
+  >([]);
+  const [isCheckingPendingChangeRequests, setIsCheckingPendingChangeRequests] =
+    useState(projectId !== undefined);
+ 
   const {
     context,
     validateAll,
@@ -52,36 +66,60 @@ export const RequestContainer = () => {
   } = useInputValidator(requestSchema, project, validatorOptions);
 
   const [notification, setNotification] = usePromiseNotification();
+  const hasPendingChangeRequests = pendingChangeRequests.length > 0;
 
   const getIsMounted = useIsMounted();
   useEffect(() => {
     // load original request if this is a change request
     const cb = async () => {
-      const response = await authenticatedFetch(
-        `/api/${team}/Project/Get/${projectId}`
-      );
+      try {
+        setIsCheckingPendingChangeRequests(true);
 
-      if (response.ok) {
-        const proj: Project = await response.json();
+        const [response, pendingResponse] = await Promise.all([
+          authenticatedFetch(`/api/${team}/Project/Get/${projectId}`),
+          authenticatedFetch(
+            `/api/${team}/Project/GetPendingChangeRequests/${projectId}`
+          ),
+        ]);
 
-        if (getIsMounted()) {
-          setProject({
-            ...proj,
-            start: new Date(proj.start),
-            end: new Date(proj.end),
-            requirements: `Original: ${proj.requirements}`,
-          });
-          setOriginalProject(proj);
+        if (response.ok) {
+          const proj: Project = await response.json();
+
+          if (getIsMounted()) {
+            setProject({
+              ...proj,
+              start: new Date(proj.start),
+              end: new Date(proj.end),
+              requirements: `Original: ${proj.requirements}`,
+            });
+            setOriginalProject(proj);
+          }
         }
+
+        if (pendingResponse.ok) {
+          const pendingRequests: PendingChangeRequest[] =
+            await pendingResponse.json();
+          getIsMounted() && setPendingChangeRequests(pendingRequests);
+        } else {
+          getIsMounted() && setPendingChangeRequests([]);
+        }
+      } finally {
+        getIsMounted() && setIsCheckingPendingChangeRequests(false);
       }
     };
 
     if (projectId !== undefined) {
       cb();
+    } else {
+      setIsCheckingPendingChangeRequests(false);
     }
   }, [projectId, getIsMounted, team]);
 
   const create = async () => {
+    if (hasPendingChangeRequests) {
+      return;
+    }
+
     // TODO: validation, loading spinner
     // create a new project
     const requestErrors = await validateAll();
@@ -99,10 +137,16 @@ export const RequestContainer = () => {
       setNotification(
         request,
         `Creating Request For ${project.principalInvestigator.name}`,
-        `Request Created For ${project.principalInvestigator.name}`
+        `Request Created For ${project.principalInvestigator.name}`,
+        async (error) => (await error.text()) || genericErrorMessage
       );
     } else {
-      setNotification(request, "Creating Request", "Request Created");
+      setNotification(
+        request,
+        "Creating Request",
+        "Request Created",
+        async (error) => (await error.text()) || genericErrorMessage
+      );
     }
 
     const response = await request;
@@ -132,8 +176,11 @@ export const RequestContainer = () => {
     return project.start && project.end && project.crop && project.requirements;
   }, [project.start, project.end, project.crop, project.requirements]);
 
-  if (projectId !== undefined && project.id === 0) {
-    // if we have a project id but it hasn't loaded yet, wait
+  if (
+    projectId !== undefined &&
+    (project.id === 0 || isCheckingPendingChangeRequests)
+  ) {
+    // if we have a project id but it or the related request check hasn't loaded yet, wait
     return <div>Loading...</div>;
   }
 
@@ -352,6 +399,26 @@ export const RequestContainer = () => {
                 />
                 <InputErrorMessage name="requirements" />
               </FormGroup>
+              {projectId && hasPendingChangeRequests && (
+                <div className="alert alert-danger" role="alert">
+                  <strong>
+                    Another active change request already exists for this
+                    project.
+                  </strong>{" "}
+                  Only one change request can be created at a time. Please open
+                  the existing change request below instead of creating a new
+                  one.
+                  <ul className="mb-0 mt-2">
+                    {pendingChangeRequests.map((request) => (
+                      <li key={request.id}>
+                        <Link to={`/${team}/project/details/${request.id}`}>
+                          View change request #{request.id}: {request.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
               <div className="row justify-content-center">
                 <Button
                   id="Request-Button"
@@ -361,6 +428,8 @@ export const RequestContainer = () => {
                   disabled={
                     !isFilledIn ||
                     notification.pending ||
+                    isCheckingPendingChangeRequests ||
+                    hasPendingChangeRequests ||
                     formErrorCount > 0 ||
                     !formIsDirty
                   }

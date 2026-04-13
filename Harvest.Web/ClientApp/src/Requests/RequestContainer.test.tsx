@@ -1,7 +1,7 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MemoryRouter, Route } from "react-router-dom";
-import { act } from "react-dom/test-utils";
+import { act, Simulate } from "react-dom/test-utils";
 
 import { RequestContainer } from "./RequestContainer";
 import { fakeAppContext, fakeCrops, fakeProject } from "../Test/mockData";
@@ -29,13 +29,21 @@ beforeEach(() => {
     json: () => Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
   });
 
+  const pendingChangeRequestsResponse = Promise.resolve({
+    status: 200,
+    ok: true,
+    json: () => Promise.resolve([]),
+  });
+
   (global as any).Harvest = fakeAppContext;
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
   global.fetch = jest.fn().mockImplementation((x) =>
     responseMap(x, {
-      "/api/team1/Project": projectResponse,
+      "/api/team1/Project/GetPendingChangeRequests/":
+        pendingChangeRequestsResponse,
+      "/api/team1/Project/Get/": projectResponse,
       "/api/File/": fileResponse,
       "/api/Crop": cropResponse,
     })
@@ -119,6 +127,75 @@ describe("Request Container", () => {
     expect(cropType?.innerHTML).toContain("");
     expect(vegetable?.textContent).toContain("");
     expect(PI[1]?.value).toContain("");
+    expect(button).toContainHTML("disabled=");
+  });
+
+  it("Shows a warning and keeps create change request disabled when one already exists", async () => {
+    const pendingChangeRequestsResponse = Promise.resolve({
+      status: 200,
+      ok: true,
+      json: () =>
+        Promise.resolve([
+          {
+            id: 42,
+            status: "ChangeRequested",
+            name: "Tomato Update",
+          },
+        ]),
+    });
+
+    global.fetch = jest.fn().mockImplementation((x) =>
+      responseMap(x, {
+        "/api/team1/Project/GetPendingChangeRequests/":
+          pendingChangeRequestsResponse,
+        "/api/team1/Project/Get/": Promise.resolve({
+          status: 200,
+          ok: true,
+          json: () => Promise.resolve(fakeProject),
+        }),
+        "/api/File/": Promise.resolve({
+          status: 200,
+          ok: true,
+          text: () => Promise.resolve("file 1"),
+        }),
+        "/api/Crop": Promise.resolve({
+          status: 200,
+          ok: true,
+          json: () =>
+            Promise.resolve(fakeCrops.filter((c) => c.type === "Row")),
+        }),
+      })
+    );
+
+    await act(async () => {
+      render(
+        <MemoryRouter initialEntries={["team1/request/create/3"]}>
+          <Route path=":team/request/create/:projectId?">
+            <RequestContainer />
+          </Route>
+        </MemoryRouter>,
+        container
+      );
+    });
+
+    const requirements = container.querySelector(
+      "#requirements"
+    ) as HTMLInputElement;
+
+    await act(async () => {
+      Simulate.change(requirements, {
+        target: { value: "Updated requirements" } as unknown as EventTarget,
+      });
+    });
+
+    const button = container.querySelector("#Request-Button");
+    const warning = container.querySelector(".alert.alert-danger");
+
+    expect(warning?.textContent).toContain(
+      "Only one change request can be created at a time"
+    );
+    expect(warning?.textContent).toContain("Tomato Update");
+    expect(warning?.textContent).toContain("View change request #42");
     expect(button).toContainHTML("disabled=");
   });
 });
