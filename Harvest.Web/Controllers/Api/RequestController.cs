@@ -481,6 +481,21 @@ namespace Harvest.Web.Controllers.Api
                     }
                 }
 
+                var existingChangeRequestIds = await _dbContext.Projects
+                    .Where(a =>
+                        a.Team.Slug == TeamSlug &&
+                        a.OriginalProjectId == project.Id &&
+                        a.IsActive &&
+                        Project.Statuses.OpenChangeRequestStatuses.Contains(a.Status))
+                    .Select(a => a.Id)
+                    .ToListAsync();
+
+                if (existingChangeRequestIds.Any())
+                {
+                    return BadRequest(
+                        $"Only one active change request can be created at a time for project {project.Id}. Existing change request ID(s): {string.Join(", ", existingChangeRequestIds)}.");
+                }
+
                 changeRequest = true;
                 newProject.UpdateStatus(Project.Statuses.ChangeRequested);
                 newProject.OriginalProjectId = project.Id;

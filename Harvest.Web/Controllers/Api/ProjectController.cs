@@ -186,8 +186,14 @@ namespace Harvest.Web.Controllers.Api
         [HttpGet]
         public async Task<ActionResult> GetPendingChangeRequests(int projectId)
         {
-
-            var projects = await _dbContext.Projects.Where(a => a.Team.Slug == TeamSlug && a.OriginalProjectId == projectId && a.IsActive && (a.Status == Project.Statuses.PendingApproval || a.Status == Project.Statuses.ChangeRequested || a.Status == Project.Statuses.QuoteRejected)).Select(ProjectChangeRequestModel.Projection()).ToListAsync();
+            var projects = await _dbContext.Projects
+                .Where(a =>
+                    a.Team.Slug == TeamSlug &&
+                    a.OriginalProjectId == projectId &&
+                    a.IsActive &&
+                    Project.Statuses.OpenChangeRequestStatuses.Contains(a.Status))
+                .Select(ProjectChangeRequestModel.Projection())
+                .ToListAsync();
             return Ok(projects);
         }
 

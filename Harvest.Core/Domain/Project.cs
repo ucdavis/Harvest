@@ -223,6 +223,13 @@ namespace Harvest.Core.Domain
             public const string Canceled = "Canceled";
             public const string ChangeApplied = "ChangeApplied"; //Change Request was approved and applied, this is no longer an active project.
 
+            public static readonly IReadOnlyList<string> OpenChangeRequestStatuses = new[]
+            {
+                PendingApproval,
+                ChangeRequested,
+                QuoteRejected,
+            };
+
             public static List<string> TypeList = new List<string>
             {
                 Requested,
