@@ -51,7 +51,7 @@ export const RequestContainer = () => {
   >([]);
   const [isCheckingPendingChangeRequests, setIsCheckingPendingChangeRequests] =
     useState(projectId !== undefined);
- 
+
   const {
     context,
     validateAll,
@@ -401,14 +401,31 @@ export const RequestContainer = () => {
               </FormGroup>
               {projectId && hasPendingChangeRequests && (
                 <div className="alert alert-danger" role="alert">
-                  <strong>
-                    Another active change request already exists for this
-                    project.
-                  </strong>{" "}
-                  Only one change request can be created at a time. Please open
-                  the existing change request below instead of creating a new
-                  one.
-                  <ul className="mb-0 mt-2">
+                  <p className="mb-2">
+                    <strong>
+                      Another active change request already exists for this
+                      project.
+                    </strong>
+                  </p>
+                  <p className="mb-2">
+                    Only one change request can be created at a time. Please
+                    open the existing change request below instead of creating a
+                    new one.
+                  </p>
+                  <p className="mb-2">
+                    If a quote for this change is rejected, let the Field
+                    Manager know to cancel the pending change request and you
+                    can create a new one.
+                  </p>
+                  <p className="mb-2">
+                    If the quote has been created, either approve or reject the
+                    change request to proceed.
+                  </p>
+                  <p className="mb-2">
+                    If you need to change the end date, that will need a new
+                    change request once the current one is resolved.
+                  </p>
+                  <ul className="mb-0">
                     {pendingChangeRequests.map((request) => (
                       <li key={request.id}>
                         <Link to={`/${team}/project/details/${request.id}`}>
