@@ -263,7 +263,8 @@ export const WorkItemsForm = (props: WorkItemsFormProps) => {
             <div className="col-2 col-md-2">
               <label id="markupLabel">Markup</label>
               <UncontrolledTooltip placement="right" target="markupLabel">
-                Adds a 20% parts markup to the total price
+                Adds a 20% markup on the first $1,000 of this expense, up to
+                $200 maximum
               </UncontrolledTooltip>
             </div>
           </>

@@ -5,6 +5,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -107,6 +108,8 @@ namespace Harvest.Web.Controllers.Api
         [HttpPost]
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
         {
+            ExpenseCalculations.NormalizeQuoteDetail(quoteDetail);
+
             // only FM is allowed to submit a quote, anyone with access can save
             if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
             {

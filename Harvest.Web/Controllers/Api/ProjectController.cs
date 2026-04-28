@@ -5,6 +5,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Harvest.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -491,12 +492,16 @@ namespace Harvest.Web.Controllers.Api
                 var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
                 foreach (var expense in postModel.Expenses)
                 {
+                    var rate = allRates.Single(a => a.Id == expense.RateId);
                     expense.CreatedBy = currentUser;
                     expense.CreatedOn = DateTime.UtcNow;
                     expense.Project = newProject;
                     expense.InvoiceId = null;
-                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    expense.Account = rate.Account;
+                    expense.Price = rate.Price;
+                    expense.Type = rate.Type;
+                    expense.Total = ExpenseCalculations.CalculateExpenseTotal(rate.Price, expense.Quantity, expense.Markup);
+                    expense.IsPassthrough = rate.IsPassthrough;
 
                     expense.Approved = true;
                     expense.ApprovedOn = DateTime.UtcNow;
@@ -509,6 +514,9 @@ namespace Harvest.Web.Controllers.Api
 
                 await _dbContext.Projects.AddAsync(newProject);
                 await _dbContext.SaveChangesAsync();
+
+                ExpenseCalculations.NormalizeQuoteDetail(postModel.Quote);
+                newProject.QuoteTotal = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
 
                 var quote = new Quote();
                 quote.InitiatedById = currentUser.Id;

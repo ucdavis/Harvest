@@ -6,6 +6,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -53,10 +54,6 @@ namespace Harvest.Web.Controllers.Api
                     return BadRequest($"Rate with ID of {expense.RateId} is not valid.");
                 }
 
-                //expense.Markup is 20% when true so rate.Price * 1.2
-
-                var markupPrice = expense.Markup ? rate.Price * 1.2m : rate.Price;
-
                 expense.CreatedBy = user;
                 expense.CreatedOn = DateTime.UtcNow;
                 expense.ProjectId = projectId;
@@ -64,7 +61,7 @@ namespace Harvest.Web.Controllers.Api
                 expense.Account = rate.Account;
                 expense.Price = rate.Price;
                 expense.Type = rate.Type;
-                expense.Total = Math.Round(markupPrice * expense.Quantity, 2, MidpointRounding.AwayFromZero); //was MidpointRounding.ToZero
+                expense.Total = ExpenseCalculations.CalculateExpenseTotal(rate.Price, expense.Quantity, expense.Markup);
                 expense.IsPassthrough = rate.IsPassthrough;
                 if (autoApprove)
                 {
@@ -184,11 +181,13 @@ namespace Harvest.Web.Controllers.Api
             existingExpense.Markup = expense.Markup;
             //existingExpense.Rate = expense.Rate; Do not set this as it is a null value in the posted object, ends up deleting the expense.
             existingExpense.RateId = expense.RateId;
-            existingExpense.Price = expense.Price;
-            existingExpense.Total = expense.Total;
+            var existingRate = allRates.Single(a => a.Id == expense.RateId);
+            existingExpense.Price = existingRate.Price;
+            existingExpense.Type = existingRate.Type;
+            existingExpense.Total = ExpenseCalculations.CalculateExpenseTotal(existingRate.Price, expense.Quantity, expense.Markup);
             existingExpense.CreatedOn = DateTime.UtcNow;
-            existingExpense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-            existingExpense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+            existingExpense.Account = existingRate.Account;
+            existingExpense.IsPassthrough = existingRate.IsPassthrough;
             if (existingExpense.Total <= 0)
             {
                 return BadRequest("Maybe the expense was removed. Can't do that.");
@@ -198,12 +197,16 @@ namespace Harvest.Web.Controllers.Api
             var newExpenses = expenses.Where(e => e.Id == 0).ToList();
             foreach (var newExpense in newExpenses)
             {
+                var newRate = allRates.Single(a => a.Id == newExpense.RateId);
                 newExpense.CreatedBy = existingExpense.CreatedBy;
                 newExpense.CreatedOn = DateTime.UtcNow;
                 newExpense.ProjectId = projectId;
                 newExpense.InvoiceId = null;
-                newExpense.Account = allRates.Single(a => a.Id == newExpense.RateId).Account;
-                newExpense.IsPassthrough = allRates.Single(a => a.Id == newExpense.RateId).IsPassthrough;
+                newExpense.Account = newRate.Account;
+                newExpense.Price = newRate.Price;
+                newExpense.Type = newRate.Type;
+                newExpense.Total = ExpenseCalculations.CalculateExpenseTotal(newRate.Price, newExpense.Quantity, newExpense.Markup);
+                newExpense.IsPassthrough = newRate.IsPassthrough;
 
                 ////Ok, new expenses are being created with an edit here, so we need to make sure 
                 //if (isFieldManager)
@@ -214,10 +217,6 @@ namespace Harvest.Web.Controllers.Api
                 //}
 
             }
-
-            //if markup is true, price is rate.Price * 1.2
-            //But we don't have to deal with it here because we are using the client side total
-
             if (newExpenses.Count > 0)
             {
                 _dbContext.Expenses.AddRange(newExpenses);
