@@ -45,11 +45,13 @@ namespace Harvest.Web.Controllers.Api
 
             var user = await _userService.GetCurrentUser();
             var autoApprove = await _userService.HasAnyTeamRoles(TeamSlug, new[] { Role.Codes.FieldManager });
-            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            var allRates = await _dbContext.Rates
+                .Where(a => a.IsActive && a.TeamId == project.TeamId)
+                .ToListAsync();
             foreach (var expense in expenses)
             {
                 var rate = allRates.SingleOrDefault(a => a.Id == expense.RateId);
-                if(rate == null)
+                if (rate == null)
                 {
                     return BadRequest($"Rate with ID of {expense.RateId} is not valid.");
                 }
@@ -160,7 +162,9 @@ namespace Harvest.Web.Controllers.Api
                 return BadRequest("Cannot edit an expense that has been billed.");
             }
 
-            var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+            var allRates = await _dbContext.Rates
+                .Where(a => a.IsActive && a.TeamId == project.TeamId)
+                .ToListAsync();
 
             if (!isFieldManager)
             {
@@ -222,7 +226,7 @@ namespace Harvest.Web.Controllers.Api
                 _dbContext.Expenses.AddRange(newExpenses);
                 await _historyService.ExpensesCreated(projectId, newExpenses); //TODO: Change to edited?
             }
-            
+
 
             await _dbContext.SaveChangesAsync();
 
@@ -241,7 +245,7 @@ namespace Harvest.Web.Controllers.Api
                 return NotFound();
             }
 
-            if(expense.InvoiceId != null)
+            if (expense.InvoiceId != null)
             {
                 return BadRequest("Cannot delete an expense that has been billed.");
             }
