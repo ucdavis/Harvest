@@ -1,14 +1,28 @@
 import { WorkItem } from "../types";
 
+export const expenseMarkupRate = 0.2;
+export const expenseMarkupCap = 1000;
+
+export const calculateMarkupAmount = (
+  baseTotal: number,
+  applyMarkup: boolean
+) => {
+  if (!applyMarkup || baseTotal <= 0) {
+    return 0;
+  }
+
+  return roundToTwo(Math.min(baseTotal, expenseMarkupCap) * expenseMarkupRate);
+};
+
 export const calculateAdjustedTotal = (
   workItem: WorkItem,
   adjustment: number
 ) => {
-  const markup = workItem.markup ? 1.2 : 1;
-  return (
-    (workItem.rate + (workItem.rate * adjustment) / 100.0) *
-    workItem.quantity *
-    markup
+  const baseTotal =
+    (workItem.rate + (workItem.rate * adjustment) / 100.0) * workItem.quantity;
+
+  return roundToTwo(
+    baseTotal + calculateMarkupAmount(baseTotal, workItem.markup)
   );
 };
 

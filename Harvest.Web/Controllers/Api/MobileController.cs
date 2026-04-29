@@ -3,6 +3,7 @@ using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Harvest.Web.Models.MobileModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -332,9 +333,6 @@ namespace Harvest.Web.Controllers.Api
                 {
                     var rate = allRates.Single(a => a.Id == expense.RateId);
 
-                    var markupPrice = expense.Markup ? rate.Price * 1.2m : rate.Price;
-                    //TODO: Mobile needs to send the markup flag for Other rates.
-
                     expense.Approved = false; //Don't trust what we pass, or use a model instead?
                     expense.ApprovedById = null;
                     expense.ApprovedOn = null;
@@ -347,7 +345,7 @@ namespace Harvest.Web.Controllers.Api
                     expense.Account = rate.Account;
                     expense.Price = rate.Price;
                     expense.Type = rate.Type;
-                    expense.Total = Math.Round(markupPrice * expense.Quantity, 2, MidpointRounding.AwayFromZero); //was MidpointRounding.ToZero
+                    expense.Total = ExpenseCalculations.CalculateExpenseTotal(rate.Price, expense.Quantity, expense.Markup);
                     expense.IsPassthrough = rate.IsPassthrough;
                     if (autoApprove)
                     {

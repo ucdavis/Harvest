@@ -5,6 +5,7 @@ using Harvest.Core.Data;
 using Harvest.Core.Domain;
 using Harvest.Core.Models;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -70,14 +71,14 @@ namespace Harvest.Web.Controllers.Api
             }
             else
             {
-                if(!hasAccess && project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id))
+                if (!hasAccess && project.PrincipalInvestigator.Id != user.Id && !project.ProjectPermissions.Any(a => a.User.Id == user.Id))
                 {
                     //return not authorized
                     return Unauthorized();
                 }
             }
 
-            
+
 
             var model = new QuoteModel
             {
@@ -90,11 +91,11 @@ namespace Harvest.Web.Controllers.Api
                 model.Quote.ApprovedOn = project.Quote?.ApprovedOn;
             }
 
-            if(project.QuoteId == null && project.OriginalProjectId != null)
+            if (project.QuoteId == null && project.OriginalProjectId != null)
             {
                 // Ok, we want to try to view the pending change request's quote.
                 var newQuote = await _dbContext.Quotes.SingleOrDefaultAsync(q => q.ProjectId == project.Id);
-                if(newQuote != null)
+                if (newQuote != null)
                 {
                     model.Quote = QuoteDetail.Deserialize(newQuote.Text);
                 }
@@ -107,11 +108,18 @@ namespace Harvest.Web.Controllers.Api
         [HttpPost]
         public async Task<ActionResult> Save(int projectId, bool submit, [FromBody] QuoteDetail quoteDetail)
         {
+            if (quoteDetail == null)
+            {
+                return BadRequest("Malformed payload: quote is required.");
+            }
+
             // only FM is allowed to submit a quote, anyone with access can save
             if (submit && !await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
             {
                 return Unauthorized();
             }
+
+            ExpenseCalculations.NormalizeQuoteDetail(quoteDetail);
 
 
             // Use existing quote if it exists, otherwise create new one
@@ -144,7 +152,7 @@ namespace Harvest.Web.Controllers.Api
             else
             {
                 await _historyService.QuoteSaved(projectId, quote);
-                if(!await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
+                if (!await _userService.HasAccess(AccessCodes.FieldManagerAccess, TeamSlug))
                 {
                     await _emailService.SupervisorSavedQuote(project, quote);
                 }

@@ -5,6 +5,7 @@ using Harvest.Core.Models;
 using Harvest.Core.Models.ProjectModels;
 using Harvest.Core.Models.Settings;
 using Harvest.Core.Services;
+using Harvest.Core.Utilities;
 using Harvest.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -146,7 +147,7 @@ namespace Harvest.Web.Controllers.Api
         [Route("/api/{team}/Project/Get/{projectId}/{shareId?}")]
         [Authorize(Policy = AccessCodes.InvoiceAccess)] //PI, Finance, Field Manager, Supervisor -- Don't really know a better name for this access (Maybe ProjectViewAccess?)        
         public async Task<ActionResult> Get(int projectId, Guid? shareId = null)
-        {            
+        {
             var user = await _userService.GetCurrentUser();
             var project = await _dbContext.Projects
                 .Include(a => a.Team)
@@ -169,7 +170,7 @@ namespace Harvest.Web.Controllers.Api
                 file.SasLink = _fileService.GetDownloadUrl(_storageSettings.ContainerName, file.Identifier).AbsoluteUri;
             }
 
-            if(shareId != null && project.ShareId != shareId)
+            if (shareId != null && project.ShareId != shareId)
             {
                 return BadRequest("share id invalid");
             }
@@ -256,13 +257,13 @@ namespace Harvest.Web.Controllers.Api
             {
                 return BadRequest("You are not the PI of this project or an editor of the project.");
             }
-            
+
             if (project.ProjectPermissions.Any(a => a.User?.Iam == postModel.User.Iam) || project.PrincipalInvestigator.Iam == postModel.User.Iam)
             {
                 return BadRequest("User already has a permission for this project.");
             }
 
-            if(postModel.Permission != Role.Codes.ProjectEditor && postModel.Permission != Role.Codes.ProjectViewer)
+            if (postModel.Permission != Role.Codes.ProjectEditor && postModel.Permission != Role.Codes.ProjectViewer)
             {
                 return BadRequest("Invalid permission type. Only Project Editor and Project Viewer are allowed.");
             }
@@ -272,7 +273,7 @@ namespace Harvest.Web.Controllers.Api
                 ProjectId = projectId,
                 Permission = postModel.Permission,
             };
-            
+
 
             //// create user if needed and assign to project
             var permissionUser = await _dbContext.Users.SingleOrDefaultAsync(x => x.Iam == postModel.User.Iam);
@@ -319,7 +320,7 @@ namespace Harvest.Web.Controllers.Api
             {
                 return NotFound("Permission not found.");
             }
-            if(permissionToRemove.User.Iam == user.Iam)
+            if (permissionToRemove.User.Iam == user.Iam)
             {
                 return BadRequest("You cannot remove your own permission from the project. Please contact the PI or another" +
                     " project editor to do this.");
@@ -328,10 +329,10 @@ namespace Harvest.Web.Controllers.Api
             await _historyService.AdhocHistory(projectId, "ProjectPermissionRemoved", $"Project Permission Removed:\n{permissionToRemove.User.Name}({permissionToRemove.User.Email}) with permission: {permissionToRemove.Permission.SplitCamelCase()}", project, true);
             _dbContext.ProjectPermissions.Remove(permissionToRemove);
 
-            
+
 
             await _dbContext.SaveChangesAsync();
-            
+
             return Ok();
         }
 
@@ -480,7 +481,7 @@ namespace Harvest.Web.Controllers.Api
                     {
                         return BadRequest("Negative Percentage Detected");
                     }
-                    newProject.Accounts.Add(account); 
+                    newProject.Accounts.Add(account);
                 }
 
                 if (percentage != 100.0m)
@@ -488,15 +489,26 @@ namespace Harvest.Web.Controllers.Api
                     return BadRequest("Percentage of accounts is not 100%");
                 }
 
-                var allRates = await _dbContext.Rates.Where(a => a.IsActive).ToListAsync();
+                var allRates = await _dbContext.Rates
+                    .Where(a => a.IsActive && a.TeamId == team.Id)
+                    .ToListAsync();
                 foreach (var expense in postModel.Expenses)
                 {
+                    var rate = allRates.SingleOrDefault(a => a.Id == expense.RateId);
+                    if (rate == null)
+                    {
+                        return BadRequest($"Rate with ID of {expense.RateId} is not valid.");
+                    }
+
                     expense.CreatedBy = currentUser;
                     expense.CreatedOn = DateTime.UtcNow;
                     expense.Project = newProject;
                     expense.InvoiceId = null;
-                    expense.Account = allRates.Single(a => a.Id == expense.RateId).Account;
-                    expense.IsPassthrough = allRates.Single(a => a.Id == expense.RateId).IsPassthrough;
+                    expense.Account = rate.Account;
+                    expense.Price = rate.Price;
+                    expense.Type = rate.Type;
+                    expense.Total = ExpenseCalculations.CalculateExpenseTotal(rate.Price, expense.Quantity, expense.Markup);
+                    expense.IsPassthrough = rate.IsPassthrough;
 
                     expense.Approved = true;
                     expense.ApprovedOn = DateTime.UtcNow;
@@ -509,6 +521,14 @@ namespace Harvest.Web.Controllers.Api
 
                 await _dbContext.Projects.AddAsync(newProject);
                 await _dbContext.SaveChangesAsync();
+
+                if (postModel.Quote == null)
+                {
+                    return BadRequest("Malformed payload: quote is required.");
+                }
+
+                ExpenseCalculations.NormalizeQuoteDetail(postModel.Quote);
+                newProject.QuoteTotal = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
 
                 var quote = new Quote();
                 quote.InitiatedById = currentUser.Id;
@@ -566,12 +586,12 @@ namespace Harvest.Web.Controllers.Api
             {
                 return NotFound();
             }
-            if(existingProject.Status != Project.Statuses.Requested)
+            if (existingProject.Status != Project.Statuses.Requested)
             {
                 return BadRequest("Only projects in Requested status can be overridden.");
             }
 
-            if(project.Start.Date > project.End.Date)
+            if (project.Start.Date > project.End.Date)
             {
                 return BadRequest("Project start date cannot be after end date.");
             }
@@ -589,7 +609,7 @@ namespace Harvest.Web.Controllers.Api
 
                 var historyNotes = $"Project dates overridden from {oldStart.ToShortDateString()} - {oldEnd.ToShortDateString()} to {existingProject.Start.ToShortDateString()} - {existingProject.End.ToShortDateString()}";
                 await _historyService.AdhocHistory(project.Id, "ProjectDatesOverridden", historyNotes, existingProject, true);
-                
+
             }
             await _dbContext.SaveChangesAsync();
             return Ok(existingProject);
