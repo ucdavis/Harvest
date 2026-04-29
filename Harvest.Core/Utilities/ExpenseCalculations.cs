@@ -43,38 +43,45 @@ namespace Harvest.Core.Utilities
                         continue;
                     }
 
-                    workItem.Total = CalculateWorkItemTotal(workItem, activity.Adjustment);
-                    activityTotal += (decimal)workItem.Total;
+                    var workItemTotal = CalculateWorkItemTotal(workItem, activity.Adjustment);
+                    workItem.Total = (double)workItemTotal;
+                    activityTotal += workItemTotal;
 
                     switch (workItem.Type)
                     {
                         case Rate.Types.Labor:
-                            laborTotal += (decimal)workItem.Total;
+                            laborTotal += workItemTotal;
                             break;
                         case Rate.Types.Equipment:
-                            equipmentTotal += (decimal)workItem.Total;
+                            equipmentTotal += workItemTotal;
                             break;
                         case Rate.Types.Other:
-                            otherTotal += (decimal)workItem.Total;
+                            otherTotal += workItemTotal;
                             break;
                     }
                 }
 
-                activity.Total = (double)RoundCurrency(activityTotal);
-                activitiesTotal += (decimal)activity.Total;
+                var roundedActivityTotal = RoundCurrency(activityTotal);
+                activity.Total = (double)roundedActivityTotal;
+                activitiesTotal += roundedActivityTotal;
             }
 
-            quoteDetail.AcreageTotal = (double)RoundCurrency(
+            var acreageTotal = RoundCurrency(
                 (decimal)quoteDetail.AcreageRate *
                 (decimal)quoteDetail.Acres *
                 quoteDetail.Years);
-            quoteDetail.ActivitiesTotal = (double)RoundCurrency(activitiesTotal);
-            quoteDetail.LaborTotal = (double)RoundCurrency(laborTotal);
-            quoteDetail.EquipmentTotal = (double)RoundCurrency(equipmentTotal);
-            quoteDetail.OtherTotal = (double)RoundCurrency(otherTotal);
-            quoteDetail.GrandTotal = (double)RoundCurrency(
-                (decimal)quoteDetail.AcreageTotal +
-                (decimal)quoteDetail.ActivitiesTotal);
+            var roundedActivitiesTotal = RoundCurrency(activitiesTotal);
+            var roundedLaborTotal = RoundCurrency(laborTotal);
+            var roundedEquipmentTotal = RoundCurrency(equipmentTotal);
+            var roundedOtherTotal = RoundCurrency(otherTotal);
+            var grandTotal = RoundCurrency(acreageTotal + roundedActivitiesTotal);
+
+            quoteDetail.AcreageTotal = (double)acreageTotal;
+            quoteDetail.ActivitiesTotal = (double)roundedActivitiesTotal;
+            quoteDetail.LaborTotal = (double)roundedLaborTotal;
+            quoteDetail.EquipmentTotal = (double)roundedEquipmentTotal;
+            quoteDetail.OtherTotal = (double)roundedOtherTotal;
+            quoteDetail.GrandTotal = (double)grandTotal;
         }
 
         private static decimal RoundCurrency(decimal value)
@@ -92,7 +99,7 @@ namespace Harvest.Core.Utilities
             return RoundCurrency(Math.Min(baseTotal, MarkupCap) * MarkupRate);
         }
 
-        private static double CalculateWorkItemTotal(WorkItem workItem, decimal adjustment)
+        private static decimal CalculateWorkItemTotal(WorkItem workItem, decimal adjustment)
         {
             if (workItem == null)
             {
@@ -101,7 +108,7 @@ namespace Harvest.Core.Utilities
 
             var adjustedRate = (decimal)workItem.Rate + (((decimal)workItem.Rate * adjustment) / 100m);
             var baseTotal = adjustedRate * (decimal)workItem.Quantity;
-            return (double)RoundCurrency(baseTotal + CalculateMarkupAmount(baseTotal, workItem.Markup));
+            return RoundCurrency(baseTotal + CalculateMarkupAmount(baseTotal, workItem.Markup));
         }
     }
 }
