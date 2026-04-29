@@ -11,7 +11,7 @@ export const calculateMarkupAmount = (
     return 0;
   }
 
-  return Math.min(baseTotal, expenseMarkupCap) * expenseMarkupRate;
+  return roundToTwo(Math.min(baseTotal, expenseMarkupCap) * expenseMarkupRate);
 };
 
 export const calculateAdjustedTotal = (
@@ -19,10 +19,11 @@ export const calculateAdjustedTotal = (
   adjustment: number
 ) => {
   const baseTotal =
-    (workItem.rate + (workItem.rate * adjustment) / 100.0) *
-    workItem.quantity;
+    (workItem.rate + (workItem.rate * adjustment) / 100.0) * workItem.quantity;
 
-  return baseTotal + calculateMarkupAmount(baseTotal, workItem.markup);
+  return roundToTwo(
+    baseTotal + calculateMarkupAmount(baseTotal, workItem.markup)
+  );
 };
 
 export const roundToTwo = (num: number) => {
