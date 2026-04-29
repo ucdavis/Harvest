@@ -51,10 +51,20 @@ namespace Harvest.Core.Utilities
 
             foreach (var activity in quoteDetail.Activities ?? Array.Empty<Activity>())
             {
+                if (activity == null)
+                {
+                    continue;
+                }
+
                 decimal activityTotal = 0;
 
                 foreach (var workItem in activity.WorkItems ?? Array.Empty<WorkItem>())
                 {
+                    if (workItem == null)
+                    {
+                        continue;
+                    }
+
                     workItem.Total = CalculateWorkItemTotal(workItem, activity.Adjustment);
                     activityTotal += (decimal)workItem.Total;
 
