@@ -522,6 +522,11 @@ namespace Harvest.Web.Controllers.Api
                 await _dbContext.Projects.AddAsync(newProject);
                 await _dbContext.SaveChangesAsync();
 
+                if (postModel.Quote == null)
+                {
+                    return BadRequest("Malformed payload: quote is required.");
+                }
+
                 ExpenseCalculations.NormalizeQuoteDetail(postModel.Quote);
                 newProject.QuoteTotal = (decimal)Math.Round(postModel.Quote.GrandTotal, 2);
 
