@@ -9,32 +9,10 @@ namespace Harvest.Core.Utilities
         public const decimal MarkupRate = 0.20m;
         public const decimal MarkupCap = 1000m;
 
-        public static decimal CalculateMarkupAmount(decimal baseTotal, bool applyMarkup)
-        {
-            if (!applyMarkup || baseTotal <= 0)
-            {
-                return 0;
-            }
-
-            return RoundCurrency(Math.Min(baseTotal, MarkupCap) * MarkupRate);
-        }
-
         public static decimal CalculateExpenseTotal(decimal rate, decimal quantity, bool applyMarkup)
         {
             var baseTotal = rate * quantity;
             return RoundCurrency(baseTotal + CalculateMarkupAmount(baseTotal, applyMarkup));
-        }
-
-        public static double CalculateWorkItemTotal(WorkItem workItem, decimal adjustment)
-        {
-            if (workItem == null)
-            {
-                throw new ArgumentNullException(nameof(workItem));
-            }
-
-            var adjustedRate = (decimal)workItem.Rate + (((decimal)workItem.Rate * adjustment) / 100m);
-            var baseTotal = adjustedRate * (decimal)workItem.Quantity;
-            return (double)RoundCurrency(baseTotal + CalculateMarkupAmount(baseTotal, workItem.Markup));
         }
 
         public static void NormalizeQuoteDetail(QuoteDetail quoteDetail)
@@ -102,6 +80,28 @@ namespace Harvest.Core.Utilities
         private static decimal RoundCurrency(decimal value)
         {
             return Math.Round(value, 2, MidpointRounding.AwayFromZero);
+        }
+
+        private static decimal CalculateMarkupAmount(decimal baseTotal, bool applyMarkup)
+        {
+            if (!applyMarkup || baseTotal <= 0)
+            {
+                return 0;
+            }
+
+            return RoundCurrency(Math.Min(baseTotal, MarkupCap) * MarkupRate);
+        }
+
+        private static double CalculateWorkItemTotal(WorkItem workItem, decimal adjustment)
+        {
+            if (workItem == null)
+            {
+                throw new ArgumentNullException(nameof(workItem));
+            }
+
+            var adjustedRate = (decimal)workItem.Rate + (((decimal)workItem.Rate * adjustment) / 100m);
+            var baseTotal = adjustedRate * (decimal)workItem.Quantity;
+            return (double)RoundCurrency(baseTotal + CalculateMarkupAmount(baseTotal, workItem.Markup));
         }
     }
 }
