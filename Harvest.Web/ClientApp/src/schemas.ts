@@ -31,9 +31,15 @@ export const fileSchema: SchemaOf<BlobFile> = yup.object().shape({
 export const requestSchema = yup.object().shape({
   id: yup.number().required(),
   start: requiredDateSchema,
-  end: requiredDateSchema.when("start", (start, yup) =>
-    yup.min(addDays(start, 1), ErrorMessages.EndDateAfterStartDate)
-  ),
+  end: requiredDateSchema
+    .when("start", (start, yup) =>
+      yup.min(addDays(start, 1), ErrorMessages.EndDateAfterStartDate)
+    )
+    .test(
+      "endDateAtLeastOneWeekAway",
+      ErrorMessages.EndDateAtLeastOneWeekAway,
+      (end) => !end || end >= addDays(new Date(), 7)
+    ),
   crop: yup.string().required(),
   cropType: yup.string().required(),
   requirements: yup.string().required(),
