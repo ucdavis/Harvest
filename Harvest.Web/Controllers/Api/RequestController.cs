@@ -434,6 +434,11 @@ namespace Harvest.Web.Controllers.Api
         [Route("/api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Create([FromBody] Project project)
         {
+            if (project.End.ToPacificTime().Date < DateTime.UtcNow.ToPacificTime().Date.AddDays(7))
+            {
+                return BadRequest("End date must be at least one week in the future.");
+            }
+
             var currentUser = await _userService.GetCurrentUser();
             var changeRequest = false;
 
@@ -499,6 +504,7 @@ namespace Harvest.Web.Controllers.Api
                 changeRequest = true;
                 newProject.UpdateStatus(Project.Statuses.ChangeRequested);
                 newProject.OriginalProjectId = project.Id;
+                newProject.Start = existingProject.Start;
                 newProject.Acres = project.Acres;
 
                 newProject.Name = $"{existingProject.Name} (Change Request)";
