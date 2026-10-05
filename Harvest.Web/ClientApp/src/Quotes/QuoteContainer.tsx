@@ -16,6 +16,8 @@ import { ProjectDetail } from "./ProjectDetail";
 import { ProjectHeader } from "../Shared/ProjectHeader";
 import { ActivitiesContainer } from "./ActivitiesContainer";
 import { QuoteTotals } from "./QuoteTotals";
+import { MapEditWidget } from "../Maps/MapEditWidget";
+import { MapSketchWidget } from "../Maps/MapSketchWidget";
 
 import { authenticatedFetch } from "../Util/Api";
 import { usePromiseNotification } from "../Util/Notifications";
@@ -26,6 +28,7 @@ import { useIsMounted } from "../Shared/UseIsMounted";
 import { ShowFor } from "../Shared/ShowFor";
 import { validatorOptions } from "../constants";
 import { Button } from "reactstrap";
+import { MapEditReactState } from "../Maps/MapEditReactState";
 
 export const QuoteContainer = () => {
   const history = useHistory();
@@ -256,14 +259,14 @@ export const QuoteContainer = () => {
   // TODO: we might want to move this all into a separate component
   if (editFields) {
     return (
-      <div>
-        <div className="card-wrapper">
+      <div className="fullHeightWidth">
+        <div className="card-wrapper fullHeightWidth">
           <ProjectHeader
             project={project}
             title={"Field Request #" + (project?.id || "")}
           ></ProjectHeader>
 
-          <div className="card-green-bg">
+          <div className="card-green-bg fullHeightWidth">
             <div className="card-content">
               <div className="row">
                 <div className="col-md-6">
@@ -294,14 +297,17 @@ export const QuoteContainer = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          <FieldContainer
+            <MapEditWidget />
+            {/* <MapEditReactState /> */}
+            {/* <MapSketchWidget /> */}
+            {/* <FieldContainer
             crops={cropArray}
             fields={quote.fields}
             project={project}
             updateFields={(fields) => setQuote({ ...quote, fields })}
-          ></FieldContainer>
+          ></FieldContainer> */}
+          </div>
         </div>
       </div>
     );

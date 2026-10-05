@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@arcgis/core": "^4.28.1",
     "@azure/storage-blob": "^12.14.0",
     "@david.kucsai/react-pdf-table": "^0.4.1",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
