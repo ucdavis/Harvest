@@ -225,7 +225,8 @@ export const RequestContainer = () => {
                         onChange={onChangeValue("start", (date: Date) =>
                           setProject({ ...project, start: date })
                         )}
-                        isClearable
+                        disabled={projectId !== undefined}
+                        isClearable={projectId === undefined}
                       />
                     </div>
                     <InputErrorMessage name="start" />

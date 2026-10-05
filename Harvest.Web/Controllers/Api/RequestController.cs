@@ -499,6 +499,7 @@ namespace Harvest.Web.Controllers.Api
                 changeRequest = true;
                 newProject.UpdateStatus(Project.Statuses.ChangeRequested);
                 newProject.OriginalProjectId = project.Id;
+                newProject.Start = existingProject.Start;
                 newProject.Acres = project.Acres;
 
                 newProject.Name = $"{existingProject.Name} (Change Request)";
