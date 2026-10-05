@@ -38,7 +38,12 @@ export const requestSchema = yup.object().shape({
     .test(
       "endDateAtLeastOneWeekAway",
       ErrorMessages.EndDateAtLeastOneWeekAway,
-      (end) => !end || end >= addDays(new Date(), 7)
+      (end) => {
+        const minimumEndDate = new Date();
+        minimumEndDate.setHours(0, 0, 0, 0);
+        minimumEndDate.setDate(minimumEndDate.getDate() + 7);
+        return !end || end >= minimumEndDate;
+      }
     ),
   crop: yup.string().required(),
   cropType: yup.string().required(),

@@ -434,7 +434,7 @@ namespace Harvest.Web.Controllers.Api
         [Route("/api/{team}/{controller}/{action}")]
         public async Task<ActionResult> Create([FromBody] Project project)
         {
-            if (project.End < DateTime.UtcNow.AddDays(7))
+            if (project.End.ToPacificTime().Date < DateTime.UtcNow.ToPacificTime().Date.AddDays(7))
             {
                 return BadRequest("End date must be at least one week in the future.");
             }
